@@ -22,7 +22,7 @@
 (def ui-counter (fp/factory Counter {:keyfn :counter/id}))
 
 
-(fp/defsc DoubleCounter
+(fp/defsc DoubleCounterRoot
   [this {:keys [counters]}]
   {:query [{:counters (fp/get-query Counter)}]}
   (dom/div (map ui-counter counters)))
@@ -37,7 +37,8 @@
 
 (ws/defcard double-counter-card
   (ct.fulcro/fulcro-card
-    {::f.portal/root DoubleCounter
+    {::f.portal/root DoubleCounterRoot
+     ::f.portal/wrap-root? false
 
      ::f.portal/app
      {:started-callback (fn [app] (.log js/console app))}
@@ -50,7 +51,7 @@
      {:qwer 123}}))
 
 
-(fp/defsc AddableCounter
+(fp/defsc AddableCountersRoot
   [this {:keys [counters]}]
   {:initial-state (fn [_] {:counters []})
    :query [{:counters (fp/get-query Counter)}]}
@@ -73,12 +74,13 @@
          (-> s
            (assoc-in counter-ident new-counter)
            (fm/integrate-ident* counter-ident
-                                :append [:ui/root :counters])))))))
+                                :append [:counters])))))))
 
 
 (ws/defcard addable-counter-card
     (ct.fulcro/fulcro-card
-      {::f.portal/root AddableCounter
+      {::f.portal/root AddableCountersRoot
+       ::f.portal/wrap-root? false
 
        ::f.portal/app
        {:started-callback (fn [app] (.log js/console app))}}))
