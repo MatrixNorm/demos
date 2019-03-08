@@ -49,9 +49,11 @@
      ::f.portal/root-state
      {:qwer 123}}))
 
+
 (fp/defsc AddableCounter
   [this {:keys [counters]}]
-  {:query [{:counters (fp/get-query Counter)}]}
+  {:initial-state (fn [_] {:counters []})
+   :query [{:counters (fp/get-query Counter)}]}
   (let [add-new-counter (fn []
           (fp/transact! this `[(mut-add-new-counter)]))]
     (dom/div
@@ -65,11 +67,13 @@
     (let [curr-table (:counter/by-id @state)
           max-id (reduce max 0 (keys curr-table))
           next-id (inc max-id)
-          next-table (assoc curr-table next-id {:counter/id next-id :counter/value 0})]
-      ;(.log js/console state)
-      ;(.log js/console curr-table)
-      ;(.log js/console next-table)
-      (swap! state assoc-in [:counter/by-id] next-table))))
+          new-counter {:counter/id next-id :counter/value 0}
+          counter-ident (fp/ident Counter new-counter)]
+      (swap! state (fn [s]
+         (-> s
+           (assoc-in counter-ident new-counter)
+           (fm/integrate-ident* counter-ident
+                                :append [:ui/root :counters])))))))
 
 
 (ws/defcard addable-counter-card
@@ -77,7 +81,4 @@
       {::f.portal/root AddableCounter
 
        ::f.portal/app
-       {:started-callback (fn [app] (.log js/console app))}
-
-       ::f.portal/initial-state
-       (fn [_] {:counters []})}))
+       {:started-callback (fn [app] (.log js/console app))}}))
