@@ -1,6 +1,7 @@
 (ns myapp.workspaces.chap2-getting-started-part3
   (:require [fulcro.client.primitives :as prim :refer [defsc]]
-            [fulcro.client.localized-dom :as dom]))
+            [fulcro.client.localized-dom :as dom]
+            [fulcro.client.mutations :as m]))
 
 
 (defsc Person [this {:person/keys [name age]} {:keys [onDelete]}]
@@ -25,11 +26,15 @@
              (prim/get-initial-state Person {:name "Joe" :age 22})]
             [(prim/get-initial-state Person {:name "Fred" :age 11})
              (prim/get-initial-state Person {:name "Bobby" :age 55})])})}
-  (let [delete-person (fn [name] (println label "asked to delete" name))
+  (let [delete-person (fn [name]
+                        (do
+                          (println "XXX: " this)
+                          (prim/transact! this
+                                         `[(mut-delete-person {:list-name ~label :name ~name})])))
         person->ui (fn [person]
                      (-> person
                          (prim/computed {:onDelete delete-person})
-                         ;(doto println)
+                         (doto println)
                          ui-person))]
     (dom/div
      (dom/h4 label)
@@ -49,3 +54,14 @@
   (dom/div
     (ui-person-list friends)
     (ui-person-list enemies)))
+
+
+(m/defmutation mut-delete-person [{:keys [list-name name]}]
+  (action [{:keys [state]}]
+     (let [path  (if (= "Friends" list-name)
+                    [:friends :person-list/people]
+                    [:enemies :person-list/people])
+           old-list (get-in @state path)
+           new-list (vec (filter #(not= (:person/name %) name) old-list))]
+       (println path)
+       (swap! state assoc-in path new-list))))

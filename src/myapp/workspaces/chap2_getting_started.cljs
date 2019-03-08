@@ -6,7 +6,8 @@
 
     [myapp.workspaces.chap2-getting-started-part1 :as part1]
     [myapp.workspaces.chap2-getting-started-part2 :as part2]
-    [myapp.workspaces.chap2-getting-started-part3 :as part3]))
+    [myapp.workspaces.chap2-getting-started-part3 :as part3]
+    [myapp.workspaces.chap2-getting-started-part4 :as part4]))
 
 
 (ws/defcard friends-enemies-card1
@@ -30,6 +31,14 @@
 (ws/defcard friends-enemies-card3
   (ct.fulcro/fulcro-card
     {::f.portal/root part3/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:started-callback (fn [app] (.log js/console "friends-enemies-card"))}}))
+
+(ws/defcard friends-enemies-card4
+  (ct.fulcro/fulcro-card
+    {::f.portal/root part4/Root
      ::f.portal/wrap-root? false
 
      ::f.portal/app
