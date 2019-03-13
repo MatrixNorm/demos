@@ -33,7 +33,15 @@
                                 (prim/computed {:check check
                                                 :uncheck uncheck})
                                 ui-item))]
-    (dom/ul (map item->ui items))))
+    (dom/div
+      (dom/div
+        (dom/label "Select All")
+        (dom/input {:className "toggle"
+                    :type      "checkbox"
+                    :checked   (every? #(:item/selected? %) items)
+                    :onChange (fn [_] (prim/transact! this
+                                          `[(all-items-toggle)]))}))
+      (dom/ul (map item->ui items)))))
 
 
 (pc/defresolver items [{::keys [records]} _]
@@ -44,13 +52,27 @@
   [state-map id selected?]
   (assoc-in state-map [:item/by-id id :item/selected?] selected?))
 
+(defn all-items-selected?* [state-map]
+  (every? #(:item/selected? %) (vals (:item/by-id state-map))))
+
+(defn set-all-items-selected*
+  [state-map selected?]
+  (let [reducer (fn [m k v] (assoc m k (assoc-in v [:item/selected?] selected?)))
+        make-new-map #(reduce-kv reducer {} %)]
+    (update-in state-map [:item/by-id] make-new-map)))
+
 (m/defmutation item-select [{:keys [id]}]
   (action [{:keys [state]}]
-          (swap! state set-item-selected* id true)))
+    (swap! state set-item-selected* id true)))
 
 (m/defmutation item-unselect [{:keys [id]}]
-             (action [{:keys [state]}]
-                     (swap! state set-item-selected* id false)))
+  (action [{:keys [state]}]
+    (swap! state set-item-selected* id false)))
+
+(m/defmutation all-items-toggle [_]
+  (action [{:keys [state]}]
+    (let [all-selected? (all-items-selected?* @state)]
+      (swap! state set-all-items-selected* (not all-selected?)))))
 
 (def parser
   (p/parallel-parser
