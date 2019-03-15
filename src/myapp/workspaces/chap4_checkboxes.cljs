@@ -5,6 +5,11 @@
             [com.wsscode.pathom.connect :as pc]
             [com.wsscode.pathom.core :as p]))
 
+(defn log [& x] (apply js/console.log x))
+
+;;
+;; UI
+;; =>
 
 (defsc Item [this {:keys [db/id item/text item/selected?]}
                   {:keys [check uncheck]}]
@@ -24,7 +29,15 @@
 
 (defsc Root [this {:keys [items]}]
   {:query [{:items (prim/get-query Item)}]
-   :initial-state (fn [_] {:items []})}
+   :initial-state (fn [_] {:items []})
+   :pre-merge (fn [env] (log "PRE MERGE: " env))
+   :initLocalState (fn []
+                     (set! (.-saveref this)
+                         (fn [r]
+                           (set! (.-ref this) r)
+                           (log "A: " r this)))
+                     (log "B: " (.-saveref this))
+                     {})}
   (let [check (fn [item-id]
                 (prim/transact! this `[(item-select ~{:id item-id})]))
         uncheck (fn [item-id]
@@ -40,13 +53,13 @@
                     :type      "checkbox"
                     :checked   (every? #(:item/selected? %) items)
                     :onChange (fn [_] (prim/transact! this
-                                          `[(all-items-toggle)]))}))
+                                          `[(all-items-toggle)]))
+                    :ref (.-saveref this)}))
       (dom/ul (map item->ui items)))))
 
-
-(pc/defresolver items [{::keys [records]} _]
-  {::pc/output [{:items [:db/id :item/text :item/selected?]}]}
-  {:items (vals @records)})
+;;
+;; Mutations.
+;; =>
 
 (defn set-item-selected*
   [state-map id selected?]
@@ -74,6 +87,18 @@
     (let [all-selected? (all-items-selected?* @state)]
       (swap! state set-all-items-selected* (not all-selected?)))))
 
+;;
+;; Resolvers.
+;; =>
+
+(pc/defresolver items [{::keys [database]} _]
+                {::pc/output [{:items [:db/id :item/text :item/selected?]}]}
+                {:items (vals @database)})
+
+(def database (atom {1 {:db/id 1 :item/text "Aaa" :item/selected? false}
+                     2 {:db/id 2 :item/text "Bbb" :item/selected? true}
+                     3 {:db/id 3 :item/text "Ccc" :item/selected? false}}))
+
 (def parser
   (p/parallel-parser
     {::p/env {::p/reader [p/map-reader
@@ -81,10 +106,7 @@
                           pc/open-ident-reader
                           p/env-placeholder-reader]
               ::p/placeholder-prefixes #{">"}
-              ::records
-              (atom {1 {:db/id 1 :item/text "Aaa" :item/selected? false}
-                     2 {:db/id 2 :item/text "Bbb" :item/selected? true}
-                     3 {:db/id 3 :item/text "Ccc" :item/selected? false}})}
+              ::database database}
      ::p/mutate  pc/mutate-async
      ::p/plugins [(pc/connect-plugin {::pc/register [items]})
                   p/error-handler-plugin

@@ -10,7 +10,8 @@
     [myapp.workspaces.chap2-getting-started-part2 :as part2]
     [myapp.workspaces.chap2-getting-started-part3 :as part3]
     [myapp.workspaces.chap2-getting-started-part4 :as part4]
-    [myapp.workspaces.chap4-checkboxes :as checkboxes]))
+    [myapp.workspaces.chap4-checkboxes :as chap4-checkboxes]
+    [myapp.workspaces.chap4-focus-input :as chap4-focus-input]))
 
 
 (ws/defcard friends-enemies-card1
@@ -49,17 +50,25 @@
      {:client-did-mount (fn [app] (.log js/console "friends-enemies-card4"))}}))
 
 
-(ws/defcard card5
+(ws/defcard chap4-checkboxes-card
   (ct.fulcro/fulcro-card
-    {::f.portal/root checkboxes/Root
+    {::f.portal/root chap4-checkboxes/Root
      ::f.portal/wrap-root? false
 
      ::f.portal/app
       {:client-did-mount
         (fn [app]
           (do
-            (.log js/console "chap4-checkboxes")
-            (fetch/load app :items checkboxes/Item)))
+            (.log js/console "chap4-checkboxes: client-did-mount")
+            (fetch/load app :items chap4-checkboxes/Item)))
        :networking
-        {:remote (pfn/pathom-remote checkboxes/parser)}}
+        {:remote (pfn/pathom-remote chap4-checkboxes/parser)}}
      }))
+
+(ws/defcard chap4-focus-input-card
+  (ct.fulcro/fulcro-card
+    {::f.portal/root chap4-focus-input/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:client-did-mount (fn [app] (.log js/console "chap4-focus-input-card"))}}))
