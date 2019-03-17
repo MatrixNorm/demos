@@ -65,6 +65,7 @@
         {:remote (pfn/pathom-remote chap4-checkboxes/parser)}}
      }))
 
+
 (ws/defcard chap4-focus-input-card
   (ct.fulcro/fulcro-card
     {::f.portal/root chap4-focus-input/Root
