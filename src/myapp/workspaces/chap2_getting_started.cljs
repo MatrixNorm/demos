@@ -11,7 +11,8 @@
     [myapp.workspaces.chap2-getting-started-part3 :as part3]
     [myapp.workspaces.chap2-getting-started-part4 :as part4]
     [myapp.workspaces.chap4-checkboxes :as chap4-checkboxes]
-    [myapp.workspaces.chap4-focus-input :as chap4-focus-input]))
+    [myapp.workspaces.chap4-focus-input :as chap4-focus-input]
+    [myapp.workspaces.chap4-d3 :as chap4-d3]))
 
 
 (ws/defcard friends-enemies-card1
@@ -73,3 +74,12 @@
 
      ::f.portal/app
      {:client-did-mount (fn [app] (.log js/console "chap4-focus-input-card"))}}))
+
+
+(ws/defcard chap4-d3
+  (ct.fulcro/fulcro-card
+    {::f.portal/root chap4-d3/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:client-did-mount (fn [app] (.log js/console "chap4-d3"))}}))
