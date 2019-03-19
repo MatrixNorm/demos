@@ -1,6 +1,7 @@
 (ns myapp.workspaces.chap2-getting-started
   (:require
     [nubank.workspaces.core :as ws]
+    [nubank.workspaces.model :as wsm]
     [nubank.workspaces.card-types.fulcro :as ct.fulcro]
     [nubank.workspaces.lib.fulcro-portal :as f.portal]
     [com.wsscode.pathom.fulcro.network :as pfn]
@@ -12,7 +13,8 @@
     [myapp.workspaces.chap2-getting-started-part4 :as part4]
     [myapp.workspaces.chap4-checkboxes :as chap4-checkboxes]
     [myapp.workspaces.chap4-focus-input :as chap4-focus-input]
-    [myapp.workspaces.chap4-d3 :as chap4-d3]))
+    [myapp.workspaces.chap4-d3 :as chap4-d3]
+    [myapp.workspaces.chap4-canvas :as chap4-canvas]))
 
 
 (ws/defcard friends-enemies-card1
@@ -83,3 +85,14 @@
 
      ::f.portal/app
      {:client-did-mount (fn [app] (.log js/console "chap4-d3"))}}))
+
+
+(ws/defcard chap4-canvas
+  {::wsm/card-width 3
+   ::wsm/card-height 9}
+  (ct.fulcro/fulcro-card
+    {::f.portal/root chap4-canvas/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:client-did-mount (fn [app] (.log js/console "chap4-canvas"))}}))
