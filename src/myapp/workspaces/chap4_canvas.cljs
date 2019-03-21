@@ -79,53 +79,70 @@
 
 (defn place-marker
   [child evt]
-  (let [canvas (gobj/get child "canvas")]
+  (let [canvas (.-canvas child)]
     (prim/transact! child `[(update-marker
                               {:coords ~(event->normalized-coords evt canvas)})])))
 
 (defn hover-marker
   [child evt]
-  (let [canvas         (.-canvas child)
+  (let [canvas (.-canvas child)
         updated-coords (event->dom-coords evt canvas)]
-    (prim/set-state! child {:coords updated-coords})
-    (render-hover-and-marker canvas (prim/props child) updated-coords)))
+    (prim/set-state! child {:coords updated-coords})))
 
 ;; UI
 
 (defsc Child [this {:keys [id size]}]
-  {:query          [:id :size :marker]
+  {:query [:id :size :marker]
    :initial-state
-     (fn [params] (merge {:id 0 :size 50 :marker [0.5 0.5]} params))
-   :ident          (fn [] [:child/by-id id])
+     (fn [params] (merge {:id 0 :size 50 :marker [0.5 0.5]}
+                         params))
+   :ident (fn [] [:child/by-id id])
    :initLocalState
      (fn []
+       (log "initLocalState")
        (set! (.-canvasRefCallback this)
              (fn [r]
                (log "REF CALLBACK: " r)
                (set! (.-canvas this) r)))
+       ;; initially hide mouse gray marker
+       ;; by placing it outside canvas
        {:coords [-50 -50]})
+   ;; draw canvas after component is mounted
    :componentDidMount
      (fn []
-       (log "componentDidMount")
+       (log "componentDidMount: " (prim/props this) (prim/get-state this :coords))
        (render-hover-and-marker
          (.-canvas this)
          (prim/props this)
          (prim/get-state this :coords)))
+   ;; component being updated means canvas is resized
+   ;; so it should be redrawn
    :componentDidUpdate
-     (fn [_ _]
+     (fn [props state]
        (log "componentDidUpdate")
        (render-hover-and-marker
          (.-canvas this)
-         (prim/props this)
-         (prim/get-state this :coords)))
+         props
+         (state :coords)))
+   :getDerivedStateFromProps
+     (fn [prev-props prev-state]
+       (log "getDerivedStateFromProps")
+       (merge prev-state prev-props))
    :shouldComponentUpdate
-     (fn [next-props _]
+     (fn [next-props next-state]
        (let [prev-props (prim/props this)
-             update? (not= prev-props next-props)]
-         (log "shouldComponentUpdate: " update?)
-         update?))
-   :componentWillMount #(log "componentWillMount")
-   :componentWillUnmount #(log "componentWillUnmount")}
+             update-dom? (not= (:size prev-props) (:size next-props))]
+         (log "shouldComponentUpdate: " update-dom?)
+         ;; sheeeeeiiiiit
+         (when (not update-dom?)
+           (let [prev-state (prim/get-state this)]
+             (when (not= next-state prev-state)
+               (log "shouldComponentUpdate: redraw canvas")
+               (render-hover-and-marker
+                 (.-canvas this)
+                 next-props
+                 (:coords next-state)))))
+         update-dom?))}
   (log "RENDER")
   (dom/canvas {:width       (str size "px")
                :height      (str size "px")
