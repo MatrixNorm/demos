@@ -56,21 +56,19 @@
 
 (defn render-hover-and-marker
   "Render the graphics in the canvas. Pass the component props and state. "
-  [canvas props coords]
-  (let [marker             (:marker props)
-        size               (:size props)
-        real-marker-coords (mapv (partial * size) marker)
+  [canvas {:keys [marker size coords]}]
+  (let [real-marker-coords (mapv (partial * size) marker)
         ; See HTML5 canvas docs
-        ctx                (.getContext canvas "2d")
-        clear              (fn []
-                             (set! (.-fillStyle ctx) "white")
-                             (.fillRect ctx 0 0 size size))
-        drawHover          (fn []
-                             (set! (.-strokeStyle ctx) "gray")
-                             (.strokeRect ctx (- (first coords) 5) (- (second coords) 5) 10 10))
-        drawMarker         (fn []
-                             (set! (.-strokeStyle ctx) "red")
-                             (.strokeRect ctx (- (first real-marker-coords) 5) (- (second real-marker-coords) 5) 10 10))]
+        ctx (.getContext canvas "2d")
+        clear (fn []
+                (set! (.-fillStyle ctx) "white")
+                (.fillRect ctx 0 0 size size))
+        drawHover (fn []
+                    (set! (.-strokeStyle ctx) "gray")
+                    (.strokeRect ctx (- (first coords) 5) (- (second coords) 5) 10 10))
+        drawMarker (fn []
+                      (set! (.-strokeStyle ctx) "red")
+                      (.strokeRect ctx (- (first real-marker-coords) 5) (- (second real-marker-coords) 5) 10 10))]
     (.save ctx)
     (clear)
     (drawHover)
@@ -113,17 +111,14 @@
        (log "componentDidMount: " (prim/props this) (prim/get-state this :coords))
        (render-hover-and-marker
          (.-canvas this)
-         (prim/props this)
-         (prim/get-state this :coords)))
+         ;(prim/props this)
+         (prim/get-state this)))
    ;; component being updated means canvas is resized
-   ;; so it should be redrawn
+   ;; so canvas should be redrawn
    :componentDidUpdate
-     (fn [props state]
-       (log "componentDidUpdate")
-       (render-hover-and-marker
-         (.-canvas this)
-         props
-         (state :coords)))
+     (fn [_ state]
+       (log "componentDidUpdate: " state (prim/get-state this))
+       (render-hover-and-marker (.-canvas this) state))
    :getDerivedStateFromProps
      (fn [prev-props prev-state]
        (log "getDerivedStateFromProps")
@@ -138,10 +133,7 @@
            (let [prev-state (prim/get-state this)]
              (when (not= next-state prev-state)
                (log "shouldComponentUpdate: redraw canvas")
-               (render-hover-and-marker
-                 (.-canvas this)
-                 next-props
-                 (:coords next-state)))))
+               (render-hover-and-marker (.-canvas this) next-state))))
          update-dom?))}
   (log "RENDER")
   (dom/canvas {:width       (str size "px")
