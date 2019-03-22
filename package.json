@@ -19,6 +19,7 @@
     "react-grid-layout": "^0.16.6",
     "react-icons": "^2.2.7",
     "reakit": "^0.11.2",
-    "shadow-cljs": "^2.4.24"
+    "shadow-cljs": "^2.4.24",
+    "victory": "^32.1.0"
   }
 }
