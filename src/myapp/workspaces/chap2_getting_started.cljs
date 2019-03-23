@@ -15,7 +15,8 @@
     [myapp.workspaces.chap4-focus-input :as chap4-focus-input]
     [myapp.workspaces.chap4-d3 :as chap4-d3]
     [myapp.workspaces.chap4-canvas :as chap4-canvas]
-    [myapp.workspaces.chap4-victory-chart :as chap4-victory-chart]))
+    [myapp.workspaces.chap4-victory-chart :as chap4-victory-chart]
+    [myapp.workspaces.chap4-css1 :as chap4-css1]))
 
 
 (ws/defcard friends-enemies-card1
@@ -107,3 +108,14 @@
 
      ::f.portal/app
      {:client-did-mount (fn [app] (.log js/console "chap4-victory-chart"))}}))
+
+
+(ws/defcard chap4-css1
+  {::wsm/card-width 2
+   ::wsm/card-height 9}
+  (ct.fulcro/fulcro-card
+    {::f.portal/root chap4-css1/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:client-did-mount (fn [app] (.log js/console "chap4-css1"))}}))
