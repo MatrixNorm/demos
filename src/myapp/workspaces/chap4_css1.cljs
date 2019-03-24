@@ -38,3 +38,8 @@
   (let [the-list {:id 1 :items [{:id 1 :label "A"} {:id 2 :label "B"}]}]
     (dom/div {:className text}
              (ui-list the-list))))
+
+; Add the CSS from Root as a HEAD style element. If it already exists, replace it.
+; This will recursively follow all of the CSS includes *just* for components
+; that Root includes!
+;(css/upsert-css "myapp.workspaces.chap4-css1" Root)
