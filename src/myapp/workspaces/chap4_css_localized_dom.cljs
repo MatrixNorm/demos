@@ -49,8 +49,8 @@
                 "Toggle visible")
     (ui-child child)))
 
-(defn upsert-css []
-  (css/upsert-css "myapp.workspaces.chap4-css-localized-dom" Root))
+;(defn upsert-css []
+;  (css/upsert-css "myapp.workspaces.chap4-css-localized-dom" Root))
 
 ;(defn change-color [c]
 ;  (reset! theme-color c)
@@ -59,4 +59,4 @@
 ; Push the real CSS to the DOM via a component.
 ; One or more of these could be done to, for example,
 ; include CSS from different modules or libraries into different style elements.
-(upsert-css )
+;(upsert-css )

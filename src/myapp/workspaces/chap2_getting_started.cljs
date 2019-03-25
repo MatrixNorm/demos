@@ -19,7 +19,8 @@
     [myapp.workspaces.chap4-css1 :as chap4-css1]
     [myapp.workspaces.chap4-css1a :as chap4-css1a]
     [myapp.workspaces.chap4-css-upsert :as chap4-css-upsert]
-    [myapp.workspaces.chap4-css-localized-dom :as chap4-css-localized-dom]))
+    [myapp.workspaces.chap4-css-localized-dom :as chap4-css-localized-dom]
+    [myapp.workspaces.chap4-cliptool-demo :as chap4-cliptool-demo]))
 
 
 (ws/defcard friends-enemies-card1
@@ -155,3 +156,15 @@
 
      ::f.portal/app
      {:client-did-mount (fn [app] (.log js/console "chap4-css-localized-dom"))}}))
+
+
+(ws/defcard chap4-cliptool-demo
+  {::wsm/card-width 4
+   ::wsm/card-height 16
+   ::wsm/align {:align-items "baseline"}}
+  (ct.fulcro/fulcro-card
+    {::f.portal/root chap4-cliptool-demo/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:client-did-mount (fn [app] (.log js/console "chap4-cliptool-demo"))}}))
