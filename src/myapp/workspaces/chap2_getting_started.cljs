@@ -18,7 +18,8 @@
     [myapp.workspaces.chap4-victory-chart :as chap4-victory-chart]
     [myapp.workspaces.chap4-css1 :as chap4-css1]
     [myapp.workspaces.chap4-css1a :as chap4-css1a]
-    [myapp.workspaces.chap4-css-upsert :as chap4-css-upsert]))
+    [myapp.workspaces.chap4-css-upsert :as chap4-css-upsert]
+    [myapp.workspaces.chap4-css-localized-dom :as chap4-css-localized-dom]))
 
 
 (ws/defcard friends-enemies-card1
@@ -143,3 +144,14 @@
 
      ::f.portal/app
      {:client-did-mount (fn [app] (.log js/console "chap4-css-upsert"))}}))
+
+
+(ws/defcard chap4-css-localized-dom
+  {::wsm/card-width 2
+   ::wsm/card-height 9}
+  (ct.fulcro/fulcro-card
+    {::f.portal/root chap4-css-localized-dom/Root
+     ::f.portal/wrap-root? false
+
+     ::f.portal/app
+     {:client-did-mount (fn [app] (.log js/console "chap4-css-localized-dom"))}}))

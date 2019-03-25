@@ -24,8 +24,7 @@
 
 
 (defsc Root [this props]
-  {:css [[:.container {:background-color "#00c327"
-                       :padding "0 15px"}]]
+  {:css [[:.container {:background-color "red"}]]
    :css-include [ListComponent]}
   (let [the-list {:id 1 :items [{:id 1 :label "A"} {:id 2 :label "B"}]}]
     (dom/div :.container
