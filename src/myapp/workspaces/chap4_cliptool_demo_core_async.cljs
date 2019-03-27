@@ -1,11 +1,12 @@
-(ns myapp.workspaces.chap4-cliptool-demo
+(ns myapp.workspaces.chap4-cliptool-demo-core-async
   (:require [cljs.pprint :refer [cl-format]]
             [fulcro.ui.clip-tool :as ct]
             [fulcro.ui.clip-geometry :as cg]
             [fulcro.client.cards :refer [defcard-fulcro]]
             [fulcro.client.mutations :as m :refer [defmutation]]
             [fulcro.client.dom :as dom]
-            [fulcro.client.primitives :as prim :refer [defsc]]))
+            [fulcro.client.primitives :as prim :refer [defsc]]
+            [cljs.core.async :as async]))
 
 (defn log [& x] (apply js/console.log x))
 (def minion-image "/img/minion.jpg")
@@ -23,7 +24,10 @@
    :ident [:clip-tools/by-id :id]
    :protocols [Object
        (initLocalState [this]
-           (let [img (js/Image.)]
+           (let [img (js/Image.)
+                 mouse-down-chan (async/chan)
+                 mouse-up-chan (async/chan)
+                 mouse-move-chan (async/chan)]
              (log :BBB img)
              (set! (.-onload img)
                  (fn []
@@ -36,12 +40,30 @@
                         (when onChange (onChange (assoc (prim/get-state this) :clip-region (ct/translate-clip-region clip-region size img)))))
                       (ct/refresh-clip-region this (prim/props this))
                    ))
+
+             (async/go-loop []
+                (async/loop []
+                    (async/alt! [mouse-down-chan] ([down]
+                        (do (log "we hit mouse down and onto next loop.") nil))))
+                (log "we won't reach here until mouse down.")
+                (loop []
+                  (async/alt! [mouse-up-chan] ([up]
+                        (do (log "we hit mouse up, final recur and back to previous loop.")  nil))
+                        [mouse-move-chan] ([coords]
+                                       (do
+                                         (log coords)
+                                         (recur)))))
+                (recur))
+
              {:image-object    img
               :origin          (cg/->Point 0 0)
               :clip-region     (cg/->Rectangle (cg/->Point 0 0)
                                                (cg/->Point 0 0))
-              :active-operation :none
-              :min-size        20}))
+              :activeOperation :none
+              :min-size        20
+              :mouse-down mouse-down-chan
+              :mouse-up mouse-up-chan
+              :mouse-move mouse-move-chan}))
        (shouldComponentUpdate [this next-props next-state] false)
        (componentWillReceiveProps [this props]
           ;(log :TTT)
@@ -59,16 +81,13 @@
                     :id          id
                     :width       (str (:width size) "px")
                     :height      (str (:height size) "px")
-                    :onMouseDown (fn [evt]
-                                   (log :onMouseDown evt)
-                                   (ct/mouseDown this evt))
+                    :onMouseDown #(async/put! (prim/get-state this :mouse-down) %)
+                    :onMouseUp   #(async/put! (prim/get-state this :mouse-up) %)
                     :onMouseMove (fn [evt]
                                    ;(log :onMouseMove evt)
                                    (ct/mouseMoved this evt onChange))
-                    :onMouseUp   (fn [evt]
-                                   (log :onMouseUp evt)
-                                   (ct/mouseUp this evt))
                     :className   "clip-tool"}))))
+
 
 (defsc PreviewClip [this {:keys [filename width height clip-region]}]
   {}
@@ -89,6 +108,7 @@
 
 (def ui-clip-tool (prim/factory ClipTool))
 (def ui-preview-clip (prim/factory PreviewClip))
+
 
 (defsc Root [this {:keys [ctool]}]
   {:initial-state

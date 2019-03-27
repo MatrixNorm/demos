@@ -8,4 +8,4 @@
   fulcrologic/fulcro-inspect {:mvn/version "2.2.5"}
   nubank/workspaces          {:mvn/version "1.0.6"}
   org.clojure/core.async     {:mvn/version "0.4.474"}
-  re-frame                   {:mvn/version "0.10.5"}}}
+  reagent                    {:mvn/version "0.8.1"}}}
