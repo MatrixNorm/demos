@@ -13,8 +13,11 @@
   (ct.react/react-card
     (element "div" {} "Hello World")))
 
+(println "RELOAD")
+(defonce counter (atom 0))
+
 (ws/defcard counter-example-card
-  (let [counter (atom 0)]
+  (let [_ nil]
     (ct.react/react-card
       counter
       (element "div" {}

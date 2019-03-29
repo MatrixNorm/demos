@@ -1,6 +1,6 @@
 ;; shadow-cljs configuration
 {:deps true
-
+ :nrepl  {:port 9999}
  :builds
  {:workspaces {:target     :browser
                :output-dir "resources/public/js/workspaces"

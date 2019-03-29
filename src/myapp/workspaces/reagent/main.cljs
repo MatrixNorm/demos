@@ -7,6 +7,8 @@
             [myapp.workspaces.reagent.bmi :as bmi]
             [myapp.workspaces.reagent.tictactoe :as tictactoe]))
 
+(+ 1 2)
+
 ;; Form-1
 
 (ws/defcard hello-card
@@ -15,13 +17,15 @@
 
 ;; Form-2
 
+(defonce click-count (r/atom 0))
+
 (defn counter-component []
-  (let [click-count (r/atom 0)]
+  (let [who "soyboy"]
     (fn []
       [:div
       "The atom " [:code "click-count"] " has value: "
       @click-count ". "
-      [:input {:type     "button" :value "Click me!"
+      [:input {:type     "button" :value (str "Click me, " who)
                :on-click #(swap! click-count inc)}]])))
 
 (ws/defcard counter-card
