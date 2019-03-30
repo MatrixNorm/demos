@@ -3,7 +3,7 @@
 
 
 (defn new-board [n]
-  (vec (repeat n (vec (repeat n 0)))))
+  (vec (repeat n (vec (repeat n :blank)))))
 
 (def initial-app-state
   {:text "Tic Tac Toe"
@@ -11,6 +11,9 @@
 
 (defonce app-state
   (r/atom initial-app-state))
+
+(defn computer-move []
+  (swap! app-state assoc-in [:board 0 0 ] :cross))
 
 (defn blank [i j]
   [:rect
@@ -49,13 +52,14 @@
                 j (range n)]
             (assoc-in
               (case (get-in @app-state [:board i j])
-               0 (blank i j)
-               1 (circle i j)
-               (cross i j))
+               :blank (blank i j)
+               :circle (circle i j)
+               :cross (cross i j))
               [1 :on-click]
               (fn tail-click [e]
                 (prn "Clicked " i j)
-                (swap! app-state update-in [:board i j] inc)
+                (swap! app-state assoc-in [:board i j] :circle)
+                (computer-move)
                 (prn @app-state))))))
       [:p
        [:button
