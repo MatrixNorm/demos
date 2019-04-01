@@ -1,7 +1,7 @@
 (ns myapp.workspaces.reagent.tictactoe
   (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [reagent.core :as r]
-            [cljs.core.async :refer [>! <! put! chan alts!]]))
+            [cljs.core.async :as async :refer [>! <! put! chan alts!]]))
 
 
 (defn new-board [n]
@@ -16,23 +16,39 @@
          (r/atom initial-app-state))
 
 (def user-chan (chan))
-(def computer-chan (chan))
 
-(defn run []
+(defn run-user-process [steplock]
   (go
     (loop []
-      (let [[action c] (alts! [user-chan computer-chan])]
-       (prn action c)
-       (recur)))))
+      (let [[action payload] (<! user-chan)]
+        (if (= action :action/user-move)
+          (do
+            (prn :AAA action payload)
+            (let [[i j] payload]
+              (swap! app-state assoc-in [:board i j] :circle))
+            (>! steplock :go)
+            (<! steplock)
+            (swap! app-state assoc :next-turn :user))
+          (do
+            (prn :BBB action)
+            (case action
+              :action/new-game (swap! app-state assoc :board (new-board 3)))))
+        (recur)))))
+
+(defn run-computer-process [steplock]
+  (go
+    (loop []
+      (<! steplock)
+      (swap! app-state assoc :next-turn :computer)
+      (<! (async/timeout 5000))
+      (swap! app-state assoc-in [:board 0 0] :cross)
+      (>! steplock :go)
+      (recur))))
 
 (defn run2 []
-  (go
-    (loop []
-      (let [action (<! user-chan)]
-        (prn action))
-      (let [action (<! computer-chan)]
-        (prn action))
-      (recur))))
+  (let [steplock (chan)]
+    (run-user-process steplock)
+    (run-computer-process steplock)))
 
 (defn computer-move []
   (swap! app-state assoc-in [:board 0 0] :cross))
@@ -65,7 +81,7 @@
 
 (defn main []
   (let [button-text "New Game"
-        _ (run)]
+        _ (run2)]
     (fn []
      [:center
       [:h1 (:text @app-state)]
@@ -82,15 +98,11 @@
                 :cross (cross i j))
               [1 :on-click]
               (fn tail-click [e]
-                (prn "Clicked " i j)
-                (swap! app-state assoc-in [:board i j] :circle)
-                (computer-move)
-                (put! user-chan :action/user-move)
-                (prn @app-state))))))
+                (put! user-chan [:action/user-move [i j]]))))))
+      [:div "Turn: " (:next-turn @app-state)]
       [:p
        [:button
         {:on-click
          (fn new-game-click [e]
-           (swap! app-state assoc :board (new-board 3))
-           (put! user-chan :action/new-game))}
+           (put! user-chan [:action/new-game]))}
         button-text]]])))
