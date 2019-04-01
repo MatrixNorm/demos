@@ -1,5 +1,5 @@
 (ns myapp.workspaces.reagent.tictactoe
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [reagent.core :as r]
             [cljs.core.async :as async :refer [>! <! put! chan alts!]]))
 
@@ -18,34 +18,33 @@
 (def user-chan (chan))
 
 (defn run-user-process [steplock]
-  (go
-    (loop []
-      (let [[action payload] (<! user-chan)]
-        (if (= action :action/user-move)
-          (do
-            (prn :AAA action payload)
-            (let [[i j] payload]
-              (swap! app-state assoc-in [:board i j] :circle))
-            (>! steplock :go)
-            (<! steplock)
-            (swap! app-state assoc :next-turn :user))
-          (do
-            (prn :BBB action)
-            (case action
-              :action/new-game (swap! app-state assoc :board (new-board 3)))))
-        (recur)))))
+  (go-loop []
+     (prn :WWW)
+     (let [[action payload] (<! user-chan)]
+       (if (= action :action/user-move)
+         (do
+           (prn :AAA action payload)
+           (let [[i j] payload]
+             (swap! app-state assoc-in [:board i j] :circle))
+           (>! steplock :go)
+           (<! steplock)
+           (swap! app-state assoc :next-turn :user))
+         (do
+           (prn :BBB action)
+           (case action
+             :action/new-game (swap! app-state assoc :board (new-board 3)))))
+       (recur))))
 
 (defn run-computer-process [steplock]
-  (go
-    (loop []
-      (<! steplock)
-      (swap! app-state assoc :next-turn :computer)
-      (<! (async/timeout 5000))
-      (swap! app-state assoc-in [:board 0 0] :cross)
-      (>! steplock :go)
-      (recur))))
+  (go-loop []
+     (<! steplock)
+     (swap! app-state assoc :next-turn :computer)
+     (<! (async/timeout 5000))
+     (swap! app-state assoc-in [:board 0 0] :cross)
+     (>! steplock :go)
+     (recur)))
 
-(defn run2 []
+(defn run []
   (let [steplock (chan)]
     (run-user-process steplock)
     (run-computer-process steplock)))
@@ -81,7 +80,7 @@
 
 (defn main []
   (let [button-text "New Game"
-        _ (run2)]
+        _ (run)]
     (fn []
      [:center
       [:h1 (:text @app-state)]
