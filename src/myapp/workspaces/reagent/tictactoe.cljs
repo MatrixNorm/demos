@@ -17,24 +17,6 @@
 
 (def user-chan (chan))
 
-(defn run-user-process [steplock]
-  (go-loop []
-           (prn :WWW)
-           (let [[action payload] (<! user-chan)]
-             (if (= action :action/user-move)
-               (do
-                 (prn :AAA action payload)
-                 (let [[i j] payload]
-                   (swap! app-state assoc-in [:board i j] :circle))
-                 (>! steplock 1)
-                 (<! steplock)
-                 (swap! app-state assoc :next-turn :user))
-               (do
-                 (prn :BBB action)
-                 (case action
-                   :action/new-game (swap! app-state assoc :board (new-board 3)))))
-             (recur))))
-
 (defn calculate-computer-move [board]
   (let [N (count board)
         blank? #(= (get-in board [%1 %2]) :blank)
@@ -45,22 +27,50 @@
     (prn vacant-cells)
     (rand-nth vacant-cells)))
 
-(defn run-computer-process [steplock]
-  (go-loop []
-           (prn :COMPUTER)
-           (<! steplock)
-           (swap! app-state assoc :next-turn :computer)
-           (<! (async/timeout 3000))
-           (swap! app-state assoc-in
-                  (into [:board] (calculate-computer-move (:board @app-state)))
-                  :cross)
-           (>! steplock 1)
-           (recur)))
+(defn user-process []
+  (let [control (chan)]
+    (go-loop []
+      (<! control)
+      (loop [[action payload] (<! user-chan)]
+        (if (= action :action/user-move)
+          (do
+            (prn :AAA action payload)
+            (let [[i j] payload]
+              (swap! app-state assoc-in [:board i j] :circle))
+            (>! control 1))
+          (do
+            (prn :BBB action)
+            (case action
+              :action/new-game (swap! app-state assoc :board (new-board 3)))
+            (recur (<! user-chan)))))
+      (recur))
+    control))
 
-(defn run []
-  (let [steplock (chan)]
-    (run-user-process steplock)
-    (run-computer-process steplock)))
+(defn computer-process []
+  (let [control (chan)]
+    (go-loop []
+      (<! control)
+      (prn :COMPUTER)
+      (swap! app-state assoc :next-turn :computer)
+      (<! (async/timeout 3000))
+      (swap! app-state assoc-in
+             (into [:board] (calculate-computer-move (:board @app-state)))
+             :cross)
+      (>! control 1)
+      (recur))
+    control))
+
+(defn run-game []
+  (let [user (user-process)
+        computer (computer-process)]
+    (go-loop []
+      (swap! app-state assoc :next-turn :user)
+      (>! user 1)
+      (<! user)
+      (swap! app-state assoc :next-turn :computer)
+      (>! computer 1)
+      (<! computer)
+      (recur))))
 
 (defn blank [i j]
   [:rect
@@ -90,7 +100,7 @@
 
 (defn main []
   (let [button-text "New Game"
-        _ (run)]
+        _ (run-game)]
     (fn []
       [:center
        [:h1 (:text @app-state)]
