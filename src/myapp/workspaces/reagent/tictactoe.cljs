@@ -15,8 +15,6 @@
 (defonce app-state
          (r/atom initial-app-state))
 
-(def user-chan (chan))
-
 (defn calculate-computer-move [board]
   (let [N (count board)
         blank? #(= (get-in board [%1 %2]) :blank)
@@ -24,8 +22,43 @@
                            j (range N)
                            :when (blank? i j)]
                        [i j])]
-    (prn vacant-cells)
-    (rand-nth vacant-cells)))
+     (prn vacant-cells)
+     (rand-nth vacant-cells)))
+
+(defn game-over? [board]
+  false)
+
+(defn user-step [user-move-chan]
+  (go
+    (let [[i j] (<! user-move-chan)]
+      ;; XXX check if vacant
+      (swap! app-state assoc-in [:board i j] :circle))))
+
+(defn computer-step []
+  (go
+    (<! (async/timeout 3000))
+    (swap! app-state assoc-in
+           (into [:board] (calculate-computer-move (:board @app-state)))
+           :cross)))
+
+(defn game-process [user-move-chan]
+  (go-loop []
+     (when-not (game-over? (:board @app-state))
+        (<! (user-step user-move-chan))
+        (when-not (game-over? (:board @app-state))
+           (<! (computer-step))
+           (recur)))))
+
+(defn app-process []
+  (go-loop [[action payload] (<! action-bus)]
+
+           (recur (<! action-bus))))
+
+;; ======================================
+
+(def user-chan (chan))
+
+
 
 (defn user-process []
   (let [control (chan)]
@@ -60,6 +93,8 @@
       (recur))
     control))
 
+
+
 (defn run-game []
   (let [user (user-process)
         computer (computer-process)]
@@ -67,6 +102,7 @@
       (swap! app-state assoc :next-turn :user)
       (>! user 1)
       (<! user)
+      ;; check if game is over
       (swap! app-state assoc :next-turn :computer)
       (>! computer 1)
       (<! computer)
