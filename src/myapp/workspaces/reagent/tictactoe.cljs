@@ -15,6 +15,8 @@
 (defonce app-state
          (r/atom initial-app-state))
 
+(def user-move-chan (chan))
+
 (defn calculate-computer-move [board]
   (let [N (count board)
         blank? #(= (get-in board [%1 %2]) :blank)
@@ -28,7 +30,7 @@
 (defn game-over? [board]
   false)
 
-(defn user-step [user-move-chan]
+(defn user-step []
   (go
     (let [[i j] (<! user-move-chan)]
       ;; XXX check if vacant
@@ -41,18 +43,51 @@
            (into [:board] (calculate-computer-move (:board @app-state)))
            :cross)))
 
-(defn game-process [user-move-chan]
+(defn game-process []
   (let [outer-chan (chan)
         finita? (fn [] (game-over? (:board @app-state)))]
     (go-loop [the-end false]
       (if the-end
         (put! outer-chan :game-over)
         (do
-          (<! (user-step user-move-chan))
-          (when (finita?) (recur true))
-          (<! (computer-step))
-          (when (finita?) (recur true))
+          (let [[v c] (alts! [(user-step) outer-chan])]
+            (when (or (and (= c outer-chan)
+                           (= v :abort-game))
+                      (finita?))
+              (recur true)))
+          (let [[v c] (alts! [(computer-step) outer-chan])]
+            (when (or (and (= c outer-chan)
+                           (= v :abort-game))
+                      (finita?))
+              (recur true)))
           (recur false))))
+    outer-chan))
+
+(defn game-process2 []
+  (let [outer-chan (chan)]
+    (go
+      (doseq
+        (take-while
+          (fn [step]
+            (let [[v ch] (alts! [(step) outer-chan])
+                  abort? (and (= ch outer-chan) (= v :abort-game))
+                  over?  (game-over? (:board @app-state))
+                  done?  (or over? abort?)]
+              (not done?)))
+          (cycle [user-step computer-step]))))
+    outer-chan))
+
+
+(defn game-process3 []
+  (let [outer-chan (chan)
+        finita? (fn [] (game-over? (:board @app-state)))]
+    (go
+      (for [step (cycle [user-step computer-step])
+            :let [[v c] (alts! [(step) outer-chan])]
+            :while (not (or (and (= c outer-chan)
+                                 (= v :abort-game))
+                        (finita?)))]
+        1))
     outer-chan))
 
 (defn game-controller-process []
@@ -80,7 +115,7 @@
 
 ;; ======================================
 
-(def user-chan (chan))
+
 
 
 
