@@ -10,12 +10,24 @@
 (def initial-app-state
   {:text      "Tic Tac Toe"
    :board     (new-board 3)
-   :next-turn :user})
+   :game-over false})
 
 (defonce app-state
          (r/atom initial-app-state))
 
-(def user-move-chan (chan))
+(def event-bus (chan))
+
+(defn reducer [state [event-type event-data]]
+  (case event-type
+    :user-move (when-not (:game-over state)
+                 (let [[i j] event-data
+                       board (:board state)
+                       tile (get-in board [i j])]
+                   (when (= tile :blank)
+                     (assoc-in state [:board i j] :circle))))
+    :new-game (-> state
+                  (assoc :board (new-board 3))
+                  (assoc :game-over false))))
 
 (defn calculate-computer-move [board]
   (let [N (count board)
@@ -29,143 +41,6 @@
 
 (defn game-over? [board]
   false)
-
-(defn user-step []
-  (go
-    (let [[i j] (<! user-move-chan)]
-      ;; XXX check if vacant
-      (swap! app-state assoc-in [:board i j] :circle))))
-
-(defn computer-step []
-  (go
-    (<! (async/timeout 3000))
-    (swap! app-state assoc-in
-           (into [:board] (calculate-computer-move (:board @app-state)))
-           :cross)))
-
-(defn game-process []
-  (let [outer-chan (chan)
-        finita? (fn [] (game-over? (:board @app-state)))]
-    (go-loop [the-end false]
-      (if the-end
-        (put! outer-chan :game-over)
-        (do
-          (let [[v c] (alts! [(user-step) outer-chan])]
-            (when (or (and (= c outer-chan)
-                           (= v :abort-game))
-                      (finita?))
-              (recur true)))
-          (let [[v c] (alts! [(computer-step) outer-chan])]
-            (when (or (and (= c outer-chan)
-                           (= v :abort-game))
-                      (finita?))
-              (recur true)))
-          (recur false))))
-    outer-chan))
-
-(defn game-process2 []
-  (let [outer-chan (chan)]
-    (go
-      (doseq
-        (take-while
-          (fn [step]
-            (let [[v ch] (alts! [(step) outer-chan])
-                  abort? (and (= ch outer-chan) (= v :abort-game))
-                  over?  (game-over? (:board @app-state))
-                  done?  (or over? abort?)]
-              (not done?)))
-          (cycle [user-step computer-step]))))
-    outer-chan))
-
-
-(defn game-process3 []
-  (let [outer-chan (chan)
-        finita? (fn [] (game-over? (:board @app-state)))]
-    (go
-      (for [step (cycle [user-step computer-step])
-            :let [[v c] (alts! [(step) outer-chan])]
-            :while (not (or (and (= c outer-chan)
-                                 (= v :abort-game))
-                        (finita?)))]
-        1))
-    outer-chan))
-
-(defn game-controller-process []
-  (let [outer-chan (chan)]
-    (go-loop [action (<! outer-chan)
-              internal-state :idle]
-             (case [action internal-state]
-               [:action.game/new-game :idle]
-                  (let [game-chan (game-process)]
-                      (go-loop []))
-               [:action.game/new-game :game-on]
-               (prn "fuck off"))
-             (recur))
-    outer-chan))
-
-(defn app-process []
-  (let [game-controller-chan (game-controller-process)]
-    (go-loop [[action payload] (<! action-bus)]
-             (case action
-               :action.game/new-game (>! game-controller-chan action)
-               :action/foo (prn "foo")
-               :action/bar (prn "bar")
-               (prn "Shit Negro, That's All You Had To Say"))
-             (recur (<! action-bus)))))
-
-;; ======================================
-
-
-
-
-
-(defn user-process []
-  (let [control (chan)]
-    (go-loop []
-             (<! control)
-             (loop [[action payload] (<! user-chan)]
-               (if (= action :action/user-move)
-                 (do
-                   (prn :AAA action payload)
-                   (let [[i j] payload]
-                     (swap! app-state assoc-in [:board i j] :circle))
-                   (>! control 1))
-                 (do
-                   (prn :BBB action)
-                   (case action
-                     :action/new-game (swap! app-state assoc :board (new-board 3)))
-                   (recur (<! user-chan)))))
-             (recur))
-    control))
-
-(defn computer-process []
-  (let [control (chan)]
-    (go-loop []
-             (<! control)
-             (prn :COMPUTER)
-             (swap! app-state assoc :next-turn :computer)
-             (<! (async/timeout 3000))
-             (swap! app-state assoc-in
-                    (into [:board] (calculate-computer-move (:board @app-state)))
-                    :cross)
-             (>! control 1)
-             (recur))
-    control))
-
-
-
-(defn run-game []
-  (let [user (user-process)
-        computer (computer-process)]
-    (go-loop []
-             (swap! app-state assoc :next-turn :user)
-             (>! user 1)
-             (<! user)
-             ;; check if game is over
-             (swap! app-state assoc :next-turn :computer)
-             (>! computer 1)
-             (<! computer)
-             (recur))))
 
 (defn blank [i j]
   [:rect
@@ -212,11 +87,11 @@
                  :cross (cross i j))
                [1 :on-click]
                (fn tail-click [_]
-                 (offer! user-chan [:action/user-move [i j]]))))))
-       [:div "Turn: " (:next-turn @app-state)]
+                 (offer! user-chan [:user-move [i j]]))))))
+       ;;[:div "Turn: " (:next-turn @app-state)]
        [:p
         [:button
          {:on-click
           (fn new-game-click [_]
-            (offer! user-chan [:action/new-game]))}
+            (offer! user-chan [:new-game]))}
          button-text]]])))
