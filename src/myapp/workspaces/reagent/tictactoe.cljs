@@ -10,7 +10,8 @@
 (def initial-app-state
   {:text      "Tic Tac Toe"
    :board     (new-board 3)
-   :game-over false})
+   :game-over false
+   :next-move-by-player :user})
 
 (defonce app-state
          (r/atom initial-app-state))
@@ -19,12 +20,19 @@
 
 (defn reducer [state [event-type event-data]]
   (case event-type
-    :user-move (when-not (:game-over state)
+    :user-move (when-not (or (:game-over state) (= :AI (:next-move-by-player state)))
                  (let [[i j] event-data
                        board (:board state)
                        tile (get-in board [i j])]
                    (when (= tile :blank)
-                     (assoc-in state [:board i j] :circle))))
+                     (-> state
+                         (assoc-in [:board i j] :circle)
+                         (assoc :next-move-by-player :AI)))))
+    :AI-move (when-not (or (:game-over state) (= :user (:next-move-by-player state)))
+               (let [[i j] event-data]
+                 (-> state
+                   (assoc-in [:board i j] :cross)
+                   (assoc :next-move-by-player :user))))
     :new-game (-> state
                   (assoc :board (new-board 3))
                   (assoc :game-over false))))
@@ -41,6 +49,15 @@
 
 (defn game-over? [board]
   false)
+
+;; AI
+
+(defn AI-move []
+  (go
+    (<! (async/timeout 2000))
+    (>! event-bus (calculate-computer-move (:board app-state)))))
+
+;; UI
 
 (defn blank [i j]
   [:rect
@@ -62,8 +79,7 @@
   [:g {:stroke         "green"
        :stroke-width   0.15
        :stroke-linecap "round"
-       :transform
-                       (str "translate(" (+ 0.2 i) "," (+ 0.2 j) ") "
+       :transform      (str "translate(" (+ 0.2 i) "," (+ 0.2 j) ") "
                             "scale(0.55)")}
    [:line {:x1 0 :y1 0 :x2 1 :y2 1}]
    [:line {:x1 0 :y1 1 :x2 1 :y2 0}]])
