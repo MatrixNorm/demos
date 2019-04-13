@@ -16,26 +16,33 @@
 (defonce app-state
          (r/atom initial-app-state))
 
-(def event-bus (chan))
+(def event-bus (chan 1))
 
-(defn reducer [state [event-type event-data]]
+(def next-player-map
+  {:user :AI
+   :AI :user})
+
+(defn reducer-player-move [state player [i j]]
+  (when (and (not (:game-over state)) (= player (:next-move-by-player state)))
+    (let [tile (get-in (:board state) [i j])]
+      (when (= tile :blank)
+        (-> state
+            (assoc-in [:board i j] player)
+            (assoc :next-move-by-player (player next-player-map)))))))
+
+(defn reducer* [state [event-type event-data]]
   (case event-type
-    :user-move (when-not (or (:game-over state) (= :AI (:next-move-by-player state)))
-                 (let [[i j] event-data
-                       board (:board state)
-                       tile (get-in board [i j])]
-                   (when (= tile :blank)
-                     (-> state
-                         (assoc-in [:board i j] :circle)
-                         (assoc :next-move-by-player :AI)))))
-    :AI-move (when-not (or (:game-over state) (= :user (:next-move-by-player state)))
-               (let [[i j] event-data]
-                 (-> state
-                   (assoc-in [:board i j] :cross)
-                   (assoc :next-move-by-player :user))))
+    :user-move (reducer-player-move state :user event-data)
+    :AI-move (reducer-player-move state :AI event-data)
     :new-game (-> state
                   (assoc :board (new-board 3))
                   (assoc :game-over false))))
+
+(defn reducer [state event]
+  (let [next-state (reducer* state event)]
+    (if next-state
+      next-state
+      state)))
 
 (defn calculate-computer-move [board]
   (let [N (count board)
@@ -59,7 +66,7 @@
 
 ;; UI
 
-(defn blank [i j]
+(defn tile-blank [i j]
   [:rect
    {:width  0.9
     :height 0.9
@@ -67,7 +74,7 @@
     :x      i
     :y      j}])
 
-(defn circle [i j]
+(defn tile-user [i j]
   [:circle
    {:r    0.45
     :cx   (+ 0.45 i)
@@ -75,7 +82,7 @@
     :fill "coral"}])
 
 
-(defn cross [i j]
+(defn tile-AI [i j]
   [:g {:stroke         "green"
        :stroke-width   0.15
        :stroke-linecap "round"
@@ -103,11 +110,11 @@
                  :cross (cross i j))
                [1 :on-click]
                (fn tail-click [_]
-                 (offer! user-chan [:user-move [i j]]))))))
+                 (put! event-bus [:user-move [i j]]))))))
        ;;[:div "Turn: " (:next-turn @app-state)]
        [:p
         [:button
          {:on-click
           (fn new-game-click [_]
-            (offer! user-chan [:new-game]))}
+            (put! event-bus [:new-game]))}
          button-text]]])))
