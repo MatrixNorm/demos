@@ -16,7 +16,27 @@
 (defonce app-state
          (r/atom initial-app-state))
 
-(def event-bus (chan 1))
+(def event-chan (chan 1))
+
+(defn AI-move []
+  (go
+    (<! (async/timeout 2000))
+    (>! event-bus (calculate-computer-move (:board app-state)))))
+
+(defn run-app [state-atom event-chan reducer]
+  (go-loop []
+    (let [current-state @state-atom
+          next-state (reducer current-state (<! event-chan) )]
+      (when (not= next-state current-state)
+        (swap! state-atom next-state)
+        (when (and (= :user (:next-move-by-player current-state))
+                   (= :AI (:next-move-by-player next-state)))
+          (AI-move)))
+      (recur))))
+
+;;;;;;;;;
+;;
+;;;;;;;;;
 
 (def next-player-map
   {:user :AI
@@ -46,10 +66,9 @@
 
 (defn calculate-computer-move [board]
   (let [N (count board)
-        blank? #(= (get-in board [%1 %2]) :blank)
         vacant-cells (for [i (range N)
                            j (range N)
-                           :when (blank? i j)]
+                           :when (= :blank (get-in board [i j]))]
                        [i j])]
     (prn vacant-cells)
     (rand-nth vacant-cells)))
@@ -57,24 +76,21 @@
 (defn game-over? [board]
   false)
 
-;; AI
+;;;;;;;;
+;; UI ;;
+;;;;;;;;
 
-(defn AI-move []
-  (go
-    (<! (async/timeout 2000))
-    (>! event-bus (calculate-computer-move (:board app-state)))))
-
-;; UI
-
-(defn tile-blank [i j]
+(defn blank [i j]
   [:rect
    {:width  0.9
     :height 0.9
     :fill   "skyblue"
     :x      i
-    :y      j}])
+    :y      j
+    :on-click (fn tail-click [_]
+                (put! event-chan [:user-move [i j]]))}])
 
-(defn tile-user [i j]
+(defn circle [i j]
   [:circle
    {:r    0.45
     :cx   (+ 0.45 i)
@@ -82,7 +98,7 @@
     :fill "coral"}])
 
 
-(defn tile-AI [i j]
+(defn cross [i j]
   [:g {:stroke         "green"
        :stroke-width   0.15
        :stroke-linecap "round"
@@ -103,18 +119,14 @@
          (let [n (count (:board @app-state))]
            (for [i (range n)
                  j (range n)]
-             (assoc-in
-               (case (get-in @app-state [:board i j])
-                 :blank (blank i j)
-                 :circle (circle i j)
-                 :cross (cross i j))
-               [1 :on-click]
-               (fn tail-click [_]
-                 (put! event-bus [:user-move [i j]]))))))
-       ;;[:div "Turn: " (:next-turn @app-state)]
+             (case (get-in @app-state [:board i j])
+               :blank (blank i j)
+               :user (circle i j)
+               :AI (cross i j)))))
+       [:div "Turn: " (:next-turn @app-state)]
        [:p
         [:button
          {:on-click
           (fn new-game-click [_]
-            (put! event-bus [:new-game]))}
+            (put! event-chan [:new-game]))}
          button-text]]])))
