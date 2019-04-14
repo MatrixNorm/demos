@@ -13,31 +13,6 @@
    :game-over false
    :next-move-by-player :user})
 
-(defonce app-state
-         (r/atom initial-app-state))
-
-(def event-chan (chan 1))
-
-(defn AI-move []
-  (go
-    (<! (async/timeout 2000))
-    (>! event-bus (calculate-computer-move (:board app-state)))))
-
-(defn run-app [state-atom event-chan reducer]
-  (go-loop []
-    (let [current-state @state-atom
-          next-state (reducer current-state (<! event-chan) )]
-      (when (not= next-state current-state)
-        (swap! state-atom next-state)
-        (when (and (= :user (:next-move-by-player current-state))
-                   (= :AI (:next-move-by-player next-state)))
-          (AI-move)))
-      (recur))))
-
-;;;;;;;;;
-;;
-;;;;;;;;;
-
 (def next-player-map
   {:user :AI
    :AI :user})
@@ -75,6 +50,56 @@
 
 (defn game-over? [board]
   false)
+
+;;;;;;;;;
+;;
+;;;;;;;;;
+
+(defonce app-state
+         (r/atom initial-app-state))
+
+(defn AI-move []
+  (go
+    (<! (async/timeout 2000))
+    (>! event-bus (calculate-computer-move (:board app-state)))))
+
+(defn create-state-chan [state-atom event-chan reducer]
+  (let [state-chan (chan)]
+    (go-loop []
+     (let [current-state @state-atom
+           next-state (reducer current-state (<! event-chan))]
+       (when (not= next-state current-state)
+         (swap! state-atom next-state)
+         (when (and (= :user (:next-move-by-player current-state))
+                    (= :AI (:next-move-by-player next-state)))
+           (AI-move)))
+       (recur)))
+    state-chan))
+
+(defonce event-chan (chan 1))
+(defonce state-chan (chan 1 ))
+;;(defonce sink-chan (async/mult state-chan))
+
+(def xform
+  (comp
+    (map (fn [event] [event @app-state]))
+    (map (fn [event state] {:event event
+                            :state state
+                            :next-state (reducer state event)}))
+    (filter (fn [{:keys [state next-state]}] (not= state next-state)))))
+
+(async/pipeline 1 state-chan xform event-chan)
+
+(async/take!
+  state-chan
+  (fn [data]
+    (swap! app-state (:next-state data))
+    (AI-move)))
+;;(defonce state-chan (create-state-chan app-state event-chan reducer))
+
+;;;;;;;;;;;;;;;;
+;; transducers
+;;;;;;;;;;;;;;;;
 
 ;;;;;;;;
 ;; UI ;;
