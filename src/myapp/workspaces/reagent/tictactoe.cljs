@@ -1,7 +1,8 @@
 (ns myapp.workspaces.reagent.tictactoe
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [reagent.core :as r]
-            [cljs.core.async :as async :refer [>! <! put! chan alts!]]))
+            [cljs.core.async :as async :refer [>! <! put! chan alts!]]
+            [cljs.test :as test]))
 
 
 (defn new-board [n]
@@ -17,22 +18,29 @@
   {:user :AI
    :AI :user})
 
-(defn reducer-player-move [state player [i j]]
+(defn reducer-player-move* [state player [i j]]
+  (let [tile (get-in (:board state) [i j])]
+    (when (= tile :blank)
+      (-> state
+          (assoc-in [:board i j] player)
+          (assoc :next-move-by-player (player next-player-map))))))
+
+(defn reducer-player-move [state player coords]
   (when (and (not (:game-over state)) (= player (:next-move-by-player state)))
-    (let [tile (get-in (:board state) [i j])]
-      (when (= tile :blank)
-        (-> state
-            (assoc-in [:board i j] player)
-            (assoc :next-move-by-player (player next-player-map)))))))
+    (reducer-player-move* state player coords)))
+
+(defn reducer-new-game [state]
+  (-> state
+      (assoc :board (new-board 3))
+      (assoc :game-over false)
+      (assoc :next-move-by-player :user)))
 
 (defn reducer* [state [event-type event-data]]
-  (prn event-type event-data state)
+  (prn :ooooooo event-type event-data state)
   (case event-type
     :user-move (reducer-player-move state :user event-data)
     :AI-move (reducer-player-move state :AI event-data)
-    :new-game (-> state
-                  (assoc :board (new-board 3))
-                  (assoc :game-over false))))
+    :new-game (reducer-new-game state)))
 
 (defn reducer [state event]
   (let [next-state (reducer* state event)]
@@ -52,13 +60,23 @@
 (defn game-over? [board]
   false)
 
-;;;;;;;;;
-;;
-;;;;;;;;;
+(test/deftest test-numbers
+  (test/is (= 1 1)))
+
+(test/run-tests)
+
+;;;;;;;;;;;;;;;;;;
+;; moving parts ;;
+;;;;;;;;;;;;;;;;;;
 
 (defonce app-state  (r/atom initial-app-state))
-(def event-chan (chan 1))
-(def state-chan (chan 1))
+(defonce event-chan (chan))
+(defonce state-chan (chan))
+
+(defn AI-move [board]
+  (go
+    (<! (async/timeout 1000))
+    (>! event-chan [:AI-move (calculate-computer-move board)])))
 
 (def xform-event->state
   (comp
@@ -73,24 +91,15 @@
                 xform-event->state
                 event-chan)
 
-(defn AI-move [board]
-  (go
-    (<! (async/timeout 2000))
-    (>! event-chan [:AI-move (calculate-computer-move board)])))
-
-(async/take!
-  state-chan
-  (fn [data]
-    ;; update app state
+(go-loop []
+  (let [data (<! state-chan)]
+    ; update app state
     (reset! app-state (:next-state data))
-    ;; AI move
-    (prn @app-state)
-    (prn (= (get (:event data) 0) :user-move))
-    (prn (= :AI (:next-move-by-player (:next-state data))))
+    ; AI move
     (when (and (= (get (:event data) 0) :user-move)
                (= :AI (:next-move-by-player (:next-state data))))
-      (AI-move (:board (:next-state data))))
-    ))
+      (AI-move (:board (:next-state data)))))
+  (recur))
 
 (defn dispatch! [evt]
   (put! event-chan evt))
