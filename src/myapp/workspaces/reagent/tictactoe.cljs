@@ -1,7 +1,7 @@
 (ns myapp.workspaces.reagent.tictactoe
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [reagent.core :as r]
-            [cljs.core.async :as async :refer [>! <! offer! chan alts!]]))
+            [cljs.core.async :as async :refer [>! <! put! chan alts!]]))
 
 
 (defn new-board [n]
@@ -26,6 +26,7 @@
             (assoc :next-move-by-player (player next-player-map)))))))
 
 (defn reducer* [state [event-type event-data]]
+  (prn event-type event-data state)
   (case event-type
     :user-move (reducer-player-move state :user event-data)
     :AI-move (reducer-player-move state :AI event-data)
@@ -55,51 +56,44 @@
 ;;
 ;;;;;;;;;
 
-(defonce app-state
-         (r/atom initial-app-state))
+(defonce app-state  (r/atom initial-app-state))
+(def event-chan (chan 1))
+(def state-chan (chan 1))
 
-(defn AI-move []
-  (go
-    (<! (async/timeout 2000))
-    (>! event-bus (calculate-computer-move (:board app-state)))))
-
-(defn create-state-chan [state-atom event-chan reducer]
-  (let [state-chan (chan)]
-    (go-loop []
-     (let [current-state @state-atom
-           next-state (reducer current-state (<! event-chan))]
-       (when (not= next-state current-state)
-         (swap! state-atom next-state)
-         (when (and (= :user (:next-move-by-player current-state))
-                    (= :AI (:next-move-by-player next-state)))
-           (AI-move)))
-       (recur)))
-    state-chan))
-
-(defonce event-chan (chan 1))
-(defonce state-chan (chan 1 ))
-;;(defonce sink-chan (async/mult state-chan))
-
-(def xform
+(def xform-event->state
   (comp
     (map (fn [event] [event @app-state]))
-    (map (fn [event state] {:event event
-                            :state state
-                            :next-state (reducer state event)}))
+    (map (fn [[event state]] {:event event
+                              :state state
+                              :next-state (reducer state event)}))
     (filter (fn [{:keys [state next-state]}] (not= state next-state)))))
 
-(async/pipeline 1 state-chan xform event-chan)
+(async/pipeline 1
+                state-chan
+                xform-event->state
+                event-chan)
+
+(defn AI-move [board]
+  (go
+    (<! (async/timeout 2000))
+    (>! event-chan [:AI-move (calculate-computer-move board)])))
 
 (async/take!
   state-chan
   (fn [data]
-    (swap! app-state (:next-state data))
-    (AI-move)))
-;;(defonce state-chan (create-state-chan app-state event-chan reducer))
+    ;; update app state
+    (reset! app-state (:next-state data))
+    ;; AI move
+    (prn @app-state)
+    (prn (= (get (:event data) 0) :user-move))
+    (prn (= :AI (:next-move-by-player (:next-state data))))
+    (when (and (= (get (:event data) 0) :user-move)
+               (= :AI (:next-move-by-player (:next-state data))))
+      (AI-move (:board (:next-state data))))
+    ))
 
-;;;;;;;;;;;;;;;;
-;; transducers
-;;;;;;;;;;;;;;;;
+(defn dispatch! [evt]
+  (put! event-chan evt))
 
 ;;;;;;;;
 ;; UI ;;
@@ -113,7 +107,7 @@
     :x      i
     :y      j
     :on-click (fn tail-click [_]
-                (put! event-chan [:user-move [i j]]))}])
+                (dispatch! [:user-move [i j]]))}])
 
 (defn circle [i j]
   [:circle
@@ -133,8 +127,7 @@
    [:line {:x1 0 :y1 1 :x2 1 :y2 0}]])
 
 (defn main []
-  (let [button-text "New Game"
-        _ (run-game)]
+  (let [button-text "New Game"]
     (fn []
       [:center
        [:h1 (:text @app-state)]
@@ -148,10 +141,10 @@
                :blank (blank i j)
                :user (circle i j)
                :AI (cross i j)))))
-       [:div "Turn: " (:next-turn @app-state)]
+       [:div "Turn: " (:next-move-by-player @app-state)]
        [:p
         [:button
          {:on-click
           (fn new-game-click [_]
-            (put! event-chan [:new-game]))}
+            (dispatch! [:new-game]))}
          button-text]]])))
