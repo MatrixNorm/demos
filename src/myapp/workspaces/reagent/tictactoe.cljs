@@ -2,8 +2,13 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [reagent.core :as r]
             [cljs.core.async :as async :refer [>! <! put! chan alts!]]
-            [cljs.test :as test]))
+            [cljs.test :as t]
+            [cljs.spec.alpha :as s]
+            [cljs.spec.test.alpha :as stest]))
 
+;;;;;;;;;;
+;; pure ;;
+;;;;;;;;;;
 
 (defn new-board [n]
   (vec (repeat n (vec (repeat n :blank)))))
@@ -36,7 +41,6 @@
       (assoc :next-move-by-player :user)))
 
 (defn reducer* [state [event-type event-data]]
-  (prn :ooooooo event-type event-data state)
   (case event-type
     :user-move (reducer-player-move state :user event-data)
     :AI-move (reducer-player-move state :AI event-data)
@@ -60,10 +64,22 @@
 (defn game-over? [board]
   false)
 
-(test/deftest test-numbers
-  (test/is (= 1 1)))
+;; Specs
 
-(test/run-tests)
+(s/fdef reducer-player-move*
+        :args (s/cat :state map?
+                     :player #{:user :AI}
+                     :coords (s/coll-of int? :kind vector? :count 2))
+        :ret (s/nilable map?))
+
+(stest/instrument `reducer-player-move*)
+
+;; Tests
+
+(t/deftest test-reducer-player-move
+  (t/is (nil? (reducer-player-move {:game-over true} :user [0 0]))))
+
+(t/run-tests)
 
 ;;;;;;;;;;;;;;;;;;
 ;; moving parts ;;
@@ -73,10 +89,8 @@
 (defonce event-chan (chan))
 (defonce state-chan (chan))
 
-(defn AI-move [board]
-  (go
-    (<! (async/timeout 1000))
-    (>! event-chan [:AI-move (calculate-computer-move board)])))
+(defn dispatch! [evt]
+  (put! event-chan evt))
 
 (def xform-event->state
   (comp
@@ -91,6 +105,11 @@
                 xform-event->state
                 event-chan)
 
+(defn AI-move [board]
+  (go
+    (<! (async/timeout 1000))
+    (>! event-chan [:AI-move (calculate-computer-move board)])))
+
 (go-loop []
   (let [data (<! state-chan)]
     ; update app state
@@ -100,9 +119,6 @@
                (= :AI (:next-move-by-player (:next-state data))))
       (AI-move (:board (:next-state data)))))
   (recur))
-
-(defn dispatch! [evt]
-  (put! event-chan evt))
 
 ;;;;;;;;
 ;; UI ;;
