@@ -40,11 +40,16 @@
       (assoc :game-over false)
       (assoc :next-move-by-player :user)))
 
+(declare game-over?)
+
 (defn reducer* [state [event-type event-data]]
-  (case event-type
-    :user-move (reducer-player-move state :user event-data)
-    :AI-move (reducer-player-move state :AI event-data)
-    :new-game (reducer-new-game state)))
+  (if (= event-type :new-game)
+    (reducer-new-game state)
+    (when (not (:game-over state))
+      (let [next-state (case event-type
+                         :user-move (reducer-player-move state :user event-data)
+                         :AI-move (reducer-player-move state :AI event-data))]
+        (assoc next-state :game-over (game-over? (:board next-state)))))))
 
 (defn reducer [state event]
   (let [next-state (reducer* state event)]
@@ -60,9 +65,19 @@
                        [i j])]
     (rand-nth vacant-cells)))
 
-(defn winnable-segment? [segment]
-  (or (every? #(= % :user) segment)
-      (every? #(= % :AI) segment)))
+;; Game over conditions
+
+(defn segment-status [segment]
+  (case (set segment)
+    #{:user}            :user-winner
+    #{:AI}              :AI-winner
+    #{:user :AI}        :draw
+    #{:user :AI :blank} :draw
+    :undefined))
+
+(defn game-status
+  ([board] ...)
+  ([board ]))
 
 (defn game-over-columns* [board]
   (true? (some winnable-segment? board)))
