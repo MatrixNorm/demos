@@ -58,11 +58,33 @@
                            j (range N)
                            :when (= :blank (get-in board [i j]))]
                        [i j])]
-    (prn vacant-cells)
     (rand-nth vacant-cells)))
 
+(defn winnable-segment? [segment]
+  (or (every? #(= % :user) segment)
+      (every? #(= % :AI) segment)))
+
+(defn game-over-columns* [board]
+  (true? (some winnable-segment? board)))
+
+(defn game-over-rows* [board]
+  (true? (some winnable-segment?
+               (for [i (range (count board))]
+                 (map #(nth % i) board)))))
+
+(defn game-over-diagonals* [board]
+  (let [n (count board)
+        main-diag (for [i (range n)]
+                    (get-in board [i i]))
+        second-diag (for [i (range n)]
+                      (get-in board [i (- n 1 i)]))]
+    (or (winnable-segment? main-diag)
+        (winnable-segment? second-diag))))
+
 (defn game-over? [board]
-  false)
+  (or (game-over-columns* board)
+      (game-over-rows* board)
+      (game-over-diagonals* board)))
 
 ;; Specs
 
@@ -70,7 +92,13 @@
         :args (s/cat :state map?
                      :player #{:user :AI}
                      :coords (s/coll-of int? :kind vector? :count 2))
-        :ret (s/nilable map?))
+        :ret (s/nilable map?)
+        :fn (fn [this]
+              (prn this)
+              (let [[i j] (-> this :args :coords)
+                    n (-> this :args :state :board count)]
+                (prn j i n)
+                (and (<= i n) (> j n)))))
 
 (stest/instrument `reducer-player-move*)
 
