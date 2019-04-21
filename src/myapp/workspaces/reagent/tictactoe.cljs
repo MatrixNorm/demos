@@ -14,9 +14,8 @@
   (vec (repeat n (vec (repeat n :blank)))))
 
 (def initial-app-state
-  {:text      "Tic Tac Toe"
-   :board     (new-board 3)
-   :game-over false
+  {:board     (new-board 3)
+   :game-status :unresolved
    :next-move-by-player :user})
 
 (def next-player-map
@@ -37,19 +36,21 @@
 (defn reducer-new-game [state]
   (-> state
       (assoc :board (new-board 3))
-      (assoc :game-over false)
+      (assoc :game-status :unresolved)
       (assoc :next-move-by-player :user)))
 
-(declare game-over?)
+(declare game-status)
 
 (defn reducer* [state [event-type event-data]]
-  (if (= event-type :new-game)
-    (reducer-new-game state)
-    (when (not (:game-over state))
+  (if (contains? #{:user-move :AI-move} event-type)
+    (when (= (:game-status state) :unresolved)
       (let [next-state (case event-type
                          :user-move (reducer-player-move state :user event-data)
                          :AI-move (reducer-player-move state :AI event-data))]
-        (assoc next-state :game-over (game-over? (:board next-state)))))))
+        (assoc next-state :game-status (game-status (:board next-state)))))
+    (case event-type
+      :new-game (reducer-new-game state)
+                state)))
 
 (defn reducer [state event]
   (let [next-state (reducer* state event)]
@@ -73,33 +74,26 @@
     #{:AI}              :AI-winner
     #{:user :AI}        :draw
     #{:user :AI :blank} :draw
-    :undefined))
+    :unresolved))
 
-(defn game-status
-  ([board] ...)
-  ([board ]))
-
-(defn game-over-columns* [board]
-  (true? (some winnable-segment? board)))
-
-(defn game-over-rows* [board]
-  (true? (some winnable-segment?
-               (for [i (range (count board))]
-                 (map #(nth % i) board)))))
-
-(defn game-over-diagonals* [board]
+(defn game-status [board]
   (let [n (count board)
-        main-diag (for [i (range n)]
-                    (get-in board [i i]))
-        second-diag (for [i (range n)]
-                      (get-in board [i (- n 1 i)]))]
-    (or (winnable-segment? main-diag)
-        (winnable-segment? second-diag))))
-
-(defn game-over? [board]
-  (or (game-over-columns* board)
-      (game-over-rows* board)
-      (game-over-diagonals* board)))
+        columns board
+        rows (for [i (range n)]
+               (map #(nth % i) board))
+        diadonals [(for [i (range n)]
+                     (get-in board [i i]))
+                   (for [i (range n)]
+                     (get-in board [i (- n 1 i)]))]
+        segments (concat columns rows diadonals)]
+    (reduce (fn [acc status]
+              (if (contains? #{:user-winner :AI-winner} status)
+                (reduced status)
+                (if (= status :unresolved)
+                  :unresolved
+                  acc)))
+            :draw
+            (map segment-status segments))))
 
 ;; Specs
 
@@ -198,7 +192,7 @@
   (let [button-text "New Game"]
     (fn []
       [:center
-       [:h1 (:text @app-state)]
+       [:h1 (:game-status @app-state)]
        (into
          [:svg
           {:view-box "0 0 3 3" :width 300 :height 300}]

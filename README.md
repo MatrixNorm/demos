@@ -8,3 +8,10 @@ npx shadow-cljs watch workspaces
 ```
 
 Then open http://localhost:3655/.
+
+## REPL
+
+```
+(shadow/nrepl-select :workspaces)
+```
+
