@@ -70,8 +70,8 @@
 
 (defn segment-status [segment]
   (case (set segment)
-    #{:user}            :user-winner
-    #{:AI}              :AI-winner
+    #{:user}            :user-wins
+    #{:AI}              :AI-wins
     #{:user :AI}        :draw
     #{:user :AI :blank} :draw
     :unresolved))
@@ -87,7 +87,7 @@
                      (get-in board [i (- n 1 i)]))]
         segments (concat columns rows diadonals)]
     (reduce (fn [acc status]
-              (if (contains? #{:user-winner :AI-winner} status)
+              (if (contains? #{:user-wins :AI-wins} status)
                 (reduced status)
                 (if (= status :unresolved)
                   :unresolved
@@ -115,6 +115,12 @@
 
 (t/deftest test-reducer-player-move
   (t/is (nil? (reducer-player-move {:game-over true} :user [0 0]))))
+
+(t/deftest test-game-status
+  (t/is (= :user-wins
+           (game-status [[:AI    :blank :user]
+                         [:blank :user  :blank]
+                         [:user  :AI    :blank]]))))
 
 (t/run-tests)
 
