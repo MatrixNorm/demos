@@ -120,7 +120,11 @@
   (t/is (= :user-wins
            (game-status [[:AI    :blank :user]
                          [:blank :user  :blank]
-                         [:user  :AI    :blank]]))))
+                         [:user  :AI    :blank]])))
+  (t/is (= :draw
+           (game-status [[:user  :AI   :user]
+                         [:AI    :AI   :user]
+                         [:user  :user :AI]]))))
 
 (t/run-tests)
 
