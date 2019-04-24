@@ -6,15 +6,14 @@
 (defn new-board [n]
   (vec (repeat n (vec (repeat n :blank)))))
 
-(defn blankTile [i j]
+(defn blankTile [i j onUserMove]
   (dom/rect
-    {:width    0.9
-     :height   0.9
-     :fill     "skyblue"
-     :x        i
-     :y        j
-     :on-click (fn tail-click [_]
-                 (prim/transact! this `[(mut-user-move [i j])]))}))
+    {:width   0.9
+     :height  0.9
+     :fill    "skyblue"
+     :x       i
+     :y       j
+     :onClick onUserMove}))
 
 (defn circleTile [i j]
   (dom/circle
@@ -22,7 +21,6 @@
      :cx   (+ 0.45 i)
      :cy   (+ 0.45 j)
      :fill "coral"}))
-
 
 (defn crossTile [i j]
   (dom/g {:stroke         "green"
@@ -33,18 +31,36 @@
          (dom/line {:x1 0 :y1 0 :x2 1 :y2 1})
          (dom/line {:x1 0 :y1 1 :x2 1 :y2 0})))
 
-
-(defsc Board [this {:board board}]
-  {:query [:board]
-   :initial-state (new-board 3)}
+(defn gameBoard [board onUserMove]
   (dom/svg
     {:view-box "0 0 3 3" :width 300 :height 300}
     (let [n (count board)]
       (for [i (range n)
             j (range n)]
         (case (get-in board [i j])
-          :blank (blankTile i j)
+          :blank (blankTile i j onUserMove)
           :user (circleTile i j)
           :AI (crossTile i j))))))
 
+(defsc Game [this {:keys/game [id board status next-move-by-player]}]
+  {:query [:game/id
+           :game/board
+           :game/status
+           :game/next-move-by-player]
+   :ident [:game/by-id :game/id]}
+  (dom/div
+    (dom/h1 status)
+    (gameBoard board #(prim/transact! this `[(mut-user-move [i j])]))
+    (dom/div "Turn by: " next-move-by-player)))
 
+(def ui-game (prim/factory Game))
+
+(defsc Root [this {:keys [active-game]}]
+  {:query [:active-game ???]
+   :initial-state (fn [_] {})}
+  (if active-game
+    (ui-game active-game)
+    (dom/p
+      (dom/button
+        {:onClick #(prim/transact! this `[(mut-new-game)])}
+        "New Game"))))
