@@ -3,9 +3,6 @@
             [fulcro.client.localized-dom :as dom]
             [fulcro.client.mutations :as m]))
 
-(defn new-board [n]
-  (vec (repeat n (vec (repeat n :blank)))))
-
 (defn blankTile [i j onUserMove]
   (dom/rect
     {:width   0.9
@@ -42,7 +39,7 @@
           :user (circleTile i j)
           :AI (crossTile i j))))))
 
-(defsc Game [this {:keys/game [id board status next-move-by-player]}]
+(defsc Game [this {:game/keys [id board status next-move-by-player]}]
   {:query [:game/id
            :game/board
            :game/status
@@ -65,3 +62,21 @@
       (dom/button
         {:onClick #(prim/transact! this `[(mut-new-game)])}
         "New Game"))))
+
+;;;;;;;;;;;;;;;
+;; Mutations ;;
+;;;;;;;;;;;;;;;
+
+(defn new-game [id n]
+  {:game/id id
+   :game/board (->> (repeat 2 :blank)
+                    vec
+                    (repeat 2)
+                    vec)
+   :game/status :unresolved
+   :game/next-move-by-player :user})
+
+(m/defmutation mut-delete-person []
+  (action [{:keys [state]}]
+          (let [game (new-game (random-uuid) 3)]
+            (swap! state update-in [:person-list/by-id list-id :person-list/people] strip-fk))))

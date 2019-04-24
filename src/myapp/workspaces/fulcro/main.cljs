@@ -2,6 +2,7 @@
   (:require [nubank.workspaces.core :as ws]
             [nubank.workspaces.model :as wsm]
             [nubank.workspaces.card-types.fulcro :as ct.fulcro]
+            [nubank.workspaces.lib.fulcro-portal :as f.portal]
             [myapp.workspaces.fulcro.tictactoe :as tictactoe]))
 
 
