@@ -50,13 +50,14 @@
    :ident [:game/by-id :game/id]}
   (dom/div
     (dom/h1 status)
-    (gameBoard board #(prim/transact! this `[(mut-user-move [i j])]))
+    (gameBoard board
+               #(prim/transact! this `[(mut-user-move [i j])]))
     (dom/div "Turn by: " next-move-by-player)))
 
 (def ui-game (prim/factory Game))
 
 (defsc Root [this {:keys [active-game]}]
-  {:query [:active-game ???]
+  {:query [:active-game]
    :initial-state (fn [_] {})}
   (if active-game
     (ui-game active-game)
