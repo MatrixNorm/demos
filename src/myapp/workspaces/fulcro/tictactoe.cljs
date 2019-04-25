@@ -45,17 +45,20 @@
            :game/status
            :game/next-move-by-player]
    :ident [:game/by-id :game/id]}
+  (prn status)
   (dom/div
-    (dom/h1 status)
+    (dom/h2 (str status))
     (gameBoard board
                #(prim/transact! this `[(mut-user-move [i j])]))
-    (dom/div "Turn by: " next-move-by-player)))
+    (dom/div "Turn by: " (str next-move-by-player))
+    ))
 
 (def ui-game (prim/factory Game))
 
 (defsc Root [this {:keys [active-game]}]
-  {:query [:active-game]
-   :initial-state (fn [_] {})}
+  {:query [{:active-game (prim/get-query Game)}]
+   :initial-state (fn [_] {:active-game nil})}
+  (prn 22 active-game)
   (if active-game
     (ui-game active-game)
     (dom/p
@@ -69,14 +72,20 @@
 
 (defn new-game [id n]
   {:game/id id
-   :game/board (->> (repeat 2 :blank)
+   :game/board (->> (repeat n :blank)
                     vec
-                    (repeat 2)
+                    (repeat n)
                     vec)
    :game/status :unresolved
    :game/next-move-by-player :user})
 
-(m/defmutation mut-delete-person []
-  (action [{:keys [state]}]
-          (let [game (new-game (random-uuid) 3)]
-            (swap! state update-in [:person-list/by-id list-id :person-list/people] strip-fk))))
+(m/defmutation mut-new-game [_]
+  (action [{state-atom :state}]
+          (let [game-id (random-uuid)
+                game-ident [:game/by-id game-id]
+                game (new-game game-id 3)
+                _ (prn state-atom)
+                next-state (-> @state-atom
+                               (assoc-in game-ident game)
+                               (assoc :active-game game-ident))]
+            (reset! state-atom next-state))))
