@@ -4,6 +4,7 @@
             [fulcro.client.mutations :as m]))
 
 (defn blankTile [i j onUserMove]
+  (prn i j)
   (dom/rect
     {:width   0.9
      :height  0.9
@@ -30,7 +31,7 @@
 
 (defn gameBoard [board onUserMove]
   (dom/svg
-    {:view-box "0 0 3 3" :width 300 :height 300}
+    {:viewBox "0 0 3 3" :width 300 :height 300}
     (let [n (count board)]
       (for [i (range n)
             j (range n)]
@@ -50,16 +51,15 @@
     (dom/h2 (str status))
     (gameBoard board
                #(prim/transact! this `[(mut-user-move [i j])]))
-    (dom/div "Turn by: " (str next-move-by-player))
-    ))
+    (dom/div "Turn by: " (str next-move-by-player))))
 
 (def ui-game (prim/factory Game))
 
 (defsc Root [this {:keys [active-game]}]
   {:query [{:active-game (prim/get-query Game)}]
-   :initial-state (fn [_] {:active-game nil})}
-  (prn 22 active-game)
-  (if active-game
+   :initial-state {:active-game {}}
+   }
+  (if (:game/id active-game)
     (ui-game active-game)
     (dom/p
       (dom/button
