@@ -73,10 +73,10 @@
 
 (defsc Root [this {:keys [active-game]}]
   {:query [{:active-game (prim/get-query Game)}]
-   :initial-state {:active-game {}}
-   }
-  (if (:game/id active-game)
-    (ui-game active-game)
+   :initial-state {:active-game {}}}
+  (dom/div
+    (when (:game/id active-game)
+      (ui-game active-game))
     (dom/p
       (dom/button
         {:onClick #(prim/transact! this `[(mut-new-game)])}
@@ -100,7 +100,6 @@
           (let [game-id (random-uuid)
                 game-ident [:game/by-id game-id]
                 game (new-game game-id 3)
-                _ (prn state-atom)
                 next-state (-> @state-atom
                                (assoc-in game-ident game)
                                (assoc :active-game game-ident))]
