@@ -74,6 +74,7 @@
 (defsc Root [this {:keys [active-game]}]
   {:query [{:active-game (prim/get-query Game)}]
    :initial-state {:active-game {}}}
+  (prn active-game)
   (dom/div
     (when (:game/id active-game)
       (ui-game active-game))

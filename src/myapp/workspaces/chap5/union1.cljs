@@ -1,11 +1,7 @@
 (ns myapp.workspaces.chap5.union1
   (:require [fulcro.client.localized-dom :as dom]
             [fulcro.client.routing :as r :refer [defsc-router]]
-            [fulcro.client.primitives :as prim :refer [defsc]]
-            [fulcro.client :as fc]
-            [fulcro.ui.bootstrap3 :as b]
-            [fulcro.ui.elements :as ele]
-            [fulcro.client.cards :refer [defcard-fulcro]]))
+            [fulcro.client.primitives :as prim :refer [defsc]]))
 
 (defn item-ident
   "Generate an ident from a person, place, or thing."
@@ -20,8 +16,9 @@
 (defn make-thing [id n] {:db/id id :kind :thing/by-id :thing/label n})
 
 (defsc PersonDetail [this {:keys [db/id person/name] :as props}]
-  ; defsc-router expects there to be an initial state for each possible target. We'll cause this to be a "no selection"
-  ; state so that the detail screen that starts out will show "Nothing selected". We initialize all three in case
+  ; defsc-router expects there to be an initial state for each possible target.
+  ; We'll cause this to be a "no selection" state so that the detail screen
+  ; that starts out will show "Nothing selected". We initialize all three in case
   ; we later re-order them in the defsc-router.
   {:ident         (fn [] (item-ident props))
    :query         [:kind :db/id :person/name]
