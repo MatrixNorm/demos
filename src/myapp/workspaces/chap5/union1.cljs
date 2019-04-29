@@ -22,7 +22,8 @@
   ; we later re-order them in the defsc-router.
   {:ident         (fn [] (item-ident props))
    :query         [:kind :db/id :person/name]
-   :initial-state {:db/id :no-selection :kind :person/by-id}}
+   :initial-state {:db/id :no-selection
+                   :kind :person/by-id}}
   (dom/div
     (if (= id :no-selection)
       "Nothing selected"
@@ -31,7 +32,8 @@
 (defsc PlaceDetail [this {:keys [db/id place/name] :as props}]
   {:ident         (fn [] (item-ident props))
    :query         [:kind :db/id :place/name]
-   :initial-state {:db/id :no-selection :kind :place/by-id}}
+   :initial-state {:db/id :no-selection
+                   :kind :place/by-id}}
   (dom/div
     (if (= id :no-selection)
       "Nothing selected"
@@ -40,7 +42,8 @@
 (defsc ThingDetail [this {:keys [db/id thing/label] :as props}]
   {:ident         (fn [] (item-ident props))
    :query         [:kind :db/id :thing/label]
-   :initial-state {:db/id :no-selection :kind :thing/by-id}}
+   :initial-state {:db/id :no-selection
+                   :kind :thing/by-id}}
   (dom/div
     (if (= id :no-selection)
       "Nothing selected"
@@ -48,38 +51,42 @@
 
 (defsc PersonListItem [this
                        {:keys [db/id person/name] :as props}
-                       {:keys [onSelect] :as computed}]
+                       {:keys [onSelect]}]
   {:ident (fn [] (item-ident props))
    :query [:kind :db/id :person/name]}
   (dom/li {:onClick #(onSelect (item-ident props))}
           (dom/a {:href "javascript:void(0)"} (str "Person " id " " name))))
 
-(def ui-person (prim/factory PersonListItem {:keyfn item-key}))
-
-(defsc PlaceListItem [this {:keys [db/id place/name] :as props} {:keys [onSelect] :as computed}]
+(defsc PlaceListItem [this
+                      {:keys [db/id place/name] :as props}
+                      {:keys [onSelect]}]
   {:ident (fn [] (item-ident props))
    :query [:kind :db/id :place/name]}
   (dom/li {:onClick #(onSelect (item-ident props))}
           (dom/a {:href "javascript:void(0)"} (str "Place " id " : " name))))
 
-(def ui-place (prim/factory PlaceListItem {:keyfn item-key}))
-
-(defsc ThingListItem [this {:keys [db/id thing/label] :as props} {:keys [onSelect] :as computed}]
+(defsc ThingListItem [this
+                      {:keys [db/id thing/label] :as props}
+                      {:keys [onSelect]}]
   {:ident (fn [] (item-ident props))
    :query [:kind :db/id :thing/label]}
   (dom/li {:onClick #(onSelect (item-ident props))}
           (dom/a {:href "javascript:void(0)"} (str "Thing " id " : " label))))
 
-(def ui-thing (prim/factory ThingListItem item-key))
+(def ui-person (prim/factory PersonListItem))
+(def ui-place (prim/factory PlaceListItem))
+(def ui-thing (prim/factory ThingListItem))
 
 (defsc-router ItemDetail [this props]
-              {:router-id      :detail-router
-               :ident          (fn [] (item-ident props))
-               :default-route  PersonDetail
-               :router-targets {:person/by-id PersonDetail
-                                :place/by-id  PlaceDetail
-                                :thing/by-id  ThingDetail}}
-              (dom/div "No route"))
+  {:router-id      :detail-router
+   :ident          (fn []
+                     (prn :AAA props)
+                     (item-ident props))
+   :default-route  PersonDetail
+   :router-targets {:person/by-id PersonDetail
+                    :place/by-id  PlaceDetail
+                    :thing/by-id  ThingDetail}}
+  (dom/div "No route"))
 
 (def ui-item-detail (prim/factory ItemDetail))
 
@@ -122,6 +129,8 @@
                                     [(r/router-instruction :detail-router [:param/kind :param/id])]))
                     {:item-list   (prim/get-initial-state ItemList nil)
                      :item-detail (prim/get-initial-state ItemDetail nil)}))}
+  (prn :BBB)
+  (.log js/console (prim/get-query this))
   (let [; This is the only thing to do:
         ; Route the to the detail screen with the given route params!
         showDetail (fn [[kind id]]

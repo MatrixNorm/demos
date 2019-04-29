@@ -1,5 +1,6 @@
-(ns myapp.workspaces.chap5.union2
+(ns myapp.workspaces.chap5.union2a
   (:require [fulcro.client.localized-dom :as dom]
+            [fulcro.client.routing :as r :refer [defsc-router]]
             [fulcro.client.primitives :as prim :refer [defsc]]))
 
 (defn item-kind [props]
@@ -17,29 +18,23 @@
   (clojure.string/join "__" (item-ident props)))
 
 (defsc Person [this {:keys [db/id person/name] :as props}]
-  {:ident [:person/by-id :db/id]
-   :query [:db/id :person/name]
+  {:query [:db/id :person/name]
    :initial-state (fn [{:keys [id name]}]
                     {:db/id id :person/name name})}
-  (prn :111 (prim/get-ident this))
   (dom/div
     (str "Details about person " name " " id)))
 
 (defsc Place [this {:keys [db/id place/location] :as props}]
-  {:ident [:place/by-id :db/id]
-   :query [:db/id :place/location]
+  {:query [:db/id :place/location]
    :initial-state (fn [{:keys [id location]}]
                     {:db/id id :place/location location})}
-  (prn :222 (prim/get-ident this))
   (dom/div
     (str "Details about place " location " " id )))
 
 (defsc Thing [this {:keys [db/id thing/label] :as props}]
-  {:ident [:thing/by-id :db/id]
-   :query [:db/id :thing/label]
+  {:query [:db/id :thing/label]
    :initial-state (fn [{:keys [id label]}]
                     {:db/id id :thing/label label})}
-  (prn :333 (prim/get-ident this))
   (dom/div
     (str "Details about thing " label " " id)))
 
@@ -72,3 +67,4 @@
   (prn :xxx (prim/get-query this))
   (dom/div
     (map ui-item items)))
+
