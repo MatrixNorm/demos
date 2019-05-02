@@ -17,22 +17,19 @@
   {:query         [:db/id :router/page]
    :ident         (fn [] [page id])
    :initial-state {:db/id 1 :router/page :PAGE/settings}}
+  (prn :222 (prim/get-initial-state this {}))
   (dom/div "Settings Page"))
 
-(defsc
-  RootRouter-Union
-  [this {:keys [router/page db/id]}]
-  {:ident (fn [] [page id]),
-   :initial-state (fn [params] (prim/get-initial-state Index params)),
+(defsc RootRouter-Union [this {:keys [router/page db/id]}]
+  {:ident (fn [] [page id])
+   :initial-state (fn [params] (prim/get-initial-state Index params))
    :query (fn
             []
             {:PAGE/index (prim/get-query Index),
              :PAGE/settings (prim/get-query Settings)})}
   (let
-    [props
-     (prim/props this)
-     page__47647__auto__
-     (first (prim/get-ident this props))]
+    [props (prim/props this)
+     page__47647__auto__ (first (prim/get-ident this props))]
     (case
       page__47647__auto__
       :PAGE/index
@@ -43,35 +40,31 @@
 
 (def ui-RootRouter-Union (prim/factory RootRouter-Union))
 
-(defsc
-  RootRouter
-  [this {:keys [router/page db/id]}]
+(defsc RootRouter [this {:keys [router/page db/id]}]
   {:default-route Index,
    :ident (fn [] [:fulcro.client.routing.routers/by-id :root/router]),
    :initial-state (fn
-                    [params__47687__auto__]
-                    {:fulcro.client.routing/id :root/router,
+                    [p]
+                    {:fulcro.client.routing/id :root/router
                      :fulcro.client.routing/current-route (prim/get-initial-state
                                                             RootRouter-Union
-                                                            params__47687__auto__)}),
+                                                            p)})
    :query (fn
             []
             [:fulcro.client.routing/id
              {:fulcro.client.routing/current-route (prim/get-query RootRouter-Union)}])}
   (let
-    [computed__47688__auto__
-     (prim/get-computed this)
-     props__47689__auto__
-     (:fulcro.client.routing/current-route (prim/props this))
-     props-with-computed__47690__auto__
-     (prim/computed props__47689__auto__ computed__47688__auto__)]
-    (ui-RootRouter-Union props-with-computed__47690__auto__)))
+    [x (prim/get-computed this)
+     y    (:fulcro.client.routing/current-route (prim/props this))
+     z (prim/computed y x)]
+    (ui-RootRouter-Union z)))
 
 (def ui-root-router (prim/factory RootRouter))
 
 (defsc Root [this {:keys [router]}]
   {:initial-state (fn [p] {:router (prim/get-initial-state RootRouter {})})
    :query         [{:router (prim/get-query RootRouter)}]}
+  (prn :111 (prim/get-initial-state this {}))
   (dom/div
     (dom/a {:onClick #(prim/transact! this
                                       `[(r/set-route {:router :root/router
