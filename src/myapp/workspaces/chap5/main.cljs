@@ -5,7 +5,8 @@
             [nubank.workspaces.lib.fulcro-portal :as f.portal]
             [myapp.workspaces.chap5.union1 :as union1]
             [myapp.workspaces.chap5.union2 :as union2]
-            [myapp.workspaces.chap5.union2a :as union2a]))
+            [myapp.workspaces.chap5.union2a :as union2a]
+            [myapp.workspaces.chap5.routing1 :as routing1]))
 
 (ws/defcard union1-card
   (ct.fulcro/fulcro-card

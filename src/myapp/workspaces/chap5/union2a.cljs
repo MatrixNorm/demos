@@ -10,6 +10,8 @@
     (:thing/label props)    :thing/by-id))
 
 (defn item-ident [{:keys [db/id] :as props}]
+  ;; why is this called for many times?
+  (prn :ggg (item-kind props))
   [(item-kind props) id])
 
 (defn item-key
