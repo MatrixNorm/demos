@@ -7,6 +7,7 @@
             [myapp.workspaces.chap2-getting-started]
             [myapp.workspaces.reagent.main]
             [myapp.workspaces.fulcro.main]
-            [myapp.workspaces.chap5.main]))
+            [myapp.workspaces.chap5.main]
+            [myapp.workspaces.chap14.main]))
 
 (defonce init (ws/mount))
