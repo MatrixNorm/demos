@@ -138,15 +138,37 @@
 (m/defmutation mut-user-move [{:keys [game-id coords]}]
   (action [{state-atom :state}]
           (let [[i j] coords
-                game (get-in @state-atom [:game/by-id game-id])]
+                game-path [:game/by-id game-id]
+                board-path (conj game-path :game/board)
+                game (get-in @state-atom game-path)]
             (when (and (= (:game/status game) :unresolved)
                        (= (:game/next-move-by-player game) :user))
                 (swap! state-atom
                        #(as->
                           % $
                           (assoc-in $
-                                    [:game/by-id game-id :game/board i j]
-                                    :user)
+                                    (into board-path [i j]) :user)
                           (assoc-in $
-                                    [:game/by-id game-id :game/status]
-                                    (game-status (get-in $ [:game/by-id game-id :game/board])))))))))
+                                    (conj game-path :game/next-move-by-player) :AI)
+                          (assoc-in $
+                                    (conj game-path :game/status)
+                                    (game-status (get-in $ board-path)))))))))
+
+(m/defmutation mut-AI-move [{:keys [game-id coords]}]
+  (action [{state-atom :state}]
+          (let [[i j] coords
+                game-path [:game/by-id game-id]
+                board-path (conj game-path :game/board)
+                game (get-in @state-atom game-path)]
+            (when (and (= (:game/status game) :unresolved)
+                       (= (:game/next-move-by-player game) :AI))
+              (swap! state-atom
+                     #(as->
+                        % $
+                        (assoc-in $
+                                  (into board-path [i j]) :AI)
+                        (assoc-in $
+                                  (conj game-path :game/next-move-by-player) :user)
+                        (assoc-in $
+                                  (conj game-path :game/status)
+                                  (game-status (get-in $ board-path)))))))))
