@@ -77,7 +77,6 @@
 (defsc Root [this {:keys [active-game]}]
   {:query [{:active-game (prim/get-query Game)}]
    :initial-state {:active-game {}}}
-  (prn active-game)
   (dom/div
     (when (:game/id active-game)
       (ui-game active-game))
@@ -99,6 +98,33 @@
    :game/status :unresolved
    :game/next-move-by-player :user})
 
+(defn segment-status [segment]
+  (case (set segment)
+    #{:user}            :user-wins
+    #{:AI}              :AI-wins
+    #{:user :AI}        :draw
+    #{:user :AI :blank} :draw
+    :unresolved))
+
+(defn game-status [board]
+  (let [n (count board)
+        columns board
+        rows (for [i (range n)]
+               (map #(nth % i) board))
+        diagonals [(for [i (range n)]
+                     (get-in board [i i]))
+                   (for [i (range n)]
+                     (get-in board [i (- n 1 i)]))]
+        segments (concat columns rows diagonals)]
+    (reduce (fn [acc status]
+              (if (contains? #{:user-wins :AI-wins} status)
+                (reduced status)
+                (if (= status :unresolved)
+                  :unresolved
+                  acc)))
+            :draw
+            (map segment-status segments))))
+
 (m/defmutation mut-new-game [_]
   (action [{state-atom :state}]
           (let [game-id (random-uuid)
@@ -111,7 +137,16 @@
 
 (m/defmutation mut-user-move [{:keys [game-id coords]}]
   (action [{state-atom :state}]
-          (let [game (get-in @state-atom [:game/by-id game-id])]
+          (let [[i j] coords
+                game (get-in @state-atom [:game/by-id game-id])]
             (when (and (= (:game/status game) :unresolved)
                        (= (:game/next-move-by-player game) :user))
-                (prn game)))))
+                (swap! state-atom
+                       #(as->
+                          % $
+                          (assoc-in $
+                                    [:game/by-id game-id :game/board i j]
+                                    :user)
+                          (assoc-in $
+                                    [:game/by-id game-id :game/status]
+                                    (game-status (get-in $ [:game/by-id game-id :game/board])))))))))

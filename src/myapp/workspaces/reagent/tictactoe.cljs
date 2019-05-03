@@ -81,11 +81,11 @@
         columns board
         rows (for [i (range n)]
                (map #(nth % i) board))
-        diadonals [(for [i (range n)]
+        diagonals [(for [i (range n)]
                      (get-in board [i i]))
                    (for [i (range n)]
                      (get-in board [i (- n 1 i)]))]
-        segments (concat columns rows diadonals)]
+        segments (concat columns rows diagonals)]
     (reduce (fn [acc status]
               (if (contains? #{:user-wins :AI-wins} status)
                 (reduced status)
