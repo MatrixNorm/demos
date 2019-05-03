@@ -16,8 +16,9 @@
 (defsc Settings [this {:keys [db/id router/page]}]
   {:query         [:db/id :router/page]
    :ident         (fn [] [page id])
-   :initial-state {:db/id 1 :router/page :PAGE/settings}}
-  (prn :222 (prim/get-initial-state this {}))
+   :initial-state (fn [p]
+                    (prn :222)
+                    {:db/id 1 :router/page :PAGE/settings})}
   (dom/div "Settings Page"))
 
 (defsc RootRouter-Union [this {:keys [router/page db/id]}]
@@ -29,9 +30,10 @@
              :PAGE/settings (prim/get-query Settings)})}
   (let
     [props (prim/props this)
-     page__47647__auto__ (first (prim/get-ident this props))]
+     x (first (prim/get-ident this props))]
+    (prn :333 x)
     (case
-      page__47647__auto__
+      x
       :PAGE/index
       ((prim/factory Index) props)
       :PAGE/settings

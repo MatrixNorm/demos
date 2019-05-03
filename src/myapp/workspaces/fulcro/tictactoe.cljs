@@ -3,7 +3,7 @@
             [fulcro.client.localized-dom :as dom]
             [fulcro.client.mutations :as m]))
 
-(defn blankTile [i j key onUserMove]
+(defn blankTile [i j key on-user-move]
   (dom/rect
     {:width   0.9
      :height  0.9
@@ -11,7 +11,7 @@
      :x       i
      :y       j
      :key key
-     :onClick onUserMove}))
+     :onClick on-user-move}))
 
 (defn circleTile [i j key]
   (dom/circle
@@ -31,7 +31,7 @@
          (dom/line {:x1 0 :y1 0 :x2 1 :y2 1})
          (dom/line {:x1 0 :y1 1 :x2 1 :y2 0})))
 
-(defn gameBoard [board onUserMove]
+(defn gameBoard [board on-user-move]
   (dom/svg
     {:viewBox "0 0 3 3" :width 300 :height 300}
     (let [n (count board)]
@@ -40,7 +40,7 @@
         (let [key (+ j (* n i))
               tile (get-in board [i j])]
           (case tile
-            :blank (blankTile i j key onUserMove)
+            :blank (blankTile i j key #(on-user-move i j))
             :user (circleTile i j key)
             :AI (crossTile i j key)))))))
 
@@ -50,11 +50,14 @@
            :game/status
            :game/next-move-by-player]
    :ident [:game/by-id :game/id]}
-  (dom/div
-    (dom/h2 (str status))
-    (gameBoard board
-               #(prim/transact! this `[(mut-user-move [i j])]))
-    (dom/div "Turn by: " (str next-move-by-player))))
+  (let [on-user-move (fn [i j]
+                        (prim/transact!
+                          this
+                          `[(mut-user-move {:game-id ~id :coords [~i ~j]})]))]
+    (dom/div
+     (dom/h2 "Status: " (str status))
+     (gameBoard board on-user-move)
+     (dom/div "Turn by: " (str next-move-by-player)))))
 
 (def ui-game (prim/factory Game))
 
@@ -105,3 +108,10 @@
                                (assoc-in game-ident game)
                                (assoc :active-game game-ident))]
             (reset! state-atom next-state))))
+
+(m/defmutation mut-user-move [{:keys [game-id coords]}]
+  (action [{state-atom :state}]
+          (let [game (get-in @state-atom [:game/by-id game-id])]
+            (when (and (= (:game/status game) :unresolved)
+                       (= (:game/next-move-by-player game) :user))
+                (prn game)))))
