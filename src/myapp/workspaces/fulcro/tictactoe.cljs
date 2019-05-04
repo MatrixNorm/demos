@@ -125,50 +125,68 @@
             :draw
             (map segment-status segments))))
 
+(defn calculate-AI-move [board]
+  (let [N (count board)
+        vacant-cells (for [i (range N)
+                           j (range N)
+                           :when (= :blank (get-in board [i j]))]
+                       [i j])]
+    (rand-nth vacant-cells)))
+
+(defn player-move-reducer
+  [state {:keys [game-id coords player next-player] :as xxx}]
+  (let [[i j] coords
+        game-path [:game/by-id game-id]
+        board-path (conj game-path :game/board)
+        game (get-in state game-path)]
+    (when (and (= (:game/status game) :unresolved)
+               (= (:game/next-move-by-player game) player))
+      (as->
+        state $
+        (assoc-in $
+                  (into board-path [i j]) player)
+        (assoc-in $
+                  (conj game-path :game/next-move-by-player) next-player)
+        (assoc-in $
+                  (conj game-path :game/status)
+                  (game-status (get-in $ board-path)))))))
+
+(defn new-game-reducer [state]
+  (let [game-id (random-uuid)
+        game-ident [:game/by-id game-id]
+        game (new-game game-id 3)]
+    (-> state
+        (assoc-in game-ident game)
+        (assoc :active-game game-ident))))
+
 (m/defmutation mut-new-game [_]
   (action [{state-atom :state}]
-          (let [game-id (random-uuid)
-                game-ident [:game/by-id game-id]
-                game (new-game game-id 3)
-                next-state (-> @state-atom
-                               (assoc-in game-ident game)
-                               (assoc :active-game game-ident))]
+          (let [next-state (new-game-reducer @state-atom)]
             (reset! state-atom next-state))))
+
 
 (m/defmutation mut-user-move [{:keys [game-id coords]}]
   (action [{state-atom :state}]
-          (let [[i j] coords
-                game-path [:game/by-id game-id]
-                board-path (conj game-path :game/board)
-                game (get-in @state-atom game-path)]
-            (when (and (= (:game/status game) :unresolved)
-                       (= (:game/next-move-by-player game) :user))
-                (swap! state-atom
-                       #(as->
-                          % $
-                          (assoc-in $
-                                    (into board-path [i j]) :user)
-                          (assoc-in $
-                                    (conj game-path :game/next-move-by-player) :AI)
-                          (assoc-in $
-                                    (conj game-path :game/status)
-                                    (game-status (get-in $ board-path)))))))))
+          (when-let [next-state (player-move-reducer @state-atom
+                                                     {:game-id game-id
+                                                      :coords coords
+                                                      :player :user
+                                                      :next-player :AI})]
+            (reset! state-atom next-state)
+            ;(let [AI-move (calculate-AI-move
+            ;                (get-in @state-atom [:game/by-id game-id :game/board]))]
+            ;  (js/setTimeout
+            ;    #(prim/transact! this
+            ;                     `[(mut-new-game {:game-id ~id :coords [~i ~j]})])
+            ;    1000))
+
+            )))
 
 (m/defmutation mut-AI-move [{:keys [game-id coords]}]
   (action [{state-atom :state}]
-          (let [[i j] coords
-                game-path [:game/by-id game-id]
-                board-path (conj game-path :game/board)
-                game (get-in @state-atom game-path)]
-            (when (and (= (:game/status game) :unresolved)
-                       (= (:game/next-move-by-player game) :AI))
-              (swap! state-atom
-                     #(as->
-                        % $
-                        (assoc-in $
-                                  (into board-path [i j]) :AI)
-                        (assoc-in $
-                                  (conj game-path :game/next-move-by-player) :user)
-                        (assoc-in $
-                                  (conj game-path :game/status)
-                                  (game-status (get-in $ board-path)))))))))
+          (when-let [next-state (player-move-reducer @state-atom
+                                                     {:game-id game-id
+                                                      :coords coords
+                                                      :player :AI
+                                                      :next-player :user})]
+            (reset! state-atom next-state))))
