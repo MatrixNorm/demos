@@ -23,8 +23,8 @@
 
 (defn crossTile [i j key]
   (dom/g {:stroke         "green"
-          :stroke-width   0.15
-          :stroke-linecap "round"
+          :strokeWidth   0.15
+          :strokeLinecap "round"
           :transform      (str "translate(" (+ 0.2 i) "," (+ 0.2 j) ") "
                                "scale(0.55)")
           :key key}
@@ -53,7 +53,9 @@
   (let [on-user-move (fn [i j]
                         (prim/transact!
                           this
-                          `[(mut-user-move {:game-id ~id :coords [~i ~j]})]))]
+                          `[(mut-user-move {:game-id ~id
+                                            :coords [~i ~j]
+                                            :component ~this})]))]
     (dom/div
      (dom/h2 "Status: " (str status))
      (gameBoard board on-user-move)
@@ -164,8 +166,7 @@
           (let [next-state (new-game-reducer @state-atom)]
             (reset! state-atom next-state))))
 
-
-(m/defmutation mut-user-move [{:keys [game-id coords]}]
+(m/defmutation mut-user-move [{:keys [game-id coords component]}]
   (action [{state-atom :state}]
           (when-let [next-state (player-move-reducer @state-atom
                                                      {:game-id game-id
@@ -173,20 +174,19 @@
                                                       :player :user
                                                       :next-player :AI})]
             (reset! state-atom next-state)
-            ;(let [AI-move (calculate-AI-move
-            ;                (get-in @state-atom [:game/by-id game-id :game/board]))]
-            ;  (js/setTimeout
-            ;    #(prim/transact! this
-            ;                     `[(mut-new-game {:game-id ~id :coords [~i ~j]})])
-            ;    1000))
+            (js/setTimeout
+              #(prim/transact! component
+                               `[(mut-AI-move {:game-id ~game-id})])
+              1000))))
 
-            )))
-
-(m/defmutation mut-AI-move [{:keys [game-id coords]}]
+(m/defmutation mut-AI-move [{:keys [game-id]}]
   (action [{state-atom :state}]
-          (when-let [next-state (player-move-reducer @state-atom
-                                                     {:game-id game-id
-                                                      :coords coords
-                                                      :player :AI
-                                                      :next-player :user})]
-            (reset! state-atom next-state))))
+          (let [board (get-in @state-atom [:game/by-id game-id :game/board])
+                AI-move (calculate-AI-move board)
+                next-state (player-move-reducer @state-atom
+                                                {:game-id     game-id
+                                                 :coords      AI-move
+                                                 :player      :AI
+                                                 :next-player :user})]
+            (when next-state
+              (reset! state-atom next-state)))))
