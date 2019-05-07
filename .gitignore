@@ -1,4 +1,5 @@
-/docs
+/docs/**/cljs-runtime/
+/docs/**/manifest.edn
 /target
 /classes
 /checkouts

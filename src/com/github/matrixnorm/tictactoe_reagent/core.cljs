@@ -22,17 +22,13 @@
   {:user :AI
    :AI :user})
 
-(defn reducer-player-move* [state player [i j]]
-  (let [tile (get-in (:board state) [i j])]
-    (when (= tile :blank)
-      (-> state
-          (assoc-in [:board i j] player)
-          (assoc :next-move-by-player (player next-player-map))))))
-
-(defn reducer-player-move [state player coords]
-  (when (and (= :unresolved (:game-status state))
-             (= player (:next-move-by-player state)))
-    (reducer-player-move* state player coords)))
+(defn reducer-player-move [state player [i j]]
+  (if (and (= player (:next-move-by-player state))
+             (= :blank (get-in (:board state) [i j])))
+    (-> state
+        (assoc-in [:board i j] player)
+        (assoc :next-move-by-player (player next-player-map)))
+    state))
 
 (defn reducer-new-game [state]
   (-> state
