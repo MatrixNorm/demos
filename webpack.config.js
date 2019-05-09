@@ -8,11 +8,14 @@ builds.hello = function(env) {
   const mode = env.development ? "development" : "production";
   console.log(outputPath, mode)
   return {
-    entry: "./srcjs/hello/main.js",
+    entry: {
+      main: "./srcjs/hello/main.js",
+      "service-worker": "./srcjs/hello/service-worker.js"
+    },
     output: {
       path: path.resolve(__dirname, outputPath),
       //publicPath: "/",
-      filename: "main.js"
+      filename: "[name].js"
     },
     mode: mode,
     devServer: {
