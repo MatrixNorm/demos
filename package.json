@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "jshello-dev": "webpack-dev-server --env.build=hello --env.development"
+    "webpack-devserver": "webpack-dev-server --env.development",
+    "webpack-watch": "webpack-cli --watch --env.development"
   },
   "author": "",
   "license": "ISC",

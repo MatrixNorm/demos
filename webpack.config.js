@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+const buildId = process.env.JS_BUILD_ID;
 const builds = {};
 
 builds.hello = function(env) {
@@ -22,12 +23,16 @@ builds.hello = function(env) {
       contentBase: "jsdev/hello"
     },
     plugins: [
-      new HtmlWebpackPlugin()
+      new HtmlWebpackPlugin({
+        excludeChunks: ["service-worker"]
+      })      
     ]
   };
 }
 
 module.exports = env => {
-  console.log(env)
-  return builds[env.build](env);
+  const onBadBuild = function() { 
+    console.log(`No build with id ${buildId}`) 
+  };
+  return (builds[buildId] || onBadBuild)(env);
 }
