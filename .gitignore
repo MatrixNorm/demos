@@ -1,6 +1,7 @@
-/jsdev
-/docs/**/cljs-runtime/
 /docs/**/manifest.edn
+/jsdev
+/cljsdev/**/js/
+/cljsdev/**/manifest.edn
 /target
 /classes
 /checkouts
