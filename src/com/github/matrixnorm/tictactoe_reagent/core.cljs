@@ -8,12 +8,6 @@
 
 
 (defonce app-state  (r/atom reduce/initial-app-state))
-(defonce state-chan (chan))
-
-(async/pipeline 1
-                state-chan
-                (event-bus/xform-reducer app-state)
-                event-bus/event-chan)
 
 (defn AI-move [board]
   (go
@@ -21,15 +15,15 @@
     (>! event-bus/event-chan [:AI-move (reduce/calculate-computer-move board)])))
 
 (go-loop []
-  (let [data (<! state-chan)]
+  (let [event (<! event-bus/event-chan)
+        next-state (reduce/reducer @app-state event)]
     ; update app state
-    (reset! app-state (:next-state data))
+    (reset! app-state next-state)
     ; AI move
-    (when (and (= (get (:event data) 0) :user-move)
-               (= :AI (:next-move-by-player (:next-state data))))
-      (AI-move (:board (:next-state data)))))
+    (when (and (= (get event 0) :user-move)
+               (= :AI (:next-move-by-player next-state)))
+      (AI-move (:board next-state))))
   (recur))
-
 
 (defn main []
   (fn []
@@ -37,7 +31,6 @@
      [:h1 (:game-status @app-state)]
      [ui/boardComponent (:board @app-state)]
      [ui/footer @app-state]]))
-
 
 (r/render [main]
           (js/document.getElementById "app"))
