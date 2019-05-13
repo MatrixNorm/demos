@@ -1,7 +1,7 @@
 /docs/**/manifest.edn
 /jsdev
-/cljsdev/**/js/
-/cljsdev/**/manifest.edn
+/cljsdev/js/
+/cljsdev/manifest.edn
 /target
 /classes
 /checkouts

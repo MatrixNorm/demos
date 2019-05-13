@@ -1,27 +1,34 @@
 ;; shadow-cljs configuration
 {:deps true
- :nrepl  {:port 9999}
+ :nrepl {:port 9999}
+ :dev-http
+    {8888 {:root "cljsdev"}}
  :builds
-   {:workspaces
-        {:target     :browser
-         :output-dir "resources/public/js/workspaces"
-         :asset-path "/js/workspaces"
-         :devtools   {:preloads           [devtools.preload fulcro.inspect.preload]
-                      :after-load         nubank.workspaces.core/after-load
-                      :loader-mode        :eval
-                      :http-root          "resources/public"
-                      :http-port          3655
-                      :http-resource-root "."}
-         :modules    {:main {:entries [myapp.workspaces.main]}}}
+   {
+    ;:workspaces
+    ;    {:target     :browser
+    ;     :output-dir "resources/public/js/workspaces"
+    ;     :asset-path "/js/workspaces"
+    ;     :devtools   {:preloads           [devtools.preload fulcro.inspect.preload]
+    ;                  :after-load         nubank.workspaces.core/after-load
+    ;                  :loader-mode        :eval
+    ;                  :http-root          "resources/public"
+    ;                  :http-port          3655
+    ;                  :http-resource-root "."}
+    ;     :modules    {:main {:entries [myapp.workspaces.main]}}}
 
-    :tictactoe-reagent
-        {:target :browser
-         :output-dir "cljsdev/tictactoe-reagent/js"
-         :asset-path "/js"
-         :devtools {:preloads           [devtools.preload]
-                    :loader-mode        :eval
-                    :http-root          "cljsdev/tictactoe-reagent"
-                    :http-port          3655
-                    :http-resource-root "."}
-         :modules {:main {:entries [com.github.matrixnorm.tictactoe-reagent.core]}}
-         :release {:output-dir "docs/tictactoe-reagent/js"}}}}
+   :tictactoe-reagent
+      {:target :browser
+       :output-dir "cljsdev/js"
+       :asset-path "/js"
+       :devtools {:preloads [devtools.preload]}
+       :modules {:main {:entries [com.github.matrixnorm.tictactoe-reagent.core]}}
+       :release {:output-dir "docs/tictactoe-reagent/js"}}
+
+   :tictactoe-reagent-test
+      {:target :browser
+       :output-dir "cljsdev/tictactoe-reagent/js/test"
+       :devtools {:preloads           [devtools.preload]
+                  :loader-mode        :eval
+                  :http-root          "cljsdev/tictactoe-reagent"
+                  :http-port          3655}}}}
