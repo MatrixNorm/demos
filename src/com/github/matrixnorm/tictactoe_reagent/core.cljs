@@ -32,5 +32,3 @@
      [ui/boardComponent (:board @app-state)]
      [ui/footer @app-state]]))
 
-(r/render [main]
-          (js/document.getElementById "app"))
