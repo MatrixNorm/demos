@@ -1,8 +1,15 @@
 (ns com.github.matrixnorm.tictactoe-reagent-sw.sw)
 
 
-(js/oninstall (fn [event]
-                (.log js/console "SW: install")))
+(prn 333333333)
 
-(js/onactivate (fn [event]
-                 (.log js/console "SW: activate")))
+(js/self.addEventListener
+  "install"
+  (fn [event]
+    (prn :GGGGGGGGGGGGG)
+    (.log js/console "SW: installed" event)))
+
+(js/self.addEventListener
+  "activate"
+  (fn [event]
+    (.log js/console "SW: activated" event)))

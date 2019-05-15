@@ -6,16 +6,6 @@
   </head>
   <body>
     <div id="app"></div>
-    <script type="text/javascript">
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/js/service-worker.js')
-        .then(function(reg) {
-          console.log('Yey!', reg);
-        }).catch(function(err) {
-          console.log('Boo!', err);
-        });
-      }
-    </script>
     <script src="/js/main.js" type="text/javascript"></script>
   </body>
 </html>

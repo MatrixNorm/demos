@@ -41,5 +41,6 @@
           :devtools   {:preloads [devtools.preload]}
           :modules    {:main           {:entries [com.github.matrixnorm.tictactoe-reagent-sw.core]}
                        :service-worker {:entries    [com.github.matrixnorm.tictactoe-reagent-sw.sw]
+                                        :web-worker true
                                         :depends-on #{:main}}}
           :release    {:output-dir "docs/tictactoe-reagent-sw/js"}}}}

@@ -1,6 +1,5 @@
-(ns com.github.matrixnorm.tictactoe-reagent.iu
+(ns com.github.matrixnorm.tictactoe-reagent.ui
   (:require [com.github.matrixnorm.tictactoe-reagent.event_bus :refer [dispatch!]]))
-
 
 (defn blankTile [i j]
   [:rect
