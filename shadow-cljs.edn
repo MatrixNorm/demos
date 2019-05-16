@@ -39,7 +39,9 @@
             [(com.github.matrixnorm.tictactoe-reagent-sw.shadow-hooks/index)]
           :asset-path "/js"
           :devtools   {:preloads [devtools.preload]}
-          :modules    {:main           {:entries [com.github.matrixnorm.tictactoe-reagent-sw.core]}
+          :modules    {:main {:entries [com.github.matrixnorm.tictactoe-reagent-sw.core]}
+                       :reg {:entries [com.github.matrixnorm.tictactoe-reagent-sw.reg]
+                             :depends-on #{:service-worker}}
                        :service-worker {:entries    [com.github.matrixnorm.tictactoe-reagent-sw.sw]
                                         :web-worker true
                                         :depends-on #{:main}}}
