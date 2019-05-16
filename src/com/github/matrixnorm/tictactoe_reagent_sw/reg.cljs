@@ -15,28 +15,29 @@
         .-serviceWorker
         (.register path-to-sw)
         (.then (fn [reg]
-                 (.log js/console "SW OK" reg)
+                 (.log js/console "start reg done" reg)
                  (done-callback)))
         (.catch (fn [reg] (.log js/console "SW FAIL"))))))
 
 (defn ^:dev/before-load-async stop [done]
-  (js/console.log "stop reg")
+  (js/console.log "stop reg ...")
   (-> js/navigator
       .-serviceWorker
       .getRegistrations
       (.then (fn [regs]
-               (js/console.log :fffff (empty? regs))
                (if (empty? regs)
-                 (done)
+                 (do
+                   (js/console.log "stop reg done")
+                   (done))
                  (doseq [r regs]
                    (-> r
                        .unregister
                        (.then (fn []
-                                (js/console.log "unregister")
+                                (js/console.log "stop reg done")
                                 (done))))))))))
 
 (defn ^:dev/after-load-async start [done]
-  (js/console.log "start reg")
+  (js/console.log "start reg ...")
   (register-service-worker "/js/service-worker.js" done))
 
 

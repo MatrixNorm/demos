@@ -36,7 +36,8 @@
          {:target     :browser
           :output-dir "cljsdev/js"
           :build-hooks
-            [(com.github.matrixnorm.tictactoe-reagent-sw.shadow-hooks/index)]
+            [(com.github.matrixnorm.shadow-tools.core/index-html
+               "src/com/github/matrixnorm/tictactoe_reagent_sw/index.html")]
           :asset-path "/js"
           :devtools   {:preloads [devtools.preload]}
           :modules    {:main {:entries [com.github.matrixnorm.tictactoe-reagent-sw.core]}
