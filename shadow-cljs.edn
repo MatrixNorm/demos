@@ -1,8 +1,7 @@
 ;; shadow-cljs configuration
 {:deps  true
  :nrepl {:port 9999}
- :dev-http
-        {8888 {:root "cljsdev"}}
+ :dev-http {8888 {:root "cljsdev"}}
  :builds
         {;:workspaces
          ;    {:target     :browser
@@ -39,11 +38,30 @@
             [(com.github.matrixnorm.shadow-tools.core/index-html
                "src/com/github/matrixnorm/tictactoe_reagent_sw/index.html")]
           :asset-path "/js"
-          :devtools   {:preloads [devtools.preload]}
-          :modules    {:main {:entries [com.github.matrixnorm.tictactoe-reagent-sw.core]}
-                       :reg {:entries [com.github.matrixnorm.tictactoe-reagent-sw.reg]
-                             :depends-on #{:service-worker}}
-                       :service-worker {:entries    [com.github.matrixnorm.tictactoe-reagent-sw.sw]
-                                        :web-worker true
-                                        :depends-on #{:main}}}
-          :release    {:output-dir "docs/tictactoe-reagent-sw/js"}}}}
+          :devtools {:preloads [devtools.preload]}
+          :modules {:main
+                      {:entries [com.github.matrixnorm.tictactoe-reagent-sw.core]}}
+          :release {:output-dir "docs/tictactoe-reagent-sw/js"}}
+
+         :tictactoe-reagent-sw-service-worker
+         {:target     :browser
+          :output-dir "cljsdev/sw"
+          :asset-path "/sw"
+          :devtools {:preloads [devtools.preload]}
+          :modules {:service-worker
+                      {:entries [com.github.matrixnorm.tictactoe-reagent-sw.sw]
+                       :web-worker true}}
+          :release {:output-dir "docs/tictactoe-reagent-sw/sw"}}
+
+         :bidi-routing
+         {:target     :browser
+          :output-dir "cljsdev/js"
+          :build-hooks
+                      [(com.github.matrixnorm.shadow-tools.core/index-html
+                         "src/com/github/matrixnorm/bidi_routing/index.html")]
+          :asset-path "/js"
+          :devtools {:preloads [devtools.preload]}
+          :modules {:main
+                    {:entries [com.github.matrixnorm.bidi-routing.core]}}
+          :release {:output-dir "docs/bidi-routing/js"}}
+         }}

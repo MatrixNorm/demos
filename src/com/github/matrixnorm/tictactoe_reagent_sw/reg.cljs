@@ -1,8 +1,7 @@
 (ns com.github.matrixnorm.tictactoe-reagent-sw.reg
-  (:require [com.github.matrixnorm.tictactoe-reagent-sw.sw])
-  )
+  (:require [com.github.matrixnorm.tictactoe-reagent-sw.sw]))
 
-(prn :reg)
+(prn :reg 22)
 
 (defn is-service-worker-supported?
   []

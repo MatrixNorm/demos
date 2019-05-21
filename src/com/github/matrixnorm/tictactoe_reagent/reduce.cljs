@@ -116,4 +116,4 @@
                                   [:AI    :AI   :user]
                                   [:user  :user :AI]]))))
 
-(t/run-tests)
+;(t/run-tests)

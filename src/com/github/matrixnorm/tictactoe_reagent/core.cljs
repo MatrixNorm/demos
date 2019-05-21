@@ -7,7 +7,7 @@
             [cljs.core.async :as async :refer [>! <! put! chan alts!]]))
 
 
-(defonce app-state  (r/atom reduce/initial-app-state))
+(defonce app-state (r/atom reduce/initial-app-state))
 
 (defn AI-move [board]
   (go
