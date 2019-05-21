@@ -31,15 +31,31 @@
 (defmethod page-view :route/err404 []
   [:p "404"])
 
-(defn main-view []
+(defn ui-footer []
+  (let [css {:background-color "#20b2aa"
+             :margin           0
+             :padding          10}]
+    [:p {:style css} "Footer"]))
+
+(defn ui-navigation []
+  (let [ul-css {:list-style "none"}
+        li-css {:display "inline-block"
+                :margin-right 10}
+        ui-item- (fn [route text]
+                   [:li {:style li-css}
+                    [:a {:href (url-for route)} text]])]
+    [:ul {:style ul-css}
+     (ui-item- :route/home "Home")
+     (ui-item- :route/sports "Sports")
+     (ui-item- :route/pol "Pol")
+     (ui-item- :route/random "Random")]))
+
+(defn ui-main []
   (fn []
-    [:div [:ul
-      [:li [:a {:href (url-for :route/home)} "Home"]]
-      [:li [:a {:href (url-for :route/sports)} "Sports"]]
-      [:li [:a {:href (url-for :route/pol)} "Pol"]]
-      [:li [:a {:href (url-for :route/random)} "Random"]]]
+    [:div
+     (ui-navigation)
      [:div (page-view (:current-route @app-state))]
-     [:p "Footer"]]))
+     (ui-footer)]))
 
 
 (defn dispatch-route [matched-route]
@@ -56,5 +72,5 @@
 
 (pushy/start! html5-history)
 
-(r/render [main-view]
+(r/render [ui-main]
           (js/document.getElementById "app"))
