@@ -38,24 +38,26 @@
     [:p {:style css} "Footer"]))
 
 (defn ui-navigation []
-  (let [ul-css {:list-style "none"}
-        li-css {:display "inline-block"
-                :margin-right 10}
-        ui-item- (fn [route text]
-                   [:li {:style li-css}
-                    [:a {:href (url-for route)} text]])]
-    [:ul {:style ul-css}
-     (ui-item- :route/home "Home")
-     (ui-item- :route/sports "Sports")
-     (ui-item- :route/pol "Pol")
-     (ui-item- :route/random "Random")]))
+  (fn []
+    (let [ul-css {:list-style "none"}
+          li-css {:display      "inline-block"
+                  :margin-right 10}
+          ui-item (fn [route text]
+                    [:li {:style li-css}
+                     [:a {:href (url-for route)} text]])
+          current-route (:current-route @app-state)]
+     [:ul {:style ul-css}
+      (ui-item :route/home "Home")
+      (ui-item :route/sports "Sports")
+      (ui-item :route/pol "Pol")
+      (ui-item :route/random "Random")])))
 
 (defn ui-main []
   (fn []
     [:div
-     (ui-navigation)
-     [:div (page-view (:current-route @app-state))]
-     (ui-footer)]))
+     [ui-navigation]
+     [:div [page-view (:current-route @app-state)]]
+     [ui-footer]]))
 
 
 (defn dispatch-route [matched-route]
