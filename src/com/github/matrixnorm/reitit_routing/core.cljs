@@ -1,18 +1,15 @@
-(ns com.github.matrixnorm.bidi-routing.core
+(ns com.github.matrixnorm.reitit-routing.core
   (:require [reagent.core :as r]
-            [bidi.bidi :as bidi]
-            [pushy.core :as pushy]))
+            [reitit.frontend :as rtf]
+            [reitit.frontend.easy :as rtfe]))
 
 (declare app-state)
 
 (def routes-table
-  ["/" {"" :route/home
-        "sports" :route/sports
-        "pol" :route/pol
-        "random" :route/random
-        true :route/err404}])
-
-(def url-for (partial bidi/path-for routes-table))
+  [["/" :route/home]
+   ["/sports" :route/sports]
+   ["/pol" :route/pol]
+   ["/random" :route/random]])
 
 (defmulti page-view identity)
 
@@ -44,7 +41,7 @@
                   :margin-right 10}
           ui-item (fn [route text]
                     [:li {:style li-css}
-                     [:a {:href (url-for route)} text]])
+                     [:a {:href (rtfe/href route)} text]])
           current-route (:current-route @app-state)]
      [:ul {:style ul-css}
       (ui-item :route/home "Home")
@@ -59,20 +56,21 @@
      [:div [page-view (:current-route @app-state)]]
      [ui-footer]]))
 
+;
+; Statefull stuff
+;
 
-(defn dispatch-route [matched-route]
-  (swap! app-state assoc :current-route (matched-route :handler))
-  (js/console.log app-state))
-
+(defn dispatch-route! [matched-route]
+  (swap! app-state assoc :current-route matched-route))
 
 (defonce app-state
          (r/atom {:current-route :route/home}))
 
-(defonce html5-history
-         (pushy/pushy dispatch-route
-                      (partial bidi/match-route routes-table)))
-
-(pushy/start! html5-history)
+(rtfe/start!
+  (rtf/router routes-table)
+  (fn [match]
+    (dispatch-route! (:name (:data match))))
+  {:use-fragment false})
 
 (r/render [ui-main]
           (js/document.getElementById "app"))

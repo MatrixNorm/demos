@@ -10,4 +10,5 @@
   org.clojure/core.async     {:mvn/version "0.4.474"}
   reagent                    {:mvn/version "0.8.1"}
   bidi                       {:mvn/version "2.1.6"}
+  metosin/reitit             {:mvn/version "0.3.7"}
   kibu/pushy                 {:mvn/version "0.3.8"}}}
