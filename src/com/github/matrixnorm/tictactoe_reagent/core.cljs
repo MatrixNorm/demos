@@ -1,7 +1,7 @@
 (ns com.github.matrixnorm.tictactoe-reagent.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [com.github.matrixnorm.tictactoe-reagent.ui :as ui]
-            [com.github.matrixnorm.tictactoe-reagent.event_bus :as event-bus]
+            [com.github.matrixnorm.tictactoe-reagent.event-bus :as event-bus]
             [com.github.matrixnorm.tictactoe-reagent.reduce :as reduce]
             [reagent.core :as r]
             [cljs.core.async :as async :refer [>! <! put! chan alts!]]))

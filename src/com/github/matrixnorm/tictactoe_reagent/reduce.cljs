@@ -1,6 +1,5 @@
 (ns com.github.matrixnorm.tictactoe-reagent.reduce
-  (:require [cljs.test :as t]
-            [cljs.spec.alpha :as s]
+  (:require [cljs.spec.alpha :as s]
             [cljs.spec.test.alpha :as stest]))
 
 (defn new-board [n]
@@ -14,6 +13,19 @@
 (def next-player-map
   {:user :AI
    :AI :user})
+
+
+(defn create-game [state]
+  (let [s (get-in [:service/create-game :status] state)]
+    (when (!= s :working)
+      [(assoc-in state [:service/create-game :status] :working)
+       :command/create-game])))
+
+;(defn event-handler [state [ev-type ev-payload]]
+;  (case ev-type
+;    :event/create-game (create-game state)))
+
+;; ====================================
 
 (defn reducer-player-move [state player [i j]]
   (if (and (= player (:next-move-by-player state))
@@ -103,17 +115,3 @@
 
 ;; Tests
 
-(t/deftest test-reducer-player-move
-           (t/is (nil? (reducer-player-move {:game-over true} :user [0 0]))))
-
-(t/deftest test-game-status
-           (t/is (= :user-wins
-                    (game-status [[:AI    :blank :user]
-                                  [:blank :user  :blank]
-                                  [:user  :AI    :blank]])))
-           (t/is (= :draw
-                    (game-status [[:user  :AI   :user]
-                                  [:AI    :AI   :user]
-                                  [:user  :user :AI]]))))
-
-;(t/run-tests)

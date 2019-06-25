@@ -40,12 +40,19 @@
           :AI [crossTile i j])))))
 
 (defn footer [state]
-  [:div
-   [:div "Turn: " (:next-move-by-player state)]
-   [:p
-    [:button
-     {:on-click (fn new-game-click [_]
-                  (dispatch! [:new-game]))}
-     "New Game"]]])
+  [:div "Turn: " (:next-move-by-player state)])
+
+(defmulti view identity)
+
+(defmethod view :route/root []
+  [:p
+   [:button
+    {:on-click (fn new-game-click [_]
+                 (dispatch! [:new-game]))}
+    "New Game"]])
+
+(defmethod view :route/game []
+  )
+
 
 

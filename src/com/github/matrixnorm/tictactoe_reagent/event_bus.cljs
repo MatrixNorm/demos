@@ -1,7 +1,7 @@
-(ns com.github.matrixnorm.tictactoe-reagent.event_bus
+(ns com.github.matrixnorm.tictactoe-reagent.event-bus
   (:require [cljs.core.async :refer [put! chan]]))
 
-(defonce event-chan (chan))
+(defonce event-bus (chan))
 
 (defn dispatch! [evt]
-  (put! event-chan evt))
+  (put! event-bus evt))
