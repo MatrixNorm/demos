@@ -15,11 +15,16 @@
    :AI :user})
 
 
-(defn create-game [state]
+(defn game-create [state]
   (let [s (get-in [:service/create-game :status] state)]
     (when (!= s :working)
       [(assoc-in state [:service/create-game :status] :working)
-       :command/create-game])))
+       [:command/create-game]])))
+
+(defn game-load [state game-id])
+
+(defn game-player-move [state {:keys [game-id player move-coords]}]
+  )
 
 ;(defn event-handler [state [ev-type ev-payload]]
 ;  (case ev-type
