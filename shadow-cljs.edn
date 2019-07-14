@@ -57,8 +57,7 @@
          {:target     :browser
           :output-dir "cljsdev/js"
           :build-hooks
-                      [(com.github.matrixnorm.shadow-tools.core/index-html
-                         "src/com/github/matrixnorm/bidi_routing/index.html")]
+                      [(com.github.matrixnorm.shadow-tools.core/index-html)]
           :asset-path "/js"
           :devtools {:preloads [devtools.preload]}
           :modules {:main
@@ -69,8 +68,7 @@
          {:target     :browser
           :output-dir "cljsdev/js"
           :build-hooks
-                      [(com.github.matrixnorm.shadow-tools.core/index-html
-                         "src/com/github/matrixnorm/reitit_routing/index.html")]
+                      [(com.github.matrixnorm.shadow-tools.core/index-html)]
           :asset-path "/js"
           :devtools {:preloads [devtools.preload]}
           :modules {:main
