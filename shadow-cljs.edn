@@ -73,4 +73,15 @@
           :devtools {:preloads [devtools.preload]}
           :modules {:main
                     {:entries [com.github.matrixnorm.reitit-routing.core]}}
+          :release {:output-dir "docs/reitit-routing/js"}}
+
+         :serene-hello
+         {:target     :browser
+          :output-dir "cljsdev/js"
+          :build-hooks
+                      [(com.github.matrixnorm.shadow-tools.core/index-html)]
+          :asset-path "/js"
+          :devtools {:preloads [devtools.preload]}
+          :modules {:main
+                    {:entries [com.github.matrixnorm.serene-hello.core]}}
           :release {:output-dir "docs/reitit-routing/js"}}}}

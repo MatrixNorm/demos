@@ -16,8 +16,9 @@ const root = {
 
 const x = graphqlSync(schema, '{ hello }', root);
 
-console.log(x.data);
+console.log(x);
 
 const y = graphqlSync(schema, introspectionQuery);
 
-console.log(y.data.__schema);
+console.log(y);
+window.y = y
