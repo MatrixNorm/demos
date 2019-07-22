@@ -4,6 +4,7 @@
  :deps
  {org.clojure/clojurescript {:mvn/version "1.10.516"}
   org.clojure/core.async     {:mvn/version "0.4.474"}
+  org.clojure/test.check     {:mvn/version "0.10.0-alpha4"}
   binaryage/devtools         {:mvn/version "0.9.10"}
   fulcrologic/fulcro         {:git/url "https://github.com/MatrixNorm/fulcro.git"
                               :sha "2b126456ff3dfe48b58584ca537d28ed8eca774c"}
@@ -13,4 +14,5 @@
   bidi                       {:mvn/version "2.1.6"}
   metosin/reitit             {:mvn/version "0.3.7"}
   kibu/pushy                 {:mvn/version "0.3.8"}
-  com.paren/serene           {:mvn/version "0.0.2"}}}
+  com.paren/serene           {:mvn/version "0.0.2"}
+  com.walmartlabs/lacinia    {:mvn/version "0.33.0"}}}
