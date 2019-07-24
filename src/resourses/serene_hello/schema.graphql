@@ -1,5 +1,18 @@
+type Book {
+    ISBN: String!
+    title: String!
+    authors: [Author!]
+}
+
+type Author {
+    name: String!
+    height_cm: Int
+    books: [Book!]
+}
+
 type Query {
-    hello: String
+    getBooks: [Book!]
+    getAuthors: [Author!]
 }
 
 schema {

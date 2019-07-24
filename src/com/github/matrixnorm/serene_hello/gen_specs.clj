@@ -10,10 +10,11 @@
              :rename {query introspection-query}]))
 
 (def schema
-  (-> "resourses/schema.graphql"
+  (-> "resourses/serene_hello/schema.graphql"
       io/resource
       slurp
-      (parse-schema {:resolvers {:Query {:hello (constantly "Hi!")}}})
+      (parse-schema {:resolvers {:Query {:getBooks   (constantly nil)
+                                         :getAuthors (constantly nil)}}})
       sch/compile))
 
 (clojure.pprint/pprint schema)
@@ -22,15 +23,15 @@
 
 (macroexpand-1 '(serene/def-specs introspection-data {:prefix :gql}))
 
-;(serene/def-specs introspection-data {:prefix :gql})
+(serene/def-specs introspection-data {:prefix :gql})
 
 (serene/spit-specs "src/com/github/matrixnorm/serene_hello/specs.cljs"
                    'com.github.matrixnorm.serene-hello.specs
                    introspection-data
                    {:prefix :gql})
 
-;(s/valid? :gql.Query/hello "Foo")
-;(s/valid? :gql.Query/hello 2)
+(s/valid? :gql.Author/name "Foo")
+(s/valid? :gql.Author/name 11)
 ;
 ;(s/explain :gql.Query/hello "Foo")
 ;(s/explain :gql.Query/hello 2)
