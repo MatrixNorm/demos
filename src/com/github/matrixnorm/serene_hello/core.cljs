@@ -1,11 +1,9 @@
 (ns com.github.matrixnorm.serene-hello.core
-  ;(:require-macros [paren.serene :refer [def-specs]])
   (:require
     [clojure.spec.alpha :as s]
     [clojure.test.check.generators]
     [clojure.spec.gen.alpha :as gen]
-    [com.github.matrixnorm.serene-hello.specs :as specs]
-    [paren.serene :as serene]))
+    [com.github.matrixnorm.serene-hello.specs]))
 
 
 (js/console.log (s/valid? :gql.Query/hello "Foo"))
