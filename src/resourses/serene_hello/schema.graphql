@@ -1,12 +1,17 @@
+#type User {
+#    name: String!
+#    email: String!
+#}
+
 type Book {
     ISBN: String!
     title: String!
-    authors: [Author!]
+    authors: [Author!]!
 }
 
 type Author {
     name: String!
-    height_cm: Int
+    email: String
     books: [Book!]
 }
 

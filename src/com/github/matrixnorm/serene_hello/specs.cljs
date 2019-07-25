@@ -11,7 +11,7 @@
   (clojure.spec.alpha/keys
    :opt-un
    [:com.github.matrixnorm.serene-hello.specs.Author/books
-    :com.github.matrixnorm.serene-hello.specs.Author/height_cm
+    :com.github.matrixnorm.serene-hello.specs.Author/email
     :com.github.matrixnorm.serene-hello.specs.Author/name
     :com.github.matrixnorm.serene-hello.specs.Author/__typename]))
 
@@ -34,6 +34,9 @@
     :com.github.matrixnorm.serene-hello.specs/Author
     :kind
     clojure.core/sequential?)))
+
+(clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Author/email
+  (clojure.spec.alpha/nilable :com.github.matrixnorm.serene-hello.specs/String))
 
 (clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Author.name/&args
   (clojure.spec.alpha/keys :opt-un [] :req-un []))
@@ -73,21 +76,17 @@
     :com.github.matrixnorm.serene-hello.specs.Query/__typename]))
 
 (clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Book/authors
-  (clojure.spec.alpha/nilable
-   (clojure.spec.alpha/coll-of
-    :com.github.matrixnorm.serene-hello.specs/Author
-    :kind
-    clojure.core/sequential?)))
+  (clojure.spec.alpha/coll-of
+   :com.github.matrixnorm.serene-hello.specs/Author
+   :kind
+   clojure.core/sequential?))
 
 (clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Book.authors/&args
   (clojure.spec.alpha/keys :opt-un [] :req-un []))
 
 (clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs/Float clojure.core/float?)
 
-(clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Author/height_cm
-  (clojure.spec.alpha/nilable :com.github.matrixnorm.serene-hello.specs/Int))
-
-(clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Author.height_cm/&args
+(clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Author.email/&args
   (clojure.spec.alpha/keys :opt-un [] :req-un []))
 
 (clojure.spec.alpha/def :com.github.matrixnorm.serene-hello.specs.Query.getAuthors/&args
@@ -140,8 +139,7 @@
 
 (clojure.spec.alpha/def :gql.Author/books :com.github.matrixnorm.serene-hello.specs.Author/books)
 
-(clojure.spec.alpha/def :gql.Author/height_cm
-  :com.github.matrixnorm.serene-hello.specs.Author/height_cm)
+(clojure.spec.alpha/def :gql.Author/email :com.github.matrixnorm.serene-hello.specs.Author/email)
 
 (clojure.spec.alpha/def :gql.Author.__typename/&args
   :com.github.matrixnorm.serene-hello.specs.Author.__typename/&args)
@@ -149,8 +147,8 @@
 (clojure.spec.alpha/def :gql.Author.books/&args
   :com.github.matrixnorm.serene-hello.specs.Author.books/&args)
 
-(clojure.spec.alpha/def :gql.Author.height_cm/&args
-  :com.github.matrixnorm.serene-hello.specs.Author.height_cm/&args)
+(clojure.spec.alpha/def :gql.Author.email/&args
+  :com.github.matrixnorm.serene-hello.specs.Author.email/&args)
 
 (clojure.spec.alpha/def :gql.Author.name/&args
   :com.github.matrixnorm.serene-hello.specs.Author.name/&args)

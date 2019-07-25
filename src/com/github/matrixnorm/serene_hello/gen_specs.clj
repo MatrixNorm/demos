@@ -13,17 +13,18 @@
   (-> "resourses/serene_hello/schema.graphql"
       io/resource
       slurp
-      (parse-schema {:resolvers {:Query {:getBooks   (constantly nil)
-                                         :getAuthors (constantly nil)}}})
+      (parse-schema {
+                     ;:resolvers {:Query {:getBooks   (constantly nil)
+                     ;                    :getAuthors (constantly nil)}}
+                     })
       sch/compile))
-
-(clojure.pprint/pprint schema)
 
 (def introspection-data (execute schema introspection-query nil nil))
 
 (macroexpand-1 '(serene/def-specs introspection-data {:prefix :gql}))
 
-(serene/def-specs introspection-data {:prefix :gql})
+(serene/def-specs introspection-data {:prefix :gql
+                                      :gen-object-fields true})
 
 (serene/spit-specs "src/com/github/matrixnorm/serene_hello/specs.cljs"
                    'com.github.matrixnorm.serene-hello.specs
@@ -36,4 +37,4 @@
 ;(s/explain :gql.Query/hello "Foo")
 ;(s/explain :gql.Query/hello 2)
 ;
-;(gen/generate (s/gen :gql.Query/hello))
+(binding [s/*recursion-limit* 2] (gen/generate (s/gen :gql.Query/getBooks)))
