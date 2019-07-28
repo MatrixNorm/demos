@@ -16,7 +16,10 @@ type Author {
 }
 
 type Query {
+    getBook(ISBN: String!): Book
     getBooks: [Book!]
+    
+    getAuthorsByName(name: String!): [Author!]
     getAuthors: [Author!]
 }
 

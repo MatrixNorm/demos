@@ -8,6 +8,7 @@
   binaryage/devtools         {:mvn/version "0.9.10"}
   fulcrologic/fulcro         {:git/url "https://github.com/MatrixNorm/fulcro.git"
                               :sha "2b126456ff3dfe48b58584ca537d28ed8eca774c"}
+  com.wsscode/pathom         {:mvn/version "2.2.18"}
   fulcrologic/fulcro-inspect {:mvn/version "2.2.5"}
   nubank/workspaces          {:mvn/version "1.0.6"}
   reagent                    {:mvn/version "0.8.1"}

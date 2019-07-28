@@ -13,10 +13,8 @@
   (-> "resourses/serene_hello/schema.graphql"
       io/resource
       slurp
-      (parse-schema {
-                     ;:resolvers {:Query {:getBooks   (constantly nil)
-                     ;                    :getAuthors (constantly nil)}}
-                     })
+      (parse-schema {:resolvers {:Query {:getBooks   (constantly nil)
+                                         :getAuthors (constantly nil)}}})
       sch/compile))
 
 (def introspection-data (execute schema introspection-query nil nil))
