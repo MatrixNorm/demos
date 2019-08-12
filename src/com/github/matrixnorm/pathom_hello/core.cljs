@@ -67,7 +67,10 @@
   (helper [{::shit-people [:person/id
                            :person/name
                            :person/email
-                           :address/city]}])
+                           :address/city
+                           {:person/bills [:bill/amount
+                                           :bill/date
+                                           :bill/currency]}]}])
 
   (helper [{[:address/id 1] [:address/zip
                              :address/state]}])
