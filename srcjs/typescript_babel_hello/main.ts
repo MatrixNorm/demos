@@ -1,4 +1,10 @@
 
-const x: number = 111;
+interface Brainlet {
+  IQ: number;
+}
 
-console.log(x);
+const you: Brainlet = {IQ: 15};
+
+console.log(you);
+
+export {};
