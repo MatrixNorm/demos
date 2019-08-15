@@ -1,0 +1,12 @@
+schema {
+  query: Root
+}
+
+type Root {
+  getPost: Post
+}
+
+type Post {
+  id: String!
+  title: String!
+}

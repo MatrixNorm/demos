@@ -1,6 +1,7 @@
 import {
   createFragmentContainer, 
-  graphql} from 'react-relay'
+  graphql
+} from 'react-relay'
 
 const Post = post => {
   return (
