@@ -6,9 +6,9 @@ import environment from './Environement'
 import PostDetails from './PostDetails'
 
 const PostQuery = graphql`
-  query PostQuery {
+  query mainQuery {
     getPost {
-      ...Post_post
+      ...PostDetails_post
     }
   }
 `
