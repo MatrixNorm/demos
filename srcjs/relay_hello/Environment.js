@@ -3,11 +3,12 @@ import {
   Network,
   RecordSource,
   Store,
-} from 'relay-runtime'
+} from 'relay-runtime';
+
 import {
   graphqlSync, 
   buildSchema,
-} from 'graphql'
+} from 'graphql';
 
 // XXX
 const schema = buildSchema(`
@@ -35,7 +36,9 @@ const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
   console.log(operation, variables)
-  return graphqlSync(schema, operation.query, resolvers)
+  const resp = graphqlSync(schema, operation.text, resolvers)
+  console.log(resp)
+  return resp
 })
 
 const environment = new Environment({network, store})

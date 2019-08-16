@@ -2,7 +2,11 @@ import {
   QueryRenderer, 
   graphql
 } from 'react-relay'
-import environment from './Environement'
+
+import React from 'react'
+import ReactDOM from 'react-dom'
+
+import environment from './Environment'
 import PostDetails from './PostDetails'
 
 const PostQuery = graphql`
@@ -33,3 +37,8 @@ const App = () => {
     />
   )
 }
+
+const body = document.getElementsByTagName('body')[0]
+const appContainer = document.createElement('div')
+body.insertBefore(appContainer, body.firstChild)
+ReactDOM.render(<App />, appContainer);

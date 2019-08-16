@@ -3,6 +3,8 @@ import {
   graphql
 } from 'react-relay'
 
+import React from 'react'
+
 const PostDetails = post => {
   return (
     <div>

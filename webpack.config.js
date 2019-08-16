@@ -58,6 +58,22 @@ builds.typescript_babel_hello = basedBuild('typescript_babel_hello')({
   }
 });
 
+builds.relay_hello = basedBuild('relay_hello')({
+  module: {
+    rules: [
+      {
+        test: /\.(js|jsx)$/,
+        exclude: /node_modules/,
+        use: ['babel-loader']
+      }
+    ]
+  },
+  resolve: {
+    // https://github.com/graphql/graphql-js/issues/1272#issuecomment-377384574
+    extensions: ['.mjs', '.js', '.jsx']
+  },
+});
+
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
   const onBuildNotFound = function () {
