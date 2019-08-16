@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash dc83f53663fe642504fccac131255b87
+ * @relayHash e37bda1cadaf17be64c37663a6997594
  */
 
 /* eslint-disable */
@@ -12,7 +12,7 @@ import type { ConcreteRequest } from 'relay-runtime';
 type PostDetails_post$ref = any;
 export type mainQueryVariables = {||};
 export type mainQueryResponse = {|
-  +getPost: ?{|
+  +post: ?{|
     +$fragmentRefs: PostDetails_post$ref
   |}
 |};
@@ -25,7 +25,7 @@ export type mainQuery = {|
 
 /*
 query mainQuery {
-  getPost {
+  post {
     ...PostDetails_post
     id
   }
@@ -49,7 +49,7 @@ const node/*: ConcreteRequest*/ = {
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "getPost",
+        "name": "post",
         "storageKey": null,
         "args": null,
         "concreteType": "Post",
@@ -72,7 +72,7 @@ const node/*: ConcreteRequest*/ = {
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "getPost",
+        "name": "post",
         "storageKey": null,
         "args": null,
         "concreteType": "Post",
@@ -100,10 +100,10 @@ const node/*: ConcreteRequest*/ = {
     "operationKind": "query",
     "name": "mainQuery",
     "id": null,
-    "text": "query mainQuery {\n  getPost {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  id\n  title\n}\n",
+    "text": "query mainQuery {\n  post {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  id\n  title\n}\n",
     "metadata": {}
   }
 };
 // prettier-ignore
-(node/*: any*/).hash = 'b60f4ef04cea7471e948dd4f8c46bccd';
+(node/*: any*/).hash = '813916505b58d2388800a830d255f5d2';
 module.exports = node;

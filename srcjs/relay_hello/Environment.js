@@ -17,7 +17,7 @@ const schema = buildSchema(`
   }
 
   type Root {
-    getPost: Post
+    post: Post
   }
 
   type Post {
@@ -27,7 +27,7 @@ const schema = buildSchema(`
 `);
 
 const resolvers = {
-  getPost: () => {
+  post: () => {
     return {id: 11, title: "Ocaml vs Haskell"};
   },
 };

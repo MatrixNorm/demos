@@ -11,13 +11,14 @@ import PostDetails from './PostDetails'
 
 const PostQuery = graphql`
   query mainQuery {
-    getPost {
+    post {
       ...PostDetails_post
     }
   }
 `
 
 const render = ({error, props}) => {
+  console.log(props.post)
   if (error) {
     return <div>Error: {error}</div>;
   }

@@ -3,7 +3,7 @@ schema {
 }
 
 type Root {
-  getPost: Post
+  post: Post
 }
 
 type Post {
