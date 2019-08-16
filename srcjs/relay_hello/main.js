@@ -3,7 +3,7 @@ import {
   graphql
 } from 'react-relay'
 import environment from './Environement'
-import Post from './Post'
+import PostDetails from './PostDetails'
 
 const PostQuery = graphql`
   query PostQuery {
@@ -20,7 +20,7 @@ const render = ({error, props}) => {
   if (!props) {
     return <div>Loading...</div>
   }
-  return <Post post={props.post} />
+  return <PostDetails post={props.post} />
 }
 
 const App = () => {

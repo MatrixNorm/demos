@@ -3,7 +3,7 @@ import {
   graphql
 } from 'react-relay'
 
-const Post = post => {
+const PostDetails = post => {
   return (
     <div>
       <h1>post.title</h1>
@@ -12,9 +12,9 @@ const Post = post => {
   )
 }
 
-export default createFragmentContainer(Post, {
+export default createFragmentContainer(PostDetails, {
   post: graphql`
-    fragment Post_post on Post {
+    fragment PostDetails_post on Post {
       id,
       title
     }
