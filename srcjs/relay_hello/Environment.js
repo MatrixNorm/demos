@@ -10,21 +10,9 @@ import {
   buildSchema,
 } from 'graphql';
 
-// XXX
-const schema = buildSchema(`
-  schema {
-    query: Root
-  }
+import schemaDefinition from 'raw-loader!./schema.graphql';
 
-  type Root {
-    post: Post
-  }
-
-  type Post {
-    id: String!
-    title: String!
-  }
-`);
+const schema = buildSchema(schemaDefinition);
 
 const resolvers = {
   post: () => {

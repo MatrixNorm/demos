@@ -5,11 +5,12 @@ import {
 
 import React from 'react'
 
-const PostDetails = post => {
+const PostDetails = props => {
+  console.log(props)
   return (
     <div>
-      <h1>post.title</h1>
-      <h2>post.id</h2>
+      <h1>{props.post.title}</h1>
+      <h2>{props.post.id}</h2>
     </div>
   )
 }

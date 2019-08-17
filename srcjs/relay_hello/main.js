@@ -18,7 +18,7 @@ const PostQuery = graphql`
 `
 
 const render = ({error, props}) => {
-  console.log(props.post)
+  console.log(props)
   if (error) {
     return <div>Error: {error}</div>;
   }
