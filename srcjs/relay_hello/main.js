@@ -10,17 +10,16 @@ import environment from './Environment'
 import PostDetails from './PostDetails'
 
 const PostQuery = graphql`
-  query mainQuery {
-    post {
+  query mainQuery($postId: ID!) {
+    post(id: $postId) {
       ...PostDetails_post
     }
   }
 `
 
 const render = ({error, props}) => {
-  console.log(props)
   if (error) {
-    return <div>Error: {error}</div>;
+    return <div style={{color: "red"}}>Error: {error.message}</div>;
   }
   if (!props) {
     return <div>Loading...</div>
@@ -33,9 +32,8 @@ const App = () => {
     <QueryRenderer
       query={PostQuery}
       environment={environment}
-      variables={{}}
-      render={render}
-    />
+      variables={{postId: "3.14"}}
+      render={render}/>
   )
 }
 

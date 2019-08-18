@@ -3,28 +3,35 @@ import {
   Network,
   RecordSource,
   Store,
-} from 'relay-runtime';
+} from 'relay-runtime'
 
 import {
   graphqlSync, 
   buildSchema,
-} from 'graphql';
+} from 'graphql'
 
-import schemaDefinition from 'raw-loader!./schema.graphql';
+const db = {}
 
-const schema = buildSchema(schemaDefinition);
+db.postsbyId = {
+  "3.14": {id: "3.14", title: "Ocaml vs Haskell"}
+}
+
+import schemaDefinition from 'raw-loader!./schema.graphql'
+
+const schema = buildSchema(schemaDefinition)
 
 const resolvers = {
-  post: () => {
-    return {id: 11, title: "Ocaml vs Haskell"};
-  },
+  post: ({id}) => {
+    // how to check if response conforms this the GQL schema ???
+    return db.postsbyId[id];
+  }
 };
 
 const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
   console.log(operation, variables)
-  const resp = graphqlSync(schema, operation.text, resolvers)
+  const resp = graphqlSync(schema, operation.text, resolvers, undefined, variables)
   console.log(resp)
   return resp
 })

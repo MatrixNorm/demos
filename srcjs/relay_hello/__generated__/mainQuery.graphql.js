@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash e37bda1cadaf17be64c37663a6997594
+ * @relayHash 549376ad4ac521d2a795c39fa38b8f78
  */
 
 /* eslint-disable */
@@ -10,7 +10,9 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type PostDetails_post$ref = any;
-export type mainQueryVariables = {||};
+export type mainQueryVariables = {|
+  postId: string
+|};
 export type mainQueryResponse = {|
   +post: ?{|
     +$fragmentRefs: PostDetails_post$ref
@@ -24,8 +26,10 @@ export type mainQuery = {|
 
 
 /*
-query mainQuery {
-  post {
+query mainQuery(
+  $postId: ID!
+) {
+  post(id: $postId) {
     ...PostDetails_post
     id
   }
@@ -37,21 +41,37 @@ fragment PostDetails_post on Post {
 }
 */
 
-const node/*: ConcreteRequest*/ = {
+const node/*: ConcreteRequest*/ = (function(){
+var v0 = [
+  {
+    "kind": "LocalArgument",
+    "name": "postId",
+    "type": "ID!",
+    "defaultValue": null
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "postId"
+  }
+];
+return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
     "name": "mainQuery",
     "type": "Root",
     "metadata": null,
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
         "name": "post",
         "storageKey": null,
-        "args": null,
+        "args": (v1/*: any*/),
         "concreteType": "Post",
         "plural": false,
         "selections": [
@@ -67,14 +87,14 @@ const node/*: ConcreteRequest*/ = {
   "operation": {
     "kind": "Operation",
     "name": "mainQuery",
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
         "name": "post",
         "storageKey": null,
-        "args": null,
+        "args": (v1/*: any*/),
         "concreteType": "Post",
         "plural": false,
         "selections": [
@@ -100,10 +120,11 @@ const node/*: ConcreteRequest*/ = {
     "operationKind": "query",
     "name": "mainQuery",
     "id": null,
-    "text": "query mainQuery {\n  post {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  id\n  title\n}\n",
+    "text": "query mainQuery(\n  $postId: ID!\n) {\n  post(id: $postId) {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  id\n  title\n}\n",
     "metadata": {}
   }
 };
+})();
 // prettier-ignore
-(node/*: any*/).hash = '813916505b58d2388800a830d255f5d2';
+(node/*: any*/).hash = '2a72913a099682067cede7aba2d49a29';
 module.exports = node;

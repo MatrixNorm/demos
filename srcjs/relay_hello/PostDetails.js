@@ -6,7 +6,6 @@ import {
 import React from 'react'
 
 const PostDetails = props => {
-  console.log(props)
   return (
     <div>
       <h1>{props.post.title}</h1>

@@ -1,12 +1,16 @@
+interface Node {
+  id: ID!
+}
+
 schema {
   query: Root
 }
 
 type Root {
-  post: Post
+  post(id: ID!): Post
 }
 
-type Post {
+type Post implements Node {
   id: ID!
   title: String!
 }
