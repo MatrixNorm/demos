@@ -12,9 +12,9 @@ import type { FragmentReference } from "relay-runtime";
 declare export opaque type PostDetails_post$ref: FragmentReference;
 declare export opaque type PostDetails_post$fragmentType: PostDetails_post$ref;
 export type PostDetails_post = {|
-  +title: string,
-  +author: {|
-    +name: string
+  +title: ?string,
+  +author: ?{|
+    +name: ?string
   |},
   +$refType: PostDetails_post$ref,
 |};

@@ -25,17 +25,20 @@ import schemaDefinition from 'raw-loader!./schema.graphql'
 const schema = buildSchema(schemaDefinition)
 
 const resolvers = {
-  post: (x, y, z) => {
-    console.log(x, y, z)
-    // how to check if response conforms this the GQL schema ???
-    return db.postsById[id]
-  }
+    post: (args) => {
+      console.log(33, args)
+      // how to check if response conforms this the GQL schema ???
+      return Object.assign(
+        db.postsById[args.id],
+        {author: {id: "df4T", name: "Boris"}})
+    }
 };
 
 const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
-  console.log(operation, variables)
+  console.log(schema)
+  console.log(operation.text, variables)
   const resp = graphqlSync(schema, operation.text, resolvers, undefined, variables)
   console.log(resp)
   return resp

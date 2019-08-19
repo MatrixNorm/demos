@@ -2,21 +2,17 @@ interface Node {
   id: ID!
 }
 
-schema {
-  query: Root
-}
-
-type Root {
+type Query {
   post(id: ID!): Post
 }
 
 type Post implements Node {
   id: ID!
-  title: String!
-  author: User!
+  title: String
+  author: User
 }
 
 type User implements Node {
   id: ID!
-  name: String!
+  name: String
 }
