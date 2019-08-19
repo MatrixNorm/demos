@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 549376ad4ac521d2a795c39fa38b8f78
+ * @relayHash 1ba40bec1cca3230d08055bbcce2509e
  */
 
 /* eslint-disable */
@@ -10,23 +10,23 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type PostDetails_post$ref = any;
-export type mainQueryVariables = {|
+export type AppQueryVariables = {|
   postId: string
 |};
-export type mainQueryResponse = {|
+export type AppQueryResponse = {|
   +post: ?{|
     +$fragmentRefs: PostDetails_post$ref
   |}
 |};
-export type mainQuery = {|
-  variables: mainQueryVariables,
-  response: mainQueryResponse,
+export type AppQuery = {|
+  variables: AppQueryVariables,
+  response: AppQueryResponse,
 |};
 */
 
 
 /*
-query mainQuery(
+query AppQuery(
   $postId: ID!
 ) {
   post(id: $postId) {
@@ -36,8 +36,11 @@ query mainQuery(
 }
 
 fragment PostDetails_post on Post {
-  id
   title
+  author {
+    name
+    id
+  }
 }
 */
 
@@ -56,12 +59,19 @@ v1 = [
     "name": "id",
     "variableName": "postId"
   }
-];
+],
+v2 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "id",
+  "args": null,
+  "storageKey": null
+};
 return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "mainQuery",
+    "name": "AppQuery",
     "type": "Root",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -86,7 +96,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "mainQuery",
+    "name": "AppQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -101,30 +111,43 @@ return {
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "id",
+            "name": "title",
             "args": null,
             "storageKey": null
           },
           {
-            "kind": "ScalarField",
+            "kind": "LinkedField",
             "alias": null,
-            "name": "title",
+            "name": "author",
+            "storageKey": null,
             "args": null,
-            "storageKey": null
-          }
+            "concreteType": "User",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "name",
+                "args": null,
+                "storageKey": null
+              },
+              (v2/*: any*/)
+            ]
+          },
+          (v2/*: any*/)
         ]
       }
     ]
   },
   "params": {
     "operationKind": "query",
-    "name": "mainQuery",
+    "name": "AppQuery",
     "id": null,
-    "text": "query mainQuery(\n  $postId: ID!\n) {\n  post(id: $postId) {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  id\n  title\n}\n",
+    "text": "query AppQuery(\n  $postId: ID!\n) {\n  post(id: $postId) {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '2a72913a099682067cede7aba2d49a29';
+(node/*: any*/).hash = '67c39018d2e5f937890ad19cc9fae230';
 module.exports = node;

@@ -12,8 +12,12 @@ import {
 
 const db = {}
 
-db.postsbyId = {
-  "3.14": {id: "3.14", title: "Ocaml vs Haskell"}
+db.postsById = {
+  "3.14": {id: "3.14", title: "Ocaml vs Haskell", authorId: "df4T"}
+}
+
+db.usersById = {
+  "df4T": {id: "df4T", name: "Boris"}
 }
 
 import schemaDefinition from 'raw-loader!./schema.graphql'
@@ -21,9 +25,10 @@ import schemaDefinition from 'raw-loader!./schema.graphql'
 const schema = buildSchema(schemaDefinition)
 
 const resolvers = {
-  post: ({id}) => {
+  post: (x, y, z) => {
+    console.log(x, y, z)
     // how to check if response conforms this the GQL schema ???
-    return db.postsbyId[id];
+    return db.postsById[id]
   }
 };
 

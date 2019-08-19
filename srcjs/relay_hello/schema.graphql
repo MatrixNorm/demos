@@ -13,4 +13,10 @@ type Root {
 type Post implements Node {
   id: ID!
   title: String!
+  author: User!
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
 }
