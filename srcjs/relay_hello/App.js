@@ -17,6 +17,7 @@ const AppQuery = graphql`
 `
 
 const render = ({error, props}) => {
+  console.log(props.post)
   if (error) {
     return <div style={{color: "red"}}>Error: {error.message}</div>;
   }
