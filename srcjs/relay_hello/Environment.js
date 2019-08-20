@@ -5,10 +5,8 @@ import {
   Store,
 } from 'relay-runtime'
 
-import {
-  graphqlSync, 
-  buildSchema,
-} from 'graphql'
+import { graphqlSync } from 'graphql'
+import { makeExecutableSchema } from 'graphql-tools'
 
 const db = {}
 
@@ -20,26 +18,29 @@ db.usersById = {
   "df4T": {id: "df4T", name: "Boris"}
 }
 
-import schemaDefinition from 'raw-loader!./schema.graphql'
-
-const schema = buildSchema(schemaDefinition)
+import typeDefs from 'raw-loader!./schema.graphql'
 
 const resolvers = {
-    post: (args) => {
-      console.log(33, args)
+  Query: {
+    post: (_, args) => {
       // how to check if response conforms this the GQL schema ???
-      return Object.assign(
-        db.postsById[args.id],
-        {author: {id: "df4T", name: "Boris"}})
+      return db.postsById[args.id]
     }
-};
+  },
+  Post: {
+    author: (post) => {
+      return db.usersById[post.authorId]
+    }
+  }
+}
 
+const schema = makeExecutableSchema({typeDefs, resolvers})
 const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
   console.log(schema)
   console.log(operation.text, variables)
-  const resp = graphqlSync(schema, operation.text, resolvers, undefined, variables)
+  const resp = graphqlSync(schema, operation.text, {}, undefined, variables)
   console.log(resp)
   return resp
 })

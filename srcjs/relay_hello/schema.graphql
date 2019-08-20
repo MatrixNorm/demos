@@ -2,10 +2,6 @@ interface Node {
   id: ID!
 }
 
-type Query {
-  post(id: ID!): Post
-}
-
 type Post implements Node {
   id: ID!
   title: String
@@ -15,4 +11,12 @@ type Post implements Node {
 type User implements Node {
   id: ID!
   name: String
+}
+
+type Query {
+  post(id: ID!): Post
+}
+
+schema {
+  query: Query
 }
