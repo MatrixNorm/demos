@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 550d68e6ea3ebd5bd58bf8a038266367
+ * @relayHash 6c94a84595f9899b8667a806c0eb1600
  */
 
 /* eslint-disable */
@@ -10,11 +10,12 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type PostSequence_posts$ref = any;
-export type AppQueryVariables = {||};
+export type AppQueryVariables = {|
+  count?: ?number,
+  cursor?: ?string,
+|};
 export type AppQueryResponse = {|
-  +posts: ?{|
-    +$fragmentRefs: PostSequence_posts$ref
-  |}
+  +$fragmentRefs: PostSequence_posts$ref
 |};
 export type AppQuery = {|
   variables: AppQueryVariables,
@@ -24,17 +25,26 @@ export type AppQuery = {|
 
 
 /*
-query AppQuery {
-  posts {
-    ...PostSequence_posts
-  }
+query AppQuery(
+  $count: Int
+  $cursor: String
+) {
+  ...PostSequence_posts
 }
 
-fragment PostSequence_posts on PostConnection {
-  edges {
-    node {
-      ...PostDetails_post
-      id
+fragment PostSequence_posts on Query {
+  posts(first: $count, after: $cursor) {
+    edges {
+      node {
+        ...PostDetails_post
+        id
+        __typename
+      }
+      cursor
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
 }
@@ -49,7 +59,33 @@ fragment PostDetails_post on Post {
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = {
+var v0 = [
+  {
+    "kind": "LocalArgument",
+    "name": "count",
+    "type": "Int",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "cursor",
+    "type": "String",
+    "defaultValue": null
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "after",
+    "variableName": "cursor"
+  },
+  {
+    "kind": "Variable",
+    "name": "first",
+    "variableName": "count"
+  }
+],
+v2 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "id",
@@ -63,37 +99,26 @@ return {
     "name": "AppQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
-        "kind": "LinkedField",
-        "alias": null,
-        "name": "posts",
-        "storageKey": null,
-        "args": null,
-        "concreteType": "PostConnection",
-        "plural": false,
-        "selections": [
-          {
-            "kind": "FragmentSpread",
-            "name": "PostSequence_posts",
-            "args": null
-          }
-        ]
+        "kind": "FragmentSpread",
+        "name": "PostSequence_posts",
+        "args": null
       }
     ]
   },
   "operation": {
     "kind": "Operation",
     "name": "AppQuery",
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
         "name": "posts",
         "storageKey": null,
-        "args": null,
+        "args": (v1/*: any*/),
         "concreteType": "PostConnection",
         "plural": false,
         "selections": [
@@ -138,15 +163,63 @@ return {
                         "args": null,
                         "storageKey": null
                       },
-                      (v0/*: any*/)
+                      (v2/*: any*/)
                     ]
                   },
-                  (v0/*: any*/)
+                  (v2/*: any*/),
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "__typename",
+                    "args": null,
+                    "storageKey": null
+                  }
                 ]
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "cursor",
+                "args": null,
+                "storageKey": null
+              }
+            ]
+          },
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "pageInfo",
+            "storageKey": null,
+            "args": null,
+            "concreteType": "PageInfo",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "endCursor",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "hasNextPage",
+                "args": null,
+                "storageKey": null
               }
             ]
           }
         ]
+      },
+      {
+        "kind": "LinkedHandle",
+        "alias": null,
+        "name": "posts",
+        "args": (v1/*: any*/),
+        "handle": "connection",
+        "key": "PostSequence_posts",
+        "filters": null
       }
     ]
   },
@@ -154,11 +227,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  posts {\n    ...PostSequence_posts\n  }\n}\n\nfragment PostSequence_posts on PostConnection {\n  edges {\n    node {\n      ...PostDetails_post\n      id\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $count: Int\n  $cursor: String\n) {\n  ...PostSequence_posts\n}\n\nfragment PostSequence_posts on Query {\n  posts(first: $count, after: $cursor) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      endCursor\n      hasNextPage\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'aa1e103eb075f1c46315b5bddaa26d8f';
+(node/*: any*/).hash = 'a1ddf0a295e09758c931a0903803d8c7';
 module.exports = node;

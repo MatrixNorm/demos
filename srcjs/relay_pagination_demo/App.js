@@ -9,10 +9,9 @@ import environment from './Environment'
 import PostSequence from './PostSequence'
 
 const AppQuery = graphql`
-  query AppQuery {
-    posts {
-      ...PostSequence_posts
-    }
+  query AppQuery($count: Int
+                 $cursor: String) {
+    ...PostSequence_posts
   }
 `
 

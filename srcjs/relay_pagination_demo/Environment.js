@@ -16,6 +16,9 @@ const resolvers = {
     post: (_, args) => {
       // how to check if response conforms this the GQL schema ???
       return db.postsById[args.id]
+    },
+    posts: (_, args) => {
+      return Object.values(db.postsById)
     }
   },
   Post: {
@@ -29,7 +32,6 @@ const schema = makeExecutableSchema({typeDefs, resolvers})
 const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
-  console.log(schema)
   console.log(operation.text, variables)
   const resp = graphqlSync(schema, operation.text, {}, undefined, variables)
   console.log(resp)

@@ -10,7 +10,7 @@ type Post implements Node {
 
 type PostConnection {
   pageInfo: PageInfo!
-  edges: [PostEdge]
+  edges: [PostEdge]!
 }
 
 type PostEdge {
@@ -36,7 +36,12 @@ type PageInfo {
 
 type Query {
   post(id: ID!): Post
-  posts: PostConnection
+  posts(
+    after: String, 
+    first: Int, 
+    before: String, 
+    last: Int, 
+    search: String): PostConnection
 }
 
 schema {

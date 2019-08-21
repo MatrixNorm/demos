@@ -1,5 +1,5 @@
 import {
-  createFragmentContainer, 
+  createPaginationContainer, 
   graphql
 } from 'react-relay'
 
@@ -10,19 +10,24 @@ const PostSequence = props => {
   console.log(props)
   return (
     <div>
-      {props.posts.map(edge => <PostDetails post={edge.node}/>)}
+      {props.posts.edges.map(edge => <PostDetails post={edge.node}/>)}
     </div>
   )
 }
 
-export default createFragmentContainer(PostSequence, {
+export default createPaginationContainer(PostSequence, {
   posts: graphql`
-    fragment PostSequence_posts on PostConnection {
-      edges {
-        node {
-          ...PostDetails_post
-        }
+    fragment PostSequence_posts on Query {
+      posts(
+        first: $count
+        after: $cursor
+      ) @connection(key: "PostSequence_posts") {
+          edges {
+            node {
+              ...PostDetails_post
+            }
+          }
+        }  
       }
-    }
-  `
+    `
 })

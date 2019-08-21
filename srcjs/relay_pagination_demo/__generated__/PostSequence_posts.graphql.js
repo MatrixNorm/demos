@@ -13,11 +13,13 @@ import type { FragmentReference } from "relay-runtime";
 declare export opaque type PostSequence_posts$ref: FragmentReference;
 declare export opaque type PostSequence_posts$fragmentType: PostSequence_posts$ref;
 export type PostSequence_posts = {|
-  +edges: ?$ReadOnlyArray<?{|
-    +node: ?{|
-      +$fragmentRefs: PostDetails_post$ref
-    |}
-  |}>,
+  +posts: ?{|
+    +edges: $ReadOnlyArray<?{|
+      +node: ?{|
+        +$fragmentRefs: PostDetails_post$ref
+      |}
+    |}>
+  |},
   +$refType: PostSequence_posts$ref,
 |};
 export type PostSequence_posts$data = PostSequence_posts;
@@ -31,32 +33,104 @@ export type PostSequence_posts$key = {
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
   "name": "PostSequence_posts",
-  "type": "PostConnection",
-  "metadata": null,
-  "argumentDefinitions": [],
+  "type": "Query",
+  "metadata": {
+    "connection": [
+      {
+        "count": "count",
+        "cursor": "cursor",
+        "direction": "forward",
+        "path": [
+          "posts"
+        ]
+      }
+    ]
+  },
+  "argumentDefinitions": [
+    {
+      "kind": "RootArgument",
+      "name": "count",
+      "type": "Int"
+    },
+    {
+      "kind": "RootArgument",
+      "name": "cursor",
+      "type": "String"
+    }
+  ],
   "selections": [
     {
       "kind": "LinkedField",
-      "alias": null,
-      "name": "edges",
+      "alias": "posts",
+      "name": "__PostSequence_posts_connection",
       "storageKey": null,
       "args": null,
-      "concreteType": "PostEdge",
-      "plural": true,
+      "concreteType": "PostConnection",
+      "plural": false,
       "selections": [
         {
           "kind": "LinkedField",
           "alias": null,
-          "name": "node",
+          "name": "edges",
           "storageKey": null,
           "args": null,
-          "concreteType": "Post",
+          "concreteType": "PostEdge",
+          "plural": true,
+          "selections": [
+            {
+              "kind": "LinkedField",
+              "alias": null,
+              "name": "node",
+              "storageKey": null,
+              "args": null,
+              "concreteType": "Post",
+              "plural": false,
+              "selections": [
+                {
+                  "kind": "ScalarField",
+                  "alias": null,
+                  "name": "__typename",
+                  "args": null,
+                  "storageKey": null
+                },
+                {
+                  "kind": "FragmentSpread",
+                  "name": "PostDetails_post",
+                  "args": null
+                }
+              ]
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "cursor",
+              "args": null,
+              "storageKey": null
+            }
+          ]
+        },
+        {
+          "kind": "LinkedField",
+          "alias": null,
+          "name": "pageInfo",
+          "storageKey": null,
+          "args": null,
+          "concreteType": "PageInfo",
           "plural": false,
           "selections": [
             {
-              "kind": "FragmentSpread",
-              "name": "PostDetails_post",
-              "args": null
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "endCursor",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "hasNextPage",
+              "args": null,
+              "storageKey": null
             }
           ]
         }
@@ -65,5 +139,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = 'bfe8decb85dc51f4b3add3e78b066d59';
+(node/*: any*/).hash = '0cb39cc112235f3b7b1fbbdab13d594c';
 module.exports = node;
