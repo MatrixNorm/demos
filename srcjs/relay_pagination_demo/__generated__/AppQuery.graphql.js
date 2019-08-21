@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 398d2220f33e0f725dde4d901e773d61
+ * @relayHash 550d68e6ea3ebd5bd58bf8a038266367
  */
 
 /* eslint-disable */
@@ -9,13 +9,11 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type PostDetails_post$ref = any;
-export type AppQueryVariables = {|
-  postId: string
-|};
+type PostSequence_posts$ref = any;
+export type AppQueryVariables = {||};
 export type AppQueryResponse = {|
-  +post: ?{|
-    +$fragmentRefs: PostDetails_post$ref
+  +posts: ?{|
+    +$fragmentRefs: PostSequence_posts$ref
   |}
 |};
 export type AppQuery = {|
@@ -26,12 +24,18 @@ export type AppQuery = {|
 
 
 /*
-query AppQuery(
-  $postId: ID!
-) {
-  post(id: $postId) {
-    ...PostDetails_post
-    id
+query AppQuery {
+  posts {
+    ...PostSequence_posts
+  }
+}
+
+fragment PostSequence_posts on PostConnection {
+  edges {
+    node {
+      ...PostDetails_post
+      id
+    }
   }
 }
 
@@ -45,22 +49,7 @@ fragment PostDetails_post on Post {
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = [
-  {
-    "kind": "LocalArgument",
-    "name": "postId",
-    "type": "ID!",
-    "defaultValue": null
-  }
-],
-v1 = [
-  {
-    "kind": "Variable",
-    "name": "id",
-    "variableName": "postId"
-  }
-],
-v2 = {
+var v0 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "id",
@@ -74,20 +63,20 @@ return {
     "name": "AppQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [],
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "post",
+        "name": "posts",
         "storageKey": null,
-        "args": (v1/*: any*/),
-        "concreteType": "Post",
+        "args": null,
+        "concreteType": "PostConnection",
         "plural": false,
         "selections": [
           {
             "kind": "FragmentSpread",
-            "name": "PostDetails_post",
+            "name": "PostSequence_posts",
             "args": null
           }
         ]
@@ -97,44 +86,66 @@ return {
   "operation": {
     "kind": "Operation",
     "name": "AppQuery",
-    "argumentDefinitions": (v0/*: any*/),
+    "argumentDefinitions": [],
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "post",
+        "name": "posts",
         "storageKey": null,
-        "args": (v1/*: any*/),
-        "concreteType": "Post",
+        "args": null,
+        "concreteType": "PostConnection",
         "plural": false,
         "selections": [
           {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "title",
-            "args": null,
-            "storageKey": null
-          },
-          {
             "kind": "LinkedField",
             "alias": null,
-            "name": "author",
+            "name": "edges",
             "storageKey": null,
             "args": null,
-            "concreteType": "User",
-            "plural": false,
+            "concreteType": "PostEdge",
+            "plural": true,
             "selections": [
               {
-                "kind": "ScalarField",
+                "kind": "LinkedField",
                 "alias": null,
-                "name": "name",
+                "name": "node",
+                "storageKey": null,
                 "args": null,
-                "storageKey": null
-              },
-              (v2/*: any*/)
+                "concreteType": "Post",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "title",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "LinkedField",
+                    "alias": null,
+                    "name": "author",
+                    "storageKey": null,
+                    "args": null,
+                    "concreteType": "User",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "name": "name",
+                        "args": null,
+                        "storageKey": null
+                      },
+                      (v0/*: any*/)
+                    ]
+                  },
+                  (v0/*: any*/)
+                ]
+              }
             ]
-          },
-          (v2/*: any*/)
+          }
         ]
       }
     ]
@@ -143,11 +154,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $postId: ID!\n) {\n  post(id: $postId) {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery {\n  posts {\n    ...PostSequence_posts\n  }\n}\n\nfragment PostSequence_posts on PostConnection {\n  edges {\n    node {\n      ...PostDetails_post\n      id\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '67c39018d2e5f937890ad19cc9fae230';
+(node/*: any*/).hash = 'aa1e103eb075f1c46315b5bddaa26d8f';
 module.exports = node;

@@ -8,16 +8,7 @@ import {
 import { graphqlSync } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
 
-const db = {}
-
-db.postsById = {
-  "3.14": {id: "3.14", title: "Ocaml vs Haskell", authorId: "df4T"}
-}
-
-db.usersById = {
-  "df4T": {id: "df4T", name: "Boris"}
-}
-
+import db from './database'
 import typeDefs from 'raw-loader!./schema.graphql'
 
 const resolvers = {

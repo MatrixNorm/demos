@@ -6,25 +6,25 @@ import {
 import React from 'react'
 
 import environment from './Environment'
-import PostDetails from './PostDetails'
+import PostSequence from './PostSequence'
 
 const AppQuery = graphql`
-  query AppQuery($postId: ID!) {
-    post(id: $postId) {
-      ...PostDetails_post
+  query AppQuery {
+    posts {
+      ...PostSequence_posts
     }
   }
 `
 
 const render = ({error, props}) => {
-  console.log(props.post)
+  console.log(props.posts)
   if (error) {
     return <div style={{color: "red"}}>Error: {error.message}</div>;
   }
   if (!props) {
     return <div>Loading...</div>
   }
-  return <PostDetails post={props.post} />
+  return <PostSequence post={props.posts} />
 }
 
 const App = () => {
@@ -32,7 +32,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{postId: "3.14"}}
+      variables={{}}
       render={render}/>
   )
 }
