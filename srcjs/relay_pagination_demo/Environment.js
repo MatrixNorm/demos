@@ -11,14 +11,11 @@ import { makeExecutableSchema } from 'graphql-tools'
 const db = {}
 
 db.postsById = {
-  "1": {id: "1", title: "Baked eggs", authorId: "2"},
-  "2": {id: "2", title: "Clojure tutorial", authorId: "1"},
-  "3": {id: "3", title: "Ocaml vs Haskell", authorId: "1"}
+  "3.14": {id: "3.14", title: "Ocaml vs Haskell", authorId: "df4T"}
 }
 
 db.usersById = {
-  "1": {id: "1", name: "Boris"},
-  "2": {id: "2", name: "John Cook"}
+  "df4T": {id: "df4T", name: "Boris"}
 }
 
 import typeDefs from 'raw-loader!./schema.graphql'

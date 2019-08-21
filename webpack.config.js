@@ -58,7 +58,7 @@ builds.typescript_babel_hello = basedBuild('typescript_babel_hello')({
   }
 });
 
-builds.relay_hello = basedBuild('relay_hello')({
+const relayOverides = {
   module: {
     rules: [
       {
@@ -72,7 +72,10 @@ builds.relay_hello = basedBuild('relay_hello')({
     // https://github.com/graphql/graphql-js/issues/1272#issuecomment-377384574
     extensions: ['.mjs', '.js', '.jsx']
   },
-});
+};
+
+builds.relay_hello = basedBuild('relay_hello')(relayOverides);
+builds.relay_pagination_demo = basedBuild('relay_pagination_demo')(relayOverides);
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;

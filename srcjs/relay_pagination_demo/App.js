@@ -15,6 +15,7 @@ const AppQuery = graphql`
     }
   }
 `
+
 const render = ({error, props}) => {
   console.log(props.post)
   if (error) {
@@ -31,7 +32,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{postId: "1"}}
+      variables={{postId: "3.14"}}
       render={render}/>
   )
 }
