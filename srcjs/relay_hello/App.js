@@ -23,7 +23,7 @@ const render = ({error, props}) => {
   if (!props) {
     return <div>Loading...</div>
   }
-  return <PostDetails post={props.post} />
+  return <PostDetails post={props.node} />
 }
 
 const App = () => {
