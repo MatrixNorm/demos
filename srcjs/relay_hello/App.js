@@ -10,7 +10,7 @@ import PostDetails from './PostDetails'
 
 const AppQuery = graphql`
   query AppQuery($postId: ID!) {
-    post(id: $postId) {
+    node(id: $postId) {
       ...PostDetails_post
     }
   }
@@ -31,7 +31,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{postId: "1"}}
+      variables={{postId: "post1"}}
       render={render}/>
   )
 }

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 398d2220f33e0f725dde4d901e773d61
+ * @relayHash 72c246d418a90acd6c90a769f371197d
  */
 
 /* eslint-disable */
@@ -14,7 +14,7 @@ export type AppQueryVariables = {|
   postId: string
 |};
 export type AppQueryResponse = {|
-  +post: ?{|
+  +node: ?{|
     +$fragmentRefs: PostDetails_post$ref
   |}
 |};
@@ -29,7 +29,8 @@ export type AppQuery = {|
 query AppQuery(
   $postId: ID!
 ) {
-  post(id: $postId) {
+  node(id: $postId) {
+    __typename
     ...PostDetails_post
     id
   }
@@ -79,10 +80,10 @@ return {
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "post",
+        "name": "node",
         "storageKey": null,
         "args": (v1/*: any*/),
-        "concreteType": "Post",
+        "concreteType": null,
         "plural": false,
         "selections": [
           {
@@ -102,39 +103,52 @@ return {
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "post",
+        "name": "node",
         "storageKey": null,
         "args": (v1/*: any*/),
-        "concreteType": "Post",
+        "concreteType": null,
         "plural": false,
         "selections": [
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "title",
+            "name": "__typename",
             "args": null,
             "storageKey": null
           },
+          (v2/*: any*/),
           {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "author",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "User",
-            "plural": false,
+            "kind": "InlineFragment",
+            "type": "Post",
             "selections": [
               {
                 "kind": "ScalarField",
                 "alias": null,
-                "name": "name",
+                "name": "title",
                 "args": null,
                 "storageKey": null
               },
-              (v2/*: any*/)
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "author",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "User",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "name",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  (v2/*: any*/)
+                ]
+              }
             ]
-          },
-          (v2/*: any*/)
+          }
         ]
       }
     ]
@@ -143,11 +157,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $postId: ID!\n) {\n  post(id: $postId) {\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $postId: ID!\n) {\n  node(id: $postId) {\n    __typename\n    ...PostDetails_post\n    id\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '67c39018d2e5f937890ad19cc9fae230';
+(node/*: any*/).hash = 'e1b310626fbfe8707763cd640b7d04e1';
 module.exports = node;

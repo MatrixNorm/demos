@@ -14,7 +14,7 @@ type User implements Node {
 }
 
 type Query {
-  post(id: ID!): Post
+  node(id: ID!): Node
 }
 
 schema {
