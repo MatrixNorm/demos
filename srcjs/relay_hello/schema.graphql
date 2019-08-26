@@ -11,6 +11,7 @@ type Post implements Node {
 type User implements Node {
   id: ID!
   name: String
+  posts: [Post]
 }
 
 type Query {
