@@ -13,17 +13,41 @@ import typeDefs from 'raw-loader!./schema.graphql'
 
 const resolvers = {
   Query: {
-    post: (_, args) => {
-      // how to check if response conforms this the GQL schema ???
-      return db.postsById[args.id]
+    node: (_, args) => {
+      const { id } = args;
+      if (id.startsWith('post')) {
+        return db.postsById[id]
+      }
+      if (id.startsWith('user')) {
+        return db.usersById[id] 
+      }
+      return null
     },
-    posts: (_, args) => {
-      return Object.values(db.postsById)
+    posts: (_, {after, first}) => {
+      console.log(after, first)
+      return Object.values(db.postsById).slice(0, first)
+    }
+  },
+  Node: {
+    __resolveType(node) {
+      if (node.id.startsWith('post')) {
+        return 'Post' 
+      }
+      if (node.id.startsWith('user')) {
+        return 'User' 
+      }
+      return null
     }
   },
   Post: {
     author: (post) => {
       return db.usersById[post.authorId]
+    }
+  },
+  User: {
+    posts: (user) => {
+      return Object.values(db.postsById)
+        .filter(p => p.authorId == user.id)
     }
   }
 }

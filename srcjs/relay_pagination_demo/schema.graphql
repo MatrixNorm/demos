@@ -21,6 +21,7 @@ type PostEdge {
 type User implements Node {
   id: ID!
   name: String
+  posts: [Post]
 }
 
 type PageInfo {
@@ -35,7 +36,7 @@ type PageInfo {
 }
 
 type Query {
-  post(id: ID!): Post
+  node(id: ID!): Node
   posts(
     after: String, 
     first: Int, 

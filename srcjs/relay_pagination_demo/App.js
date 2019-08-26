@@ -31,7 +31,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{}}
+      variables={{count: 3}}
       render={render}/>
   )
 }

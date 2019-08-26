@@ -30,4 +30,15 @@ export default createPaginationContainer(PostSequence, {
         }  
       }
     `
-})
+  },
+  {
+    direction: 'forward',
+    getConnectionFromProps(props) {
+      console.log(props)
+      return props.posts.posts;
+    },
+    getVariables(props, {count, cursor}, fragmentVariables) {
+      console.log('getVariables', count)
+      return { count, cursor };
+    }
+  })
