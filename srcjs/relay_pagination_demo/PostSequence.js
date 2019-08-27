@@ -16,16 +16,24 @@ const PostSequence = props => {
 }
 
 export default createPaginationContainer(PostSequence, {
-  posts: graphql`
-    fragment PostSequence_posts on Query {
-      posts(
+  conn: graphql`
+    fragment PostSequence_conn on PostSeq 
+    @argumentDefinitions(
+      count: {type: "Int"}
+      cursor: {type: "String"}
+    ) {
+      conn(
         first: $count
         after: $cursor
-      ) @connection(key: "PostSequence_posts") {
+      ) @connection(key: "PostSequence_conn") {
           edges {
             node {
               ...PostDetails_post
             }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
           }
         }  
       }
@@ -35,7 +43,7 @@ export default createPaginationContainer(PostSequence, {
     direction: 'forward',
     getConnectionFromProps(props) {
       console.log(props)
-      return props.posts.posts;
+      return props.posts.conn;
     },
     getVariables(props, {count, cursor}, fragmentVariables) {
       console.log('getVariables', count)

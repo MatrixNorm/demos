@@ -11,7 +11,9 @@ import PostSequence from './PostSequence'
 const AppQuery = graphql`
   query AppQuery($count: Int
                  $cursor: String) {
-    ...PostSequence_posts
+    posts {
+      ...PostSequence_conn @arguments(count: $count, cursor: $cursor)
+    }
   }
 `
 
@@ -23,7 +25,7 @@ const render = ({error, props}) => {
   if (!props) {
     return <div>Loading...</div>
   }
-  return <PostSequence post={props.posts} />
+  return <PostSequence posts={props.posts} />
 }
 
 const App = () => {

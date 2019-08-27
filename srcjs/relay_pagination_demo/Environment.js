@@ -23,9 +23,10 @@ const resolvers = {
       }
       return null
     },
-    posts: (_, {after, first}) => {
-      console.log(after, first)
-      return Object.values(db.postsById).slice(0, first)
+    posts: (_, args) => {
+      console.log(args)
+      return args
+      //Object.values(db.postsById).slice(0, first)
     }
   },
   Node: {
@@ -42,6 +43,42 @@ const resolvers = {
   Post: {
     author: (post) => {
       return db.usersById[post.authorId]
+    }
+  },
+  PostSeq: {
+    conn: (x, y) => {
+      console.log(x, y)
+      return y
+    }
+  },
+  PostConnection: {
+    edges: (conn, args) => {
+      console.log(conn, args)
+      return []
+    },
+    pageInfo: (conn, args) => {
+      console.log(conn, args)
+      return {}
+    }
+  },
+  PostEdge: {
+    node: (edge) => {
+      console.log(edge)
+      return db.postsById["post1"]
+    },
+    cursor: (edge) => {
+      console.log(edge)
+      return "XYZ"
+    }
+  },
+  PageInfo: {
+    hasNextPage: (pageInfo) => {
+      console.log(pageInfo)
+      return false
+    },
+    endCursor: (pageInfo) => {
+      console.log(pageInfo)
+      return "XYZ"
     }
   },
   User: {

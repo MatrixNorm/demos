@@ -10,30 +10,34 @@
 import type { ReaderFragment } from 'relay-runtime';
 type PostDetails_post$ref = any;
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type PostSequence_posts$ref: FragmentReference;
-declare export opaque type PostSequence_posts$fragmentType: PostSequence_posts$ref;
-export type PostSequence_posts = {|
-  +posts: ?{|
+declare export opaque type PostSequence_conn$ref: FragmentReference;
+declare export opaque type PostSequence_conn$fragmentType: PostSequence_conn$ref;
+export type PostSequence_conn = {|
+  +conn: ?{|
     +edges: $ReadOnlyArray<?{|
       +node: ?{|
         +$fragmentRefs: PostDetails_post$ref
       |}
-    |}>
+    |}>,
+    +pageInfo: {|
+      +hasNextPage: boolean,
+      +endCursor: ?string,
+    |},
   |},
-  +$refType: PostSequence_posts$ref,
+  +$refType: PostSequence_conn$ref,
 |};
-export type PostSequence_posts$data = PostSequence_posts;
-export type PostSequence_posts$key = {
-  +$data?: PostSequence_posts$data,
-  +$fragmentRefs: PostSequence_posts$ref,
+export type PostSequence_conn$data = PostSequence_conn;
+export type PostSequence_conn$key = {
+  +$data?: PostSequence_conn$data,
+  +$fragmentRefs: PostSequence_conn$ref,
 };
 */
 
 
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
-  "name": "PostSequence_posts",
-  "type": "Query",
+  "name": "PostSequence_conn",
+  "type": "PostSeq",
   "metadata": {
     "connection": [
       {
@@ -41,28 +45,30 @@ const node/*: ReaderFragment*/ = {
         "cursor": "cursor",
         "direction": "forward",
         "path": [
-          "posts"
+          "conn"
         ]
       }
     ]
   },
   "argumentDefinitions": [
     {
-      "kind": "RootArgument",
+      "kind": "LocalArgument",
       "name": "count",
-      "type": "Int"
+      "type": "Int",
+      "defaultValue": null
     },
     {
-      "kind": "RootArgument",
+      "kind": "LocalArgument",
       "name": "cursor",
-      "type": "String"
+      "type": "String",
+      "defaultValue": null
     }
   ],
   "selections": [
     {
       "kind": "LinkedField",
-      "alias": "posts",
-      "name": "__PostSequence_posts_connection",
+      "alias": "conn",
+      "name": "__PostSequence_conn_connection",
       "storageKey": null,
       "args": null,
       "concreteType": "PostConnection",
@@ -121,14 +127,14 @@ const node/*: ReaderFragment*/ = {
             {
               "kind": "ScalarField",
               "alias": null,
-              "name": "endCursor",
+              "name": "hasNextPage",
               "args": null,
               "storageKey": null
             },
             {
               "kind": "ScalarField",
               "alias": null,
-              "name": "hasNextPage",
+              "name": "endCursor",
               "args": null,
               "storageKey": null
             }
@@ -139,5 +145,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '0cb39cc112235f3b7b1fbbdab13d594c';
+(node/*: any*/).hash = 'dc79c5be39e884bfffce9bd32ec56bb7';
 module.exports = node;
