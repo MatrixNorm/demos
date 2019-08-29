@@ -6,26 +6,42 @@ import {
 import React from 'react'
 
 import environment from './Environment'
-import PostSequence from './PostSequence'
+import PostDetails from './PostDetails'
 
 const AppQuery = graphql`
   query AppQuery($count: Int
                  $cursor: String) {
-    posts {
-      ...PostSequence_conn @arguments(count: $count, cursor: $cursor)
-    }
+    postFeed(
+      first: $count, 
+      after: $cursor
+    ) @connection(key: "PostFeed_postFeed") {
+        edges {
+          node {
+            ...PostDetails_post
+          }
+        }
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+      }
   }
 `
 
 const render = ({error, props}) => {
-  console.log(props.posts)
+  console.log(props.postFeed)
   if (error) {
     return <div style={{color: "red"}}>Error: {error.message}</div>;
   }
   if (!props) {
     return <div>Loading...</div>
   }
-  return <PostSequence posts={props.posts} />
+  return (
+    <div>
+      {props.postFeed.edges
+          .map(edge => <PostDetails post={edge.node} key={edge.cursor}/>)}
+    </div>
+  )
 }
 
 const App = () => {

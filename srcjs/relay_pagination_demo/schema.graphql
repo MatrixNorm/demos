@@ -8,15 +8,6 @@ type Post implements Node {
   author: User
 }
 
-type PostSeq {
-  conn(
-    after: String, 
-    first: Int, 
-    before: String, 
-    last: Int, 
-    search: String): PostConnection
-}
-
 type PostConnection {
   pageInfo: PageInfo!
   edges: [PostEdge]!
@@ -47,7 +38,12 @@ type PageInfo {
 type Query {
   node(id: ID!): Node
   """ https://github.com/facebook/relay/issues/1983 """
-  posts: PostSeq
+  postFeed(
+    after: String, 
+    first: Int, 
+    before: String, 
+    last: Int, 
+  ): PostConnection
 }
 
 schema {

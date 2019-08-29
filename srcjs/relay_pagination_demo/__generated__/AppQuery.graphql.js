@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 94d3abdc994e21b26b66d638935d201f
+ * @relayHash ef33638bbc9535525de76081771b2d61
  */
 
 /* eslint-disable */
@@ -9,14 +9,22 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type PostSequence_conn$ref = any;
+type PostDetails_post$ref = any;
 export type AppQueryVariables = {|
   count?: ?number,
   cursor?: ?string,
 |};
 export type AppQueryResponse = {|
-  +posts: ?{|
-    +$fragmentRefs: PostSequence_conn$ref
+  +postFeed: ?{|
+    +edges: $ReadOnlyArray<?{|
+      +node: ?{|
+        +$fragmentRefs: PostDetails_post$ref
+      |}
+    |}>,
+    +pageInfo: {|
+      +hasNextPage: boolean,
+      +endCursor: ?string,
+    |},
   |}
 |};
 export type AppQuery = {|
@@ -31,13 +39,7 @@ query AppQuery(
   $count: Int
   $cursor: String
 ) {
-  posts {
-    ...PostSequence_conn_1G22uz
-  }
-}
-
-fragment PostSequence_conn_1G22uz on PostSeq {
-  conn(first: $count, after: $cursor) {
+  postFeed(first: $count, after: $cursor) {
     edges {
       node {
         ...PostDetails_post
@@ -77,7 +79,46 @@ var v0 = [
     "defaultValue": null
   }
 ],
-v1 = [
+v1 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "__typename",
+  "args": null,
+  "storageKey": null
+},
+v2 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "cursor",
+  "args": null,
+  "storageKey": null
+},
+v3 = {
+  "kind": "LinkedField",
+  "alias": null,
+  "name": "pageInfo",
+  "storageKey": null,
+  "args": null,
+  "concreteType": "PageInfo",
+  "plural": false,
+  "selections": [
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "hasNextPage",
+      "args": null,
+      "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "endCursor",
+      "args": null,
+      "storageKey": null
+    }
+  ]
+},
+v4 = [
   {
     "kind": "Variable",
     "name": "after",
@@ -89,7 +130,7 @@ v1 = [
     "variableName": "count"
   }
 ],
-v2 = {
+v5 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "id",
@@ -107,29 +148,43 @@ return {
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": null,
-        "name": "posts",
+        "alias": "postFeed",
+        "name": "__PostFeed_postFeed_connection",
         "storageKey": null,
         "args": null,
-        "concreteType": "PostSeq",
+        "concreteType": "PostConnection",
         "plural": false,
         "selections": [
           {
-            "kind": "FragmentSpread",
-            "name": "PostSequence_conn",
-            "args": [
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "edges",
+            "storageKey": null,
+            "args": null,
+            "concreteType": "PostEdge",
+            "plural": true,
+            "selections": [
               {
-                "kind": "Variable",
-                "name": "count",
-                "variableName": "count"
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "node",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "Post",
+                "plural": false,
+                "selections": [
+                  (v1/*: any*/),
+                  {
+                    "kind": "FragmentSpread",
+                    "name": "PostDetails_post",
+                    "args": null
+                  }
+                ]
               },
-              {
-                "kind": "Variable",
-                "name": "cursor",
-                "variableName": "cursor"
-              }
+              (v2/*: any*/)
             ]
-          }
+          },
+          (v3/*: any*/)
         ]
       }
     ]
@@ -142,121 +197,74 @@ return {
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "posts",
+        "name": "postFeed",
         "storageKey": null,
-        "args": null,
-        "concreteType": "PostSeq",
+        "args": (v4/*: any*/),
+        "concreteType": "PostConnection",
         "plural": false,
         "selections": [
           {
             "kind": "LinkedField",
             "alias": null,
-            "name": "conn",
+            "name": "edges",
             "storageKey": null,
-            "args": (v1/*: any*/),
-            "concreteType": "PostConnection",
-            "plural": false,
+            "args": null,
+            "concreteType": "PostEdge",
+            "plural": true,
             "selections": [
               {
                 "kind": "LinkedField",
                 "alias": null,
-                "name": "edges",
+                "name": "node",
                 "storageKey": null,
                 "args": null,
-                "concreteType": "PostEdge",
-                "plural": true,
-                "selections": [
-                  {
-                    "kind": "LinkedField",
-                    "alias": null,
-                    "name": "node",
-                    "storageKey": null,
-                    "args": null,
-                    "concreteType": "Post",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "title",
-                        "args": null,
-                        "storageKey": null
-                      },
-                      {
-                        "kind": "LinkedField",
-                        "alias": null,
-                        "name": "author",
-                        "storageKey": null,
-                        "args": null,
-                        "concreteType": "User",
-                        "plural": false,
-                        "selections": [
-                          {
-                            "kind": "ScalarField",
-                            "alias": null,
-                            "name": "name",
-                            "args": null,
-                            "storageKey": null
-                          },
-                          (v2/*: any*/)
-                        ]
-                      },
-                      (v2/*: any*/),
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "__typename",
-                        "args": null,
-                        "storageKey": null
-                      }
-                    ]
-                  },
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "cursor",
-                    "args": null,
-                    "storageKey": null
-                  }
-                ]
-              },
-              {
-                "kind": "LinkedField",
-                "alias": null,
-                "name": "pageInfo",
-                "storageKey": null,
-                "args": null,
-                "concreteType": "PageInfo",
+                "concreteType": "Post",
                 "plural": false,
                 "selections": [
                   {
                     "kind": "ScalarField",
                     "alias": null,
-                    "name": "hasNextPage",
+                    "name": "title",
                     "args": null,
                     "storageKey": null
                   },
                   {
-                    "kind": "ScalarField",
+                    "kind": "LinkedField",
                     "alias": null,
-                    "name": "endCursor",
+                    "name": "author",
+                    "storageKey": null,
                     "args": null,
-                    "storageKey": null
-                  }
+                    "concreteType": "User",
+                    "plural": false,
+                    "selections": [
+                      {
+                        "kind": "ScalarField",
+                        "alias": null,
+                        "name": "name",
+                        "args": null,
+                        "storageKey": null
+                      },
+                      (v5/*: any*/)
+                    ]
+                  },
+                  (v5/*: any*/),
+                  (v1/*: any*/)
                 ]
-              }
+              },
+              (v2/*: any*/)
             ]
           },
-          {
-            "kind": "LinkedHandle",
-            "alias": null,
-            "name": "conn",
-            "args": (v1/*: any*/),
-            "handle": "connection",
-            "key": "PostSequence_conn",
-            "filters": null
-          }
+          (v3/*: any*/)
         ]
+      },
+      {
+        "kind": "LinkedHandle",
+        "alias": null,
+        "name": "postFeed",
+        "args": (v4/*: any*/),
+        "handle": "connection",
+        "key": "PostFeed_postFeed",
+        "filters": null
       }
     ]
   },
@@ -264,11 +272,22 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $count: Int\n  $cursor: String\n) {\n  posts {\n    ...PostSequence_conn_1G22uz\n  }\n}\n\nfragment PostSequence_conn_1G22uz on PostSeq {\n  conn(first: $count, after: $cursor) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
-    "metadata": {}
+    "text": "query AppQuery(\n  $count: Int\n  $cursor: String\n) {\n  postFeed(first: $count, after: $cursor) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "metadata": {
+      "connection": [
+        {
+          "count": "count",
+          "cursor": "cursor",
+          "direction": "forward",
+          "path": [
+            "postFeed"
+          ]
+        }
+      ]
+    }
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '52c3f3a5d14ca4dada90f80bdc94501e';
+(node/*: any*/).hash = '605a2b1c91085deb3fcea571c130b2fe';
 module.exports = node;
