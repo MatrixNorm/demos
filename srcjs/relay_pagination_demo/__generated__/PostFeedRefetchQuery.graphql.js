@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 75cd4346a23604042c3c695d3ead93dc
+ * @relayHash 72e33a4d61695dc0cf92c169e7b4c6c1
  */
 
 /* eslint-disable */
@@ -38,9 +38,7 @@ fragment PostFeed_posts_2HEEH6 on Query {
       node {
         ...PostDetails_post
         id
-        __typename
       }
-      cursor
     }
     pageInfo {
       hasNextPage
@@ -166,22 +164,8 @@ return {
                       (v2/*: any*/)
                     ]
                   },
-                  (v2/*: any*/),
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "__typename",
-                    "args": null,
-                    "storageKey": null
-                  }
+                  (v2/*: any*/)
                 ]
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "cursor",
-                "args": null,
-                "storageKey": null
               }
             ]
           },
@@ -211,15 +195,6 @@ return {
             ]
           }
         ]
-      },
-      {
-        "kind": "LinkedHandle",
-        "alias": null,
-        "name": "postFeed",
-        "args": (v1/*: any*/),
-        "handle": "connection",
-        "key": "PostFeed_postFeed",
-        "filters": null
       }
     ]
   },
@@ -227,7 +202,7 @@ return {
     "operationKind": "query",
     "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query PostFeedRefetchQuery(\n  $first: Int!\n  $after: String\n) {\n  ...PostFeed_posts_2HEEH6\n}\n\nfragment PostFeed_posts_2HEEH6 on Query {\n  postFeed(first: $first, after: $after) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int!\n  $after: String\n) {\n  ...PostFeed_posts_2HEEH6\n}\n\nfragment PostFeed_posts_2HEEH6 on Query {\n  postFeed(first: $first, after: $after) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };

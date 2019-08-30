@@ -38,18 +38,7 @@ const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
   "name": "PostFeed_posts",
   "type": "Query",
-  "metadata": {
-    "connection": [
-      {
-        "count": "first",
-        "cursor": "after",
-        "direction": "forward",
-        "path": [
-          "postFeed"
-        ]
-      }
-    ]
-  },
+  "metadata": null,
   "argumentDefinitions": [
     {
       "kind": "LocalArgument",
@@ -67,10 +56,21 @@ const node/*: ReaderFragment*/ = {
   "selections": [
     {
       "kind": "LinkedField",
-      "alias": "postFeed",
-      "name": "__PostFeed_postFeed_connection",
+      "alias": null,
+      "name": "postFeed",
       "storageKey": null,
-      "args": null,
+      "args": [
+        {
+          "kind": "Variable",
+          "name": "after",
+          "variableName": "after"
+        },
+        {
+          "kind": "Variable",
+          "name": "first",
+          "variableName": "first"
+        }
+      ],
       "concreteType": "PostConnection",
       "plural": false,
       "selections": [
@@ -93,25 +93,11 @@ const node/*: ReaderFragment*/ = {
               "plural": false,
               "selections": [
                 {
-                  "kind": "ScalarField",
-                  "alias": null,
-                  "name": "__typename",
-                  "args": null,
-                  "storageKey": null
-                },
-                {
                   "kind": "FragmentSpread",
                   "name": "PostDetails_post",
                   "args": null
                 }
               ]
-            },
-            {
-              "kind": "ScalarField",
-              "alias": null,
-              "name": "cursor",
-              "args": null,
-              "storageKey": null
             }
           ]
         },
@@ -145,5 +131,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '42ad1f509160d862ccf9c126367156e2';
+(node/*: any*/).hash = '98833e3dd3a769be4f4115e79391d962';
 module.exports = node;

@@ -22,14 +22,15 @@ const postFeed = (props) => {
     <div>
       <div>
         {props.posts.postFeed.edges
-            .map(edge => <PostDetails post={edge.node} 
-                                      key={edge.cursor}/>)}
+            .map(edge => <PostDetails post={edge.node}
+                                      // XXX 
+                                      key={edge.node.__id}/>)}
       </div>
       <button onClick={goNext}>NEXT</button>
     </div>
   )
 }
-
+//@connection(key: "PostFeed_postFeed")
 export default createRefetchContainer(
   postFeed, 
   {
@@ -42,7 +43,7 @@ export default createRefetchContainer(
         postFeed(
           first: $first, 
           after: $after
-        ) @connection(key: "PostFeed_postFeed") {
+        ) {
           edges {
             node {
               ...PostDetails_post
