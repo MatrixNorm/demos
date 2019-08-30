@@ -13,7 +13,7 @@ const schema = makeExecutableSchema({typeDefs, resolvers})
 const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
-  console.log(operation.text, variables)
+  console.log(variables)
   const resp = graphqlSync(schema, operation.text, {}, undefined, variables)
   console.log(resp)
   return resp

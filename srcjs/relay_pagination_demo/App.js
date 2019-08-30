@@ -2,46 +2,25 @@ import {
   QueryRenderer, 
   graphql
 } from 'react-relay'
-
 import React from 'react'
-
 import environment from './Environment'
-import PostDetails from './PostDetails'
+import PostFeed from './PostFeed'
 
 const AppQuery = graphql`
-  query AppQuery($count: Int
-                 $cursor: String) {
-    postFeed(
-      first: $count, 
-      after: $cursor
-    ) @connection(key: "PostFeed_postFeed") {
-        edges {
-          node {
-            ...PostDetails_post
-          }
-        }
-        pageInfo {
-          hasNextPage
-          endCursor
-        }
-      }
+  query AppQuery($first: Int!
+                 $after: String) {
+    ...PostFeed_posts @arguments(first: $first, after: $after)
   }
 `
 
 const render = ({error, props}) => {
-  console.log(props.postFeed)
   if (error) {
     return <div style={{color: "red"}}>Error: {error.message}</div>;
   }
   if (!props) {
     return <div>Loading...</div>
   }
-  return (
-    <div>
-      {props.postFeed.edges
-          .map(edge => <PostDetails post={edge.node} key={edge.cursor}/>)}
-    </div>
-  )
+  return (<PostFeed posts={props} />)
 }
 
 const App = () => {
@@ -49,7 +28,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{count: 3}}
+      variables={{first: 3, after: null}}
       render={render}/>
   )
 }

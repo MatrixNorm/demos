@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 2bfb5a2fb6c6e097dd2c30a93c47509b
+ * @relayHash 75cd4346a23604042c3c695d3ead93dc
  */
 
 /* eslint-disable */
@@ -10,22 +10,22 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type PostFeed_posts$ref = any;
-export type AppQueryVariables = {|
+export type PostFeedRefetchQueryVariables = {|
   first: number,
   after?: ?string,
 |};
-export type AppQueryResponse = {|
+export type PostFeedRefetchQueryResponse = {|
   +$fragmentRefs: PostFeed_posts$ref
 |};
-export type AppQuery = {|
-  variables: AppQueryVariables,
-  response: AppQueryResponse,
+export type PostFeedRefetchQuery = {|
+  variables: PostFeedRefetchQueryVariables,
+  response: PostFeedRefetchQueryResponse,
 |};
 */
 
 
 /*
-query AppQuery(
+query PostFeedRefetchQuery(
   $first: Int!
   $after: String
 ) {
@@ -96,7 +96,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "AppQuery",
+    "name": "PostFeedRefetchQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -110,7 +110,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "AppQuery",
+    "name": "PostFeedRefetchQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -225,13 +225,13 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "AppQuery",
+    "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int!\n  $after: String\n) {\n  ...PostFeed_posts_2HEEH6\n}\n\nfragment PostFeed_posts_2HEEH6 on Query {\n  postFeed(first: $first, after: $after) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int!\n  $after: String\n) {\n  ...PostFeed_posts_2HEEH6\n}\n\nfragment PostFeed_posts_2HEEH6 on Query {\n  postFeed(first: $first, after: $after) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a515ac521cc7e84af852f64757bc699d';
+(node/*: any*/).hash = '72825e8da4ea6d114c853c0b056f3ff9';
 module.exports = node;

@@ -20,12 +20,14 @@ const resolvers = {
       let zzz, startIndex;
 
       if (args.after) {
-        startIndex = posts.findIndex(args.after)
+        startIndex = posts.findIndex(p => p.id === args.after)
         if (startIndex > 0) {
-          zzz = posts.slice(startIndex, args.first)
+          zzz = posts.slice(startIndex, startIndex + args.first)
         }
-        // XXX error: invalid cursor
-        zzz = []
+        else {
+          // XXX error: invalid cursor
+          zzz = []
+        }
       } else {
         startIndex = 0
         zzz = posts.slice(0, args.first)

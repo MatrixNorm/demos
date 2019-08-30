@@ -2,7 +2,6 @@ import {
   createFragmentContainer, 
   graphql
 } from 'react-relay'
-
 import React from 'react'
 
 const PostDetails = props => {
