@@ -1,5 +1,36 @@
 import db from './database'
 
+function _postFeedForward(first, after, posts) {
+  let startIndex;
+
+  if (after) {
+    startIndex = posts.findIndex(p => p.id === after)
+    if (startIndex < 0) {
+      throw "Bad `after` cursor"
+    }
+  } else {
+    startIndex = 0
+  }
+  const endIndex = Math.min(startIndex + first, posts.length - 1)
+  return {startIndex, endIndex}
+}
+
+function _postFeedBackward(last, before, posts) {
+  console.log(last, before, posts)
+  let endIndex;
+
+  if (before) {
+    endIndex = posts.findIndex(p => p.id === before)
+    if (endIndex < 0) {
+      throw "Bad `before` cursor"
+    }
+  } else {
+    endIndex = posts.length - 1
+  }
+  const startIndex = Math.max(endIndex - last, 0)
+  return {startIndex, endIndex}
+}
+
 const resolvers = {
   Query: {
     node: (_, args) => {
@@ -12,36 +43,33 @@ const resolvers = {
       }
       return null
     },
-    postFeed: (_, args) => {
-      console.log(args)
+    postFeed: (_, {first, after, last, before}) => {
+      console.log(first, after, last, before)
+
       const posts = Object.values(db.postsById)
       posts.sort((a, b) => a.createdAt < b.createdAt ? -1 : 1)
 
-      let zzz, startIndex;
+      let startIndex, endIndex;
 
-      if (args.after) {
-        startIndex = posts.findIndex(p => p.id === args.after)
-        if (startIndex > 0) {
-          zzz = posts.slice(startIndex, startIndex + args.first)
-        }
-        else {
-          // XXX error: invalid cursor
-          zzz = []
-        }
-      } else {
-        startIndex = 0
-        zzz = posts.slice(0, args.first)
+      if (first) {
+        ({startIndex, endIndex} = _postFeedForward(first, after, posts))
       }
-
+      if (last) {
+        ({startIndex, endIndex} = _postFeedBackward(last, before, posts))
+      }
+      const segment = posts.slice(startIndex, endIndex)
+  
       const pageInfo = {
-        hasNextPage: startIndex + args.first < posts.length,
-        endCursor: posts[startIndex + args.first].id
+        hasNextPage: endIndex + 1 < posts.length,
+        endCursor: segment[segment.length - 1].id,
+        hasPreviousPage: posts[startIndex - 1] ? true : false,
+        startCursor: posts[startIndex - 1]?.id
       }
 
       return {
-        edges: zzz.map(post => ({node: post, cursor: post.id})), 
+        edges: segment.map(post => ({node: post, cursor: post.id})), 
         pageInfo
-      }
+      }   
     }
   },
   Node: {

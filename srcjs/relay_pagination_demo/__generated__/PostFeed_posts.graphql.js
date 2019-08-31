@@ -22,6 +22,8 @@ export type PostFeed_posts = {|
     +pageInfo: {|
       +hasNextPage: boolean,
       +endCursor: ?string,
+      +hasPreviousPage: boolean,
+      +startCursor: ?string,
     |},
   |},
   +$refType: PostFeed_posts$ref,
@@ -43,12 +45,24 @@ const node/*: ReaderFragment*/ = {
     {
       "kind": "LocalArgument",
       "name": "first",
-      "type": "Int!",
+      "type": "Int",
       "defaultValue": null
     },
     {
       "kind": "LocalArgument",
       "name": "after",
+      "type": "String",
+      "defaultValue": null
+    },
+    {
+      "kind": "LocalArgument",
+      "name": "last",
+      "type": "Int",
+      "defaultValue": null
+    },
+    {
+      "kind": "LocalArgument",
+      "name": "before",
       "type": "String",
       "defaultValue": null
     }
@@ -67,8 +81,18 @@ const node/*: ReaderFragment*/ = {
         },
         {
           "kind": "Variable",
+          "name": "before",
+          "variableName": "before"
+        },
+        {
+          "kind": "Variable",
           "name": "first",
           "variableName": "first"
+        },
+        {
+          "kind": "Variable",
+          "name": "last",
+          "variableName": "last"
         }
       ],
       "concreteType": "PostConnection",
@@ -123,6 +147,20 @@ const node/*: ReaderFragment*/ = {
               "name": "endCursor",
               "args": null,
               "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "hasPreviousPage",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "startCursor",
+              "args": null,
+              "storageKey": null
             }
           ]
         }
@@ -131,5 +169,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '98833e3dd3a769be4f4115e79391d962';
+(node/*: any*/).hash = '0bf7671101ff861d8c46ffdd898e11f1';
 module.exports = node;

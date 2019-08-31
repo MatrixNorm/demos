@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 72e33a4d61695dc0cf92c169e7b4c6c1
+ * @relayHash 8fbe4acc95b1f625046f4bff26f120fe
  */
 
 /* eslint-disable */
@@ -11,8 +11,10 @@
 import type { ConcreteRequest } from 'relay-runtime';
 type PostFeed_posts$ref = any;
 export type PostFeedRefetchQueryVariables = {|
-  first: number,
+  first?: ?number,
   after?: ?string,
+  last?: ?number,
+  before?: ?string,
 |};
 export type PostFeedRefetchQueryResponse = {|
   +$fragmentRefs: PostFeed_posts$ref
@@ -26,14 +28,16 @@ export type PostFeedRefetchQuery = {|
 
 /*
 query PostFeedRefetchQuery(
-  $first: Int!
+  $first: Int
   $after: String
+  $last: Int
+  $before: String
 ) {
-  ...PostFeed_posts_2HEEH6
+  ...PostFeed_posts_pbnwq
 }
 
-fragment PostFeed_posts_2HEEH6 on Query {
-  postFeed(first: $first, after: $after) {
+fragment PostFeed_posts_pbnwq on Query {
+  postFeed(first: $first, after: $after, last: $last, before: $before) {
     edges {
       node {
         ...PostDetails_post
@@ -43,6 +47,8 @@ fragment PostFeed_posts_2HEEH6 on Query {
     pageInfo {
       hasNextPage
       endCursor
+      hasPreviousPage
+      startCursor
     }
   }
 }
@@ -61,12 +67,24 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "first",
-    "type": "Int!",
+    "type": "Int",
     "defaultValue": null
   },
   {
     "kind": "LocalArgument",
     "name": "after",
+    "type": "String",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "last",
+    "type": "Int",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "before",
     "type": "String",
     "defaultValue": null
   }
@@ -79,8 +97,18 @@ v1 = [
   },
   {
     "kind": "Variable",
+    "name": "before",
+    "variableName": "before"
+  },
+  {
+    "kind": "Variable",
     "name": "first",
     "variableName": "first"
+  },
+  {
+    "kind": "Variable",
+    "name": "last",
+    "variableName": "last"
   }
 ],
 v2 = {
@@ -191,6 +219,20 @@ return {
                 "name": "endCursor",
                 "args": null,
                 "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "hasPreviousPage",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "startCursor",
+                "args": null,
+                "storageKey": null
               }
             ]
           }
@@ -202,11 +244,11 @@ return {
     "operationKind": "query",
     "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query PostFeedRefetchQuery(\n  $first: Int!\n  $after: String\n) {\n  ...PostFeed_posts_2HEEH6\n}\n\nfragment PostFeed_posts_2HEEH6 on Query {\n  postFeed(first: $first, after: $after) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...PostFeed_posts_pbnwq\n}\n\nfragment PostFeed_posts_pbnwq on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '72825e8da4ea6d114c853c0b056f3ff9';
+(node/*: any*/).hash = '3ce26cb03a9ab0b0e42b80fbc92badf5';
 module.exports = node;

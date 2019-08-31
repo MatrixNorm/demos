@@ -7,9 +7,14 @@ import environment from './Environment'
 import PostFeed from './PostFeed'
 
 const AppQuery = graphql`
-  query AppQuery($first: Int!
-                 $after: String) {
-    ...PostFeed_posts @arguments(first: $first, after: $after)
+  query AppQuery($first: Int
+                 $after: String
+                 $last: Int
+                 $before: String) {
+    ...PostFeed_posts @arguments(first: $first,
+                                 after: $after,
+                                 last: $last,
+                                 before: $before)
   }
 `
 
