@@ -1,5 +1,10 @@
 const path = require('path');
+const util = require('util')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+function PP(obj) {
+  console.log(util.inspect(obj, {showHidden: false, depth: null}))
+}
 
 const builds = {};
 
@@ -105,9 +110,9 @@ builds.typescript_babel_hello = (() => {
   ];
 })();
 
-const flowMixin = {
+const flowMixin = () => ({
   resolve: {
-    extensions: ['.js', '.mjs', '.jsx']
+    extensions: ['.mjs', '.js', '.jsx']
   },
   module: {
     rules: [
@@ -119,48 +124,71 @@ const flowMixin = {
           options: {
             presets: [
               '@babel/preset-env', 
-              '@babel/preset-flow'
+              //'@babel/preset-flow'
+            ],
+            plugins: [
+              "@babel/proposal-class-properties",
+              "@babel/proposal-object-rest-spread",
+              "@babel/plugin-proposal-optional-chaining"
             ]
           }
         }        
       }
     ],
   }
-};
+});
 
 builds.flow_babel_hello = [
   baseBuild({ buildId: 'flow_babel_hello' }),
-  flowMixin
+  flowMixin()
 ];
+
+const relayMixin = () => {
+  let x = flowMixin();
+
+  let plugins = x.module.rules[0].use.options.plugins;
+  plugins.unshift('relay');
+
+  let presets = x.module.rules[0].use.options.presets;
+  presets.unshift('@babel/preset-react');
+
+  x.module.rules[0].use.options.plugins = plugins;
+  x.module.rules[0].use.options.presets = presets;
+
+  return x;
+};
 
 builds.relay_hello = [
   baseBuild({ buildId: 'relay_hello' }),
-  flowMixin
+  relayMixin()
 ];
 
 builds.relay_pagination_demo = [
   baseBuild({ buildId: 'relay_pagination_demo' }),
-  flowMixin
+  relayMixin()
 ];
 
 module.exports = env => {
+
   const buildId = process.env.JS_BUILD_ID;
+
   const onBuildNotFound = function () {
     console.log(`No build with id ${buildId}\n env: ${env}`)
   };
+
   const buildsChain = builds[buildId];
   if ( !buildsChain ) {
     return onBuildNotFound(env);
   }
   let finalConfig = {};
   for (let build of buildsChain) {
-    if (typeof v === 'function') {
+    if (typeof build === 'function') {
       finalConfig = Object.assign(finalConfig, build(env))
     } 
     else {
       finalConfig = Object.assign(finalConfig, build)
     }
   }
-  console.log(finalConfig)
+  PP(finalConfig)
   return finalConfig;
 }
