@@ -124,7 +124,7 @@ const flowMixin = () => ({
           options: {
             presets: [
               '@babel/preset-env', 
-              //'@babel/preset-flow'
+              '@babel/preset-flow'
             ],
             plugins: [
               "@babel/proposal-class-properties",

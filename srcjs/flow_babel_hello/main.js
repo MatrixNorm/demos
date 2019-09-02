@@ -4,4 +4,5 @@ function square(n: number): number {
   return n * n;
 }
 
-square("2");
+const x = square(4);
+console.log(x)
