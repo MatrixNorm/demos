@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8fbe4acc95b1f625046f4bff26f120fe
+ * @relayHash 4b2dac855b7a843789f8f65cf29c41b7
  */
 
 /* eslint-disable */
@@ -40,8 +40,8 @@ fragment PostFeed_posts_pbnwq on Query {
   postFeed(first: $first, after: $after, last: $last, before: $before) {
     edges {
       node {
-        ...PostDetails_post
         id
+        ...PostDetails_post
       }
     }
     pageInfo {
@@ -166,6 +166,7 @@ return {
                 "concreteType": "Post",
                 "plural": false,
                 "selections": [
+                  (v2/*: any*/),
                   {
                     "kind": "ScalarField",
                     "alias": null,
@@ -191,8 +192,7 @@ return {
                       },
                       (v2/*: any*/)
                     ]
-                  },
-                  (v2/*: any*/)
+                  }
                 ]
               }
             ]
@@ -244,7 +244,7 @@ return {
     "operationKind": "query",
     "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...PostFeed_posts_pbnwq\n}\n\nfragment PostFeed_posts_pbnwq on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...PostFeed_posts_pbnwq\n}\n\nfragment PostFeed_posts_pbnwq on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };

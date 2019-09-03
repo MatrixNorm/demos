@@ -16,7 +16,8 @@ export type PostFeed_posts = {|
   +postFeed: ?{|
     +edges: $ReadOnlyArray<?{|
       +node: ?{|
-        +$fragmentRefs: PostDetails_post$ref
+        +id: string,
+        +$fragmentRefs: PostDetails_post$ref,
       |}
     |}>,
     +pageInfo: {|
@@ -117,6 +118,13 @@ const node/*: ReaderFragment*/ = {
               "plural": false,
               "selections": [
                 {
+                  "kind": "ScalarField",
+                  "alias": null,
+                  "name": "id",
+                  "args": null,
+                  "storageKey": null
+                },
+                {
                   "kind": "FragmentSpread",
                   "name": "PostDetails_post",
                   "args": null
@@ -169,5 +177,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '0bf7671101ff861d8c46ffdd898e11f1';
+(node/*: any*/).hash = '5fc980ceea5472a449ae27a8d0760aa6';
 module.exports = node;

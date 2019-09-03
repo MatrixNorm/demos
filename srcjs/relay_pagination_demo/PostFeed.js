@@ -1,20 +1,33 @@
+// @flow
+
 import {
   createRefetchContainer, 
-  graphql
+  graphql,
+  type RelayProp
 } from 'react-relay'
+
 import React from 'react'
 import PostDetails from './PostDetails'
 
-const postFeed = (props) => {
+import type { PostFeed_posts as PostFeedType } from './__generated__/PostFeed_posts.graphql'
 
-  console.log(props)
+type Props = {|
+  +relay: RelayProp,
+  +posts: PostFeedType,
+|}
+
+const postFeed = ({relay, posts: {postFeed}}: Props) => {
 
   function goNext() {
-    console.log(props)
-    props.relay.refetch(
+
+    if ( !postFeed ) {
+      return
+    }
+
+    relay.refetch(
       {
         first: 3,
-        after: props.posts.postFeed.pageInfo.endCursor,
+        after: postFeed.pageInfo.endCursor,
         last: null,
         before: null
       },
@@ -23,32 +36,43 @@ const postFeed = (props) => {
   }
 
   function goPrev() {
-    console.log(props)
-    props.relay.refetch(
+
+    if ( !postFeed ) {
+      return
+    }
+
+    relay.refetch(
       {
         first: null,
         after: null,
         last: 3,
-        before: props.posts.postFeed.pageInfo.startCursor
+        before: postFeed.pageInfo.startCursor
       },
       null,
       () => console.log('prev done!'))
   }
 
+  const nodes = 
+    postFeed && postFeed.edges
+      ? postFeed.edges
+          .filter(Boolean)
+          .map(edge => edge.node)
+          .filter(Boolean)
+      : [];
+
   return (
     <div>
       <div>
-        {props.posts.postFeed.edges
-            .map(edge => <PostDetails post={edge.node}
-                                      // XXX 
-                                      key={edge.node.__id}/>)}
+        {nodes
+            .map(node => <PostDetails post={node}
+                                      key={node.id}/>)}
       </div>
       <button onClick={goPrev}>PREV</button>
       <button onClick={goNext}>NEXT</button>
     </div>
   )
 }
-//@connection(key: "PostFeed_postFeed")
+
 export default createRefetchContainer(
   postFeed, 
   {
@@ -68,6 +92,7 @@ export default createRefetchContainer(
         ) {
           edges {
             node {
+              id
               ...PostDetails_post
             }
           }

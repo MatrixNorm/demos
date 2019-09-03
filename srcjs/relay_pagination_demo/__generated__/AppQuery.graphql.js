@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 48a071cfed2a41c892ddf045448840c4
+ * @relayHash 9aed11f5c7defd392d1935be95f150c9
  */
 
 /* eslint-disable */
@@ -40,8 +40,8 @@ fragment PostFeed_posts_pbnwq on Query {
   postFeed(first: $first, after: $after, last: $last, before: $before) {
     edges {
       node {
-        ...PostDetails_post
         id
+        ...PostDetails_post
       }
     }
     pageInfo {
@@ -166,6 +166,7 @@ return {
                 "concreteType": "Post",
                 "plural": false,
                 "selections": [
+                  (v2/*: any*/),
                   {
                     "kind": "ScalarField",
                     "alias": null,
@@ -191,8 +192,7 @@ return {
                       },
                       (v2/*: any*/)
                     ]
-                  },
-                  (v2/*: any*/)
+                  }
                 ]
               }
             ]
@@ -244,7 +244,7 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...PostFeed_posts_pbnwq\n}\n\nfragment PostFeed_posts_pbnwq on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        ...PostDetails_post\n        id\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...PostFeed_posts_pbnwq\n}\n\nfragment PostFeed_posts_pbnwq on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };

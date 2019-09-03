@@ -4,8 +4,8 @@ interface Node {
 
 type Post implements Node {
   id: ID!
-  title: String
-  author: User
+  title: String!
+  author: User!
 }
 
 type PostConnection {
@@ -20,7 +20,7 @@ type PostEdge {
 
 type User implements Node {
   id: ID!
-  name: String
+  name: String!
   posts: [Post]
 }
 
