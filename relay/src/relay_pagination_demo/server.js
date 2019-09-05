@@ -1,40 +1,76 @@
+// @flow
+
 import db from './database'
 
-function _postFeedForward(first, after, posts) {
-  let startIndex;
+// type NodeType = {
+//   id: string
+// }
 
-  if (after) {
-    startIndex = posts.findIndex(p => p.id === after)
-    if (startIndex < 0) {
-      throw "Bad `after` cursor"
-    }
-  } else {
-    startIndex = 0
-  }
-  const endIndex = Math.min(startIndex + first, posts.length - 1)
-  return {startIndex, endIndex}
+type PostType = {
+  id: string,
+  title: string,
+  createdAt: number
 }
 
-function _postFeedBackward(last, before, posts) {
+type PaginationType = {
+  first: ?number, 
+  after: ?string, 
+  last: ?number, 
+  before: ?string
+}
+
+function _postFeedForward(first: number, after: ?string, posts: PostType[]): [number, number] {
+  /*
+    posts can be generic NodeType[]
+  
+  */
+  
+  console.log(first, after, posts)
+  let startIndexIncluding = 0
+
+  if (after) {
+    let afterIndex = posts.findIndex(p => p.id === after)
+    if (afterIndex < 0) {
+      throw "Bad `after` cursor"
+    }
+    startIndexIncluding = afterIndex + 1  
+  }
+  const endIndexExcluding = Math.min(startIndexIncluding + first, posts.length - 1)
+  return [startIndexIncluding, endIndexExcluding]
+}
+
+function _postFeedBackward(last: number, before: ?string, posts: PostType[]): [number, number] {
   console.log(last, before, posts)
-  let endIndex;
+  let endIndexExcluding = posts.length
 
   if (before) {
-    endIndex = posts.findIndex(p => p.id === before)
-    if (endIndex < 0) {
+    endIndexExcluding = posts.findIndex(p => p.id === before)
+    if (endIndexExcluding < 0) {
       throw "Bad `before` cursor"
     }
-  } else {
-    endIndex = posts.length - 1
   }
-  const startIndex = Math.max(endIndex - last, 0)
-  return {startIndex, endIndex}
+  const startIndexIncluding = Math.max(endIndexExcluding - last + 1, 0)
+  return [startIndexIncluding, endIndexExcluding]
+}
+
+function xxx(startIndexIncluding, endIndexExcluding, posts) {
+  const segment = posts.slice(startIndexIncluding, endIndexExcluding)
+  
+  const pageInfo = {
+    hasNextPage: endIndexExcluding < posts.length - 1,
+    endCursor: segment[segment.length - 1].id,
+    hasPreviousPage: startIndexIncluding > 0,
+    startCursor: segment[0].id
+  }
+
+  const edges = segment.map(post => ({node: post, cursor: post.id}))
+
+  return {edges, pageInfo}
 }
 
 const resolvers = {
   Query: {
-    node: (_, args) => {
-      const { id } = args;
+    node: (_: any, { id }: {id: string}) => {
       if (id.startsWith('post')) {
         return db.postsById[id]
       }
@@ -43,37 +79,29 @@ const resolvers = {
       }
       return null
     },
-    postFeed: (_, {first, after, last, before}) => {
+    postFeed: (_: any, {first, after, last, before}: PaginationType) => {
       console.log(first, after, last, before)
 
-      const posts = Object.values(db.postsById)
+      if ( !first && !last ) {
+        return
+      }
+
+      const posts: PostType[] = Object.values(db.postsById)
       posts.sort((a, b) => a.createdAt < b.createdAt ? -1 : 1)
 
-      let startIndex, endIndex;
+      let startIndexIncluding = 0, endIndexExcluding = 0;
 
       if (first) {
-        ({startIndex, endIndex} = _postFeedForward(first, after, posts))
+        [startIndexIncluding, endIndexExcluding] = _postFeedForward(first, after, posts)
       }
       if (last) {
-        ({startIndex, endIndex} = _postFeedBackward(last, before, posts))
+        [startIndexIncluding, endIndexExcluding] = _postFeedBackward(last, before, posts)
       }
-      const segment = posts.slice(startIndex, endIndex)
-  
-      const pageInfo = {
-        hasNextPage: endIndex + 1 < posts.length,
-        endCursor: segment[segment.length - 1].id,
-        hasPreviousPage: posts[startIndex - 1] ? true : false,
-        startCursor: posts[startIndex - 1]?.id
-      }
-
-      return {
-        edges: segment.map(post => ({node: post, cursor: post.id})), 
-        pageInfo
-      }   
+      return xxx(startIndexIncluding, endIndexExcluding, posts)   
     }
   },
   Node: {
-    __resolveType(node) {
+    __resolveType(node: {id: string}) {
       if (node.id.startsWith('post')) {
         return 'Post' 
       }
@@ -84,12 +112,12 @@ const resolvers = {
     }
   },
   Post: {
-    author: (post) => {
+    author: (post: {authorId: string}) => {
       return db.usersById[post.authorId]
     }
   },
   User: {
-    posts: (user) => {
+    posts: (user: {id: string}) => {
       return Object.values(db.postsById)
         .filter(p => p.authorId == user.id)
     }

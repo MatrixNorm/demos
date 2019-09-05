@@ -1,10 +1,17 @@
-import {
-  QueryRenderer, 
-  graphql
-} from 'react-relay'
+// @flow
+
+import { QueryRenderer, graphql } from 'react-relay'
 import React from 'react'
+
 import environment from './Environment'
 import PostFeed from './PostFeed'
+
+import type { AppQueryResponse } from './__generated__/AppQuery.graphql'
+
+type RenderProps = {|
+  +error: Error, 
+  +props: AppQueryResponse
+|}
 
 const AppQuery = graphql`
   query AppQuery($first: Int
@@ -18,7 +25,7 @@ const AppQuery = graphql`
   }
 `
 
-const render = ({error, props}) => {
+const render = ({error, props}: RenderProps) => {
   //console.log(props)
   if (error) {
     return <div style={{color: "red"}}>Error: {error.message}</div>;
