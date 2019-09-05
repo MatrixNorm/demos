@@ -19,6 +19,22 @@ type PaginationType = {
   before: ?string
 }
 
+export function sum(x: number, y: number) {
+  return x + y
+}
+
+/*
+
+Posts can be sorted in many ways thus there can be many pagination orders.
+
+{first, after, last, before, orderBy}
+
+logicalPostSequence = getLogicalPostSequence(orderBy)
+logicalPostSequence.getForward(first, after)
+logicalPostSequence.getBackward(last, before)
+
+*/
+
 function _postFeedForward(first: number, after: ?string, posts: PostType[]): [number, number] {
   /*
     posts can be generic NodeType[]
