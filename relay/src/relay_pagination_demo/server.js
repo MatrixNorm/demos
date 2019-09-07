@@ -12,108 +12,77 @@ type PostType = {
   createdAt: number
 }
 
-type PaginationType = {
+type PaginationInputType = {
   first: ?number, 
   after: ?string, 
   last: ?number, 
-  before: ?string
+  before: ?string,
+  orderBy: ?string
 }
 
 export function sum(x: number, y: number) {
   return x + y
 }
 
-/*
+function _paginate({itemId, count, orderBy, direction}) {
 
-Posts can be sorted in many ways thus there can be many pagination orders.
+  const index = db.posts.indexes[orderBy]
 
-{first, after, last, before, orderBy}
+  const { 
+    items: nodes, 
+    hasNext, 
+    hasPrev } = index.get(direction, itemId, count)
 
-logicalPostSequence = getLogicalPostSequence(orderBy)
-logicalPostSequence.getForward(first, after)
-logicalPostSequence.getBackward(last, before)
+  const edges = nodes.map(node => ({node, cursor: `${node.id}@${orderBy}`}))
 
-*/
-
-function _postFeedForward(first: number, after: ?string, posts: PostType[]): [number, number] {
-  /*
-    posts can be generic NodeType[]
-  
-  */
-  
-  console.log(first, after, posts)
-  let startIndexIncluding = 0
-
-  if (after) {
-    let afterIndex = posts.findIndex(p => p.id === after)
-    if (afterIndex < 0) {
-      throw "Bad `after` cursor"
-    }
-    startIndexIncluding = afterIndex + 1  
-  }
-  const endIndexExcluding = Math.min(startIndexIncluding + first, posts.length - 1)
-  return [startIndexIncluding, endIndexExcluding]
-}
-
-function _postFeedBackward(last: number, before: ?string, posts: PostType[]): [number, number] {
-  console.log(last, before, posts)
-  let endIndexExcluding = posts.length
-
-  if (before) {
-    endIndexExcluding = posts.findIndex(p => p.id === before)
-    if (endIndexExcluding < 0) {
-      throw "Bad `before` cursor"
-    }
-  }
-  const startIndexIncluding = Math.max(endIndexExcluding - last + 1, 0)
-  return [startIndexIncluding, endIndexExcluding]
-}
-
-function xxx(startIndexIncluding, endIndexExcluding, posts) {
-  const segment = posts.slice(startIndexIncluding, endIndexExcluding)
-  
   const pageInfo = {
-    hasNextPage: endIndexExcluding < posts.length - 1,
-    endCursor: segment[segment.length - 1].id,
-    hasPreviousPage: startIndexIncluding > 0,
-    startCursor: segment[0].id
+    hasNextPage: hasNext,
+    endCursor: edges[edges.length - 1].cursor,
+    hasPreviousPage: hasPrev,
+    startCursor: edges[0].cursor
   }
 
-  const edges = segment.map(post => ({node: post, cursor: post.id}))
+  return { edges, pageInfo }
+}
 
-  return {edges, pageInfo}
+function paginate({ cursor, count, orderBy, direction}) {
+  if ( cursor ) {
+    const [itemId, orderBy] = cursor.split('@')
+    return _paginate({ itemId, count, orderBy, direction })
+  }
+  return _paginate({ itemId: null, count, orderBy, direction })
 }
 
 const resolvers = {
   Query: {
     node: (_: any, { id }: {id: string}) => {
       if (id.startsWith('post')) {
-        return db.postsById[id]
+        return db.posts.byId[id]
       }
       if (id.startsWith('user')) {
-        return db.usersById[id] 
+        return db.users.byId[id] 
       }
       return null
     },
-    postFeed: (_: any, {first, after, last, before}: PaginationType) => {
+    postFeed: (_: any, {first, after, last, before, orderBy}: PaginationInputType) => {
       console.log(first, after, last, before)
 
-      if ( !first && !last ) {
-        return
+      // XXX 
+      orderBy = 'createdAt'
+
+      if ( first ) {
+        if ( !after && !orderBy) {
+          throw `Unable to paginate`
+        }
+        return paginate({ cursor: after, count: first, orderBy, direction: 'forward' })
       }
 
-      const posts: PostType[] = Object.values(db.postsById)
-      posts.sort((a, b) => a.createdAt < b.createdAt ? -1 : 1)
-
-      let startIndexIncluding = 0, endIndexExcluding = 0;
-
-      if (first) {
-        [startIndexIncluding, endIndexExcluding] = _postFeedForward(first, after, posts)
+      if ( last ) {
+        if ( !before && !orderBy) {
+          throw `Unable to paginate`
+        }
+        return paginate({ cursor: before, count: last, orderBy, direction: 'backward' })
       }
-      if (last) {
-        [startIndexIncluding, endIndexExcluding] = _postFeedBackward(last, before, posts)
-      }
-      return xxx(startIndexIncluding, endIndexExcluding, posts)   
     }
   },
   Node: {
@@ -129,12 +98,12 @@ const resolvers = {
   },
   Post: {
     author: (post: {authorId: string}) => {
-      return db.usersById[post.authorId]
+      return db.users.byId[post.authorId]
     }
   },
   User: {
     posts: (user: {id: string}) => {
-      return Object.values(db.postsById)
+      return Object.values(db.posts.byId)
         .filter(p => p.authorId == user.id)
     }
   }
