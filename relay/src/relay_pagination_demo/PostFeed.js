@@ -60,15 +60,16 @@ const postFeed = ({relay, posts: {postFeed}}: Props) => {
           .filter(Boolean)
       : [];
 
+  const hasPrev = postFeed?.pageInfo?.hasPreviousPage
+  const hasNext = postFeed?.pageInfo?.hasNextPage
+
   return (
     <div>
       <div>
-        {nodes
-            .map(node => <PostDetails post={node}
-                                      key={node.id}/>)}
+        {nodes.map(node => <PostDetails post={node} key={node.id}/>)}
       </div>
-      <button onClick={goPrev}>PREV</button>
-      <button onClick={goNext}>NEXT</button>
+      {hasPrev && <button onClick={goPrev}>PREV</button>}
+      {hasNext && <button onClick={goNext}>NEXT</button>}
     </div>
   )
 }

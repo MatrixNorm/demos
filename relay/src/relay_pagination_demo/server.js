@@ -28,9 +28,8 @@ export function sum(x: number, y: number) {
   return x + y
 }
 
-function _paginate({itemId, count, orderBy, direction}) {
+function _paginate({itemId, count, orderBy, direction, index}) {
   console.log(itemId, count, orderBy, direction)
-  const index = db.posts.indexes[orderBy]
 
   const { 
     items: nodes, 
@@ -41,9 +40,9 @@ function _paginate({itemId, count, orderBy, direction}) {
 
   const pageInfo = {
     hasNextPage: hasNext,
-    endCursor: edges[edges.length - 1].cursor,
+    endCursor: edges[edges.length - 1]?.cursor,
     hasPreviousPage: hasPrev,
-    startCursor: edges[0].cursor
+    startCursor: edges[0]?.cursor
   }
 
   return { edges, pageInfo }
@@ -54,11 +53,12 @@ function paginate({ cursor, count, orderBy, direction}:
                    count: number, 
                    orderBy: string, 
                    direction: PaginationDirectionType}) {
+  let itemId = null;
   if ( cursor ) {
-    const [itemId, orderBy] = decodeCursor(cursor)
-    return _paginate({ itemId, count, orderBy, direction })
+    [itemId, orderBy] = decodeCursor(cursor)
   }
-  return _paginate({ itemId: null, count, orderBy, direction })
+  const index = db.posts.indexes[orderBy]
+  return _paginate({ itemId, count, orderBy, direction, index })
 }
 
 function decodeCursor(cursor: string) {
