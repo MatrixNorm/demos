@@ -6,11 +6,11 @@ import db from './database'
 //   id: string
 // }
 
-type PostType = {
-  id: string,
-  title: string,
-  createdAt: number
-}
+// type PostType = {
+//   id: string,
+//   title: string,
+//   createdAt: number
+// }
 
 type PaginationInputType = {
   first: ?number, 

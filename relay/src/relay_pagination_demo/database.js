@@ -77,7 +77,7 @@ export class Index {
       positionInIndex = this.index.findIndex(p => p.id === itemId)
       items = this.index.slice(Math.max(positionInIndex - count, 0), positionInIndex)
     } else {
-      positionInIndex = this.index.length - 1
+      positionInIndex = this.index.length
       items = this.index.slice(positionInIndex - count, positionInIndex)
     }
     const hasNext = positionInIndex < this.index.length - 1
