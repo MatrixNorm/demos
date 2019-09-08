@@ -20,20 +20,24 @@ type PaginationInputType = {
   orderBy: ?string
 }
 
+type PaginationDirectionType =
+  | 'forward'
+  | 'backward'
+
 export function sum(x: number, y: number) {
   return x + y
 }
 
 function _paginate({itemId, count, orderBy, direction}) {
-
+  console.log(itemId, count, orderBy, direction)
   const index = db.posts.indexes[orderBy]
 
   const { 
     items: nodes, 
     hasNext, 
-    hasPrev } = index.get(direction, itemId, count)
+    hasPrev } = index.get({ direction, itemId, count })
 
-  const edges = nodes.map(node => ({node, cursor: `${node.id}@${orderBy}`}))
+  const edges = nodes.map(node => ({node, cursor: encodeCursor(node.id, orderBy)}))
 
   const pageInfo = {
     hasNextPage: hasNext,
@@ -45,12 +49,24 @@ function _paginate({itemId, count, orderBy, direction}) {
   return { edges, pageInfo }
 }
 
-function paginate({ cursor, count, orderBy, direction}) {
+function paginate({ cursor, count, orderBy, direction}: 
+                  {cursor: ?string, 
+                   count: number, 
+                   orderBy: string, 
+                   direction: PaginationDirectionType}) {
   if ( cursor ) {
-    const [itemId, orderBy] = cursor.split('@')
+    const [itemId, orderBy] = decodeCursor(cursor)
     return _paginate({ itemId, count, orderBy, direction })
   }
   return _paginate({ itemId: null, count, orderBy, direction })
+}
+
+function decodeCursor(cursor: string) {
+  return cursor.split('@')
+}
+
+function encodeCursor(nodeId, orderBy) {
+  return `${nodeId}@${orderBy}`
 }
 
 const resolvers = {
@@ -103,8 +119,7 @@ const resolvers = {
   },
   User: {
     posts: (user: {id: string}) => {
-      return Object.values(db.posts.byId)
-        .filter(p => p.authorId == user.id)
+      return Object.values(db.posts.byId).filter(p => p.authorId == user.id)
     }
   }
 }
