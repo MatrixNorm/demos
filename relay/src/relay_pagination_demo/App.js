@@ -6,15 +6,12 @@ import React, { useState } from 'react'
 import environment from './Environment'
 import PostFeed from './PostFeed'
 
-import type { AppQueryResponse } from './__generated__/AppQuery.graphql'
+import type { AppQueryResponse, PostOrdering } from './__generated__/AppQuery.graphql'
 
 type RenderProps = {|
   +error: Error, 
   +props: AppQueryResponse
 |}
-
-// XXX repeating GraphQL type definition
-type PostOrderByType = 'createdAt' | 'viewsCount'
 
 const AppQuery = graphql`
   query AppQuery($first: Int
@@ -42,9 +39,9 @@ const render = ({error, props}: RenderProps) => {
 }
 
 const App = () => {
-  const [orderBy, setOrderBy]: [PostOrderByType, any] = useState('createdAt')
+  const [orderBy, setOrderBy]: [PostOrdering, any] = useState('createdAt')
 
-  const onOrderByChanged = ( orderBy: PostOrderByType ) => {
+  const onOrderByChanged = ( orderBy: PostOrdering ) => {
     console.log(7777777, orderBy)
     setOrderBy(orderBy)
   }

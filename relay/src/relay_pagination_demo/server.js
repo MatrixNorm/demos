@@ -2,22 +2,14 @@
 
 import db from './database'
 
-// type NodeType = {
-//   id: string
-// }
-
-// type PostType = {
-//   id: string,
-//   title: string,
-//   createdAt: number
-// }
+import type { PostOrdering } from './__generated__/AppQuery.graphql'
 
 type PaginationInputType = {
   first: ?number, 
   after: ?string, 
   last: ?number, 
   before: ?string,
-  orderBy: ?string
+  orderBy: ?PostOrdering
 }
 
 type PaginationDirectionType =
@@ -48,24 +40,31 @@ function _paginate({itemId, count, orderBy, direction, index}) {
   return { edges, pageInfo }
 }
 
-function paginate({ cursor, count, orderBy, direction}: 
-                  {cursor: ?string, 
-                   count: number, 
-                   orderBy: ?string, 
-                   direction: PaginationDirectionType}) {
-  let itemId = null;
+function paginate({ cursor, count, orderBy, direction}: {cursor: ?string, 
+                                                         count: number, 
+                                                         orderBy: ?PostOrdering, 
+                                                         direction: PaginationDirectionType}) {
   if ( cursor ) {
-    [itemId, orderBy] = decodeCursor(cursor)
+    const [itemId, orderBy] = decodeCursor(cursor)
+    const index = db.posts.indexes[orderBy]
+    return _paginate({ itemId, count, orderBy, direction, index })
   }
-  const index = db.posts.indexes[orderBy]
-  return _paginate({ itemId, count, orderBy, direction, index })
+  if ( orderBy ) {
+    const index = db.posts.indexes[orderBy]
+    return _paginate({ itemId: null, count, orderBy, direction, index })
+  }
+  throw `unable to paginte: provide either 'cursor' or 'orderBy'`
 }
 
-function decodeCursor(cursor: string) {
-  return cursor.split('@')
+function decodeCursor(cursor: string): [string, PostOrdering] {
+  const [itemId, orderBy] = cursor.split('@')
+  if ( orderBy === 'createdAt' || orderBy === 'viewsCount' ) {
+    return [itemId, orderBy]
+  }
+  throw `Invalid orderBy`
 }
 
-function encodeCursor(nodeId: string, orderBy: string) {
+function encodeCursor(nodeId: string, orderBy: PostOrdering) {
   return `${nodeId}@${orderBy}`
 }
 
