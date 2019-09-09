@@ -14,7 +14,7 @@ const PostDetails = (props: Props) => {
   return (
     <div>
       <h1>{post.title}</h1>
-      <h2>{post.author.name}</h2>
+      <h3>by {post.author.name}</h3>
     </div>
   )
 }

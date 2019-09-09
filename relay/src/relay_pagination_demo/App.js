@@ -1,7 +1,7 @@
 // @flow
 
 import { QueryRenderer, graphql } from 'react-relay'
-import React from 'react'
+import React, { useState } from 'react'
 
 import environment from './Environment'
 import PostFeed from './PostFeed'
@@ -39,12 +39,35 @@ const render = ({error, props}: RenderProps) => {
 }
 
 const App = () => {
+  const [orderBy, setOrderBy] = useState('createdAt')
+
+  const onOrderByChanged = ({ target: { value } }) => {
+    console.log(77777777777)
+    setOrderBy(value)
+  }
+
   return (
-    <QueryRenderer
-      query={AppQuery}
-      environment={environment}
-      variables={{first: 3, after: null, orderBy: 'createdAt'}}
-      render={render}/>
+    <div>
+      <div className="...">
+        <div>
+          <input type="radio" name="paginationOrdering" value="createdAt"
+                 checked={orderBy === 'createdAt'} 
+                 onChange={onOrderByChanged} />
+          <label>Recent First</label>
+        </div>
+        <div>
+          <input type="radio" name="paginationOrdering" value="viewsCount"
+          checked={orderBy === 'viewsCount'}
+          onChange={onOrderByChanged} />
+          <label>Most Popular</label>
+        </div>
+      </div>
+      <QueryRenderer
+        query={AppQuery}
+        environment={environment}
+        variables={{first: 3, after: null, orderBy}}
+        render={render}/>
+    </div>
   )
 }
 

@@ -12,20 +12,20 @@
  }
 
 db.posts.byId = {
-  "post1":  {id: "post1",  title: "Ocaml 1",  authorId: "user1", createdAt: 1, viewsCount: 4523},
-  "post2":  {id: "post2",  title: "Ocaml 2",  authorId: "user1", createdAt: 2, viewsCount: 523},
-  "post3":  {id: "post3",  title: "Ocaml 3",  authorId: "user1", createdAt: 3, viewsCount: 1423},
-  "post4":  {id: "post4",  title: "Ocaml 4",  authorId: "user1", createdAt: 4, viewsCount: 894},
-  "post5":  {id: "post5",  title: "Ocaml 5",  authorId: "user2", createdAt: 5, viewsCount: 45},
-  "post6":  {id: "post6",  title: "Ocaml 6",  authorId: "user2", createdAt: 6, viewsCount: 577},
-  "post7":  {id: "post7",  title: "Ocaml 7",  authorId: "user1", createdAt: 7, viewsCount: 974},
-  "post8":  {id: "post8",  title: "Ocaml 8",  authorId: "user1", createdAt: 8, viewsCount: 78},
-  "post9":  {id: "post9",  title: "Ocaml 9",  authorId: "user1", createdAt: 9, viewsCount: 23455},
-  "post10": {id: "post10", title: "Ocaml 10", authorId: "user1", createdAt: 10, viewsCount: 3451},
-  "post11": {id: "post11", title: "Ocaml 11", authorId: "user2", createdAt: 11, viewsCount: 129},
-  "post12": {id: "post12", title: "Ocaml 12", authorId: "user1", createdAt: 12, viewsCount: 53},
-  "post13": {id: "post13", title: "Ocaml 13", authorId: "user1", createdAt: 13, viewsCount: 5673},
-  "post14": {id: "post14", title: "Ocaml 14", authorId: "user2", createdAt: 14, viewsCount: 1224},
+  "post1":  {id: "post1",  title: "Values and Change: Clojure’s approach to Identity and State",  authorId: "user1", createdAt: 1, viewsCount: 4523},
+  "post2":  {id: "post2",  title: "Ocaml tuturial",  authorId: "user1", createdAt: 2, viewsCount: 523},
+  "post3":  {id: "post3",  title: "The Dunning-Kruger Effect",  authorId: "user1", createdAt: 3, viewsCount: 1423},
+  "post4":  {id: "post4",  title: "Demand-driven architecture: Relay, Falcor, Om.Next",  authorId: "user1", createdAt: 4, viewsCount: 894},
+  "post5":  {id: "post5",  title: "React Hooks",  authorId: "user2", createdAt: 5, viewsCount: 45},
+  "post6":  {id: "post6",  title: "Python >>> Ruby",  authorId: "user2", createdAt: 6, viewsCount: 577},
+  "post7":  {id: "post7",  title: "Scala",  authorId: "user1", createdAt: 7, viewsCount: 974},
+  "post8":  {id: "post8",  title: "Why ReasonML?",  authorId: "user1", createdAt: 8, viewsCount: 78},
+  "post9":  {id: "post9",  title: "Clojurescript >>> Javascript",  authorId: "user1", createdAt: 9, viewsCount: 23455},
+  "post10": {id: "post10", title: "Datomic, Datascipt and Datalog", authorId: "user1", createdAt: 10, viewsCount: 3451},
+  "post11": {id: "post11", title: "Haskell type system", authorId: "user2", createdAt: 11, viewsCount: 129},
+  "post12": {id: "post12", title: "SQL", authorId: "user1", createdAt: 12, viewsCount: 53},
+  "post13": {id: "post13", title: "React radio input", authorId: "user1", createdAt: 13, viewsCount: 5673},
+  "post14": {id: "post14", title: "Ocaml vs Haskell", authorId: "user2", createdAt: 14, viewsCount: 1224},
 }
 
 db.users.byId = {
