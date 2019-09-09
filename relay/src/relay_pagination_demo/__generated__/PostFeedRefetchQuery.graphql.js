@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8237f7f06bbaa86b5a662d739f3e9677
+ * @relayHash dcc49277bd7d9db8c24e455219ebe0c0
  */
 
 /* eslint-disable */
@@ -10,12 +10,13 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type PostFeed_posts$ref = any;
+export type PostOrdering = "createdAt" | "viewsCount" | "%future added value";
 export type PostFeedRefetchQueryVariables = {|
   first?: ?number,
   after?: ?string,
   last?: ?number,
   before?: ?string,
-  orderBy?: ?string,
+  orderBy?: ?PostOrdering,
 |};
 export type PostFeedRefetchQueryResponse = {|
   +$fragmentRefs: PostFeed_posts$ref
@@ -33,7 +34,7 @@ query PostFeedRefetchQuery(
   $after: String
   $last: Int
   $before: String
-  $orderBy: String
+  $orderBy: PostOrdering
 ) {
   ...PostFeed_posts_sdb03
 }
@@ -93,7 +94,7 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "orderBy",
-    "type": "String",
+    "type": "PostOrdering",
     "defaultValue": null
   }
 ],
@@ -257,11 +258,11 @@ return {
     "operationKind": "query",
     "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: String\n) {\n  ...PostFeed_posts_sdb03\n}\n\nfragment PostFeed_posts_sdb03 on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  ...PostFeed_posts_sdb03\n}\n\nfragment PostFeed_posts_sdb03 on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'd4b196e77c76c7680032c0fc8f89718a';
+(node/*: any*/).hash = 'e84c79b4a2e372e0f0c3185548f6957d';
 module.exports = node;

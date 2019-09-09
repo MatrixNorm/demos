@@ -13,12 +13,15 @@ type RenderProps = {|
   +props: AppQueryResponse
 |}
 
+// XXX repeating GraphQL type definition
+type PostOrderByType = 'createdAt' | 'viewsCount'
+
 const AppQuery = graphql`
   query AppQuery($first: Int
                  $after: String
                  $last: Int
                  $before: String
-                 $orderBy: String) {
+                 $orderBy: PostOrdering) {
     ...PostFeed_posts @arguments(first: $first,
                                  after: $after,
                                  last: $last,
@@ -39,11 +42,11 @@ const render = ({error, props}: RenderProps) => {
 }
 
 const App = () => {
-  const [orderBy, setOrderBy] = useState('createdAt')
+  const [orderBy, setOrderBy]: [PostOrderByType, any] = useState('createdAt')
 
-  const onOrderByChanged = ({ target: { value } }) => {
-    console.log(77777777777)
-    setOrderBy(value)
+  const onOrderByChanged = ( orderBy: PostOrderByType ) => {
+    console.log(7777777, orderBy)
+    setOrderBy(orderBy)
   }
 
   return (
@@ -52,13 +55,13 @@ const App = () => {
         <div>
           <input type="radio" name="paginationOrdering" value="createdAt"
                  checked={orderBy === 'createdAt'} 
-                 onChange={onOrderByChanged} />
+                 onChange={() => onOrderByChanged('createdAt')} />
           <label>Recent First</label>
         </div>
         <div>
           <input type="radio" name="paginationOrdering" value="viewsCount"
           checked={orderBy === 'viewsCount'}
-          onChange={onOrderByChanged} />
+          onChange={() => onOrderByChanged('viewsCount')} />
           <label>Most Popular</label>
         </div>
       </div>

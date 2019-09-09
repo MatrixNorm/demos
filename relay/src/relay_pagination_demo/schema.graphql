@@ -35,6 +35,11 @@ type PageInfo {
   endCursor: String
 }
 
+enum PostOrdering {
+  createdAt,
+  viewsCount
+}
+
 type Query {
   node(id: ID!): Node
   """ https://github.com/facebook/relay/issues/1983 """
@@ -43,7 +48,7 @@ type Query {
     first: Int,
     before: String,
     last: Int,
-    orderBy: String
+    orderBy: PostOrdering
   ): PostConnection
 }
 

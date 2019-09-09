@@ -86,7 +86,7 @@ export default createRefetchContainer(
           after: { type: "String" },
           last:  { type: "Int" },
           before: { type: "String" },
-          orderBy: { type: "String" }
+          orderBy: { type: "PostOrdering" }
         ){
         postFeed(
           first: $first, 
@@ -117,7 +117,7 @@ export default createRefetchContainer(
       $after: String
       $last: Int
       $before: String,
-      $orderBy: String) {
+      $orderBy: PostOrdering) {
 
       ...PostFeed_posts @arguments(first: $first,
                                    after: $after,
