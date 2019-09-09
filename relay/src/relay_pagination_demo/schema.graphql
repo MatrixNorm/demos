@@ -39,10 +39,11 @@ type Query {
   node(id: ID!): Node
   """ https://github.com/facebook/relay/issues/1983 """
   postFeed(
-    after: String, 
-    first: Int, 
-    before: String, 
-    last: Int, 
+    after: String,
+    first: Int,
+    before: String,
+    last: Int,
+    orderBy: String
   ): PostConnection
 }
 

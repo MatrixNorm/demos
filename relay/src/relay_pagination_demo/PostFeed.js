@@ -29,7 +29,8 @@ const postFeed = ({relay, posts: {postFeed}}: Props) => {
         first: 3,
         after: postFeed.pageInfo.endCursor,
         last: null,
-        before: null
+        before: null,
+        orderBy: null,
       },
       null,
       () => console.log('next done!'))
@@ -46,7 +47,8 @@ const postFeed = ({relay, posts: {postFeed}}: Props) => {
         first: null,
         after: null,
         last: 3,
-        before: postFeed.pageInfo.startCursor
+        before: postFeed.pageInfo.startCursor,
+        orderBy: null,
       },
       null,
       () => console.log('prev done!'))
@@ -83,13 +85,15 @@ export default createRefetchContainer(
           first: { type: "Int" },
           after: { type: "String" },
           last:  { type: "Int" },
-          before: { type: "String" }
+          before: { type: "String" },
+          orderBy: { type: "String" }
         ){
         postFeed(
           first: $first, 
           after: $after,
           last: $last,
-          before: $before
+          before: $before,
+          orderBy: $orderBy
         ) {
           edges {
             node {
@@ -112,12 +116,14 @@ export default createRefetchContainer(
       $first: Int
       $after: String
       $last: Int
-      $before: String) {
+      $before: String,
+      $orderBy: String) {
 
       ...PostFeed_posts @arguments(first: $first,
                                    after: $after,
                                    last: $last,
-                                   before: $before)
+                                   before: $before,
+                                   orderBy: $orderBy)
     }  
   `
 )

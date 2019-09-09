@@ -17,11 +17,13 @@ const AppQuery = graphql`
   query AppQuery($first: Int
                  $after: String
                  $last: Int
-                 $before: String) {
+                 $before: String
+                 $orderBy: String) {
     ...PostFeed_posts @arguments(first: $first,
                                  after: $after,
                                  last: $last,
-                                 before: $before)
+                                 before: $before,
+                                 orderBy: $orderBy)
   }
 `
 
@@ -41,7 +43,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{first: 3, after: null}}
+      variables={{first: 3, after: null, orderBy: 'createdAt'}}
       render={render}/>
   )
 }

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 9aed11f5c7defd392d1935be95f150c9
+ * @relayHash 0df36e3efcfa5c794407f0eac9d65ab1
  */
 
 /* eslint-disable */
@@ -15,6 +15,7 @@ export type AppQueryVariables = {|
   after?: ?string,
   last?: ?number,
   before?: ?string,
+  orderBy?: ?string,
 |};
 export type AppQueryResponse = {|
   +$fragmentRefs: PostFeed_posts$ref
@@ -32,12 +33,13 @@ query AppQuery(
   $after: String
   $last: Int
   $before: String
+  $orderBy: String
 ) {
-  ...PostFeed_posts_pbnwq
+  ...PostFeed_posts_sdb03
 }
 
-fragment PostFeed_posts_pbnwq on Query {
-  postFeed(first: $first, after: $after, last: $last, before: $before) {
+fragment PostFeed_posts_sdb03 on Query {
+  postFeed(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {
     edges {
       node {
         id
@@ -87,6 +89,12 @@ var v0 = [
     "name": "before",
     "type": "String",
     "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "orderBy",
+    "type": "String",
+    "defaultValue": null
   }
 ],
 v1 = [
@@ -109,6 +117,11 @@ v1 = [
     "kind": "Variable",
     "name": "last",
     "variableName": "last"
+  },
+  {
+    "kind": "Variable",
+    "name": "orderBy",
+    "variableName": "orderBy"
   }
 ],
 v2 = {
@@ -244,11 +257,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...PostFeed_posts_pbnwq\n}\n\nfragment PostFeed_posts_pbnwq on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: String\n) {\n  ...PostFeed_posts_sdb03\n}\n\nfragment PostFeed_posts_sdb03 on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a1e3bcfb793bf2f0f42d82ab6cabb923';
+(node/*: any*/).hash = '89cf9c67a92cc7bdc16f4e433daac1b1';
 module.exports = node;

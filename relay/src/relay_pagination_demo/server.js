@@ -51,7 +51,7 @@ function _paginate({itemId, count, orderBy, direction, index}) {
 function paginate({ cursor, count, orderBy, direction}: 
                   {cursor: ?string, 
                    count: number, 
-                   orderBy: string, 
+                   orderBy: ?string, 
                    direction: PaginationDirectionType}) {
   let itemId = null;
   if ( cursor ) {
@@ -65,7 +65,7 @@ function decodeCursor(cursor: string) {
   return cursor.split('@')
 }
 
-function encodeCursor(nodeId, orderBy) {
+function encodeCursor(nodeId: string, orderBy: string) {
   return `${nodeId}@${orderBy}`
 }
 
@@ -81,11 +81,7 @@ const resolvers = {
       return null
     },
     postFeed: (_: any, {first, after, last, before, orderBy}: PaginationInputType) => {
-      console.log(first, after, last, before)
-
-      // XXX 
-      orderBy = 'createdAt'
-
+      console.log(first, after, last, before, orderBy)
       if ( first ) {
         if ( !after && !orderBy) {
           throw `Unable to paginate`

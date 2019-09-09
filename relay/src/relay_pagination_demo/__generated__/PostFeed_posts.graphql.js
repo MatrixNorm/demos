@@ -66,6 +66,12 @@ const node/*: ReaderFragment*/ = {
       "name": "before",
       "type": "String",
       "defaultValue": null
+    },
+    {
+      "kind": "LocalArgument",
+      "name": "orderBy",
+      "type": "String",
+      "defaultValue": null
     }
   ],
   "selections": [
@@ -94,6 +100,11 @@ const node/*: ReaderFragment*/ = {
           "kind": "Variable",
           "name": "last",
           "variableName": "last"
+        },
+        {
+          "kind": "Variable",
+          "name": "orderBy",
+          "variableName": "orderBy"
         }
       ],
       "concreteType": "PostConnection",
@@ -177,5 +188,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '5fc980ceea5472a449ae27a8d0760aa6';
+(node/*: any*/).hash = 'db3b3967f62686527e0d3f57abce553f';
 module.exports = node;
