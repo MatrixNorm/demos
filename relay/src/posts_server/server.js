@@ -1,20 +1,4 @@
-// @flow
-
 import db from './database'
-
-import type { PostOrdering } from '../relay_pagination_demo/__generated__/AppQuery.graphql'
-
-type PaginationInputType = {
-  first: ?number, 
-  after: ?string, 
-  last: ?number, 
-  before: ?string,
-  orderBy: ?PostOrdering
-}
-
-type PaginationDirectionType =
-  | 'forward'
-  | 'backward'
 
 export function sum(x: number, y: number) {
   return x + y
@@ -40,10 +24,7 @@ function _paginate({itemId, count, orderBy, direction, index}) {
   return { edges, pageInfo }
 }
 
-function paginate({ cursor, count, orderBy, direction}: {cursor: ?string, 
-                                                         count: number, 
-                                                         orderBy: ?PostOrdering, 
-                                                         direction: PaginationDirectionType}) {
+function paginate({ cursor, count, orderBy, direction}) {
   if ( cursor ) {
     const [itemId, orderBy] = decodeCursor(cursor)
     const index = db.posts.indexes[orderBy]
@@ -56,15 +37,11 @@ function paginate({ cursor, count, orderBy, direction}: {cursor: ?string,
   throw `unable to paginte: provide either 'cursor' or 'orderBy'`
 }
 
-function decodeCursor(cursor: string): [string, PostOrdering] {
-  const [itemId, orderBy] = cursor.split('@')
-  if ( orderBy === 'createdAt' || orderBy === 'viewsCount' ) {
-    return [itemId, orderBy]
-  }
-  throw `Invalid orderBy`
+function decodeCursor(cursor: string) {
+  return cursor.split('@')
 }
 
-function encodeCursor(nodeId: string, orderBy: PostOrdering) {
+function encodeCursor(nodeId, orderBy) {
   return `${nodeId}@${orderBy}`
 }
 
@@ -79,7 +56,7 @@ const resolvers = {
       }
       return null
     },
-    postFeed: (_: any, {first, after, last, before, orderBy}: PaginationInputType) => {
+    postFeed: (_: any, {first, after, last, before, orderBy}) => {
       console.log(first, after, last, before, orderBy)
       if ( first ) {
         if ( !after && !orderBy) {

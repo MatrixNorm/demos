@@ -1,3 +1,4 @@
+/* globals test expect */
 import * as s from './server'
 
 //const sum = server.__get__('sum')
