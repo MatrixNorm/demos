@@ -2,7 +2,7 @@
 
 import db from './database'
 
-import type { PostOrdering } from './__generated__/AppQuery.graphql'
+import type { PostOrdering } from '../relay_pagination_demo/__generated__/AppQuery.graphql'
 
 type PaginationInputType = {
   first: ?number, 

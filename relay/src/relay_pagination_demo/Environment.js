@@ -6,8 +6,8 @@ import {
 } from 'relay-runtime'
 import { graphqlSync } from 'graphql'
 import { makeExecutableSchema } from 'graphql-tools'
-import resolvers from './server'
-import typeDefs from 'raw-loader!./schema.graphql'
+import resolvers from '../posts_server/server'
+import typeDefs from 'raw-loader!../posts_server/schema.graphql'
 
 const schema = makeExecutableSchema({typeDefs, resolvers})
 const store = new Store(new RecordSource())
