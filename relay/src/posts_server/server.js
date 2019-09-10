@@ -47,7 +47,7 @@ function encodeCursor(nodeId, orderBy) {
 
 const resolvers = {
   Query: {
-    node: (_: any, { id }: {id: string}) => {
+    node: (_, { id }) => {
       if (id.startsWith('post')) {
         return db.posts.byId[id]
       }
@@ -56,7 +56,7 @@ const resolvers = {
       }
       return null
     },
-    postFeed: (_: any, {first, after, last, before, orderBy}) => {
+    postFeed: (_, {first, after, last, before, orderBy}) => {
       console.log(first, after, last, before, orderBy)
       if ( first ) {
         if ( !after && !orderBy) {
@@ -74,7 +74,7 @@ const resolvers = {
     }
   },
   Node: {
-    __resolveType(node: {id: string}) {
+    __resolveType(node) {
       if (node.id.startsWith('post')) {
         return 'Post' 
       }
@@ -85,12 +85,12 @@ const resolvers = {
     }
   },
   Post: {
-    author: (post: {authorId: string}) => {
+    author: (post) => {
       return db.users.byId[post.authorId]
     }
   },
   User: {
-    posts: (user: {id: string}) => {
+    posts: (user) => {
       return Object.values(db.posts.byId).filter(p => p.authorId == user.id)
     }
   }
