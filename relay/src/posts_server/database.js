@@ -49,15 +49,15 @@ export class Index {
     this.index = index
   }
 
-  get ({ itemId, count, forward }: {itemId: ?string, count: number, forward: boolean}) {
-    console.log(itemId, count, forward)
-    if ( forward ) {
+  get ({ itemId, count }: {itemId: ?string, count: number}) {
+    //console.log(itemId, count)
+    if ( count >= 0 ) {
       return this.getAfter(itemId, count)
     } 
-    return this.getBefore(itemId, count)
+    return this.getBefore(itemId, (-1) * count)
   }
 
-  getAfter(itemId, count) {
+  getAfter(itemId: ?string, count: number) {
     console.log(itemId, count)
     let positionInIndex, items;
     if ( itemId ) {
@@ -72,7 +72,7 @@ export class Index {
     return { items, hasNext, hasPrev }
   }
 
-  getBefore(itemId, count) {
+  getBefore(itemId: ?string, count: number) {
     let positionInIndex, items;
     if ( itemId ) {
       positionInIndex = this.index.findIndex(p => p.id === itemId)
@@ -87,7 +87,12 @@ export class Index {
   }
 }
 
-db.posts.indexes.createdAt = new Index(createIndex(db.posts.byId, 'createdAt'))
-db.posts.indexes.viewsCount = new Index(createIndex(db.posts.byId, 'viewsCount'))
+const indexes = {}
+indexes.createdAt = new Index(createIndex(db.posts.byId, 'createdAt'))
+indexes.viewsCount = new Index(createIndex(db.posts.byId, 'viewsCount'))
+
+export function getIndex(orderBy): Index {
+  return indexes[orderBy]
+}
 
 export default db

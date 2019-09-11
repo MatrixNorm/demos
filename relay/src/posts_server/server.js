@@ -1,26 +1,31 @@
 // @flow
 
-import db from './database'
+import db, { getIndex } from './database'
 
 import type { Index as DatabaseIndex } from './database'
-import type { PostOrdering } from './graphql.types'
+import type { PostOrdering, QueryPostFeedArgs } from './graphql.types'
 import { PostOrderingValues } from './graphql.types'
 
-const x: PostOrdering = 'createdAt3333'
+const x: PostOrdering = 'createdAt33'
 console.log(x)
 
 export function sum(x: number, y: number) {
   return x + y
 }
 
-function _paginate({itemId, count, orderBy, forward, index}: 
-                   {itemId: ?string, count: number, orderBy: PostOrdering, forward: boolean, index: DatabaseIndex}) {
-  console.log(itemId, count, orderBy, forward)
+type PaginationConfig = {
+  orderBy: PostOrdering,
+  forward: boolean,
+  index: DatabaseIndex
+}
 
+function paginate({itemId, count, orderBy}: {itemId: ?string, count: number, orderBy: PostOrdering}) {
+  console.log(itemId, count, orderBy)
+  const index: DatabaseIndex = getIndex(orderBy)
   const { 
     items: nodes, 
     hasNext, 
-    hasPrev } = index.get({ itemId, count, forward })
+    hasPrev } = index.get({ itemId, count })
 
   const edges = nodes.map(node => ({node, cursor: encodeCursor(node.id, orderBy)}))
 
@@ -32,11 +37,6 @@ function _paginate({itemId, count, orderBy, forward, index}:
   }
 
   return { edges, pageInfo }
-}
-
-function paginate({ itemId, count, orderBy, forward}: { itemId: ?string, count: number, orderBy: PostOrdering, forward: boolean}) {
-  const index = db.posts.indexes[orderBy] // XXX opaque type
-  return _paginate({ itemId, count, orderBy, forward, index })
 }
 
 function decodeCursor(cursor: string): [string, PostOrdering] {
@@ -67,31 +67,32 @@ const resolvers = {
         return db.users.byId[id] 
       }
       return null
-    },
-    postFeed: (_, {first, after, last, before, orderBy}) => {
-      console.log(first, after, last, before, orderBy)
-      if ( first ) {
-        if ( after ) {
-          const [postId, orderBy] = decodeCursor(after)
-          return paginate({ itemId: postId, count: first, orderBy, forward: true })
-        }
-        if ( orderBy ) {
-          return paginate({ itemId: null, count: first, orderBy, forward: true })
-        }
-        throw `Unable to paginate`
-      }
-
-      if ( last ) {
-        if ( before ) {
-          const [postId, orderBy] = decodeCursor(before)
-          return paginate({ itemId: postId, count: first, orderBy, forward: false })
-        }
-        if ( orderBy ) {
-          return paginate({ itemId: null, count: first, orderBy, forward: false })
-        }
-        throw `Unable to paginate`
-      }
     }
+  },
+  postFeed: (_, args: QueryPostFeedArgs) => {
+    //console.log(args)
+    const {first, after, last, before, orderBy} = args
+
+    let count, cursor;
+
+    if ( first ) {
+      count = first
+      cursor = after
+    } else if ( last ) {
+      count = (-1) * last
+      cursor = before
+    } else {
+      throw `Unable to paginate ${args.toString()}`
+    }
+
+    if ( cursor ) {
+      const [postId, orderBy] = decodeCursor(cursor)
+      return paginate({ itemId: postId, count, orderBy })
+    }
+    if ( orderBy ) {
+      return paginate({ itemId: null, count, orderBy })
+    }
+    throw `Unable to paginate ${args.toString()}`
   },
   Node: {
     __resolveType(node) {
