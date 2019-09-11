@@ -1,16 +1,26 @@
+// @flow
+
 import db from './database'
+
+import type { Index as DatabaseIndex } from './database'
+import type { PostOrdering } from './graphql.types'
+import { PostOrderingValues } from './graphql.types'
+
+const x: PostOrdering = 'createdAt3333'
+console.log(x)
 
 export function sum(x: number, y: number) {
   return x + y
 }
 
-function _paginate({itemId, count, orderBy, direction, index}) {
-  console.log(itemId, count, orderBy, direction)
+function _paginate({itemId, count, orderBy, forward, index}: 
+                   {itemId: ?string, count: number, orderBy: PostOrdering, forward: boolean, index: DatabaseIndex}) {
+  console.log(itemId, count, orderBy, forward)
 
   const { 
     items: nodes, 
     hasNext, 
-    hasPrev } = index.get({ direction, itemId, count })
+    hasPrev } = index.get({ itemId, count, forward })
 
   const edges = nodes.map(node => ({node, cursor: encodeCursor(node.id, orderBy)}))
 
@@ -24,30 +34,32 @@ function _paginate({itemId, count, orderBy, direction, index}) {
   return { edges, pageInfo }
 }
 
-function paginate({ cursor, count, orderBy, direction}) {
-  if ( cursor ) {
-    const [itemId, orderBy] = decodeCursor(cursor)
-    const index = db.posts.indexes[orderBy]
-    return _paginate({ itemId, count, orderBy, direction, index })
-  }
-  if ( orderBy ) {
-    const index = db.posts.indexes[orderBy]
-    return _paginate({ itemId: null, count, orderBy, direction, index })
-  }
-  throw `unable to paginte: provide either 'cursor' or 'orderBy'`
+function paginate({ itemId, count, orderBy, forward}: { itemId: ?string, count: number, orderBy: PostOrdering, forward: boolean}) {
+  const index = db.posts.indexes[orderBy] // XXX opaque type
+  return _paginate({ itemId, count, orderBy, forward, index })
 }
 
-function decodeCursor(cursor: string) {
-  return cursor.split('@')
+function decodeCursor(cursor: string): [string, PostOrdering] {
+  const [itemId, orderBy] = cursor.split('@')
+  // WTF we have PostOrderingValues after all
+  if ( orderBy === 'createdAt' || orderBy === 'viewsCount' ) {
+    return [itemId, orderBy]
+  }
+  throw `Invalid orderBy`
 }
 
-function encodeCursor(nodeId, orderBy) {
+function encodeCursor(nodeId: string, orderBy: PostOrdering) {
   return `${nodeId}@${orderBy}`
 }
 
 const resolvers = {
   Query: {
     node: (_, { id }) => {
+      /*
+        type Query {
+          node(id: ID!): Node
+        }
+      */
       if (id.startsWith('post')) {
         return db.posts.byId[id]
       }
@@ -59,17 +71,25 @@ const resolvers = {
     postFeed: (_, {first, after, last, before, orderBy}) => {
       console.log(first, after, last, before, orderBy)
       if ( first ) {
-        if ( !after && !orderBy) {
-          throw `Unable to paginate`
+        if ( after ) {
+          const [postId, orderBy] = decodeCursor(after)
+          return paginate({ itemId: postId, count: first, orderBy, forward: true })
         }
-        return paginate({ cursor: after, count: first, orderBy, direction: 'forward' })
+        if ( orderBy ) {
+          return paginate({ itemId: null, count: first, orderBy, forward: true })
+        }
+        throw `Unable to paginate`
       }
 
       if ( last ) {
-        if ( !before && !orderBy) {
-          throw `Unable to paginate`
+        if ( before ) {
+          const [postId, orderBy] = decodeCursor(before)
+          return paginate({ itemId: postId, count: first, orderBy, forward: false })
         }
-        return paginate({ cursor: before, count: last, orderBy, direction: 'backward' })
+        if ( orderBy ) {
+          return paginate({ itemId: null, count: first, orderBy, forward: false })
+        }
+        throw `Unable to paginate`
       }
     }
   },

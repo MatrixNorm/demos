@@ -1,3 +1,5 @@
+ // @flow
+ 
  const db = {
    posts: {
      byId: {},
@@ -47,13 +49,12 @@ export class Index {
     this.index = index
   }
 
-  get ({ direction, itemId, count }) {
-    console.log(direction, itemId, count)
-    if (direction === 'forward') {
+  get ({ itemId, count, forward }: {itemId: ?string, count: number, forward: boolean}) {
+    console.log(itemId, count, forward)
+    if ( forward ) {
       return this.getAfter(itemId, count)
-    } else if (direction === 'backward') {
-      return this.getBefore(itemId, count)
-    }
+    } 
+    return this.getBefore(itemId, count)
   }
 
   getAfter(itemId, count) {
