@@ -42,9 +42,9 @@ export function createIndex(table, attr) {
   return records
 }
 
-class Index {
-  constructor(table, attr) {
-    this.index = createIndex(table, attr)
+export class Index {
+  constructor(index) {
+    this.index = index
   }
 
   get ({ itemId, count }: {itemId: ?string, count: number}) {
@@ -86,8 +86,8 @@ class Index {
 }
 
 const indexes = {}
-indexes.createdAt = new Index(db.posts.byId, 'createdAt')
-indexes.viewsCount = new Index(db.posts.byId, 'viewsCount')
+indexes.createdAt = new Index(createIndex(db.posts.byId, 'createdAt'))
+indexes.viewsCount = new Index(createIndex(db.posts.byId, 'viewsCount'))
 
 export function getIndex(orderBy): Index {
   return indexes[orderBy]
