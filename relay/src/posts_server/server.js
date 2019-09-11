@@ -2,8 +2,7 @@
 
 import db, { getIndex } from './database'
 
-import type { Index as DatabaseIndex } from './database'
-import type { PostOrdering, QueryPostFeedArgs } from './graphql.types'
+import type { Node, PostOrdering, QueryPostFeedArgs, QueryNodeArgs } from './graphql.types'
 import { PostOrderingValues } from './graphql.types'
 
 const x: PostOrdering = 'createdAt33'
@@ -13,19 +12,12 @@ export function sum(x: number, y: number) {
   return x + y
 }
 
-type PaginationConfig = {
-  orderBy: PostOrdering,
-  forward: boolean,
-  index: DatabaseIndex
-}
-
 function paginate({itemId, count, orderBy}: {itemId: ?string, count: number, orderBy: PostOrdering}) {
   console.log(itemId, count, orderBy)
-  const index: DatabaseIndex = getIndex(orderBy)
   const { 
     items: nodes, 
     hasNext, 
-    hasPrev } = index.get({ itemId, count })
+    hasPrev } = getIndex(orderBy).get({ itemId, count })
 
   const edges = nodes.map(node => ({node, cursor: encodeCursor(node.id, orderBy)}))
 
@@ -54,7 +46,7 @@ function encodeCursor(nodeId: string, orderBy: PostOrdering) {
 
 const resolvers = {
   Query: {
-    node: (_, { id }) => {
+    node: (_: mixed, { id }: QueryNodeArgs) => {
       /*
         type Query {
           node(id: ID!): Node
@@ -69,7 +61,7 @@ const resolvers = {
       return null
     }
   },
-  postFeed: (_, args: QueryPostFeedArgs) => {
+  postFeed: (_: mixed, args: QueryPostFeedArgs) => {
     //console.log(args)
     const {first, after, last, before, orderBy} = args
 
@@ -95,7 +87,7 @@ const resolvers = {
     throw `Unable to paginate ${args.toString()}`
   },
   Node: {
-    __resolveType(node) {
+    __resolveType(node: Node) {
       if (node.id.startsWith('post')) {
         return 'Post' 
       }
@@ -106,12 +98,12 @@ const resolvers = {
     }
   },
   Post: {
-    author: (post) => {
+    author: (post: mixed) => {
       return db.users.byId[post.authorId]
     }
   },
   User: {
-    posts: (user) => {
+    posts: (user: mixed) => {
       return Object.values(db.posts.byId).filter(p => p.authorId == user.id)
     }
   }
