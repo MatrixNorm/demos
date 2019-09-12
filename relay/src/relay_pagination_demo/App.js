@@ -51,14 +51,14 @@ const App = () => {
       <div className="...">
         <div>
           <input type="radio" name="paginationOrdering" value="createdAt"
-                 checked={orderBy === 'createdAt'} 
+                 checked={orderBy.field === 'createdAt'} 
                  onChange={() => onOrderByChanged({ field: 'createdAt' })} />
           <label>Recent First</label>
         </div>
         <div>
           <input type="radio" name="paginationOrdering" value="viewsCount"
-          checked={orderBy === 'viewsCount'}
-          onChange={() => onOrderByChanged({ field: 'viewsCount' })} />
+          checked={orderBy.field === 'viewsCount'}
+          onChange={() => onOrderByChanged({ field: 'viewsCount', desc: true })} />
           <label>Most Popular</label>
         </div>
       </div>
