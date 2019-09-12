@@ -85,12 +85,31 @@ export class Index {
   }
 }
 
+class DescIndex {
+  constructor (ascIndex) {
+    this.ascIndex = ascIndex
+  }
+  get ({ itemId, count }: {itemId: ?string, count: number}) {
+    const { items, hasNext, hasPrev } =  this.ascIndex.get({ itemId, count: (-1) * count })
+    if ( hasNext && hasPrev ) {
+      return { items: items.reverse(), hasNext, hasPrev }
+    }
+    return { items: items.reverse(), hasNext: !hasNext, hasPrev: !hasPrev }
+  }
+}
+
 const indexes = {}
-indexes.createdAt = new Index(createIndex(db.posts.byId, 'createdAt'))
-indexes.viewsCount = new Index(createIndex(db.posts.byId, 'viewsCount'))
+indexes.createdAt = {}
+indexes.createdAt.asc = new Index(createIndex(db.posts.byId, 'createdAt')),
+indexes.createdAt.desc = new DescIndex(indexes.createdAt.asc)
+
+indexes.viewsCount = {}
+indexes.viewsCount.asc = new Index(createIndex(db.posts.byId, 'viewsCount')),
+indexes.viewsCount.desc = new DescIndex(indexes.viewsCount.asc)
 
 export function getIndex(orderBy): Index {
-  return indexes[orderBy]
+  const dir = orderBy.desc ? 'desc' : 'asc'
+  return indexes[orderBy.field][dir]
 }
 
 export default db

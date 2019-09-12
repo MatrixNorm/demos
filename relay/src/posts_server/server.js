@@ -12,7 +12,7 @@ function paginate({itemId, count, orderBy}: {itemId: ?string, count: number, ord
   const { 
     items: nodes, 
     hasNext, 
-    hasPrev } = getIndex(orderBy.field).get({ itemId, count })
+    hasPrev } = getIndex(orderBy).get({ itemId, count })
 
   const edges = nodes.map(node => ({ node, cursor: encodeCursor(node.id, orderBy) }))
 
