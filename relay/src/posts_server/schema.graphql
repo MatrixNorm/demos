@@ -35,9 +35,14 @@ type PageInfo {
   endCursor: String
 }
 
-enum PostOrdering {
-  createdAt,
+enum PostOrderingFields {
+  createdAt
   viewsCount
+}
+
+input PostOrdering {
+  field: PostOrderingFields!
+  desc: Boolean
 }
 
 type Query {

@@ -45,13 +45,18 @@ export type PostEdge = {
   cursor: $ElementType<Scalars, 'String'>,
 };
 
-export const PostOrderingValues = Object.freeze({
+export type PostOrdering = {
+  field: PostOrderingFields,
+  desc?: ?$ElementType<Scalars, 'Boolean'>,
+};
+
+export const PostOrderingFieldsValues = Object.freeze({
   CreatedAt: 'createdAt', 
   ViewsCount: 'viewsCount'
 });
 
 
-export type PostOrdering = $Values<typeof PostOrderingValues>;
+export type PostOrderingFields = $Values<typeof PostOrderingFieldsValues>;
 
 export type Query = {
    __typename?: 'Query',

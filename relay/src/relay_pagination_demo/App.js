@@ -39,7 +39,7 @@ const render = ({error, props}: RenderProps) => {
 }
 
 const App = () => {
-  const [orderBy, setOrderBy]: [PostOrdering, any] = useState('createdAt')
+  const [orderBy, setOrderBy]: [PostOrdering, any] = useState({ field: 'createdAt' })
 
   const onOrderByChanged = ( orderBy: PostOrdering ) => {
     console.log(7777777, orderBy)
@@ -52,13 +52,13 @@ const App = () => {
         <div>
           <input type="radio" name="paginationOrdering" value="createdAt"
                  checked={orderBy === 'createdAt'} 
-                 onChange={() => onOrderByChanged('createdAt')} />
+                 onChange={() => onOrderByChanged({ field: 'createdAt' })} />
           <label>Recent First</label>
         </div>
         <div>
           <input type="radio" name="paginationOrdering" value="viewsCount"
           checked={orderBy === 'viewsCount'}
-          onChange={() => onOrderByChanged('viewsCount')} />
+          onChange={() => onOrderByChanged({ field: 'viewsCount' })} />
           <label>Most Popular</label>
         </div>
       </div>

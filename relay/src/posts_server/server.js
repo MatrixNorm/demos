@@ -2,10 +2,10 @@
 
 import db, { getIndex } from './database'
 
-import type { Node, PostOrdering, QueryPostFeedArgs, QueryNodeArgs } from './graphql.types'
-import { PostOrderingValues } from './graphql.types'
+import type { Node, PostOrdering, PostOrderingFields, QueryPostFeedArgs, QueryNodeArgs } from './graphql.types'
+//import { PostOrderingValues } from './graphql.types'
 
-const x: PostOrdering = 'createdAt33'
+const x: PostOrderingFields = 'createdAt44'
 console.log(x)
 
 export function sum(x: number, y: number) {
@@ -17,7 +17,7 @@ function paginate({itemId, count, orderBy}: {itemId: ?string, count: number, ord
   const { 
     items: nodes, 
     hasNext, 
-    hasPrev } = getIndex(orderBy).get({ itemId, count })
+    hasPrev } = getIndex(orderBy.field).get({ itemId, count })
 
   const edges = nodes.map(node => ({node, cursor: encodeCursor(node.id, orderBy)}))
 
@@ -32,16 +32,18 @@ function paginate({itemId, count, orderBy}: {itemId: ?string, count: number, ord
 }
 
 function decodeCursor(cursor: string): [string, PostOrdering] {
-  const [itemId, orderBy] = cursor.split('@')
+  const json = JSON.parse(cursor)
+  const {nodeId, orderedByField, desc} = json
   // WTF we have PostOrderingValues after all
-  if ( orderBy === 'createdAt' || orderBy === 'viewsCount' ) {
-    return [itemId, orderBy]
+  if ( orderedByField === 'createdAt' || orderedByField === 'viewsCount' ) {
+    return [nodeId, {field: orderedByField, desc}]
   }
   throw `Invalid orderBy`
 }
 
 function encodeCursor(nodeId: string, orderBy: PostOrdering) {
-  return `${nodeId}@${orderBy}`
+  const { field, desc } = orderBy
+  return JSON.stringify({nodeId, orderedByField: field, desc})
 }
 
 const resolvers = {
