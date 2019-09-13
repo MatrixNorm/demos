@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import environment from './Environment'
 import PostFeed from './PostFeed'
 
-import type { AppQueryResponse, PostOrdering } from './__generated__/AppQuery.graphql'
+import type { AppQueryResponse, PostOrdering, PostOrderingFields } from './__generated__/AppQuery.graphql'
 
 type RenderProps = {|
   +error: Error, 
@@ -26,7 +26,6 @@ const AppQuery = graphql`
                                  orderBy: $orderBy)
   }
 `
-
 const render = ({error, props}: RenderProps) => {
   //console.log(props)
   if (error) {
@@ -39,33 +38,61 @@ const render = ({error, props}: RenderProps) => {
 }
 
 const App = () => {
-  const [orderBy, setOrderBy]: [PostOrdering, any] = useState({ field: 'createdAt' })
+  const [orderByConfig, setOrderByConfig] = useState({
+    'createdAt': { desc: false},
+    'viewsCount': { desc: true }
+  })
+  const [activeOrderField, setActiveOrderField]: [PostOrderingFields, any] = useState('createdAt')
 
-  const onOrderByChanged = ( orderBy: PostOrdering ) => {
-    console.log(7777777, orderBy)
-    setOrderBy(orderBy)
+  function handleActiveOrderFieldChange ( field: PostOrderingFields ) {
+    setActiveOrderField(field)
   }
+
+  function handleDescChange (e) {
+    setOrderByConfig({...orderByConfig, [e.target.name]: {desc: e.target.checked}})
+  }
+
+  const variables: {first: number, after: ?string, orderBy: PostOrdering} = 
+    { first: 3, after: null, orderBy: {field: activeOrderField, desc: orderByConfig[activeOrderField].desc} }
 
   return (
     <div>
-      <div className="...">
+      <div className="xxx">
         <div>
-          <input type="radio" name="paginationOrdering" value="createdAt"
-                 checked={orderBy.field === 'createdAt'} 
-                 onChange={() => onOrderByChanged({ field: 'createdAt' })} />
-          <label>Recent First</label>
+          <label>
+            <input type="radio" name="field" value="createdAt"
+                   checked={activeOrderField === 'createdAt'} 
+                   onChange={() => handleActiveOrderFieldChange('createdAt')} />
+            By creation date
+            </label>
+          <label>
+            <input type="checkbox" name="createdAt"
+                   checked={orderByConfig['createdAt'].desc}
+                   disabled={activeOrderField !== 'createdAt'}
+                   onChange={handleDescChange}/>
+            desc
+          </label>
         </div>
         <div>
-          <input type="radio" name="paginationOrdering" value="viewsCount"
-          checked={orderBy.field === 'viewsCount'}
-          onChange={() => onOrderByChanged({ field: 'viewsCount', desc: true })} />
-          <label>Most Popular</label>
+          <label>
+            <input type="radio" name="field" value="viewsCount"
+                   checked={activeOrderField === 'viewsCount'}
+                   onChange={() => handleActiveOrderFieldChange('viewsCount')} />
+            By views count
+          </label>
+          <label>
+            <input type="checkbox" name="viewsCount"
+                   checked={orderByConfig['viewsCount'].desc}
+                   disabled={activeOrderField !== 'viewsCount'}
+                   onChange={handleDescChange}/>
+            desc
+          </label>
         </div>
       </div>
       <QueryRenderer
         query={AppQuery}
         environment={environment}
-        variables={{first: 3, after: null, orderBy}}
+        variables={variables}
         render={render}/>
     </div>
   )
