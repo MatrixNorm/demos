@@ -62,7 +62,7 @@ export type Query = {
    __typename?: 'Query',
   node?: ?Node,
   /**  https://github.com/facebook/relay/issues/1983  */
-  postFeed?: ?PostConnection,
+  xxx?: ?Xxx,
 };
 
 
@@ -70,18 +70,23 @@ export type QueryNodeArgs = {
   id: $ElementType<Scalars, 'ID'>
 };
 
-
-export type QueryPostFeedArgs = {
-  after?: ?$ElementType<Scalars, 'String'>,
-  first?: ?$ElementType<Scalars, 'Int'>,
-  before?: ?$ElementType<Scalars, 'String'>,
-  last?: ?$ElementType<Scalars, 'Int'>,
-  orderBy?: ?PostOrdering
-};
-
 export type User = Node & {
    __typename?: 'User',
   id: $ElementType<Scalars, 'ID'>,
   name: $ElementType<Scalars, 'String'>,
   posts?: ?Array<?Post>,
+};
+
+export type Xxx = {
+   __typename?: 'XXX',
+  posts?: ?PostConnection,
+};
+
+
+export type XxxPostsArgs = {
+  after?: ?$ElementType<Scalars, 'String'>,
+  first?: ?$ElementType<Scalars, 'Int'>,
+  before?: ?$ElementType<Scalars, 'String'>,
+  last?: ?$ElementType<Scalars, 'Int'>,
+  orderBy?: ?PostOrdering
 };

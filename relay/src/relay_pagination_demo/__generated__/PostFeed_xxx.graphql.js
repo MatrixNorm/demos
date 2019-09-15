@@ -10,10 +10,10 @@
 import type { ReaderFragment } from 'relay-runtime';
 type PostDetails_post$ref = any;
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type PostFeed_posts$ref: FragmentReference;
-declare export opaque type PostFeed_posts$fragmentType: PostFeed_posts$ref;
-export type PostFeed_posts = {|
-  +postFeed: ?{|
+declare export opaque type PostFeed_xxx$ref: FragmentReference;
+declare export opaque type PostFeed_xxx$fragmentType: PostFeed_xxx$ref;
+export type PostFeed_xxx = {|
+  +posts: ?{|
     +edges: $ReadOnlyArray<?{|
       +node: ?{|
         +id: string,
@@ -27,20 +27,20 @@ export type PostFeed_posts = {|
       +startCursor: ?string,
     |},
   |},
-  +$refType: PostFeed_posts$ref,
+  +$refType: PostFeed_xxx$ref,
 |};
-export type PostFeed_posts$data = PostFeed_posts;
-export type PostFeed_posts$key = {
-  +$data?: PostFeed_posts$data,
-  +$fragmentRefs: PostFeed_posts$ref,
+export type PostFeed_xxx$data = PostFeed_xxx;
+export type PostFeed_xxx$key = {
+  +$data?: PostFeed_xxx$data,
+  +$fragmentRefs: PostFeed_xxx$ref,
 };
 */
 
 
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
-  "name": "PostFeed_posts",
-  "type": "Query",
+  "name": "PostFeed_xxx",
+  "type": "XXX",
   "metadata": null,
   "argumentDefinitions": [
     {
@@ -78,7 +78,7 @@ const node/*: ReaderFragment*/ = {
     {
       "kind": "LinkedField",
       "alias": null,
-      "name": "postFeed",
+      "name": "posts",
       "storageKey": null,
       "args": [
         {
@@ -188,5 +188,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '97e6336af1774c5f1ec8c601140c19ce';
+(node/*: any*/).hash = '389724f865eedd2bd8d4cd933c3729eb';
 module.exports = node;

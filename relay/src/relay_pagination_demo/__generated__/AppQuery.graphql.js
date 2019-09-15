@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash c4906c52e65e770cf042063ee52964d3
+ * @relayHash 8556b5b982008cf8529b2e976187d121
  */
 
 /* eslint-disable */
@@ -9,7 +9,7 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type PostFeed_posts$ref = any;
+type PostFeed_xxx$ref = any;
 export type PostOrderingFields = "createdAt" | "viewsCount" | "%future added value";
 export type PostOrdering = {|
   field: PostOrderingFields,
@@ -23,7 +23,12 @@ export type AppQueryVariables = {|
   orderBy?: ?PostOrdering,
 |};
 export type AppQueryResponse = {|
-  +$fragmentRefs: PostFeed_posts$ref
+  +x1: ?{|
+    +$fragmentRefs: PostFeed_xxx$ref
+  |},
+  +x2: ?{|
+    +$fragmentRefs: PostFeed_xxx$ref
+  |},
 |};
 export type AppQuery = {|
   variables: AppQueryVariables,
@@ -40,11 +45,16 @@ query AppQuery(
   $before: String
   $orderBy: PostOrdering
 ) {
-  ...PostFeed_posts_sdb03
+  x1: xxx {
+    ...PostFeed_xxx_sdb03
+  }
+  x2: xxx {
+    ...PostFeed_xxx_sdb03
+  }
 }
 
-fragment PostFeed_posts_sdb03 on Query {
-  postFeed(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {
+fragment PostFeed_xxx_sdb03 on XXX {
+  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {
     edges {
       node {
         id
@@ -129,13 +139,121 @@ v1 = [
     "variableName": "orderBy"
   }
 ],
-v2 = {
+v2 = [
+  {
+    "kind": "FragmentSpread",
+    "name": "PostFeed_xxx",
+    "args": (v1/*: any*/)
+  }
+],
+v3 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "id",
   "args": null,
   "storageKey": null
-};
+},
+v4 = [
+  {
+    "kind": "LinkedField",
+    "alias": null,
+    "name": "posts",
+    "storageKey": null,
+    "args": (v1/*: any*/),
+    "concreteType": "PostConnection",
+    "plural": false,
+    "selections": [
+      {
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "edges",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "PostEdge",
+        "plural": true,
+        "selections": [
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "node",
+            "storageKey": null,
+            "args": null,
+            "concreteType": "Post",
+            "plural": false,
+            "selections": [
+              (v3/*: any*/),
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "title",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "author",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "User",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "name",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  (v3/*: any*/)
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "pageInfo",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "PageInfo",
+        "plural": false,
+        "selections": [
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "hasNextPage",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "endCursor",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "hasPreviousPage",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "startCursor",
+            "args": null,
+            "storageKey": null
+          }
+        ]
+      }
+    ]
+  }
+];
 return {
   "kind": "Request",
   "fragment": {
@@ -146,9 +264,24 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
-        "kind": "FragmentSpread",
-        "name": "PostFeed_posts",
-        "args": (v1/*: any*/)
+        "kind": "LinkedField",
+        "alias": "x1",
+        "name": "xxx",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "XXX",
+        "plural": false,
+        "selections": (v2/*: any*/)
+      },
+      {
+        "kind": "LinkedField",
+        "alias": "x2",
+        "name": "xxx",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "XXX",
+        "plural": false,
+        "selections": (v2/*: any*/)
       }
     ]
   },
@@ -159,102 +292,23 @@ return {
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": null,
-        "name": "postFeed",
+        "alias": "x1",
+        "name": "xxx",
         "storageKey": null,
-        "args": (v1/*: any*/),
-        "concreteType": "PostConnection",
+        "args": null,
+        "concreteType": "XXX",
         "plural": false,
-        "selections": [
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "edges",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "PostEdge",
-            "plural": true,
-            "selections": [
-              {
-                "kind": "LinkedField",
-                "alias": null,
-                "name": "node",
-                "storageKey": null,
-                "args": null,
-                "concreteType": "Post",
-                "plural": false,
-                "selections": [
-                  (v2/*: any*/),
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "title",
-                    "args": null,
-                    "storageKey": null
-                  },
-                  {
-                    "kind": "LinkedField",
-                    "alias": null,
-                    "name": "author",
-                    "storageKey": null,
-                    "args": null,
-                    "concreteType": "User",
-                    "plural": false,
-                    "selections": [
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "name",
-                        "args": null,
-                        "storageKey": null
-                      },
-                      (v2/*: any*/)
-                    ]
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "pageInfo",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "PageInfo",
-            "plural": false,
-            "selections": [
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "hasNextPage",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "endCursor",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "hasPreviousPage",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "startCursor",
-                "args": null,
-                "storageKey": null
-              }
-            ]
-          }
-        ]
+        "selections": (v4/*: any*/)
+      },
+      {
+        "kind": "LinkedField",
+        "alias": "x2",
+        "name": "xxx",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "XXX",
+        "plural": false,
+        "selections": (v4/*: any*/)
       }
     ]
   },
@@ -262,11 +316,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  ...PostFeed_posts_sdb03\n}\n\nfragment PostFeed_posts_sdb03 on Query {\n  postFeed(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  x1: xxx {\n    ...PostFeed_xxx_sdb03\n  }\n  x2: xxx {\n    ...PostFeed_xxx_sdb03\n  }\n}\n\nfragment PostFeed_xxx_sdb03 on XXX {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '143c2ac25f602f66aab8810f6b2d3a04';
+(node/*: any*/).hash = '0fa923108b5bd84994a60eb66fb30705';
 module.exports = node;

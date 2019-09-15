@@ -60,7 +60,12 @@ const resolvers = {
       }
       return null
     },
-    postFeed: (_: mixed, args: QueryPostFeedArgs) => {
+    xxx: () => {
+      return {}
+    },
+  },
+  XXX: {
+    posts: (_: mixed, args: QueryPostFeedArgs) => {
       //console.log(args)
       const {first, after, last, before, orderBy} = args
   

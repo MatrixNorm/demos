@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import environment from './Environment'
 import PostFeed from './PostFeed'
 
-import type { AppQueryResponse } from './__generated__/AppQuery.graphql'
+import type { AppQueryResponse, PostOrdering, PostOrderingFields } from './__generated__/AppQuery.graphql'
 
 type RenderProps = {|
   +error: Error, 
@@ -19,11 +19,22 @@ const AppQuery = graphql`
                  $last: Int
                  $before: String
                  $orderBy: PostOrdering) {
-    ...PostFeed_posts @arguments(first: $first,
-                                 after: $after,
-                                 last: $last,
-                                 before: $before,
-                                 orderBy: $orderBy)
+    x1: xxx {
+      ...PostFeed_xxx @arguments(
+        first: $first,
+        after: $after,
+        last: $last,
+        before: $before,
+        orderBy: $orderBy)
+    }
+    x2: xxx {
+      ...PostFeed_xxx @arguments(
+        first: $first,
+        after: $after,
+        last: $last,
+        before: $before,
+        orderBy: $orderBy)
+    }
   }
 `
 const render = ({error, props}: RenderProps) => {
@@ -33,7 +44,12 @@ const render = ({error, props}: RenderProps) => {
   if (!props) {
     return <div>Loading...</div>
   }
-  return (<PostFeed posts={props} />)
+  return (
+    <>
+      <PostFeed xxx={props.x1} />
+      <PostFeed xxx={props.x2} />
+    </>
+  )
 }
 
 const App = () => {

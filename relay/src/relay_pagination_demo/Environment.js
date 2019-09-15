@@ -14,6 +14,7 @@ const store = new Store(new RecordSource())
 
 const network = Network.create((operation, variables) => {
   console.log(variables)
+  console.log(operation.text)
   const resp = graphqlSync(schema, operation.text, {}, undefined, variables)
   console.log(resp)
   return resp

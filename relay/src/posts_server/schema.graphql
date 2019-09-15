@@ -45,16 +45,20 @@ input PostOrdering {
   desc: Boolean
 }
 
-type Query {
-  node(id: ID!): Node
-  """ https://github.com/facebook/relay/issues/1983 """
-  postFeed(
+type XXX {
+  posts(
     after: String,
     first: Int,
     before: String,
     last: Int,
     orderBy: PostOrdering
   ): PostConnection
+}
+
+type Query {
+  node(id: ID!): Node
+  """ https://github.com/facebook/relay/issues/1983 """
+  xxx: XXX
 }
 
 schema {

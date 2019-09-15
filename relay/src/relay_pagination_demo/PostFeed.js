@@ -77,8 +77,8 @@ const PostFeed = ({relay, postFeed}) => {
   )
 }
 
-const PostPagination = ({relay, posts: {postFeed}}: Props) => {
-
+const PostPagination = ({relay, xxx}: Props) => {
+  console.log(xxx)
   const [orderByConfig, setOrderByConfig] = useState({
     'createdAt': { desc: false},
     'viewsCount': { desc: true }
@@ -93,7 +93,7 @@ const PostPagination = ({relay, posts: {postFeed}}: Props) => {
         after: null,
         last: null,
         before: null,
-        orderBy: { field },
+        orderBy: { field, desc: orderByConfig[field].desc },
       },
       null,
       () => console.log('field change done!'))
@@ -147,7 +147,7 @@ const PostPagination = ({relay, posts: {postFeed}}: Props) => {
           </label>
         </div>
       </div>
-      <PostFeed relay={relay} postFeed={postFeed} />
+      <PostFeed relay={relay} postFeed={xxx.posts} />
     </div>
   )
 }
@@ -155,8 +155,8 @@ const PostPagination = ({relay, posts: {postFeed}}: Props) => {
 export default createRefetchContainer(
   PostPagination, 
   {
-    posts: graphql`
-      fragment PostFeed_posts on Query 
+    xxx: graphql`
+      fragment PostFeed_xxx on XXX 
         @argumentDefinitions(
           first: { type: "Int" },
           after: { type: "String" },
@@ -164,7 +164,7 @@ export default createRefetchContainer(
           before: { type: "String" },
           orderBy: { type: "PostOrdering" }
         ){
-        postFeed(
+        posts(
           first: $first, 
           after: $after,
           last: $last,
@@ -195,11 +195,14 @@ export default createRefetchContainer(
       $before: String,
       $orderBy: PostOrdering) {
 
-      ...PostFeed_posts @arguments(first: $first,
-                                   after: $after,
-                                   last: $last,
-                                   before: $before,
-                                   orderBy: $orderBy)
+      xxx {
+        ...PostFeed_xxx @arguments(
+          first: $first,
+          after: $after,
+          last: $last,
+          before: $before,
+          orderBy: $orderBy)
+      }      
     }  
   `
 )
