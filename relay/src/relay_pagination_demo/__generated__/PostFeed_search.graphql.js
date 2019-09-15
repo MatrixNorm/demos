@@ -10,9 +10,9 @@
 import type { ReaderFragment } from 'relay-runtime';
 type PostDetails_post$ref = any;
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type PostFeed_xxx$ref: FragmentReference;
-declare export opaque type PostFeed_xxx$fragmentType: PostFeed_xxx$ref;
-export type PostFeed_xxx = {|
+declare export opaque type PostFeed_search$ref: FragmentReference;
+declare export opaque type PostFeed_search$fragmentType: PostFeed_search$ref;
+export type PostFeed_search = {|
   +posts: ?{|
     +edges: $ReadOnlyArray<?{|
       +node: ?{|
@@ -27,20 +27,20 @@ export type PostFeed_xxx = {|
       +startCursor: ?string,
     |},
   |},
-  +$refType: PostFeed_xxx$ref,
+  +$refType: PostFeed_search$ref,
 |};
-export type PostFeed_xxx$data = PostFeed_xxx;
-export type PostFeed_xxx$key = {
-  +$data?: PostFeed_xxx$data,
-  +$fragmentRefs: PostFeed_xxx$ref,
+export type PostFeed_search$data = PostFeed_search;
+export type PostFeed_search$key = {
+  +$data?: PostFeed_search$data,
+  +$fragmentRefs: PostFeed_search$ref,
 };
 */
 
 
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
-  "name": "PostFeed_xxx",
-  "type": "XXX",
+  "name": "PostFeed_search",
+  "type": "PostSearch",
   "metadata": null,
   "argumentDefinitions": [
     {
@@ -188,5 +188,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '389724f865eedd2bd8d4cd933c3729eb';
+(node/*: any*/).hash = '9b15a791d9682be314693715731c984a';
 module.exports = node;

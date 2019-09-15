@@ -45,7 +45,7 @@ input PostOrdering {
   desc: Boolean
 }
 
-type XXX {
+type PostSearch {
   posts(
     after: String,
     first: Int,
@@ -58,7 +58,7 @@ type XXX {
 type Query {
   node(id: ID!): Node
   """ https://github.com/facebook/relay/issues/1983 """
-  xxx: XXX
+  search: PostSearch
 }
 
 schema {

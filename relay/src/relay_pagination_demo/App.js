@@ -19,16 +19,16 @@ const AppQuery = graphql`
                  $last: Int
                  $before: String
                  $orderBy: PostOrdering) {
-    x1: xxx {
-      ...PostFeed_xxx @arguments(
+    x1: search {
+      ...PostFeed_search @arguments(
         first: $first,
         after: $after,
         last: $last,
         before: $before,
         orderBy: $orderBy)
     }
-    x2: xxx {
-      ...PostFeed_xxx @arguments(
+    x2: search {
+      ...PostFeed_search @arguments(
         first: $first,
         after: $after,
         last: $last,
@@ -46,8 +46,8 @@ const render = ({error, props}: RenderProps) => {
   }
   return (
     <>
-      <PostFeed xxx={props.x1} />
-      <PostFeed xxx={props.x2} />
+      <PostFeed search={props.x1} />
+      <PostFeed search={props.x2} />
     </>
   )
 }

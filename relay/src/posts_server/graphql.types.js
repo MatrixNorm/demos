@@ -58,11 +58,25 @@ export const PostOrderingFieldsValues = Object.freeze({
 
 export type PostOrderingFields = $Values<typeof PostOrderingFieldsValues>;
 
+export type PostSearch = {
+   __typename?: 'PostSearch',
+  posts?: ?PostConnection,
+};
+
+
+export type PostSearchPostsArgs = {
+  after?: ?$ElementType<Scalars, 'String'>,
+  first?: ?$ElementType<Scalars, 'Int'>,
+  before?: ?$ElementType<Scalars, 'String'>,
+  last?: ?$ElementType<Scalars, 'Int'>,
+  orderBy?: ?PostOrdering
+};
+
 export type Query = {
    __typename?: 'Query',
   node?: ?Node,
   /**  https://github.com/facebook/relay/issues/1983  */
-  xxx?: ?Xxx,
+  search?: ?PostSearch,
 };
 
 
@@ -75,18 +89,4 @@ export type User = Node & {
   id: $ElementType<Scalars, 'ID'>,
   name: $ElementType<Scalars, 'String'>,
   posts?: ?Array<?Post>,
-};
-
-export type Xxx = {
-   __typename?: 'XXX',
-  posts?: ?PostConnection,
-};
-
-
-export type XxxPostsArgs = {
-  after?: ?$ElementType<Scalars, 'String'>,
-  first?: ?$ElementType<Scalars, 'Int'>,
-  before?: ?$ElementType<Scalars, 'String'>,
-  last?: ?$ElementType<Scalars, 'Int'>,
-  orderBy?: ?PostOrdering
 };

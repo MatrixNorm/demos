@@ -77,8 +77,8 @@ const PostFeed = ({relay, postFeed}) => {
   )
 }
 
-const PostPagination = ({relay, xxx}: Props) => {
-  console.log(xxx)
+const PostPagination = ({relay, search}: Props) => {
+  console.log(search)
   const [orderByConfig, setOrderByConfig] = useState({
     'createdAt': { desc: false},
     'viewsCount': { desc: true }
@@ -147,7 +147,7 @@ const PostPagination = ({relay, xxx}: Props) => {
           </label>
         </div>
       </div>
-      <PostFeed relay={relay} postFeed={xxx.posts} />
+      <PostFeed relay={relay} postFeed={search.posts} />
     </div>
   )
 }
@@ -155,8 +155,8 @@ const PostPagination = ({relay, xxx}: Props) => {
 export default createRefetchContainer(
   PostPagination, 
   {
-    xxx: graphql`
-      fragment PostFeed_xxx on XXX 
+    search: graphql`
+      fragment PostFeed_search on PostSearch 
         @argumentDefinitions(
           first: { type: "Int" },
           after: { type: "String" },
@@ -195,8 +195,8 @@ export default createRefetchContainer(
       $before: String,
       $orderBy: PostOrdering) {
 
-      xxx {
-        ...PostFeed_xxx @arguments(
+        search {
+        ...PostFeed_search @arguments(
           first: $first,
           after: $after,
           last: $last,
