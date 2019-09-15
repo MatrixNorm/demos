@@ -8,7 +8,7 @@ echo "Client code: $CLIENT_NAME"
 echo "Server code: $SCHEMA_PATH"
 
 while inotifywait -e close_write $CLIENT_PATH $SCHEMA_PATH; 
-do npx relay-compiler --src $CLIENT_PATH --schema $SCHEMA_PATH; 
+do npx relay-compiler --src $CLIENT_PATH --schema $SCHEMA_PATH --verbose --noFutureProofEnums; 
 done
 
 # PROJ_NAME=$1

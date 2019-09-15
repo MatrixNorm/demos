@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 9dd5f599eedacbc981361255d70e19de
+ * @relayHash 4c2e1efced99c186e2d25c415fd38d73
  */
 
 /* eslint-disable */
@@ -10,7 +10,7 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 type PostFeed_search$ref = any;
-export type PostOrderingFields = "createdAt" | "viewsCount" | "%future added value";
+export type PostOrderingFields = "createdAt" | "viewsCount";
 export type PostOrdering = {|
   field: PostOrderingFields,
   desc?: ?boolean,

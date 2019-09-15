@@ -1,12 +1,12 @@
 // @flow
 
 import { QueryRenderer, graphql } from 'react-relay'
-import React, { useState } from 'react'
+import React from 'react'
 
 import environment from './Environment'
 import PostFeed from './PostFeed'
 
-import type { AppQueryResponse, PostOrdering, PostOrderingFields } from './__generated__/AppQuery.graphql'
+import type { AppQueryResponse } from './__generated__/AppQuery.graphql'
 
 type RenderProps = {|
   +error: Error, 
@@ -46,8 +46,8 @@ const render = ({error, props}: RenderProps) => {
   }
   return (
     <>
-      <PostFeed search={props.x1} />
-      <PostFeed search={props.x2} />
+      {props.x1 && <PostFeed search={props.x1} />}
+      {props.x2 && <PostFeed search={props.x2} />}
     </>
   )
 }

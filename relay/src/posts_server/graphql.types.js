@@ -58,12 +58,30 @@ export const PostOrderingFieldsValues = Object.freeze({
 
 export type PostOrderingFields = $Values<typeof PostOrderingFieldsValues>;
 
+/** 
+ * Need this because currently it is impossible to
+ * alias fragments directly like this:
+ * 
+ * query {
+ *   x: ...SomeFragment
+ *   y: ..SomeFragment
+ * }
+ **/
 export type PostSearch = {
    __typename?: 'PostSearch',
   posts?: ?PostConnection,
 };
 
 
+/** 
+ * Need this because currently it is impossible to
+ * alias fragments directly like this:
+ * 
+ * query {
+ *   x: ...SomeFragment
+ *   y: ..SomeFragment
+ * }
+ **/
 export type PostSearchPostsArgs = {
   after?: ?$ElementType<Scalars, 'String'>,
   first?: ?$ElementType<Scalars, 'Int'>,

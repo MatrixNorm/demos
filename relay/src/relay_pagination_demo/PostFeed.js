@@ -9,26 +9,21 @@ import {
 import React, { useState } from 'react'
 import PostDetails from './PostDetails'
 
-import type { PostFeed_posts as PostFeedType } from './__generated__/PostFeed_posts.graphql'
-import type { AppQueryResponse, PostOrdering, PostOrderingFields } from './__generated__/AppQuery.graphql'
+import type { PostFeed_search as PostFeedType } from './__generated__/PostFeed_search.graphql'
+import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
-type Props = {|
-  +relay: RelayProp,
-  +posts: PostFeedType,
-|}
-
-const PostFeed = ({relay, postFeed}) => {
+const Pagination = ({relay, posts}) => {
 
   function goNext() {
 
-    if ( !postFeed ) {
+    if ( !posts ) {
       return
     }
 
     relay.refetch(
       {
         first: 3,
-        after: postFeed.pageInfo.endCursor,
+        after: posts.pageInfo.endCursor,
         last: null,
         before: null,
         orderBy: null,
@@ -39,7 +34,7 @@ const PostFeed = ({relay, postFeed}) => {
 
   function goPrev() {
 
-    if ( !postFeed ) {
+    if ( !posts ) {
       return
     }
 
@@ -48,7 +43,7 @@ const PostFeed = ({relay, postFeed}) => {
         first: null,
         after: null,
         last: 3,
-        before: postFeed.pageInfo.startCursor,
+        before: posts.pageInfo.startCursor,
         orderBy: null,
       },
       null,
@@ -56,15 +51,15 @@ const PostFeed = ({relay, postFeed}) => {
   }
 
   const nodes = 
-    postFeed && postFeed.edges
-      ? postFeed.edges
+    posts && posts.edges
+      ? posts.edges
           .filter(Boolean)
           .map(edge => edge.node)
           .filter(Boolean)
       : [];
 
-  const hasPrev = postFeed?.pageInfo?.hasPreviousPage
-  const hasNext = postFeed?.pageInfo?.hasNextPage
+  const hasPrev = posts?.pageInfo?.hasPreviousPage
+  const hasNext = posts?.pageInfo?.hasNextPage
 
   return (
     <div>
@@ -77,7 +72,12 @@ const PostFeed = ({relay, postFeed}) => {
   )
 }
 
-const PostPagination = ({relay, search}: Props) => {
+type PostFeedProps = {| 
+  relay: RelayProp,
+  search: PostFeedType,
+|}
+
+const PostFeed = ({relay, search}: PostFeedProps) => {
   console.log(search)
   const [orderByConfig, setOrderByConfig] = useState({
     'createdAt': { desc: false},
@@ -147,13 +147,13 @@ const PostPagination = ({relay, search}: Props) => {
           </label>
         </div>
       </div>
-      <PostFeed relay={relay} postFeed={search.posts} />
+      <Pagination relay={relay} posts={search.posts} />
     </div>
   )
 }
 
 export default createRefetchContainer(
-  PostPagination, 
+  PostFeed, 
   {
     search: graphql`
       fragment PostFeed_search on PostSearch 
@@ -163,7 +163,7 @@ export default createRefetchContainer(
           last:  { type: "Int" },
           before: { type: "String" },
           orderBy: { type: "PostOrdering" }
-        ){
+        ) {
         posts(
           first: $first, 
           after: $after,
@@ -194,14 +194,13 @@ export default createRefetchContainer(
       $last: Int
       $before: String,
       $orderBy: PostOrdering) {
-
         search {
-        ...PostFeed_search @arguments(
-          first: $first,
-          after: $after,
-          last: $last,
-          before: $before,
-          orderBy: $orderBy)
+          ...PostFeed_search @arguments(
+            first: $first,
+            after: $after,
+            last: $last,
+            before: $before,
+            orderBy: $orderBy)
       }      
     }  
   `
