@@ -1,18 +1,6 @@
 // @flow
-/* globals $PropertyType */
 
 import React from 'react'
-import PostDetails from './PostDetails'
-
-import type { RelayProp } from 'react-relay'
-import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
-
-type PostConnection = $PropertyType<PostFeed_search, 'posts'>
-
-type Props = {| 
-  relay: RelayProp,
-  items: PostConnection,
-|}
 
 function goNext(items, refetch) {
   if ( items ) {
@@ -44,7 +32,7 @@ function goPrev(items, refetch) {
   }
 }
 
-const Pagination = ({relay, items}: Props) => {
+const Pagination = ({relay, items}) => {
 
   function handleNext() {
     goNext(items, relay.refetch)
@@ -66,14 +54,7 @@ const Pagination = ({relay, items}: Props) => {
   const hasNext = items?.pageInfo?.hasNextPage
 
   return (
-    <div>
-      <div>
-        {/* XXX this is Post specific */}
-        {nodes.map(node => <PostDetails post={node} key={node.id}/>)}
-      </div>
-      {hasPrev && <button onClick={handlePrev}>PREV</button>}
-      {hasNext && <button onClick={handleNext}>NEXT</button>}
-    </div>
+    {/* XXX place something here */}
   )
 }
 

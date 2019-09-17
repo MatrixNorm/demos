@@ -1,13 +1,7 @@
 // @flow
 
-import {
-  createRefetchContainer, 
-  graphql,
-  type RelayProp
-} from 'react-relay'
-
+import type { RelayProp } from 'react-relay'
 import React, { useState } from 'react'
-import PostPagination from './PostPagination'
 
 import type { PostFeed_search as PostFeedType } from './__generated__/PostFeed_search.graphql'
 import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
@@ -17,8 +11,8 @@ type PostFeedProps = {|
   search: PostFeedType,
 |}
 
-const PostFeed = ({relay, search}: PostFeedProps) => {
-  console.log(search)
+const PaginationControls = ({relay, search}: PostFeedProps) => {
+
   const [orderByConfig, setOrderByConfig] = useState({
     'createdAt': { desc: false},
     'viewsCount': { desc: true }
@@ -87,61 +81,8 @@ const PostFeed = ({relay, search}: PostFeedProps) => {
           </label>
         </div>
       </div>
-      <PostPagination relay={relay} items={search.posts} />
     </div>
   )
 }
 
-export default createRefetchContainer(
-  PostFeed, 
-  {
-    search: graphql`
-      fragment PostFeed_search on PostSearch 
-        @argumentDefinitions(
-          first: { type: "Int" },
-          after: { type: "String" },
-          last:  { type: "Int" },
-          before: { type: "String" },
-          orderBy: { type: "PostOrdering" }
-        ) {
-        posts(
-          first: $first, 
-          after: $after,
-          last: $last,
-          before: $before,
-          orderBy: $orderBy
-        ) {
-          edges {
-            node {
-              id
-              ...PostDetails_post
-            }
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-            hasPreviousPage
-            startCursor
-          }
-        }
-      }
-    `
-  },
-  graphql`
-    query PostFeedRefetchQuery(
-      $first: Int
-      $after: String
-      $last: Int
-      $before: String,
-      $orderBy: PostOrdering) {
-        search {
-          ...PostFeed_search @arguments(
-            first: $first,
-            after: $after,
-            last: $last,
-            before: $before,
-            orderBy: $orderBy)
-      }      
-    }  
-  `
-)
+export default PaginationControls
