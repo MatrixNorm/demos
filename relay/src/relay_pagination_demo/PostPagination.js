@@ -4,7 +4,7 @@
 import React from 'react'
 import PostDetails from './PostDetails'
 
-import type  { RelayProp } from 'react-relay'
+import type { RelayProp } from 'react-relay'
 import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
 
 type PostConnection = $PropertyType<PostFeed_search, 'posts'>
@@ -14,15 +14,9 @@ type Props = {|
   posts: PostConnection,
 |}
 
-const Pagination = ({relay, posts}: Props) => {
-  console.log("BBBBBBBBB", posts)
-  function goNext() {
-
-    if ( !posts ) {
-      return
-    }
-
-    relay.refetch(
+function goNext(posts, refetch) {
+  if ( posts ) {
+    refetch(
       {
         first: 3,
         after: posts.pageInfo.endCursor,
@@ -33,14 +27,11 @@ const Pagination = ({relay, posts}: Props) => {
       null,
       () => console.log('next done!'))
   }
+}
 
-  function goPrev() {
-
-    if ( !posts ) {
-      return
-    }
-
-    relay.refetch(
+function goPrev(posts, refetch) {
+  if ( posts ) {
+    refetch(
       {
         first: null,
         after: null,
@@ -50,6 +41,17 @@ const Pagination = ({relay, posts}: Props) => {
       },
       null,
       () => console.log('prev done!'))
+  }
+}
+
+const Pagination = ({relay, posts}: Props) => {
+
+  function handleNext() {
+    goNext(posts, relay.refetch)
+  }
+
+  function handlePrev() {
+    goPrev(posts, relay.refetch)
   }
 
   const nodes = 
@@ -68,8 +70,8 @@ const Pagination = ({relay, posts}: Props) => {
       <div>
         {nodes.map(node => <PostDetails post={node} key={node.id}/>)}
       </div>
-      {hasPrev && <button onClick={goPrev}>PREV</button>}
-      {hasNext && <button onClick={goNext}>NEXT</button>}
+      {hasPrev && <button onClick={handlePrev}>PREV</button>}
+      {hasNext && <button onClick={handleNext}>NEXT</button>}
     </div>
   )
 }
