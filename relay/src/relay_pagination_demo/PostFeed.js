@@ -21,7 +21,7 @@ const PostFeed = ({relay, search}: PostFeedProps) => {
   return (
     <div>
       <PostPaginationControls refetch={relay.refetch} />
-      <PostPagination refetch={relay.refetch} items={search.posts} />
+      <PostPagination refetch={relay.refetch} posts={search.posts} />
     </div>
   )
 }

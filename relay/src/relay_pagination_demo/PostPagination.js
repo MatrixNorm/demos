@@ -10,10 +10,10 @@ type PostConnection = $PropertyType<PostFeed_search, 'posts'>
 
 type Props = {| 
   refetch: any,
-  items: PostConnection,
+  posts: PostConnection,
 |}
 
-const PostPagination = ({refetch, items}: Props) => {
+const PostPagination = ({refetch, posts}: Props) => {
 
   const renderCallback = ({ nodes, hasNext, hasPrev, handleNext, handlePrev }) => {
     return (
@@ -27,7 +27,7 @@ const PostPagination = ({refetch, items}: Props) => {
     )
   }
 
-  return <Pagination items={items} refetch={refetch} renderCallback={renderCallback} />
+  return <Pagination items={posts} refetch={refetch} renderCallback={renderCallback} />
 }
 
 export default PostPagination
