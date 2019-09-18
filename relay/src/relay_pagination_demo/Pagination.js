@@ -1,6 +1,8 @@
 // @flow
 
-import React from 'react'
+/*
+  Generic pagination component.
+*/
 
 type Connection = {
  pageInfo: PageInfo,
@@ -50,11 +52,12 @@ function goPrev(items, refetch) {
 }
 
 type Props = {
+  items: ?Connection,
   refetch: any,
-  items: ?Connection
+  renderCallback: any
 }
 
-const Pagination = ({refetch, items}: Props) => {
+const Pagination = ({items, refetch, renderCallback }: Props) => {
 
   function handleNext() {
     goNext(items, refetch)
@@ -75,16 +78,7 @@ const Pagination = ({refetch, items}: Props) => {
   const hasPrev = items?.pageInfo.hasPreviousPage
   const hasNext = items?.pageInfo.hasNextPage
 
-  return (
-    <div>
-      <div>
-        {/* XXX this is Post specific */}
-        {nodes}
-      </div>
-      {hasPrev && <button onClick={handlePrev}>PREV</button>}
-      {hasNext && <button onClick={handleNext}>NEXT</button>}
-    </div>
-  )
+  return renderCallback({ nodes, hasNext, hasPrev, handleNext, handlePrev })
 }
 
 export default Pagination
