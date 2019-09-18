@@ -47,6 +47,7 @@ const render = ({error, props}: RenderProps) => {
   return (
     <>
       {props.x1 && <PostFeed search={props.x1} />}
+      <br /><br /><br />
       {props.x2 && <PostFeed search={props.x2} />}
     </>
   )

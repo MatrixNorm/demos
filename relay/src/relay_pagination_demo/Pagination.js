@@ -58,6 +58,7 @@ type Props = {
   renderCallback: any
 }
 
+// rename items to connection
 const Pagination = ({items, refetch, renderCallback }: Props) => {
 
   function handleNext() {

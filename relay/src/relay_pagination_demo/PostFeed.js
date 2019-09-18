@@ -18,6 +18,7 @@ type PostFeedProps = {|
 |}
 
 const PostFeed = ({relay, search}: PostFeedProps) => {
+  // pass refetch as context
   return (
     <div>
       <PostPaginationControls refetch={relay.refetch} />
