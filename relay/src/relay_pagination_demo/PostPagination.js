@@ -44,7 +44,7 @@ function goPrev(items, refetch) {
   }
 }
 
-const Pagination = ({relay, items}: Props) => {
+const PostPagination = ({relay, items}: Props) => {
 
   function handleNext() {
     goNext(items, relay.refetch)
@@ -77,4 +77,4 @@ const Pagination = ({relay, items}: Props) => {
   )
 }
 
-export default Pagination
+export default PostPagination

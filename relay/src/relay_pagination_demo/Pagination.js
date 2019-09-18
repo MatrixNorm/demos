@@ -1,6 +1,6 @@
 // @flow
 
-import React from 'react'
+import React, { useContext } from 'react'
 
 function goNext(items, refetch) {
   if ( items ) {
@@ -32,14 +32,16 @@ function goPrev(items, refetch) {
   }
 }
 
-const Pagination = ({relay, items}) => {
+const Pagination = ({ items, render }) => {
+
+  const refetch = useContext('Context.Refetch')
 
   function handleNext() {
-    goNext(items, relay.refetch)
+    goNext(items, refetch)
   }
 
   function handlePrev() {
-    goPrev(items, relay.refetch)
+    goPrev(items, refetch)
   }
 
   const nodes = 
@@ -54,7 +56,7 @@ const Pagination = ({relay, items}) => {
   const hasNext = items?.pageInfo?.hasNextPage
 
   return (
-    {/* XXX place something here */}
+    {/* XXX place something here: render props? compound components? */}
   )
 }
 
