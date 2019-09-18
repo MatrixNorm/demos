@@ -1,23 +1,24 @@
 // @flow
+/* globals $ReadOnlyArray */
 
 /*
   Generic pagination component.
 */
 
 type Connection = {
- pageInfo: PageInfo,
- edges: Array<?PostEdge>,
+ +pageInfo: PageInfo,
+ +edges: $ReadOnlyArray<?PostEdge>,
 };
 
 type PageInfo = {
-  hasNextPage: boolean,
-  hasPreviousPage: boolean,
-  startCursor?: ?string,
-  endCursor?: ?string,
+  +hasNextPage: boolean,
+  +hasPreviousPage: boolean,
+  +startCursor?: ?string,
+  +endCursor?: ?string,
  };
 
 type PostEdge = {
- node?: ?any,
+ +node?: ?any,
  cursor: string,
 };
 
