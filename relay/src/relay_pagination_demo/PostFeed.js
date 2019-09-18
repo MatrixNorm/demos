@@ -20,8 +20,8 @@ type PostFeedProps = {|
 const PostFeed = ({relay, search}: PostFeedProps) => {
   return (
     <div>
-      <PostPaginationControls relay={relay} />
-      <PostPagination relay={relay} items={search.posts} />
+      <PostPaginationControls refetch={relay.refetch} />
+      <PostPagination refetch={relay.refetch} items={search.posts} />
     </div>
   )
 }

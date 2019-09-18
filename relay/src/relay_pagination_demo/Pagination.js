@@ -1,6 +1,23 @@
 // @flow
 
-import React, { useContext } from 'react'
+import React from 'react'
+
+type Connection = {
+ pageInfo: PageInfo,
+ edges: Array<?PostEdge>,
+};
+
+type PageInfo = {
+  hasNextPage: boolean,
+  hasPreviousPage: boolean,
+  startCursor?: ?string,
+  endCursor?: ?string,
+ };
+
+type PostEdge = {
+ node?: ?any,
+ cursor: string,
+};
 
 function goNext(items, refetch) {
   if ( items ) {
@@ -32,9 +49,12 @@ function goPrev(items, refetch) {
   }
 }
 
-const Pagination = ({ items, render }) => {
+type Props = {
+  refetch: any,
+  items: ?Connection
+}
 
-  const refetch = useContext('Context.Refetch')
+const Pagination = ({refetch, items}: Props) => {
 
   function handleNext() {
     goNext(items, refetch)
@@ -52,11 +72,18 @@ const Pagination = ({ items, render }) => {
           .filter(Boolean)
       : [];
 
-  const hasPrev = items?.pageInfo?.hasPreviousPage
-  const hasNext = items?.pageInfo?.hasNextPage
+  const hasPrev = items?.pageInfo.hasPreviousPage
+  const hasNext = items?.pageInfo.hasNextPage
 
   return (
-    {/* XXX place something here: render props? compound components? */}
+    <div>
+      <div>
+        {/* XXX this is Post specific */}
+        {nodes}
+      </div>
+      {hasPrev && <button onClick={handlePrev}>PREV</button>}
+      {hasNext && <button onClick={handleNext}>NEXT</button>}
+    </div>
   )
 }
 

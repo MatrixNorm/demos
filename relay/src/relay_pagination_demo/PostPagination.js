@@ -3,14 +3,12 @@
 
 import React from 'react'
 import PostDetails from './PostDetails'
-
-import type { RelayProp } from 'react-relay'
 import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
 
 type PostConnection = $PropertyType<PostFeed_search, 'posts'>
 
 type Props = {| 
-  relay: RelayProp,
+  refetch: any,
   items: PostConnection,
 |}
 
@@ -44,14 +42,14 @@ function goPrev(items, refetch) {
   }
 }
 
-const PostPagination = ({relay, items}: Props) => {
+const PostPagination = ({refetch, items}: Props) => {
 
   function handleNext() {
-    goNext(items, relay.refetch)
+    goNext(items, refetch)
   }
 
   function handlePrev() {
-    goPrev(items, relay.refetch)
+    goPrev(items, refetch)
   }
 
   const nodes = 
@@ -62,8 +60,8 @@ const PostPagination = ({relay, items}: Props) => {
           .filter(Boolean)
       : [];
 
-  const hasPrev = items?.pageInfo?.hasPreviousPage
-  const hasNext = items?.pageInfo?.hasNextPage
+  const hasPrev = items?.pageInfo.hasPreviousPage
+  const hasNext = items?.pageInfo.hasNextPage
 
   return (
     <div>

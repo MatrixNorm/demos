@@ -4,7 +4,7 @@ import React, { useState } from 'react'
 import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
 
-const PostPaginationControls = ({ relay }) => {
+const PostPaginationControls = ({ refetch }: { refetch: any }) => {
 
   const [orderByConfig, setOrderByConfig] = useState({
     'createdAt': { desc: false},
@@ -14,7 +14,7 @@ const PostPaginationControls = ({ relay }) => {
 
   function handleActiveOrderFieldChange ( field: PostOrderingFields ) {
     setActiveOrderField(field)
-    relay.refetch(
+    refetch(
       {
         first: 3,
         after: null,
@@ -28,7 +28,7 @@ const PostPaginationControls = ({ relay }) => {
 
   function handleDescChange (e, fieldName) {
     setOrderByConfig({...orderByConfig, [fieldName]: {desc: e.target.checked}})
-    relay.refetch(
+    refetch(
       {
         first: 3,
         after: null,
