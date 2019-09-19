@@ -1,15 +1,13 @@
 // @flow
 
-import React, { useState } from 'react'
-import { PostFeedContextConsumer } from './PostFeed'
+import React, { useState, useContext } from 'react'
+import { PostFeedContext } from './PostFeedContext'
 import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
-type Props = { 
-  refetch: any,
-  renderCallback: any
-}
 
-const XXX = ({ refetch, renderCallback }: Props) => {
+const PostPaginationControls = ({ renderCallback }: any) => {
+
+  const { refetch } = useContext(PostFeedContext)
 
   const [config, setConfig] = useState({
     'createdAt': { desc: false},
@@ -86,11 +84,7 @@ const PostPaginationControls_v1 = () => {
   )
 
   return (
-    <PostFeedContextConsumer>
-      {({refetch}: Props) => (
-          <XXX refetch={refetch} renderCallback={renderCallback}/>)}
-    </PostFeedContextConsumer>
-
+    <PostPaginationControls renderCallback={renderCallback}/>
   )
 }
 
@@ -132,11 +126,7 @@ const PostPaginationControls_v2 = () => {
   )
 
   return (
-    <PostFeedContextConsumer>
-      {({refetch}: Props) => (
-          <XXX refetch={refetch} renderCallback={renderCallback}/>)}
-    </PostFeedContextConsumer>
-
+    <PostPaginationControls renderCallback={renderCallback}/>
   )
 }
 

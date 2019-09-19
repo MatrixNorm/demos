@@ -6,6 +6,7 @@ import React from 'react'
 import environment from './Environment'
 import PostFeed from './PostFeed'
 import PostPagination from './PostPagination'
+import PostPaginationControls from './PostPaginationControls'
 
 import type { AppQueryResponse } from './__generated__/AppQuery.graphql'
 
@@ -53,11 +54,11 @@ const render = ({error, props}: RenderProps) => {
           <PostPagination />
         </PostFeed>
       }
-      <br /><br /><br />
       {props.x2 && 
         <PostFeed search={props.x2}>
-          <PostPaginationControls.v2 />
           <PostPagination />
+          <br/>
+          <PostPaginationControls.v2 />          
         </PostFeed>
       }
     </>

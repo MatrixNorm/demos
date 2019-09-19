@@ -1,10 +1,10 @@
 // @flow
 /* globals $PropertyType */
 
-import React from 'react'
+import React, { useContext } from 'react'
 import Pagination from './Pagination'
 import PostDetails from './PostDetails'
-import { PostFeedContextConsumer } from './PostFeed'
+import { PostFeedContext } from './PostFeedContext'
 import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
 
 type PostConnection = $PropertyType<PostFeed_search, 'posts'>
@@ -15,6 +15,8 @@ type Props = {|
 |}
 
 const PostPagination = () => {
+
+  const { refetch, posts }: Props = useContext(PostFeedContext)
 
   const renderCallback = ({ nodes, hasNext, hasPrev, handleNext, handlePrev }) => {
     return (
@@ -29,12 +31,9 @@ const PostPagination = () => {
   }
 
   return (
-    <PostFeedContextConsumer>
-      {({refetch, posts}: Props) => (
-        <Pagination items={posts} 
-                    refetch={refetch} 
-                    renderCallback={renderCallback} />)}
-    </PostFeedContextConsumer>
+    <Pagination items={posts} 
+                refetch={refetch} 
+                renderCallback={renderCallback} />
   )
 }
 

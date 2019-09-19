@@ -6,7 +6,8 @@ import {
   type RelayProp
 } from 'react-relay'
 
-import React, { createContext } from 'react'
+import React from 'react'
+import { PostFeedContext } from './PostFeedContext'
 import type { PostFeed_search as PostFeedType } from './__generated__/PostFeed_search.graphql'
 
 type PostFeedProps = {| 
@@ -14,9 +15,6 @@ type PostFeedProps = {|
   search: PostFeedType,
   children: any
 |}
-
-const PostFeedContext = createContext()
-export const PostFeedContextConsumer = PostFeedContext.Consumer
 
 const PostFeed = ({relay, search, children}: PostFeedProps) => {
   return (
