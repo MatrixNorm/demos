@@ -6,24 +6,23 @@ import {
   type RelayProp
 } from 'react-relay'
 
-import React from 'react'
-import PostPagination from './PostPagination'
-import PostPaginationControls from './PostPaginationControls'
-
+import React, { createContext } from 'react'
 import type { PostFeed_search as PostFeedType } from './__generated__/PostFeed_search.graphql'
 
 type PostFeedProps = {| 
   relay: RelayProp,
   search: PostFeedType,
+  children: any
 |}
 
-const PostFeed = ({relay, search}: PostFeedProps) => {
-  // pass refetch as context
+const PostFeedContext = createContext()
+export const PostFeedContextConsumer = PostFeedContext.Consumer
+
+const PostFeed = ({relay, search, children}: PostFeedProps) => {
   return (
-    <div>
-      <PostPaginationControls refetch={relay.refetch} />
-      <PostPagination refetch={relay.refetch} posts={search.posts} />
-    </div>
+    <PostFeedContext.Provider value={{refetch: relay.refetch, posts: search.posts}}>
+      {children}
+    </PostFeedContext.Provider>
   )
 }
 

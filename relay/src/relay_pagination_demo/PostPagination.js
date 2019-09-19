@@ -4,6 +4,7 @@
 import React from 'react'
 import Pagination from './Pagination'
 import PostDetails from './PostDetails'
+import { PostFeedContextConsumer } from './PostFeed'
 import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
 
 type PostConnection = $PropertyType<PostFeed_search, 'posts'>
@@ -13,7 +14,7 @@ type Props = {|
   posts: PostConnection,
 |}
 
-const PostPagination = ({refetch, posts}: Props) => {
+const PostPagination = () => {
 
   const renderCallback = ({ nodes, hasNext, hasPrev, handleNext, handlePrev }) => {
     return (
@@ -27,7 +28,14 @@ const PostPagination = ({refetch, posts}: Props) => {
     )
   }
 
-  return <Pagination items={posts} refetch={refetch} renderCallback={renderCallback} />
+  return (
+    <PostFeedContextConsumer>
+      {({refetch, posts}: Props) => (
+        <Pagination items={posts} 
+                    refetch={refetch} 
+                    renderCallback={renderCallback} />)}
+    </PostFeedContextConsumer>
+  )
 }
 
 export default PostPagination

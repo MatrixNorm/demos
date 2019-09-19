@@ -1,6 +1,7 @@
 // @flow
 
 import React, { useState } from 'react'
+import { PostFeedContextConsumer } from './PostFeed'
 import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
 type Props = { 
@@ -47,7 +48,7 @@ const XXX = ({ refetch, renderCallback }: Props) => {
   return renderCallback({ config, activeField, handleActiveFieldChange, handleDirectionChange })
 }
 
-const PostPaginationControls = ({ refetch }: any) => {
+const PostPaginationControls_v1 = () => {
 
   const renderCallback = ({ config, activeField, handleActiveFieldChange, handleDirectionChange }) => (
     <div className="controls">
@@ -85,8 +86,61 @@ const PostPaginationControls = ({ refetch }: any) => {
   )
 
   return (
-    <XXX refetch={refetch} renderCallback={renderCallback}/>
+    <PostFeedContextConsumer>
+      {({refetch}: Props) => (
+          <XXX refetch={refetch} renderCallback={renderCallback}/>)}
+    </PostFeedContextConsumer>
+
   )
 }
 
-export default PostPaginationControls
+const PostPaginationControls_v2 = () => {
+
+  const renderCallback = ({ config, activeField, handleActiveFieldChange, handleDirectionChange }) => (
+    <div className="controls">
+      <div>
+        <label>
+          <input type="radio" value="createdAt"
+                  checked={activeField === 'createdAt'} 
+                  onChange={() => handleActiveFieldChange('createdAt')} />
+          By creation date
+          </label>
+        <label>
+          <input type="checkbox"
+                  checked={config['createdAt'].desc}
+                  disabled={activeField !== 'createdAt'}
+                  onChange={e => handleDirectionChange(e, 'createdAt')}/>
+          desc
+        </label>
+      </div>
+      <div>
+        <label>
+          <input type="radio" value="viewsCount"
+                  checked={activeField === 'viewsCount'}
+                  onChange={() => handleActiveFieldChange('viewsCount')} />
+          By views count
+        </label>
+        <label>
+          <input type="checkbox"
+                  checked={config['viewsCount'].desc}
+                  disabled={activeField !== 'viewsCount'}
+                  onChange={e => handleDirectionChange(e, 'viewsCount')}/>
+          desc
+        </label>
+      </div>
+    </div>
+  )
+
+  return (
+    <PostFeedContextConsumer>
+      {({refetch}: Props) => (
+          <XXX refetch={refetch} renderCallback={renderCallback}/>)}
+    </PostFeedContextConsumer>
+
+  )
+}
+
+export default {
+  v1: PostPaginationControls_v1,
+  v2: PostPaginationControls_v2
+}
