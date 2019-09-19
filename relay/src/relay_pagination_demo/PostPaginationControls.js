@@ -3,31 +3,35 @@
 import React, { useState } from 'react'
 import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
+type Props = { 
+  refetch: any,
+  renderCallback: any
+}
 
-const PostPaginationControls = ({ refetch }: { refetch: any }) => {
+const XXX = ({ refetch, renderCallback }: Props) => {
 
-  const [orderByConfig, setOrderByConfig] = useState({
+  const [config, setConfig] = useState({
     'createdAt': { desc: false},
     'viewsCount': { desc: true }
   })
-  const [activeOrderField, setActiveOrderField]: [PostOrderingFields, any] = useState('createdAt')
+  const [activeField, setActiveField]: [PostOrderingFields, any] = useState('createdAt')
 
-  function handleActiveOrderFieldChange ( field: PostOrderingFields ) {
-    setActiveOrderField(field)
+  function handleActiveFieldChange ( field: PostOrderingFields ) {
+    setActiveField(field)
     refetch(
       {
         first: 3,
         after: null,
         last: null,
         before: null,
-        orderBy: { field, desc: orderByConfig[field].desc },
+        orderBy: { field, desc: config[field].desc },
       },
       null,
       () => console.log('field change done!'))
   }
 
-  function handleDescChange (e, fieldName) {
-    setOrderByConfig({...orderByConfig, [fieldName]: {desc: e.target.checked}})
+  function handleDirectionChange (e, fieldName) {
+    setConfig({...config, [fieldName]: {desc: e.target.checked}})
     refetch(
       {
         first: 3,
@@ -40,39 +44,48 @@ const PostPaginationControls = ({ refetch }: { refetch: any }) => {
       () => console.log('desc change done!'))
   }
 
-  return (
+  return renderCallback({ config, activeField, handleActiveFieldChange, handleDirectionChange })
+}
+
+const PostPaginationControls = ({ refetch }: any) => {
+
+  const renderCallback = ({ config, activeField, handleActiveFieldChange, handleDirectionChange }) => (
     <div className="controls">
       <div>
         <label>
           <input type="radio" value="createdAt"
-                  checked={activeOrderField === 'createdAt'} 
-                  onChange={() => handleActiveOrderFieldChange('createdAt')} />
+                  checked={activeField === 'createdAt'} 
+                  onChange={() => handleActiveFieldChange('createdAt')} />
           By creation date
           </label>
         <label>
           <input type="checkbox"
-                  checked={orderByConfig['createdAt'].desc}
-                  disabled={activeOrderField !== 'createdAt'}
-                  onChange={e => handleDescChange(e, 'createdAt')}/>
+                  checked={config['createdAt'].desc}
+                  disabled={activeField !== 'createdAt'}
+                  onChange={e => handleDirectionChange(e, 'createdAt')}/>
           desc
         </label>
       </div>
       <div>
         <label>
           <input type="radio" value="viewsCount"
-                  checked={activeOrderField === 'viewsCount'}
-                  onChange={() => handleActiveOrderFieldChange('viewsCount')} />
+                  checked={activeField === 'viewsCount'}
+                  onChange={() => handleActiveFieldChange('viewsCount')} />
           By views count
         </label>
         <label>
           <input type="checkbox"
-                  checked={orderByConfig['viewsCount'].desc}
-                  disabled={activeOrderField !== 'viewsCount'}
-                  onChange={e => handleDescChange(e, 'viewsCount')}/>
+                  checked={config['viewsCount'].desc}
+                  disabled={activeField !== 'viewsCount'}
+                  onChange={e => handleDirectionChange(e, 'viewsCount')}/>
           desc
         </label>
       </div>
     </div>
+  )
+
+  return (
+    <XXX refetch={refetch} renderCallback={renderCallback}/>
   )
 }
 
