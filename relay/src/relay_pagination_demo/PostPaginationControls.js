@@ -55,7 +55,7 @@ const PostPaginationControls_v1 = () => {
           <input type="radio" value="createdAt"
                   checked={activeField === 'createdAt'} 
                   onChange={() => handleActiveFieldChange('createdAt')} />
-          By creation date
+          {config['createdAt'].desc ? 'Recent first' : 'Oldest first'}
           </label>
         <label>
           <input type="checkbox"
@@ -70,7 +70,7 @@ const PostPaginationControls_v1 = () => {
           <input type="radio" value="viewsCount"
                   checked={activeField === 'viewsCount'}
                   onChange={() => handleActiveFieldChange('viewsCount')} />
-          By views count
+          {config['viewsCount'].desc ? 'Most popular first' : 'Least popular first'}
         </label>
         <label>
           <input type="checkbox"
