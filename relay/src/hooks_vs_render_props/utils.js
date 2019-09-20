@@ -29,12 +29,44 @@ export function makePrice(price) {
 }
 
 export function initializeData() {
-  let ids = new Array(10)
-    .fill()
-    .map(() => Math.random().toString(36).substring(7))
-  let data = ids.reduce(
-    (data, id) => updateData(data, id, 83 + Math.random() * 18),
-    {}
-  )
+  const data = {}
+  for (let r of rowGenerator(10)) {
+    data[r.id] = r
+  }
   return data
+}
+
+function* rowGenerator(n) {
+  for (let i = 0; i < n; i += 1) {
+    let id = Math.random().toString(36).substring(7)
+    let price = 83 + Math.random() * 18
+    let yield_ = price > 0 ? (5 / price * 100) : 0
+    yield { id, price, yield: yield_ };
+  }
+}
+
+// function dataUpdateProcess(data) {
+//   let updateIn = Math.random() * 2000  
+//   setTimeout(() => {
+//     let len = ids.length
+//     let id = ids[Math.min(Math.floor(Math.random() * len), len-1)]
+//     setData(updateData(data, id, makePrice(data[id].price)))
+//   }, updateIn)
+// }
+
+const data = initializeData()
+const observersRegister = []
+
+function subscribeToDataChange(observer) {
+  observersRegister.push(observer)
+  return () => {
+    // TODO unsubscribe function
+  }
+}
+
+function update(newData) {
+  data = newData
+  for (let observer of observersRegister) {
+    observer(newData)
+  }
 }
