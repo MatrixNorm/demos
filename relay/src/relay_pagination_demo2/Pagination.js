@@ -2,25 +2,30 @@
 /* globals $ReadOnlyArray */
 
 /*
-  Generic pagination component.
+  Generic pagination hook.
 */
 
 type Connection = {
  +pageInfo: PageInfo,
  +edges: $ReadOnlyArray<?PostEdge>,
-};
+}
 
 type PageInfo = {
   +hasNextPage: boolean,
   +hasPreviousPage: boolean,
   +startCursor?: ?string,
   +endCursor?: ?string,
- };
+ }
 
 type PostEdge = {
  +node?: ?any,
  cursor: string,
-};
+}
+
+type Props = {
+  items: ?Connection,
+  refetch: any,
+}
 
 function goNext(items, refetch) {
   if ( items ) {
@@ -52,14 +57,8 @@ function goPrev(items, refetch) {
   }
 }
 
-type Props = {
-  items: ?Connection,
-  refetch: any,
-  renderCallback: any
-}
-
 // rename items to connection
-const Pagination = ({items, refetch, renderCallback }: Props) => {
+export function usePagination({items, refetch}: Props) {
 
   function handleNext() {
     goNext(items, refetch)
@@ -80,7 +79,5 @@ const Pagination = ({items, refetch, renderCallback }: Props) => {
   const hasPrev = items?.pageInfo.hasPreviousPage
   const hasNext = items?.pageInfo.hasNextPage
 
-  return renderCallback({ nodes, hasNext, hasPrev, handleNext, handlePrev })
+  return { nodes, hasNext, hasPrev, handleNext, handlePrev }
 }
-
-export default Pagination
