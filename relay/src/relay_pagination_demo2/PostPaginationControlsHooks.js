@@ -1,6 +1,7 @@
 
 import { useState, useContext } from 'react'
 import { PostFeedContext } from './PostFeedContext'
+import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
 
 export function usePostPaginationControls() {
@@ -39,5 +40,7 @@ export function usePostPaginationControls() {
       null,
       () => console.log('desc change done!'))
   }
+
+  return { config, activeField, handleActiveFieldChange, handleDirectionChange }
 }
 

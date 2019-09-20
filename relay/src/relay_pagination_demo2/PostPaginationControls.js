@@ -1,54 +1,13 @@
 // @flow
 
-import React, { useState, useContext } from 'react'
-import { PostFeedContext } from './PostFeedContext'
-import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
-
-
-const PostPaginationControls = ({ renderCallback }: any) => {
-
-  const { refetch } = useContext(PostFeedContext)
-
-  const [config, setConfig] = useState({
-    'createdAt': { desc: false},
-    'viewsCount': { desc: true }
-  })
-  const [activeField, setActiveField]: [PostOrderingFields, any] = useState('createdAt')
-
-  function handleActiveFieldChange ( field: PostOrderingFields ) {
-    setActiveField(field)
-    refetch(
-      {
-        first: 3,
-        after: null,
-        last: null,
-        before: null,
-        orderBy: { field, desc: config[field].desc },
-      },
-      null,
-      () => console.log('field change done!'))
-  }
-
-  function handleDirectionChange (e, fieldName) {
-    setConfig({...config, [fieldName]: {desc: e.target.checked}})
-    refetch(
-      {
-        first: 3,
-        after: null,
-        last: null,
-        before: null,
-        orderBy: { field: fieldName, desc: e.target.checked },
-      },
-      null,
-      () => console.log('desc change done!'))
-  }
-
-  return renderCallback({ config, activeField, handleActiveFieldChange, handleDirectionChange })
-}
+import React from 'react'
+import { usePostPaginationControls } from './PostPaginationControlsHooks'
 
 const PostPaginationControls_v1 = () => {
 
-  const renderCallback = ({ config, activeField, handleActiveFieldChange, handleDirectionChange }) => (
+  const { config, activeField, handleActiveFieldChange, handleDirectionChange } = usePostPaginationControls()
+
+   return (
     <div className="controls">
       <div>
         <label>
@@ -82,15 +41,13 @@ const PostPaginationControls_v1 = () => {
       </div>
     </div>
   )
-
-  return (
-    <PostPaginationControls renderCallback={renderCallback}/>
-  )
 }
 
 const PostPaginationControls_v2 = () => {
 
-  const renderCallback = ({ config, activeField, handleActiveFieldChange, handleDirectionChange }) => (
+  const { config, activeField, handleActiveFieldChange, handleDirectionChange } = usePostPaginationControls()
+
+  return (
     <div className="controls">
       <div>
         <label>
@@ -123,10 +80,6 @@ const PostPaginationControls_v2 = () => {
         </label>
       </div>
     </div>
-  )
-
-  return (
-    <PostPaginationControls renderCallback={renderCallback}/>
   )
 }
 
