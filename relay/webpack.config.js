@@ -55,12 +55,13 @@ const baseBuild = ({ buildId }) => env => {
   };
 };
 
-builds.relay_hello = 
-  baseBuild({ buildId: 'relay_hello' })
+function registerBuild(buildId) {
+  builds[buildId] = baseBuild({ buildId })
+}
 
-builds.relay_pagination_demo = 
-  baseBuild({ buildId: 'relay_pagination_demo' })
-
+registerBuild('relay_hello')
+registerBuild('relay_pagination_demo')
+registerBuild('relay_pagination_demo2')
 
 module.exports = env => {
 
