@@ -8,7 +8,7 @@
   ],
   "presets": [
     "@babel/preset-react", 
-    "@babel/preset-env", 
+    ["@babel/preset-env", {"targets": {"chrome": "76"}}], 
     "@babel/preset-flow"
   ]
 }
