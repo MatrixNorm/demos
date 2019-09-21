@@ -20,7 +20,7 @@ export function StyledTable({ children }) {
 export function StyledTableRow({ data, change }) {
   return (
     <tr className={change || ''}>
-      <td>{data.id}</td>
+      <td>{data.ticker}</td>
       <td>
         {Number(Math.round(data.price+'e2')+'e-2').toFixed(2)}
       </td>
