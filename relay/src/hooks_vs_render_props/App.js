@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { StyledTable } from './StyledTable'
 import TableRow from './TableRow'
 import { DataContext, useMarketData } from './utils'

@@ -68,6 +68,7 @@ registerBuild('relay_hello')
 registerBuild('relay_pagination_demo')
 registerBuild('relay_pagination_demo2')
 registerBuild('hooks_vs_render_props')
+registerBuild('generators_and_stuff')
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
