@@ -1,18 +1,18 @@
 
-const TICKERS = ['EEM', 'SIL', 'IWM', 'FM', 'EWG', 'UUP', 'COPX', 'WOOD', 'GDX', 'IEI']
-
 function* updatesGen(tickers) {
   while (true) {
     const ticker = tickers[Math.floor(Math.random() * tickers.length)]
-    yield { ticker, price: 100 + 20 * Math.random(), yield: 4}
+    yield {
+      [ticker]: { ticker, price: 100 + 40 * Math.random(), yield: 4 + Math.random()}
+    } 
   }
 }
 
 export function subscribeToMarketData(tickers, onUpdate) {
-  const initialData = {}
-  for (let t in tickers) {
-    initialData[t] = 100 + 40 * Math.random()
-  }
+  const initialData = Object.fromEntries(
+    tickers.map(t => [t, { ticker: t, 
+                           price: 100 + 40 * Math.random(),
+                           yield: 5 * Math.random() + Math.random()}]))
 
   const updates = (function* () {
     yield initialData
@@ -23,7 +23,7 @@ export function subscribeToMarketData(tickers, onUpdate) {
 
   return asyncLoop(
     function() {
-      onUpdate(updates.next())
+      onUpdate(updates.next().value)
     },
     (function* () {
       while (true) {
