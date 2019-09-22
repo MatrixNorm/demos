@@ -1,9 +1,18 @@
 
-function* updatesGen(tickers) {
+function* updatesGen(initialData) {
+  const data = {...initialData}
+  const tickers = Object.keys(data)
   while (true) {
     const ticker = tickers[Math.floor(Math.random() * tickers.length)]
+    const record = data[ticker]
+    const priceChange = Math.random()
+    const updatedRecord = {
+      price: record.price + priceChange,
+      yield: record.yield + 0.2 * priceChange,
+    }
+    data[ticker] = { ticker, ...updatedRecord}
     yield {
-      [ticker]: { ticker, price: 100 + 40 * Math.random(), yield: 4 + Math.random()}
+      [ticker]: { ticker, ...updatedRecord}
     } 
   }
 }
@@ -17,7 +26,7 @@ export function subscribeToMarketData(tickers, onUpdate) {
   const updates = (function* () {
     yield initialData
     while (true) {
-      yield* updatesGen(tickers)
+      yield* updatesGen(initialData)
     }
   })()
 

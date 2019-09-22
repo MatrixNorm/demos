@@ -3,8 +3,8 @@ import { useData, useDidChange, useLastValue, useTimedToggle } from './hooks'
 import { StyledTableRow } from './StyledTable'
 
 
-function TableRow({ id }) {
-  let data = useData(id)
+function TableRow({ ticker }) {
+  let data = useData(ticker)
   let last = useLastValue(data)
   let didChange = useDidChange(data)
   let [isHighlighted, highlight] = useTimedToggle(500)

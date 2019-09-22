@@ -11,7 +11,7 @@ export default function App() {
     <DataContext.Provider value={data}>
       <StyledTable>
         {Object.keys(data).map(ticker =>
-          <TableRow key={ticker} id={ticker} />
+          <TableRow key={ticker} ticker={ticker} />
         )}
       </StyledTable>
     </DataContext.Provider>

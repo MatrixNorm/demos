@@ -46,7 +46,7 @@ export function useTimedToggle(milliseconds) {
   return [isActive, activate]
 }
 
-export function useData(id) {
+export function useData(ticker) {
   let data = useContext(DataContext)
-  return data[id]
+  return data[ticker]
 }
