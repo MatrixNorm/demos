@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyledTable } from './StyledTable'
 import TableRow from './TableRow'
-import { DataContext, useMarketData } from './utils'
+import { DataContext, useMarketData } from './hooks'
 
 
 export default function App() {

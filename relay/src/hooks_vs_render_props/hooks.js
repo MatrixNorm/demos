@@ -1,31 +1,36 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import { DataContext } from './utils'
+import React, { useContext, useState, useEffect } from 'react'
+import { subscribeToMarketData } from './dataSource'
 
-export function useTimedToggle(milliseconds) {
-  let [isActive, setActive] = useState(false)
-  let timeoutRef = useRef()
-  
-  function clearActiveTimeout() {
-    if (timeoutRef.current) {
-      window.clearTimeout(timeoutRef.current)
-    }
-  }
-  
-  function activate() {
-    clearActiveTimeout()
-    setActive(true)
-    timeoutRef.current = window.setTimeout(() => {
-      setActive(false)
-    }, milliseconds)
-  }
-  
-  // When the component is unmounted, make sure to clear the timeout. 
-  useEffect(() => clearActiveTimeout, [])
-  
-  return [isActive, activate]
-}
+export const DataContext = React.createContext()
 
 export function useTickerData(ticker) {
   let data = useContext(DataContext)
   return { data: data.all[ticker], didChange: data.updatedTickers?.includes(ticker)}
+}
+
+const TICKERS = [
+  'EEM', 'SIL', 'IWM', 'FM', 'EWG', 
+  'UUP', 'COPX', 'WOOD', 'GDX', 'IEI']
+
+export function useMarketData() {
+  console.log(2222)
+
+  const [data, setData] = useState({all: {}, updatedTickers: []})
+
+  useEffect(() => {
+    console.log(3333)
+    subscribeToMarketData(TICKERS, handleDataUpdate).start()
+  }, [])
+
+  function handleDataUpdate(update) {
+    console.log(update)
+    setData(prevData => {
+      return {
+        all: {...prevData.all, ...update},
+        updatedTickers: Object.keys(update)
+      }
+    })
+  }
+
+  return data
 }
