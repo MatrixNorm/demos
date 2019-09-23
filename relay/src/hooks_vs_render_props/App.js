@@ -1,6 +1,5 @@
 import React from 'react'
-import { StyledTable } from './StyledTable'
-import TableRow from './TableRow'
+import { Table, TableRow }  from './Table'
 import { DataContext, useMarketData } from './hooks'
 
 
@@ -9,11 +8,11 @@ export default function App() {
   console.log(data)
   return (
     <DataContext.Provider value={data}>
-      <StyledTable>
+      <Table>
         {Object.keys(data.all).map(ticker =>
           <TableRow key={ticker} ticker={ticker} />
         )}
-      </StyledTable>
+      </Table>
     </DataContext.Provider>
   )
 }

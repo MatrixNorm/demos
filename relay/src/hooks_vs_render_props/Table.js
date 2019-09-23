@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useState } from 'react'
+import { useTickerData } from './hooks'
 
-export function StyledTable({ children }) {
+export function Table({ children }) {
   return (
     <table cellSpacing={0}>
       <thead>
@@ -17,9 +18,17 @@ export function StyledTable({ children }) {
   )
 }
 
-export function StyledTableRow({ data, change }) {
+export function TableRow({ ticker }) {
+  let { data, didChange } = useTickerData(ticker)
+  let [isHighlighted, setIsHighlighted] = useState(false)
+
+  if ( !isHighlighted && didChange ) { setIsHighlighted(true) }
+  if ( isHighlighted && !didChange ) { setIsHighlighted(false) }
+
+  let change = data.priceChange && (data.priceChange < 0 ? 'down' : 'up')
+
   return (
-    <tr className={change || ''}>
+    <tr className={isHighlighted && change || ''}>
       <td>{data.ticker}</td>
       <td>
         {Number(Math.round(data.price+'e2')+'e-2').toFixed(2)}
