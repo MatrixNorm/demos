@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react'
-import { useData, useDidChange, useLastValue, useTimedToggle } from './hooks'
+import { useTickerData, useTimedToggle } from './hooks'
 import { StyledTableRow } from './StyledTable'
 
 
 function TableRow({ ticker }) {
-  let data = useData(ticker)
-  let last = useLastValue(data)
-  let didChange = useDidChange(data)
+  let { data, didChange } = useTickerData(ticker)
   let [isHighlighted, highlight] = useTimedToggle(500)
 
   useEffect(() => {
@@ -14,8 +12,8 @@ function TableRow({ ticker }) {
       highlight()
     }
   })
-  
-  let change = last && (last.price > data.price ? 'down' : 'up')
+
+  let change = data.priceChange && (data.priceChange < 0 ? 'down' : 'up')
   
   return (
     <StyledTableRow

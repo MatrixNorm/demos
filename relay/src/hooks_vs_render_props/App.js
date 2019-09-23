@@ -6,11 +6,11 @@ import { DataContext, useMarketData } from './utils'
 
 export default function App() {
   const data = useMarketData()
-  console.log('App')
+  console.log(data)
   return (
     <DataContext.Provider value={data}>
       <StyledTable>
-        {Object.keys(data).map(ticker =>
+        {Object.keys(data.all).map(ticker =>
           <TableRow key={ticker} ticker={ticker} />
         )}
       </StyledTable>

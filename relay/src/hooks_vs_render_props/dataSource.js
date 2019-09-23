@@ -1,18 +1,26 @@
 
 function* updatesGen(initialData) {
+
+  const initData = {...initialData}
   const data = {...initialData}
   const tickers = Object.keys(data)
+
   while (true) {
     const ticker = tickers[Math.floor(Math.random() * tickers.length)]
-    const record = data[ticker]
-    const priceChange = Math.random()
-    const updatedRecord = {
-      price: record.price + priceChange,
-      yield: record.yield + 0.2 * priceChange,
+    const initRecord = initData[ticker]
+    const prevRecord = data[ticker]
+    const price = prevRecord.price + Math.random() - 0.5
+    const priceChange = price - initRecord.price
+    const nextRecord = {
+      ticker,
+      price,
+      priceChange,
+      priceChangePercent: 100 * (priceChange / initRecord.price),
+      yield: prevRecord.yield + 0.2 * priceChange,
     }
-    data[ticker] = { ticker, ...updatedRecord}
+    data[ticker] = nextRecord
     yield {
-      [ticker]: { ticker, ...updatedRecord}
+      [ticker]: nextRecord
     } 
   }
 }
@@ -20,7 +28,7 @@ function* updatesGen(initialData) {
 export function subscribeToMarketData(tickers, onUpdate) {
   const initialData = Object.fromEntries(
     tickers.map(t => [t, { ticker: t, 
-                           price: 100 + 40 * Math.random(),
+                           price: 100 + 50 * (Math.random() - 0.7),
                            yield: 5 * Math.random() + Math.random()}]))
 
   const updates = (function* () {
@@ -36,7 +44,7 @@ export function subscribeToMarketData(tickers, onUpdate) {
     },
     (function* () {
       while (true) {
-        yield 1000 + 2000 * Math.random()
+        yield 2000 + 3000 * Math.random()
       }
     })()
   )

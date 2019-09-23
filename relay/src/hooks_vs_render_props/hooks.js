@@ -1,27 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { DataContext } from './utils'
 
-export function useLastValue(value) {
-  let ref = useRef([])
-  let hasChanged = ref.current[1] !== value
-  useEffect(() => {
-    if (hasChanged) {
-      ref.current[0] = ref.current[1]
-      ref.current[1] = value
-    }
-  })
-  return hasChanged ? ref.current[1] : ref.current[0]
-}
-
-export function useDidChange(value) {
-  let ref = useRef()
-  let hasChanged = ref.current !== value
-  useEffect(() => {
-    ref.current = value
-  })
-  return hasChanged
-}
-
 export function useTimedToggle(milliseconds) {
   let [isActive, setActive] = useState(false)
   let timeoutRef = useRef()
@@ -46,7 +25,7 @@ export function useTimedToggle(milliseconds) {
   return [isActive, activate]
 }
 
-export function useData(ticker) {
+export function useTickerData(ticker) {
   let data = useContext(DataContext)
-  return data[ticker]
+  return { data: data.all[ticker], didChange: data.updatedTickers?.includes(ticker)}
 }

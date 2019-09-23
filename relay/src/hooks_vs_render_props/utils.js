@@ -10,10 +10,7 @@ const TICKERS = [
 export function useMarketData() {
   console.log(2222)
 
-  const [data, setData] = useState(() => {
-    console.log(5555)
-    return Object.fromEntries(TICKERS.map(t => [t, {ticker: t}]))
-  })
+  const [data, setData] = useState({all: {}, updatedTickers: []})
 
   useEffect(() => {
     console.log(3333)
@@ -23,7 +20,10 @@ export function useMarketData() {
   function handleDataUpdate(update) {
     console.log(update)
     setData(prevData => {
-      return {...prevData, ...update}
+      return {
+        all: {...prevData.all, ...update},
+        updatedTickers: Object.keys(update)
+      }
     })
   }
 
