@@ -24,7 +24,8 @@ th {
 tr {
   transition: background-color 3000ms ease-out, color 3000ms ease-out;
 }
-.up, .down {
+.up,
+.down {
   transition: backgound-color 150ms ease-out, color 150ms ease-out !important;
 }
 .up {
