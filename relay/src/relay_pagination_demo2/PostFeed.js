@@ -48,6 +48,7 @@ export default createRefetchContainer(
               id
               ...PostDetails_post
             }
+            cursor
           }
           pageInfo {
             hasNextPage

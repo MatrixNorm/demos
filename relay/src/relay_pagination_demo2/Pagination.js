@@ -7,19 +7,19 @@
 
 type Connection = {
  +pageInfo: PageInfo,
- +edges: $ReadOnlyArray<?PostEdge>,
+ +edges: $ReadOnlyArray<?Edge>,
 }
 
 type PageInfo = {
   +hasNextPage: boolean,
   +hasPreviousPage: boolean,
-  +startCursor?: ?string,
-  +endCursor?: ?string,
+  +startCursor: ?string,
+  +endCursor: ?string,
  }
 
-type PostEdge = {
- +node?: ?any,
- cursor: string,
+type Edge = {
+ +node: any,
+ +cursor: string,
 }
 
 type Props = {
