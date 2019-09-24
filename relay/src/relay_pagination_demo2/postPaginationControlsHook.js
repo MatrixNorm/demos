@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
 export function usePostPaginationControls(refetch) {
