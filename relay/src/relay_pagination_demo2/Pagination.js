@@ -6,78 +6,72 @@
 */
 
 type Connection = {
- +pageInfo: PageInfo,
- +edges: $ReadOnlyArray<?Edge>,
-}
+  +pageInfo: PageInfo,
+  +edges: $ReadOnlyArray<?Edge>
+};
 
 type PageInfo = {
   +hasNextPage: boolean,
   +hasPreviousPage: boolean,
   +startCursor: ?string,
-  +endCursor: ?string,
- }
+  +endCursor: ?string
+};
 
 type Edge = {
- +node: any,
- +cursor: string,
-}
+  +node: Object,
+  +cursor: string
+};
 
 type Props = {
-  items: ?Connection,
-  refetch: any,
+  connection: Connection,
+  refetch: any
+};
+
+function goNext(connection, refetch) {
+  refetch(
+    {
+      first: 3,
+      after: connection.pageInfo.endCursor,
+      last: null,
+      before: null,
+      orderBy: null
+    },
+    null
+  );
 }
 
-function goNext(items, refetch) {
-  if ( items ) {
-    refetch(
-      {
-        first: 3,
-        after: items.pageInfo.endCursor,
-        last: null,
-        before: null,
-        orderBy: null,
-      },
-      null,
-      () => console.log('next done!'))
-  }
-}
-
-function goPrev(items, refetch) {
-  if ( items ) {
-    refetch(
-      {
-        first: null,
-        after: null,
-        last: 3,
-        before: items.pageInfo.startCursor,
-        orderBy: null,
-      },
-      null,
-      () => console.log('prev done!'))
-  }
+function goPrev(connection, refetch) {
+  refetch(
+    {
+      first: null,
+      after: null,
+      last: 3,
+      before: connection.pageInfo.startCursor,
+      orderBy: null
+    },
+    null
+  );
 }
 
 // rename items to connection
-export function usePagination({items, refetch}: Props) {
-
+export function usePagination({ connection, refetch }: Props) {
   function handleNext() {
-    goNext(items, refetch)
+    goNext(connection, refetch);
   }
 
   function handlePrev() {
-    goPrev(items, refetch)
+    goPrev(connection, refetch);
   }
 
-  const nodes = 
-    items && items.edges
-      ? items.edges
-          .filter(Boolean)
-          .map(edge => edge.node)
-          .filter(Boolean)
-      : [];
+  const nodes = connection.edges
+    ? connection.edges
+        .filter(Boolean)
+        .map(edge => edge.node)
+        .filter(Boolean)
+    : [];
 
-  const hasPrev = items?.pageInfo.hasPreviousPage
-  const hasNext = items?.pageInfo.hasNextPage
+  const hasPrev = connection.pageInfo.hasPreviousPage;
+  const hasNext = connection.pageInfo.hasNextPage;
 
-  return { nodes, hasNext, hasPrev, handleNext, handlePrev }
+  return { nodes, hasNext, hasPrev, handleNext, handlePrev };
 }

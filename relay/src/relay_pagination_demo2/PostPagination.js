@@ -1,33 +1,39 @@
 // @flow
 /* globals $PropertyType */
 
-import React, { useContext } from 'react'
-import { usePagination } from './Pagination'
-import PostDetails from './PostDetails'
-import { PostFeedContext } from './PostFeedContext'
-import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
+import React, { useContext } from "react";
+import { usePagination } from "./Pagination";
+import PostDetails from "./PostDetails";
+import { PostFeedContext } from "./PostFeedContext";
+import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
-type PostConnection = $PropertyType<PostFeed_search, 'posts'>
-
-type Props = {| 
-  refetch: any,
-  posts: PostConnection,
-|}
+type PostConnection = $PropertyType<PostFeed_search, "posts">;
+type PostContext = {| refetch: any, posts: PostConnection |};
 
 const PostPagination = () => {
+  const { refetch, posts }: PostContext = useContext(PostFeedContext);
+  if (posts) {
+    const { nodes, hasNext, hasPrev, handleNext, handlePrev } = usePagination({
+      refetch,
+      connection: posts
+    });
 
-  const { refetch, posts }: Props = useContext(PostFeedContext)
-  const { nodes, hasNext, hasPrev, handleNext, handlePrev } = usePagination({ refetch, items: posts })
-
-  return (
-    <div>
+    return (
       <div>
-        {nodes.map(node => <PostDetails post={node} key={node.id}/>)}
+        <div>
+          {nodes.map(node => (
+            <PostDetails post={node} key={node.id} />
+          ))}
+        </div>
+        {hasPrev && <button onClick={handlePrev}>PREV</button>}
+        {hasNext && <button onClick={handleNext}>NEXT</button>}
       </div>
-      {hasPrev && <button onClick={handlePrev}>PREV</button>}
-      {hasNext && <button onClick={handleNext}>NEXT</button>}
-    </div>
-  )
-}
+    );
+  } else {
+    return (
+      <h1>Shit... no connection</h1>
+    )
+  }
+};
 
-export default PostPagination
+export default PostPagination;
