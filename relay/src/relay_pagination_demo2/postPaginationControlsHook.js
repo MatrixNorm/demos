@@ -1,10 +1,7 @@
 import { useState, useContext } from "react";
-import { PostFeedContext } from "./PostFeedContext";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
-export function usePostPaginationControls() {
-  const { refetch } = useContext(PostFeedContext);
-
+export function usePostPaginationControls(refetch) {
   const [config, setConfig] = useState({
     createdAt: { desc: false },
     viewsCount: { desc: true }

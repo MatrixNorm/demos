@@ -1,15 +1,17 @@
 // @flow
 
-import React from "react";
+import React, { useContext } from "react";
+import { PostFeedContext } from "./PostFeedContext";
 import { usePostPaginationControls } from "./postPaginationControlsHook";
 
 const PostPaginationControls_v1 = () => {
+  const { refetch } = useContext(PostFeedContext);
   const {
     config,
     activeField,
     handleActiveFieldChange,
     handleDirectionChange
-  } = usePostPaginationControls();
+  } = usePostPaginationControls(refetch);
 
   return (
     <div className="controls">
@@ -70,12 +72,13 @@ const PostPaginationControls_v1 = () => {
 };
 
 const PostPaginationControls_v2 = () => {
+  const { refetch } = useContext(PostFeedContext);
   const {
     config,
     activeField,
     handleActiveFieldChange,
     handleDirectionChange
-  } = usePostPaginationControls();
+  } = usePostPaginationControls(refetch);
 
   return (
     <div className="controls">
