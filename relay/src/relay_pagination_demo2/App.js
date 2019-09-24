@@ -50,7 +50,7 @@ const render = ({ error, props }: RenderProps) => {
     return <div style={{ color: "red" }}>Error: {error.message}</div>;
   }
   if (!props) {
-    return <div>Loading...</div>;
+    return <h1>Loading...</h1>;
   }
   return (
     <>

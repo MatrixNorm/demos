@@ -2,7 +2,7 @@
 
 import { createRefetchContainer, graphql, type RelayProp } from "react-relay";
 
-import React from "react";
+import React, { useState } from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import type { PostFeed_search as PostFeedType } from "./__generated__/PostFeed_search.graphql";
 
@@ -13,9 +13,18 @@ type PostFeedProps = {|
 |};
 
 const PostFeed = ({ relay, search, children }: PostFeedProps) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  function customRefetch(refetchVariables) {
+    if (!isLoading) {
+      setIsLoading(true);
+      relay.refetch(refetchVariables, null, () => setIsLoading(false));
+    }
+  }
+
   return (
     <PostFeedContext.Provider
-      value={{ refetch: relay.refetch, posts: search.posts }}
+      value={{ refetch: customRefetch, posts: search.posts, isLoading }}
     >
       {children}
     </PostFeedContext.Provider>

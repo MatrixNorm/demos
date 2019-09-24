@@ -19,9 +19,7 @@ export function usePostPaginationControls(refetch) {
         last: null,
         before: null,
         orderBy: { field, desc: config[field].desc }
-      },
-      null,
-      () => console.log("field change done!")
+      }
     );
   }
 
@@ -34,9 +32,7 @@ export function usePostPaginationControls(refetch) {
         last: null,
         before: null,
         orderBy: { field, desc }
-      },
-      null,
-      () => console.log("desc change done!")
+      }
     );
   }
 
