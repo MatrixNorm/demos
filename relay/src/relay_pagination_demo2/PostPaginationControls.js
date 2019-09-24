@@ -28,7 +28,12 @@ const PostPaginationControls_v1 = () => {
             type="checkbox"
             checked={config["createdAt"].desc}
             disabled={activeField !== "createdAt"}
-            onChange={e => handleDirectionChange(e, "createdAt")}
+            onChange={e =>
+              handleDirectionChange({
+                field: "createdAt",
+                desc: e.target.checked
+              })
+            }
           />
           desc
         </label>
@@ -50,7 +55,12 @@ const PostPaginationControls_v1 = () => {
             type="checkbox"
             checked={config["viewsCount"].desc}
             disabled={activeField !== "viewsCount"}
-            onChange={e => handleDirectionChange(e, "viewsCount")}
+            onChange={e =>
+              handleDirectionChange({
+                field: "viewsCount",
+                desc: e.target.checked
+              })
+            }
           />
           desc
         </label>
@@ -77,16 +87,17 @@ const PostPaginationControls_v2 = () => {
             checked={activeField === "createdAt"}
             onChange={() => handleActiveFieldChange("createdAt")}
           />
-          By creation date
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={config["createdAt"].desc}
-            disabled={activeField !== "createdAt"}
-            onChange={e => handleDirectionChange(e, "createdAt")}
-          />
-          desc
+          <button
+            type="button"
+            onClick={() =>
+              handleDirectionChange({
+                field: "createdAt",
+                desc: !config["createdAt"].desc
+              })
+            }
+          >
+            {config["createdAt"].desc ? "Recent first" : "Oldest first"}
+          </button>
         </label>
       </div>
       <div>
@@ -97,16 +108,19 @@ const PostPaginationControls_v2 = () => {
             checked={activeField === "viewsCount"}
             onChange={() => handleActiveFieldChange("viewsCount")}
           />
-          By views count
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={config["viewsCount"].desc}
-            disabled={activeField !== "viewsCount"}
-            onChange={e => handleDirectionChange(e, "viewsCount")}
-          />
-          desc
+          <button
+            type="button"
+            onClick={() =>
+              handleDirectionChange({
+                field: "viewsCount",
+                desc: !config["viewsCount"].desc
+              })
+            }
+          >
+            {config["viewsCount"].desc
+              ? "Most popular first"
+              : "Least popular first"}
+          </button>
         </label>
       </div>
     </div>

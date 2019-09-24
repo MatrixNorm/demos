@@ -28,15 +28,15 @@ export function usePostPaginationControls() {
     );
   }
 
-  function handleDirectionChange(e, fieldName) {
-    setConfig({ ...config, [fieldName]: { desc: e.target.checked } });
+  function handleDirectionChange({ field, desc }) {
+    setConfig({ ...config, [field]: { desc } });
     refetch(
       {
         first: 3,
         after: null,
         last: null,
         before: null,
-        orderBy: { field: fieldName, desc: e.target.checked }
+        orderBy: { field, desc }
       },
       null,
       () => console.log("desc change done!")
