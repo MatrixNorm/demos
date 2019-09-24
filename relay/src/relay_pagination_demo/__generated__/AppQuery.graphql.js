@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8c843d638f5f8df077a361d61d0ac6bb
+ * @relayHash d5708e3c2c7a3f887c438f7d5f951183
  */
 
 /* eslint-disable */
@@ -60,6 +60,7 @@ fragment PostFeed_search_sdb03 on PostSearch {
         id
         ...PostDetails_post
       }
+      cursor
     }
     pageInfo {
       hasNextPage
@@ -209,6 +210,13 @@ v4 = [
                 ]
               }
             ]
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "cursor",
+            "args": null,
+            "storageKey": null
           }
         ]
       },
@@ -316,7 +324,7 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  x1: search {\n    ...PostFeed_search_sdb03\n  }\n  x2: search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  x1: search {\n    ...PostFeed_search_sdb03\n  }\n  x2: search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };

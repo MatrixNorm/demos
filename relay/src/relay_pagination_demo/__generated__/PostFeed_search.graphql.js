@@ -18,7 +18,8 @@ export type PostFeed_search = {|
       +node: ?{|
         +id: string,
         +$fragmentRefs: PostDetails_post$ref,
-      |}
+      |},
+      +cursor: string,
     |}>,
     +pageInfo: {|
       +hasNextPage: boolean,
@@ -141,6 +142,13 @@ const node/*: ReaderFragment*/ = {
                   "args": null
                 }
               ]
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "cursor",
+              "args": null,
+              "storageKey": null
             }
           ]
         },
@@ -188,5 +196,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '9b15a791d9682be314693715731c984a';
+(node/*: any*/).hash = '67d3ca250c05489354323cfe7100b155';
 module.exports = node;

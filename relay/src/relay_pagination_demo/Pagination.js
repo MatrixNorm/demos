@@ -6,21 +6,26 @@
 */
 
 type Connection = {
- +pageInfo: PageInfo,
- +edges: $ReadOnlyArray<?PostEdge>,
-};
-
-type PageInfo = {
-  +hasNextPage: boolean,
-  +hasPreviousPage: boolean,
-  +startCursor?: ?string,
-  +endCursor?: ?string,
- };
-
-type PostEdge = {
- +node?: ?any,
- cursor: string,
-};
+  +pageInfo: PageInfo,
+  +edges: $ReadOnlyArray<?Edge>,
+ }
+ 
+ type PageInfo = {
+   +hasNextPage: boolean,
+   +hasPreviousPage: boolean,
+   +startCursor: ?string,
+   +endCursor: ?string,
+  }
+ 
+ type Edge = {
+  +node: Object,
+  +cursor: string,
+ }
+ 
+ type Props = {
+   items: ?Connection,
+   refetch: any,
+ }
 
 function goNext(items, refetch) {
   if ( items ) {
