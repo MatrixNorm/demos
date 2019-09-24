@@ -2,7 +2,7 @@
 /* globals $PropertyType */
 
 import React, { useContext } from "react";
-import { usePagination } from "./Pagination";
+import { pagination } from "./pagination";
 import PostDetails from "./PostDetails";
 import { PostFeedContext } from "./PostFeedContext";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
@@ -13,7 +13,7 @@ type PostContext = {| refetch: any, posts: PostConnection |};
 const PostPagination = () => {
   const { refetch, posts }: PostContext = useContext(PostFeedContext);
   if (posts) {
-    const { nodes, hasNext, hasPrev, handleNext, handlePrev } = usePagination({
+    const { nodes, hasNext, hasPrev, handleNext, handlePrev } = pagination({
       refetch,
       connection: posts
     });

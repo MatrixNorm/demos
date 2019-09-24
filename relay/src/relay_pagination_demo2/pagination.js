@@ -2,7 +2,7 @@
 /* globals $ReadOnlyArray */
 
 /*
-  Generic pagination hook.
+  Generic pagination helper.
 */
 
 type Connection = {
@@ -53,8 +53,7 @@ function goPrev(connection, refetch) {
   );
 }
 
-// rename items to connection
-export function usePagination({ connection, refetch }: Props) {
+export function pagination({ connection, refetch }: Props) {
   function handleNext() {
     goNext(connection, refetch);
   }
