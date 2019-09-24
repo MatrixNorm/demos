@@ -93,7 +93,7 @@ const PostPaginationControls_v2 = () => {
           <button
             type="button"
             onClick={() =>
-              handleDirectionChange({
+              (activeField === "createdAt") && handleDirectionChange({
                 field: "createdAt",
                 desc: !config["createdAt"].desc
               })
@@ -114,7 +114,7 @@ const PostPaginationControls_v2 = () => {
           <button
             type="button"
             onClick={() =>
-              handleDirectionChange({
+              (activeField === "viewsCount") && handleDirectionChange({
                 field: "viewsCount",
                 desc: !config["viewsCount"].desc
               })
