@@ -73,6 +73,7 @@ const PostPaginationControls_v1 = () => {
 
 const PostPaginationControls_v2 = () => {
   const { refetch } = useContext(PostFeedContext);
+
   const {
     config,
     activeField,
@@ -80,50 +81,48 @@ const PostPaginationControls_v2 = () => {
     handleDirectionChange
   } = usePostPaginationControls(refetch);
 
+  const Input = ({ field }) => (
+    <input
+      type="radio"
+      value={field}
+      checked={activeField === field}
+      onChange={() => handleActiveFieldChange(field)}
+    />
+  );
+
+  const Button = ({ field, children }) => (
+    <button
+      type="button"
+      onClick={() =>
+        activeField === field &&
+        handleDirectionChange({
+          field,
+          desc: !config[field].desc
+        })
+      }
+    >
+      {children}
+    </button>
+  );
+
   return (
     <div className="controls">
       <div>
         <label>
-          <input
-            type="radio"
-            value="createdAt"
-            checked={activeField === "createdAt"}
-            onChange={() => handleActiveFieldChange("createdAt")}
-          />
-          <button
-            type="button"
-            onClick={() =>
-              (activeField === "createdAt") && handleDirectionChange({
-                field: "createdAt",
-                desc: !config["createdAt"].desc
-              })
-            }
-          >
+          <Input field="createdAt" />
+          <Button field="createdAt">
             {config["createdAt"].desc ? "Recent first" : "Oldest first"}
-          </button>
+          </Button>
         </label>
       </div>
       <div>
         <label>
-          <input
-            type="radio"
-            value="viewsCount"
-            checked={activeField === "viewsCount"}
-            onChange={() => handleActiveFieldChange("viewsCount")}
-          />
-          <button
-            type="button"
-            onClick={() =>
-              (activeField === "viewsCount") && handleDirectionChange({
-                field: "viewsCount",
-                desc: !config["viewsCount"].desc
-              })
-            }
-          >
+          <Input field="viewsCount" />
+          <Button field="viewsCount">
             {config["viewsCount"].desc
               ? "Most popular first"
               : "Least popular first"}
-          </button>
+          </Button>
         </label>
       </div>
     </div>
