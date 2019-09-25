@@ -10,7 +10,7 @@ const store = new Store(new RecordSource());
 const network = Network.create(async (operation, variables) => {
   console.log(variables);
   console.log(operation.text);
-  await new Promise(resolve => setTimeout(resolve, 3000))
+  await new Promise(resolve => setTimeout(resolve, 1000))
   return await graphql(schema, operation.text, {}, undefined, variables);
 });
 

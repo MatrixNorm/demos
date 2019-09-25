@@ -1,11 +1,8 @@
 // @flow
 
 import db, { getIndex } from './database'
-import type { Node, User, PostOrdering, PostOrderingFields, QueryPostFeedArgs, QueryNodeArgs } from './graphql.types'
+import type { Node, User, PostOrdering, PostSearchPostsArgs, QueryNodeArgs } from './graphql.types'
 //import { PostOrderingValues } from './graphql.types'
-
-const x: PostOrderingFields = 'createdAt44'
-console.log(x)
 
 function paginate({itemId, count, orderBy}: {itemId: ?string, count: number, orderBy: PostOrdering}) {
   console.log(itemId, count, orderBy)
@@ -65,7 +62,7 @@ const resolvers = {
     },
   },
   PostSearch: {
-    posts: (_: mixed, args: QueryPostFeedArgs) => {
+    posts: (_: mixed, args: PostSearchPostsArgs) => {
       //console.log(args)
       const {first, after, last, before, orderBy} = args
   

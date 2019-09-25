@@ -1,7 +1,6 @@
 // @flow
 
 import { createRefetchContainer, graphql, type RelayProp } from "react-relay";
-
 import React, { useState } from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import type { PostFeed_search as PostFeedType } from "./__generated__/PostFeed_search.graphql";
