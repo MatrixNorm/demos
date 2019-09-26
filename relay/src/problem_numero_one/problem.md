@@ -1,11 +1,16 @@
 # Augmenting graphql query response with query arguments
 
+(link to all of the code: https://github.com/MatrixNorm/demos/tree/master/relay/src/problem_numero_one)
+
+Say I'm querying third party API about Pi number passing precision as parameter
 
 ```
 type Query {
   pi(precision: Int): Float
 }
 ```
+
+Usual Relay code:
 
 ```javascript
 const AppQuery = graphql`
@@ -38,15 +43,24 @@ const App = () => {
 };
 ```
 
+The problem is how to gracefully pass `precision` prop to the `PiComponent` component. 
+To be compliant with Realy it should be done by augmenting server response locally. Something in line with
+local resolvers or "virtual fields" like in Apollo.
 
 ```
+# what I'm asking
+
 query {
   pi(precision: 3)
 }
 
+# what I'm getting from server
+
 {
   pi: 3.142
 }
+
+# what I want to get
 
 {
   pi: 3.142,   // server field
@@ -62,3 +76,5 @@ or
   }  
 }
 ```
+
+How can I do this?
