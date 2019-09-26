@@ -1,5 +1,3 @@
-// @flow
-
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 
@@ -19,7 +17,7 @@ const render = ({ error, props }) => {
   if (!props) {
     return <h1>Loading...</h1>;
   }
-  return <PiComponent pi={props.pi} />;
+  return <PiComponent pi={props.pi} precision={props.precision} />;
 };
 
 const App = () => {

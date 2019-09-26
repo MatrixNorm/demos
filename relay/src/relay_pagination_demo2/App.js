@@ -21,7 +21,8 @@ const AppQuery = graphql`
     $after: String
     $last: Int
     $before: String
-    $orderBy: PostOrdering
+    $orderBy1: PostOrdering
+    $orderBy2: PostOrdering
   ) {
     x1: search {
       ...PostFeed_search
@@ -30,7 +31,7 @@ const AppQuery = graphql`
           after: $after
           last: $last
           before: $before
-          orderBy: $orderBy
+          orderBy: $orderBy1
         )
     }
     x2: search {
@@ -40,7 +41,7 @@ const AppQuery = graphql`
           after: $after
           last: $last
           before: $before
-          orderBy: $orderBy
+          orderBy: $orderBy2
         )
     }
   }
@@ -76,7 +77,12 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{ first: 3, after: null, orderBy: { field: "createdAt" } }}
+      variables={{
+        first: 3,
+        after: null,
+        orderBy1: { field: "createdAt" },
+        orderBy2: { field: "createdAt" }
+      }}
       render={render}
     />
   );

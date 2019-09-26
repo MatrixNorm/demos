@@ -6,34 +6,29 @@ export function usePostPaginationControls(refetch) {
     createdAt: { desc: false },
     viewsCount: { desc: true }
   });
-  const [activeField, setActiveField]: [PostOrderingFields, any] = useState(
-    "createdAt"
-  );
+  // XXX initial ordering
+  const [activeField, setActiveField]: [PostOrderingFields, any] = useState();
 
   function handleActiveFieldChange(field: PostOrderingFields) {
     setActiveField(field);
-    refetch(
-      {
-        first: 3,
-        after: null,
-        last: null,
-        before: null,
-        orderBy: { field, desc: config[field].desc }
-      }
-    );
+    refetch({
+      first: 3,
+      after: null,
+      last: null,
+      before: null,
+      orderBy: { field, desc: config[field].desc }
+    });
   }
 
   function handleDirectionChange({ field, desc }) {
     setConfig({ ...config, [field]: { desc } });
-    refetch(
-      {
-        first: 3,
-        after: null,
-        last: null,
-        before: null,
-        orderBy: { field, desc }
-      }
-    );
+    refetch({
+      first: 3,
+      after: null,
+      last: null,
+      before: null,
+      orderBy: { field, desc }
+    });
   }
 
   return {

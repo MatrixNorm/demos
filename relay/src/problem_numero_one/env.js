@@ -8,7 +8,12 @@ const resolvers = {
     pi: (_, { precision }) => {
       return Number(Math.PI.toFixed(precision));
     }
-  }
+  },
+  Node: {
+    __resolveType(node: Node) {
+      return node
+    }
+  },
 };
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });

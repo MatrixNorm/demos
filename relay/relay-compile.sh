@@ -1,10 +1,7 @@
-CLIENT_NAME=$1
-SERVER_NAME=$2
+CLIENT_PATH=$1
+SCHEMA_PATH=$2
 
-CLIENT_PATH=./src/$CLIENT_NAME
-SCHEMA_PATH=./src/$SERVER_NAME/schema.graphql
-
-echo "Client code: $CLIENT_NAME"
+echo "Client code: $CLIENT_PATH"
 echo "Server code: $SCHEMA_PATH"
 
 while inotifywait -e close_write $CLIENT_PATH $SCHEMA_PATH; 
