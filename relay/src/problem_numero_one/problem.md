@@ -1,4 +1,4 @@
-# Augmenting graphql query response with query arguments
+# Augmenting graphql response on the client
 
 Say I'm querying third party API about Pi number passing precision as parameter
 
