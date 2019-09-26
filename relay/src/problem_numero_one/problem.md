@@ -1,7 +1,5 @@
 # Augmenting graphql query response with query arguments
 
-(link to all of the code: https://github.com/MatrixNorm/demos/tree/master/relay/src/problem_numero_one)
-
 Say I'm querying third party API about Pi number passing precision as parameter
 
 ```
@@ -78,3 +76,5 @@ or
 ```
 
 How can I do this?
+
+(link to all of the code: https://github.com/MatrixNorm/demos/tree/master/relay/src/problem_numero_one)
