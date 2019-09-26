@@ -1,0 +1,8 @@
+
+type Query {
+  pi(precision: Int): Float
+}
+
+schema {
+  query: Query
+}
