@@ -1,13 +1,28 @@
+// @flow
+
 import { useState } from "react";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
-export function usePostPaginationControls(refetch) {
-  const [config, setConfig] = useState({
-    createdAt: { desc: false },
-    viewsCount: { desc: true }
-  });
-  // XXX initial ordering
-  const [activeField, setActiveField]: [PostOrderingFields, any] = useState();
+type OrderType = {|
+  field: PostOrderingFields,
+  desc: boolean
+|};
+
+export function usePostPaginationControls(refetch: any, initialOrder: OrderType) {
+  console.log(initialOrder)
+  const [config, setConfig] = useState(
+    Object.assign(
+      {
+        createdAt: { field: "createdAt", desc: false },
+        viewsCount: { field: "viewsCount", desc: true }
+      },
+      { [initialOrder.field]: initialOrder }
+    )
+  );
+
+  const [activeField, setActiveField]: [PostOrderingFields, any] = useState(
+    initialOrder.field
+  );
 
   function handleActiveFieldChange(field: PostOrderingFields) {
     setActiveField(field);
@@ -20,7 +35,7 @@ export function usePostPaginationControls(refetch) {
     });
   }
 
-  function handleDirectionChange({ field, desc }) {
+  function handleDirectionChange({ field, desc }: OrderType) {
     setConfig({ ...config, [field]: { desc } });
     refetch({
       first: 3,

@@ -5,13 +5,17 @@ import { PostFeedContext } from "./PostFeedContext";
 import { usePostPaginationControls } from "./postPaginationControlsHook";
 
 const PostPaginationControls_v1 = () => {
-  const { refetch } = useContext(PostFeedContext);
+  const {
+    refetch,
+    posts: { orderBy }
+  } = useContext(PostFeedContext);
+
   const {
     config,
     activeField,
     handleActiveFieldChange,
     handleDirectionChange
-  } = usePostPaginationControls(refetch);
+  } = usePostPaginationControls(refetch, orderBy);
 
   return (
     <div className="controls">
@@ -72,15 +76,18 @@ const PostPaginationControls_v1 = () => {
 };
 
 const PostPaginationControls_v2 = () => {
-  const { refetch } = useContext(PostFeedContext);
+  const {
+    refetch,
+    posts: { orderBy }
+  } = useContext(PostFeedContext);
 
   const {
     config,
     activeField,
     handleActiveFieldChange,
     handleDirectionChange
-  } = usePostPaginationControls(refetch);
-
+  } = usePostPaginationControls(refetch, orderBy);
+  console.log(777777777777777, orderBy);
   const Input = ({ field }) => (
     <input
       type="radio"
