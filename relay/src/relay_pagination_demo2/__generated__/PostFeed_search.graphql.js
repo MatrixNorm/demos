@@ -9,6 +9,7 @@
 /*::
 import type { ReaderFragment } from 'relay-runtime';
 type PostDetails_post$ref = any;
+export type PostOrderingFields = "createdAt" | "viewsCount";
 import type { FragmentReference } from "relay-runtime";
 declare export opaque type PostFeed_search$ref: FragmentReference;
 declare export opaque type PostFeed_search$fragmentType: PostFeed_search$ref;
@@ -26,6 +27,10 @@ export type PostFeed_search = {|
       +endCursor: ?string,
       +hasPreviousPage: boolean,
       +startCursor: ?string,
+    |},
+    +orderBy: ?{|
+      +field: PostOrderingFields,
+      +desc: ?boolean,
     |},
   |},
   +$refType: PostFeed_search$ref,
@@ -71,7 +76,7 @@ const node/*: ReaderFragment*/ = {
     {
       "kind": "LocalArgument",
       "name": "orderBy",
-      "type": "PostOrdering",
+      "type": "PostOrderingInput",
       "defaultValue": null
     }
   ],
@@ -190,11 +195,36 @@ const node/*: ReaderFragment*/ = {
               "storageKey": null
             }
           ]
+        },
+        {
+          "kind": "LinkedField",
+          "alias": null,
+          "name": "orderBy",
+          "storageKey": null,
+          "args": null,
+          "concreteType": "PostOrdering",
+          "plural": false,
+          "selections": [
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "field",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "desc",
+              "args": null,
+              "storageKey": null
+            }
+          ]
         }
       ]
     }
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '67d3ca250c05489354323cfe7100b155';
+(node/*: any*/).hash = 'e8b29ec1aa0b948bf2e048b158739847';
 module.exports = node;

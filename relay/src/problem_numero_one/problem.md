@@ -78,3 +78,7 @@ or
 How can I do this?
 
 (link to all of the code: https://github.com/MatrixNorm/demos/tree/master/relay/src/problem_numero_one)
+
+## Possible solutions
+
+1. https://www.reactjunkie.com/relay-schema-stitching

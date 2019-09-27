@@ -11,6 +11,7 @@ type Post implements Node {
 type PostConnection {
   pageInfo: PageInfo!
   edges: [PostEdge]!
+  orderBy: PostOrdering
 }
 
 type PostEdge {
@@ -40,7 +41,12 @@ enum PostOrderingFields {
   viewsCount
 }
 
-input PostOrdering {
+type PostOrdering {
+  field: PostOrderingFields!
+  desc: Boolean
+}
+
+input PostOrderingInput {
   field: PostOrderingFields!
   desc: Boolean
 }
@@ -60,7 +66,7 @@ type PostSearch {
     first: Int,
     before: String,
     last: Int,
-    orderBy: PostOrdering
+    orderBy: PostOrderingInput
   ): PostConnection
 }
 

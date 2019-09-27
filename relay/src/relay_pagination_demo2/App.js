@@ -21,8 +21,8 @@ const AppQuery = graphql`
     $after: String
     $last: Int
     $before: String
-    $orderBy1: PostOrdering
-    $orderBy2: PostOrdering
+    $orderBy1: PostOrderingInput
+    $orderBy2: PostOrderingInput
   ) {
     x1: search {
       ...PostFeed_search
@@ -81,7 +81,7 @@ const App = () => {
         first: 3,
         after: null,
         orderBy1: { field: "createdAt" },
-        orderBy2: { field: "createdAt" }
+        orderBy2: { field: "viewsCount", desc: true }
       }}
       render={render}
     />

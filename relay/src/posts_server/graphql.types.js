@@ -37,6 +37,7 @@ export type PostConnection = {
    __typename?: 'PostConnection',
   pageInfo: PageInfo,
   edges: Array<?PostEdge>,
+  orderBy?: ?PostOrdering,
 };
 
 export type PostEdge = {
@@ -46,6 +47,7 @@ export type PostEdge = {
 };
 
 export type PostOrdering = {
+   __typename?: 'PostOrdering',
   field: PostOrderingFields,
   desc?: ?$ElementType<Scalars, 'Boolean'>,
 };
@@ -57,6 +59,11 @@ export const PostOrderingFieldsValues = Object.freeze({
 
 
 export type PostOrderingFields = $Values<typeof PostOrderingFieldsValues>;
+
+export type PostOrderingInput = {
+  field: PostOrderingFields,
+  desc?: ?$ElementType<Scalars, 'Boolean'>,
+};
 
 /** 
  * Need this because currently it is impossible to
@@ -87,7 +94,7 @@ export type PostSearchPostsArgs = {
   first?: ?$ElementType<Scalars, 'Int'>,
   before?: ?$ElementType<Scalars, 'String'>,
   last?: ?$ElementType<Scalars, 'Int'>,
-  orderBy?: ?PostOrdering
+  orderBy?: ?PostOrderingInput
 };
 
 export type Query = {

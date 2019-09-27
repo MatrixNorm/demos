@@ -40,7 +40,7 @@ export default createRefetchContainer(
           after: { type: "String" }
           last: { type: "Int" }
           before: { type: "String" }
-          orderBy: { type: "PostOrdering" }
+          orderBy: { type: "PostOrderingInput" }
         ) {
         posts(
           first: $first
@@ -62,6 +62,10 @@ export default createRefetchContainer(
             hasPreviousPage
             startCursor
           }
+          orderBy {
+            field
+            desc
+          }
         }
       }
     `
@@ -72,7 +76,7 @@ export default createRefetchContainer(
       $after: String
       $last: Int
       $before: String
-      $orderBy: PostOrdering
+      $orderBy: PostOrderingInput
     ) {
       search {
         ...PostFeed_search

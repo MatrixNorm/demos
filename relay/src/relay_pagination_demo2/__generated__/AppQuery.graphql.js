@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8cedeffec9b631a60c750e78f4754f3d
+ * @relayHash 89b5ab285993c0ba6c97fab9a9976e60
  */
 
 /* eslint-disable */
@@ -11,7 +11,7 @@
 import type { ConcreteRequest } from 'relay-runtime';
 type PostFeed_search$ref = any;
 export type PostOrderingFields = "createdAt" | "viewsCount";
-export type PostOrdering = {|
+export type PostOrderingInput = {|
   field: PostOrderingFields,
   desc?: ?boolean,
 |};
@@ -20,8 +20,8 @@ export type AppQueryVariables = {|
   after?: ?string,
   last?: ?number,
   before?: ?string,
-  orderBy1?: ?PostOrdering,
-  orderBy2?: ?PostOrdering,
+  orderBy1?: ?PostOrderingInput,
+  orderBy2?: ?PostOrderingInput,
 |};
 export type AppQueryResponse = {|
   +x1: ?{|
@@ -44,8 +44,8 @@ query AppQuery(
   $after: String
   $last: Int
   $before: String
-  $orderBy1: PostOrdering
-  $orderBy2: PostOrdering
+  $orderBy1: PostOrderingInput
+  $orderBy2: PostOrderingInput
 ) {
   x1: search {
     ...PostFeed_search_1OAY3Y
@@ -70,6 +70,10 @@ fragment PostFeed_search_1OAY3Y on PostSearch {
       hasPreviousPage
       startCursor
     }
+    orderBy {
+      field
+      desc
+    }
   }
 }
 
@@ -87,6 +91,10 @@ fragment PostFeed_search_2s0h7U on PostSearch {
       endCursor
       hasPreviousPage
       startCursor
+    }
+    orderBy {
+      field
+      desc
     }
   }
 }
@@ -129,13 +137,13 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "orderBy1",
-    "type": "PostOrdering",
+    "type": "PostOrderingInput",
     "defaultValue": null
   },
   {
     "kind": "LocalArgument",
     "name": "orderBy2",
-    "type": "PostOrdering",
+    "type": "PostOrderingInput",
     "defaultValue": null
   }
 ],
@@ -283,6 +291,31 @@ v8 = [
         "storageKey": null
       }
     ]
+  },
+  {
+    "kind": "LinkedField",
+    "alias": null,
+    "name": "orderBy",
+    "storageKey": null,
+    "args": null,
+    "concreteType": "PostOrdering",
+    "plural": false,
+    "selections": [
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "field",
+        "args": null,
+        "storageKey": null
+      },
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "desc",
+        "args": null,
+        "storageKey": null
+      }
+    ]
   }
 ];
 return {
@@ -381,11 +414,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy1: PostOrdering\n  $orderBy2: PostOrdering\n) {\n  x1: search {\n    ...PostFeed_search_1OAY3Y\n  }\n  x2: search {\n    ...PostFeed_search_2s0h7U\n  }\n}\n\nfragment PostFeed_search_1OAY3Y on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy1) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostFeed_search_2s0h7U on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy2) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy1: PostOrderingInput\n  $orderBy2: PostOrderingInput\n) {\n  x1: search {\n    ...PostFeed_search_1OAY3Y\n  }\n  x2: search {\n    ...PostFeed_search_2s0h7U\n  }\n}\n\nfragment PostFeed_search_1OAY3Y on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy1) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n    orderBy {\n      field\n      desc\n    }\n  }\n}\n\nfragment PostFeed_search_2s0h7U on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy2) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n    orderBy {\n      field\n      desc\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '5817f3132de59e64404f384908a4ed76';
+(node/*: any*/).hash = '43fd0e3d2efacdc02b05da638afccd82';
 module.exports = node;

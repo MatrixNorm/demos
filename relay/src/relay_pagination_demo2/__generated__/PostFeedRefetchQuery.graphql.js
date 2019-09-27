@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 0ed38b174deb46aee91d1b4ebb59221f
+ * @relayHash 24c8e920e366cece002321215cf438b1
  */
 
 /* eslint-disable */
@@ -11,7 +11,7 @@
 import type { ConcreteRequest } from 'relay-runtime';
 type PostFeed_search$ref = any;
 export type PostOrderingFields = "createdAt" | "viewsCount";
-export type PostOrdering = {|
+export type PostOrderingInput = {|
   field: PostOrderingFields,
   desc?: ?boolean,
 |};
@@ -20,7 +20,7 @@ export type PostFeedRefetchQueryVariables = {|
   after?: ?string,
   last?: ?number,
   before?: ?string,
-  orderBy?: ?PostOrdering,
+  orderBy?: ?PostOrderingInput,
 |};
 export type PostFeedRefetchQueryResponse = {|
   +search: ?{|
@@ -40,7 +40,7 @@ query PostFeedRefetchQuery(
   $after: String
   $last: Int
   $before: String
-  $orderBy: PostOrdering
+  $orderBy: PostOrderingInput
 ) {
   search {
     ...PostFeed_search_sdb03
@@ -61,6 +61,10 @@ fragment PostFeed_search_sdb03 on PostSearch {
       endCursor
       hasPreviousPage
       startCursor
+    }
+    orderBy {
+      field
+      desc
     }
   }
 }
@@ -103,7 +107,7 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "orderBy",
-    "type": "PostOrdering",
+    "type": "PostOrderingInput",
     "defaultValue": null
   }
 ],
@@ -285,6 +289,31 @@ return {
                     "storageKey": null
                   }
                 ]
+              },
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "orderBy",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "PostOrdering",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "field",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "desc",
+                    "args": null,
+                    "storageKey": null
+                  }
+                ]
               }
             ]
           }
@@ -296,11 +325,11 @@ return {
     "operationKind": "query",
     "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrderingInput\n) {\n  search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n    orderBy {\n      field\n      desc\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '9c6ef317765decf6a45785a63e33f4f1';
+(node/*: any*/).hash = '52790b83b09c697f566a5f4bd612c8d8';
 module.exports = node;

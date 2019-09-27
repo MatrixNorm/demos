@@ -12,7 +12,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const builds = {};
 
-const baseBuild = ({ buildId }) => env => {
+const baseBuild = ({ buildId, pathToMainModule }) => env => {
 
   const outputPath = 
     env.development? 
@@ -23,7 +23,7 @@ const baseBuild = ({ buildId }) => env => {
 
   return {
     entry: {
-        "main": `./src/${buildId}/main.js`
+        "main": pathToMainModule || `./src/${buildId}/main.js`
     },
     output: {
         path: path.resolve(__dirname, outputPath),
