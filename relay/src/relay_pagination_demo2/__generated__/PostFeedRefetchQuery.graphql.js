@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 24c8e920e366cece002321215cf438b1
+ * @relayHash 4ba7904c6bcb1274bb16a94046dd9e1c
  */
 
 /* eslint-disable */
@@ -13,7 +13,7 @@ type PostFeed_search$ref = any;
 export type PostOrderingFields = "createdAt" | "viewsCount";
 export type PostOrderingInput = {|
   field: PostOrderingFields,
-  desc?: ?boolean,
+  desc: boolean,
 |};
 export type PostFeedRefetchQueryVariables = {|
   first?: ?number,

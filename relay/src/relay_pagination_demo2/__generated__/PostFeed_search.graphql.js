@@ -30,7 +30,7 @@ export type PostFeed_search = {|
     |},
     +orderBy: ?{|
       +field: PostOrderingFields,
-      +desc: ?boolean,
+      +desc: boolean,
     |},
   |},
   +$refType: PostFeed_search$ref,

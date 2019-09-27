@@ -49,7 +49,7 @@ export type PostEdge = {
 export type PostOrdering = {
    __typename?: 'PostOrdering',
   field: PostOrderingFields,
-  desc?: ?$ElementType<Scalars, 'Boolean'>,
+  desc: $ElementType<Scalars, 'Boolean'>,
 };
 
 export const PostOrderingFieldsValues = Object.freeze({
@@ -62,7 +62,7 @@ export type PostOrderingFields = $Values<typeof PostOrderingFieldsValues>;
 
 export type PostOrderingInput = {
   field: PostOrderingFields,
-  desc?: ?$ElementType<Scalars, 'Boolean'>,
+  desc: $ElementType<Scalars, 'Boolean'>,
 };
 
 /** 

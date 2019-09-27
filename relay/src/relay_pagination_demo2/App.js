@@ -80,7 +80,7 @@ const App = () => {
       variables={{
         first: 3,
         after: null,
-        orderBy1: { field: "createdAt" },
+        orderBy1: { field: "createdAt", desc: true },
         orderBy2: { field: "viewsCount", desc: true }
       }}
       render={render}
