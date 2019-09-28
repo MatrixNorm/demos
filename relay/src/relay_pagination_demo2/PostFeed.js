@@ -13,7 +13,7 @@ type PostFeedProps = {|
 
 const PostFeed = ({ relay, search, children }: PostFeedProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  console.log({search})
+  console.log(55555555555)
   function customRefetch(refetchVariables) {
     if (!isLoading) {
       setIsLoading(true);

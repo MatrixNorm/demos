@@ -53,6 +53,7 @@ const render = ({ error, props }: RenderProps) => {
   if (!props) {
     return <h1>Loading...</h1>;
   }
+  console.log(444444444444)
   return (
     <>
       {props.x1 && (

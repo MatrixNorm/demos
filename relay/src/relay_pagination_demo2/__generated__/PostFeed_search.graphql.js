@@ -8,7 +8,7 @@
 
 /*::
 import type { ReaderFragment } from 'relay-runtime';
-type PostDetails_post$ref = any;
+import type { PostDetails_post$ref } from "./PostDetails_post.graphql";
 export type PostOrderingFields = "createdAt" | "viewsCount";
 import type { FragmentReference } from "relay-runtime";
 declare export opaque type PostFeed_search$ref: FragmentReference;

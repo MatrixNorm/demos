@@ -5,7 +5,10 @@ echo "Client code: $CLIENT_PATH"
 echo "Server code: $SCHEMA_PATH"
 
 while inotifywait -e close_write $CLIENT_PATH $SCHEMA_PATH; 
-do npx relay-compiler --src $CLIENT_PATH --schema $SCHEMA_PATH --noFutureProofEnums; 
+do npx relay-compiler --src $CLIENT_PATH \
+                      --schema $SCHEMA_PATH \
+                      --artifactDirectory $CLIENT_PATH/__generated__ \
+                      --noFutureProofEnums; 
 done
 
 # PROJ_NAME=$1

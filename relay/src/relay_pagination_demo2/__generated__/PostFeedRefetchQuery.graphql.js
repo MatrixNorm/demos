@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 4ba7904c6bcb1274bb16a94046dd9e1c
+ * @relayHash 7505a7a4e9737bf2924e9edbb4b46404
  */
 
 /* eslint-disable */
@@ -9,7 +9,7 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type PostFeed_search$ref = any;
+import type { PostFeed_search$ref } from "./PostFeed_search.graphql";
 export type PostOrderingFields = "createdAt" | "viewsCount";
 export type PostOrderingInput = {|
   field: PostOrderingFields,
