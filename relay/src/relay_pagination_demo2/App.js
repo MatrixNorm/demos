@@ -8,12 +8,8 @@ import PostFeed from "./PostFeed";
 import PostPagination from "./PostPagination";
 import PostPaginationControls from "./PostPaginationControls";
 
-import type { AppQueryResponse } from "./__generated__/AppQuery.graphql";
-
-type RenderProps = {|
-  +error: Error,
-  +props: AppQueryResponse
-|};
+import type { PostOrderingInput } from "./__generated__/AppQuery.graphql";
+import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
 const AppQuery = graphql`
   query AppQuery(
@@ -46,6 +42,15 @@ const AppQuery = graphql`
     }
   }
 `;
+
+type RenderProps = {|
+  +error: Error,
+  +props: {|
+    x1: ?PostFeed_search,
+    x2: ?PostFeed_search
+  |}
+|};
+
 const render = ({ error, props }: RenderProps) => {
   if (error) {
     return <div style={{ color: "red" }}>Error: {error.message}</div>;
@@ -53,10 +58,10 @@ const render = ({ error, props }: RenderProps) => {
   if (!props) {
     return <h1>Loading...</h1>;
   }
-  console.log(444444444444)
+  // XXX flow does not ask to checks if props.x1 is not null
   return (
     <>
-      {props.x1 && (
+      {props.x2 && (
         <PostFeed search={props.x1}>
           <PostPaginationControls.v1 />
           <PostPagination />
@@ -74,6 +79,8 @@ const render = ({ error, props }: RenderProps) => {
 };
 
 const App = () => {
+  const orderBy1: PostOrderingInput = { field: "createdAt", desc: true };
+  const orderBy2: PostOrderingInput = { field: "viewsCount", desc: true };
   return (
     <QueryRenderer
       query={AppQuery}
@@ -81,8 +88,8 @@ const App = () => {
       variables={{
         first: 3,
         after: null,
-        orderBy1: { field: "createdAt", desc: true },
-        orderBy2: { field: "viewsCount", desc: true }
+        orderBy1,
+        orderBy2
       }}
       render={render}
     />
