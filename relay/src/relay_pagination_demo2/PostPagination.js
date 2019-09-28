@@ -1,18 +1,12 @@
 // @flow
-/* globals $PropertyType $NonMaybeType */
 
 import React, { useContext } from "react";
 import { pagination } from "./pagination";
 import PostDetails from "./PostDetails";
-import {
-  PostFeedContext,
-  type PostFeedContextValueType
-} from "./PostFeedContext";
+import { PostFeedContext } from "./PostFeedContext";
 
 const PostPagination = () => {
-  const { refetch, posts, isLoading }: PostFeedContextValueType = useContext(
-    PostFeedContext
-  );
+  const { refetch, posts, isLoading } = useContext(PostFeedContext);
 
   if (posts) {
     const { nodes, hasNext, hasPrev, handleNext, handlePrev } = pagination({

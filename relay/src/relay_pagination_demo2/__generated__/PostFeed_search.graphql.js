@@ -28,7 +28,7 @@ export type PostFeed_search = {|
       +hasPreviousPage: boolean,
       +startCursor: ?string,
     |},
-    +orderBy: ?{|
+    +orderBy: {|
       +field: PostOrderingFields,
       +desc: boolean,
     |},

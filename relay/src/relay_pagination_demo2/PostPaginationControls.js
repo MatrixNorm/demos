@@ -16,7 +16,7 @@ const PostPaginationControls_v1 = () => {
     handleActiveFieldChange,
     handleDirectionChange
   } = usePostPaginationControls(refetch, orderBy);
-  console.log(88888888888888, orderBy);
+
   return (
     <div className="controls">
       <div>
@@ -87,7 +87,7 @@ const PostPaginationControls_v2 = () => {
     handleActiveFieldChange,
     handleDirectionChange
   } = usePostPaginationControls(refetch, orderBy);
-  console.log(777777777777777, orderBy);
+
   const Input = ({ field }) => (
     <input
       type="radio"

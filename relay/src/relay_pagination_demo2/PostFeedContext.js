@@ -1,15 +1,15 @@
 // @flow
-/* globals $PropertyType $NonMaybeType */
+/* globals $PropertyType $NonMaybeType React$Context */
 
-import { createContext } from 'react'
+import { createContext } from "react";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
-type PostConnection = $NonMaybeType<$PropertyType<PostFeed_search, "posts">>;
+export type PostConnection = $NonMaybeType<$PropertyType<PostFeed_search, "posts">>;
 
 export type PostFeedContextValueType = {|
   refetch: any,
-  posts: ?PostConnection,
+  posts: PostConnection,
   isLoading: boolean
 |};
 
-export const PostFeedContext: React$Context<PostFeedContextValueType> = createContext()
+export const PostFeedContext: React$Context<PostFeedContextValueType> = createContext();

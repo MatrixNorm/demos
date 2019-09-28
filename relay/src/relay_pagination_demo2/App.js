@@ -58,16 +58,16 @@ const render = ({ error, props }: RenderProps) => {
   if (!props) {
     return <h1>Loading...</h1>;
   }
-  // XXX flow does not ask to checks if props.x1 is not null
+  // XXX flow does not type check here at all !!!
   return (
     <>
-      {props.x2 && (
+      {props.x1  && (
         <PostFeed search={props.x1}>
           <PostPaginationControls.v1 />
           <PostPagination />
         </PostFeed>
       )}
-      {props.x2 && (
+      {props.x2  && (
         <PostFeed search={props.x2}>
           <PostPagination />
           <br />

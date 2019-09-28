@@ -37,7 +37,7 @@ export type PostConnection = {
    __typename?: 'PostConnection',
   pageInfo: PageInfo,
   edges: Array<?PostEdge>,
-  orderBy?: ?PostOrdering,
+  orderBy: PostOrdering,
 };
 
 export type PostEdge = {

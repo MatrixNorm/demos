@@ -11,7 +11,7 @@ type Post implements Node {
 type PostConnection {
   pageInfo: PageInfo!
   edges: [PostEdge]!
-  orderBy: PostOrdering
+  orderBy: PostOrdering!
 }
 
 type PostEdge {
