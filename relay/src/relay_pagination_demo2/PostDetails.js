@@ -1,13 +1,13 @@
 // @flow
 
-import { createFragmentContainer, graphql } from 'react-relay'
-import React from 'react'
+import { createFragmentContainer, graphql } from "react-relay";
+import React from "react";
 
-import type { PostDetails_post as PostDetailsType } from './__generated__/PostDetails_post.graphql'
+import type { PostDetails_post as PostDetailsType } from "./__generated__/PostDetails_post.graphql";
 
 type Props = {|
   +post: PostDetailsType
-|}
+|};
 
 const PostDetails = (props: Props) => {
   const post = props.post;
@@ -16,8 +16,8 @@ const PostDetails = (props: Props) => {
       <h1>{post.title}</h1>
       <h3>by {post.author.name}</h3>
     </div>
-  )
-}
+  );
+};
 
 export default createFragmentContainer(PostDetails, {
   post: graphql`
@@ -28,4 +28,4 @@ export default createFragmentContainer(PostDetails, {
       }
     }
   `
-})
+});

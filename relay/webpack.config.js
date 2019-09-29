@@ -6,10 +6,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-// function PP(obj) {
-//   console.log(util.inspect(obj, {showHidden: false, depth: null}))
-// }
-
 const builds = {};
 
 const baseBuild = ({ buildId, pathToMainModule }) => env => {
@@ -53,8 +49,7 @@ const baseBuild = ({ buildId, pathToMainModule }) => env => {
                 [
                   "relay",
                   {
-                    artifactDirectory:
-                      `./src/${buildId}/__generated__`
+                    artifactDirectory: `./src/${buildId}/__generated__`
                   }
                 ],
                 "@babel/proposal-class-properties",
@@ -85,6 +80,7 @@ registerBuild("relay_pagination_demo2");
 registerBuild("hooks_vs_render_props");
 registerBuild("generators_and_stuff");
 registerBuild("problem_numero_one");
+registerBuild("problem_connection_fragment");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
