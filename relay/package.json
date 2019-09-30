@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "codemirror-graphql": "^0.9.0",
+    "graphiql": "^0.14.2",
     "graphql": "^14.4.2",
     "graphql-tools": "^4.0.5",
     "preact-render-to-string": "^3.6.3",

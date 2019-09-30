@@ -28,7 +28,11 @@ const baseBuild = ({ buildId, pathToMainModule }) => env => {
       contentBase: `jsdev/${buildId}`
     },
     devtool: "source-map",
-    plugins: [new HtmlWebpackPlugin()],
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: `src/${buildId}/index.html`
+      })
+    ],
     resolve: {
       extensions: [".mjs", ".js", ".jsx"]
     },
@@ -81,6 +85,7 @@ registerBuild("hooks_vs_render_props");
 registerBuild("generators_and_stuff");
 registerBuild("problem_numero_one");
 registerBuild("problem_connection_fragment");
+registerBuild("graphiql_demo");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;

@@ -4,7 +4,6 @@ import City from "./City";
 
 const CitiesList = ({ conn }) => {
   const { edges } = conn;
-  console.log(edges.map(e => e.node))
   return (
     <div>
       <div>
