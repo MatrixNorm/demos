@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 9f5d7298b0c8d6611f5c4254c55bebe7
+ * @relayHash f322f21c374c5635ce6be5bb24177c86
  */
 
 /* eslint-disable */
@@ -9,28 +9,30 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-import type { CitiesList_conn$ref } from "./CitiesList_conn.graphql";
-export type AppQueryVariables = {|
+import type { CitiesPagination_cities$ref } from "./CitiesPagination_cities.graphql";
+export type CitiesPaginationRefetchQueryVariables = {|
   first?: ?number,
   after?: ?string,
 |};
-export type AppQueryResponse = {|
-  +cities: ?{|
-    +$fragmentRefs: CitiesList_conn$ref
-  |}
+export type CitiesPaginationRefetchQueryResponse = {|
+  +$fragmentRefs: CitiesPagination_cities$ref
 |};
-export type AppQuery = {|
-  variables: AppQueryVariables,
-  response: AppQueryResponse,
+export type CitiesPaginationRefetchQuery = {|
+  variables: CitiesPaginationRefetchQueryVariables,
+  response: CitiesPaginationRefetchQueryResponse,
 |};
 */
 
 
 /*
-query AppQuery(
+query CitiesPaginationRefetchQuery(
   $first: Int
   $after: String
 ) {
+  ...CitiesPagination_cities_2HEEH6
+}
+
+fragment CitiesPagination_cities_2HEEH6 on Query {
   cities(first: $first, after: $after) {
     ...CitiesList_conn
   }
@@ -90,32 +92,21 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "AppQuery",
+    "name": "CitiesPaginationRefetchQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
-        "kind": "LinkedField",
-        "alias": null,
-        "name": "cities",
-        "storageKey": null,
-        "args": (v1/*: any*/),
-        "concreteType": "CityConnection",
-        "plural": false,
-        "selections": [
-          {
-            "kind": "FragmentSpread",
-            "name": "CitiesList_conn",
-            "args": null
-          }
-        ]
+        "kind": "FragmentSpread",
+        "name": "CitiesPagination_cities",
+        "args": (v1/*: any*/)
       }
     ]
   },
   "operation": {
     "kind": "Operation",
-    "name": "AppQuery",
+    "name": "CitiesPaginationRefetchQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -229,13 +220,13 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "AppQuery",
+    "name": "CitiesPaginationRefetchQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n) {\n  cities(first: $first, after: $after) {\n    ...CitiesList_conn\n  }\n}\n\nfragment CitiesList_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
+    "text": "query CitiesPaginationRefetchQuery(\n  $first: Int\n  $after: String\n) {\n  ...CitiesPagination_cities_2HEEH6\n}\n\nfragment CitiesPagination_cities_2HEEH6 on Query {\n  cities(first: $first, after: $after) {\n    ...CitiesList_conn\n  }\n}\n\nfragment CitiesList_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'd7dfa54bd8624c820e2009f0cd4544af';
+(node/*: any*/).hash = '69b23d1f3d5cda741b950cefd6d2e6ae';
 module.exports = node;

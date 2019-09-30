@@ -1,3 +1,5 @@
+/*eslint-disable */
+
 import React, { useRef } from "react";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
@@ -29,7 +31,7 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 async function fetcher(graphQLParams) {
-  console.log(graphQLParams)
+  console.log(graphQLParams);
   const resp = await graphql(schema, graphQLParams.query, {}, undefined, {});
   console.log(resp);
   return resp;

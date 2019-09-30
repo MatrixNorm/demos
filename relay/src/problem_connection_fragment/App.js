@@ -5,8 +5,8 @@ import environment from "./env";
 import CitiesList from "./CitiesList";
 
 const AppQuery = graphql`
-  query AppQuery {
-    cities {
+  query AppQuery($first: Int, $after: String) {
+    cities(first: $first, after: $after) {
       ...CitiesList_conn
     }
   }
@@ -27,7 +27,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{}}
+      variables={{ first: 3, after: null }}
       render={render}
     />
   );

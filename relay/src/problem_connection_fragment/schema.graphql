@@ -4,7 +4,10 @@ interface Node {
 
 type Query {
   node(id: ID!): Node
-  cities: CityConnection
+  cities(
+    first: Int,
+    after: String
+  ): CityConnection
 }
 
 type CityConnection {
