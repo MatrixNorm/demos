@@ -10,9 +10,9 @@
 import type { ReaderFragment } from 'relay-runtime';
 import type { City_city$ref } from "./City_city.graphql";
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type CitiesPage_conn$ref: FragmentReference;
-declare export opaque type CitiesPage_conn$fragmentType: CitiesPage_conn$ref;
-export type CitiesPage_conn = {|
+declare export opaque type CityList_cities$ref: FragmentReference;
+declare export opaque type CityList_cities$fragmentType: CityList_cities$ref;
+export type CityList_cities = {|
   +edges: $ReadOnlyArray<?{|
     +node: {|
       +id: string,
@@ -20,25 +20,19 @@ export type CitiesPage_conn = {|
     |},
     +cursor: string,
   |}>,
-  +pageInfo: {|
-    +hasNextPage: boolean,
-    +endCursor: ?string,
-    +hasPreviousPage: boolean,
-    +startCursor: ?string,
-  |},
-  +$refType: CitiesPage_conn$ref,
+  +$refType: CityList_cities$ref,
 |};
-export type CitiesPage_conn$data = CitiesPage_conn;
-export type CitiesPage_conn$key = {
-  +$data?: CitiesPage_conn$data,
-  +$fragmentRefs: CitiesPage_conn$ref,
+export type CityList_cities$data = CityList_cities;
+export type CityList_cities$key = {
+  +$data?: CityList_cities$data,
+  +$fragmentRefs: CityList_cities$ref,
 };
 */
 
 
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
-  "name": "CitiesPage_conn",
+  "name": "CityList_cities",
   "type": "CityConnection",
   "metadata": null,
   "argumentDefinitions": [],
@@ -83,48 +77,9 @@ const node/*: ReaderFragment*/ = {
           "storageKey": null
         }
       ]
-    },
-    {
-      "kind": "LinkedField",
-      "alias": null,
-      "name": "pageInfo",
-      "storageKey": null,
-      "args": null,
-      "concreteType": "PageInfo",
-      "plural": false,
-      "selections": [
-        {
-          "kind": "ScalarField",
-          "alias": null,
-          "name": "hasNextPage",
-          "args": null,
-          "storageKey": null
-        },
-        {
-          "kind": "ScalarField",
-          "alias": null,
-          "name": "endCursor",
-          "args": null,
-          "storageKey": null
-        },
-        {
-          "kind": "ScalarField",
-          "alias": null,
-          "name": "hasPreviousPage",
-          "args": null,
-          "storageKey": null
-        },
-        {
-          "kind": "ScalarField",
-          "alias": null,
-          "name": "startCursor",
-          "args": null,
-          "storageKey": null
-        }
-      ]
     }
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '324b950e0e2cedccd2a66fc1b190d01c';
+(node/*: any*/).hash = 'f99a492cf397f193e89c4884eb52bbdf';
 module.exports = node;

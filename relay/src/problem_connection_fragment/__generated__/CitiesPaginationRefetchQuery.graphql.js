@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 082053afdfa3d3c36c8aa0b67f597477
+ * @relayHash b2fe7f3313158bc4b8f8633a0dc9bf02
  */
 
 /* eslint-disable */
@@ -9,13 +9,13 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-import type { CitiesPagination_cities$ref } from "./CitiesPagination_cities.graphql";
+import type { CitiesPagination_page$ref } from "./CitiesPagination_page.graphql";
 export type CitiesPaginationRefetchQueryVariables = {|
   first?: ?number,
   after?: ?string,
 |};
 export type CitiesPaginationRefetchQueryResponse = {|
-  +$fragmentRefs: CitiesPagination_cities$ref
+  +$fragmentRefs: CitiesPagination_page$ref
 |};
 export type CitiesPaginationRefetchQuery = {|
   variables: CitiesPaginationRefetchQueryVariables,
@@ -29,28 +29,28 @@ query CitiesPaginationRefetchQuery(
   $first: Int
   $after: String
 ) {
-  ...CitiesPagination_cities_2HEEH6
+  ...CitiesPagination_page_2HEEH6
 }
 
-fragment CitiesPagination_cities_2HEEH6 on Query {
+fragment CitiesPagination_page_2HEEH6 on Query {
   cities(first: $first, after: $after) {
-    ...CitiesPage_conn
+    ...CityList_cities
+    pageInfo {
+      hasNextPage
+      endCursor
+      hasPreviousPage
+      startCursor
+    }
   }
 }
 
-fragment CitiesPage_conn on CityConnection {
+fragment CityList_cities on CityConnection {
   edges {
     node {
       id
       ...City_city
     }
     cursor
-  }
-  pageInfo {
-    hasNextPage
-    endCursor
-    hasPreviousPage
-    startCursor
   }
 }
 
@@ -99,7 +99,7 @@ return {
     "selections": [
       {
         "kind": "FragmentSpread",
-        "name": "CitiesPagination_cities",
+        "name": "CitiesPagination_page",
         "args": (v1/*: any*/)
       }
     ]
@@ -222,11 +222,11 @@ return {
     "operationKind": "query",
     "name": "CitiesPaginationRefetchQuery",
     "id": null,
-    "text": "query CitiesPaginationRefetchQuery(\n  $first: Int\n  $after: String\n) {\n  ...CitiesPagination_cities_2HEEH6\n}\n\nfragment CitiesPagination_cities_2HEEH6 on Query {\n  cities(first: $first, after: $after) {\n    ...CitiesPage_conn\n  }\n}\n\nfragment CitiesPage_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
+    "text": "query CitiesPaginationRefetchQuery(\n  $first: Int\n  $after: String\n) {\n  ...CitiesPagination_page_2HEEH6\n}\n\nfragment CitiesPagination_page_2HEEH6 on Query {\n  cities(first: $first, after: $after) {\n    ...CityList_cities\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment CityList_cities on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '69b23d1f3d5cda741b950cefd6d2e6ae';
+(node/*: any*/).hash = 'c0edb1dcbaa8b247aded74c4a308218f';
 module.exports = node;

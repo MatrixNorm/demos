@@ -6,7 +6,7 @@ import CitiesPagination from "./CitiesPagination";
 
 const AppQuery = graphql`
   query AppQuery($first: Int, $after: String) {
-    ...CitiesPagination_cities @arguments(first: $first, after: $after)
+    ...CitiesPagination_page @arguments(first: $first, after: $after)
   }
 `;
 
@@ -17,7 +17,7 @@ const render = ({ error, props }) => {
   if (!props) {
     return <h1>Loading...</h1>;
   }
-  return <CitiesPagination cities={props} />;
+  return <CitiesPagination page={props} />;
 };
 
 const App = () => {
