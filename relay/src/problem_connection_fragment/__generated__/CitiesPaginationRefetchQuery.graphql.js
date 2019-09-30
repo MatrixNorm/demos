@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash f322f21c374c5635ce6be5bb24177c86
+ * @relayHash 082053afdfa3d3c36c8aa0b67f597477
  */
 
 /* eslint-disable */
@@ -34,11 +34,11 @@ query CitiesPaginationRefetchQuery(
 
 fragment CitiesPagination_cities_2HEEH6 on Query {
   cities(first: $first, after: $after) {
-    ...CitiesList_conn
+    ...CitiesPage_conn
   }
 }
 
-fragment CitiesList_conn on CityConnection {
+fragment CitiesPage_conn on CityConnection {
   edges {
     node {
       id
@@ -222,7 +222,7 @@ return {
     "operationKind": "query",
     "name": "CitiesPaginationRefetchQuery",
     "id": null,
-    "text": "query CitiesPaginationRefetchQuery(\n  $first: Int\n  $after: String\n) {\n  ...CitiesPagination_cities_2HEEH6\n}\n\nfragment CitiesPagination_cities_2HEEH6 on Query {\n  cities(first: $first, after: $after) {\n    ...CitiesList_conn\n  }\n}\n\nfragment CitiesList_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
+    "text": "query CitiesPaginationRefetchQuery(\n  $first: Int\n  $after: String\n) {\n  ...CitiesPagination_cities_2HEEH6\n}\n\nfragment CitiesPagination_cities_2HEEH6 on Query {\n  cities(first: $first, after: $after) {\n    ...CitiesPage_conn\n  }\n}\n\nfragment CitiesPage_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
     "metadata": {}
   }
 };

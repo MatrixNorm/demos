@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 9f5d7298b0c8d6611f5c4254c55bebe7
+ * @relayHash 8431c0e44f91dbaa651fbdf21794f29a
  */
 
 /* eslint-disable */
@@ -9,15 +9,13 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-import type { CitiesList_conn$ref } from "./CitiesList_conn.graphql";
+import type { CitiesPagination_cities$ref } from "./CitiesPagination_cities.graphql";
 export type AppQueryVariables = {|
   first?: ?number,
   after?: ?string,
 |};
 export type AppQueryResponse = {|
-  +cities: ?{|
-    +$fragmentRefs: CitiesList_conn$ref
-  |}
+  +$fragmentRefs: CitiesPagination_cities$ref
 |};
 export type AppQuery = {|
   variables: AppQueryVariables,
@@ -31,12 +29,16 @@ query AppQuery(
   $first: Int
   $after: String
 ) {
+  ...CitiesPagination_cities_2HEEH6
+}
+
+fragment CitiesPagination_cities_2HEEH6 on Query {
   cities(first: $first, after: $after) {
-    ...CitiesList_conn
+    ...CitiesPage_conn
   }
 }
 
-fragment CitiesList_conn on CityConnection {
+fragment CitiesPage_conn on CityConnection {
   edges {
     node {
       id
@@ -96,20 +98,9 @@ return {
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
-        "kind": "LinkedField",
-        "alias": null,
-        "name": "cities",
-        "storageKey": null,
-        "args": (v1/*: any*/),
-        "concreteType": "CityConnection",
-        "plural": false,
-        "selections": [
-          {
-            "kind": "FragmentSpread",
-            "name": "CitiesList_conn",
-            "args": null
-          }
-        ]
+        "kind": "FragmentSpread",
+        "name": "CitiesPagination_cities",
+        "args": (v1/*: any*/)
       }
     ]
   },
@@ -231,11 +222,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n) {\n  cities(first: $first, after: $after) {\n    ...CitiesList_conn\n  }\n}\n\nfragment CitiesList_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n) {\n  ...CitiesPagination_cities_2HEEH6\n}\n\nfragment CitiesPagination_cities_2HEEH6 on Query {\n  cities(first: $first, after: $after) {\n    ...CitiesPage_conn\n  }\n}\n\nfragment CitiesPage_conn on CityConnection {\n  edges {\n    node {\n      id\n      ...City_city\n    }\n    cursor\n  }\n  pageInfo {\n    hasNextPage\n    endCursor\n    hasPreviousPage\n    startCursor\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'd7dfa54bd8624c820e2009f0cd4544af';
+(node/*: any*/).hash = '7a9dc49d2afa99cffe815b16442d23f0';
 module.exports = node;

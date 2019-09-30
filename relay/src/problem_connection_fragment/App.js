@@ -2,13 +2,11 @@ import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 
 import environment from "./env";
-import CitiesList from "./CitiesList";
+import CitiesPagination from "./CitiesPagination";
 
 const AppQuery = graphql`
   query AppQuery($first: Int, $after: String) {
-    cities(first: $first, after: $after) {
-      ...CitiesList_conn
-    }
+    ...CitiesPagination_cities @arguments(first: $first, after: $after)
   }
 `;
 
@@ -19,7 +17,7 @@ const render = ({ error, props }) => {
   if (!props) {
     return <h1>Loading...</h1>;
   }
-  return <CitiesList conn={props.cities} />;
+  return <CitiesPagination cities={props} />;
 };
 
 const App = () => {

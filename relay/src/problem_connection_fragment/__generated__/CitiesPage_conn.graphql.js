@@ -10,9 +10,9 @@
 import type { ReaderFragment } from 'relay-runtime';
 import type { City_city$ref } from "./City_city.graphql";
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type CitiesList_conn$ref: FragmentReference;
-declare export opaque type CitiesList_conn$fragmentType: CitiesList_conn$ref;
-export type CitiesList_conn = {|
+declare export opaque type CitiesPage_conn$ref: FragmentReference;
+declare export opaque type CitiesPage_conn$fragmentType: CitiesPage_conn$ref;
+export type CitiesPage_conn = {|
   +edges: $ReadOnlyArray<?{|
     +node: {|
       +id: string,
@@ -26,19 +26,19 @@ export type CitiesList_conn = {|
     +hasPreviousPage: boolean,
     +startCursor: ?string,
   |},
-  +$refType: CitiesList_conn$ref,
+  +$refType: CitiesPage_conn$ref,
 |};
-export type CitiesList_conn$data = CitiesList_conn;
-export type CitiesList_conn$key = {
-  +$data?: CitiesList_conn$data,
-  +$fragmentRefs: CitiesList_conn$ref,
+export type CitiesPage_conn$data = CitiesPage_conn;
+export type CitiesPage_conn$key = {
+  +$data?: CitiesPage_conn$data,
+  +$fragmentRefs: CitiesPage_conn$ref,
 };
 */
 
 
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
-  "name": "CitiesList_conn",
+  "name": "CitiesPage_conn",
   "type": "CityConnection",
   "metadata": null,
   "argumentDefinitions": [],
@@ -126,5 +126,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '987f651faf039869e68851cc13561a25';
+(node/*: any*/).hash = '324b950e0e2cedccd2a66fc1b190d01c';
 module.exports = node;

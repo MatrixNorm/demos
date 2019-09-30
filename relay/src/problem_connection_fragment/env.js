@@ -6,8 +6,9 @@ import citiesData from "./data";
 
 const resolvers = {
   Query: {
-    cities: (_, args) => {
-      const nodes = citiesData.slice(0, 4);
+    cities: (_, {first, after}) => {
+      const startIndex = after ? citiesData.findIndex(city => city.id === after) : 0
+      const nodes = citiesData.slice(startIndex, startIndex + first);
       const edges = nodes.map(node => ({ node, cursor: node.id }));
       const pageInfo = {
         hasNextPage: true,
@@ -29,9 +30,10 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 const store = new Store(new RecordSource());
 
 const network = Network.create(async (operation, variables) => {
+  console.log(operation.text, variables)
   await new Promise(resolve => setTimeout(resolve, 30));
   const resp = await graphql(schema, operation.text, {}, undefined, variables);
-  //console.log(resp)
+  console.log(resp)
   return resp;
 });
 

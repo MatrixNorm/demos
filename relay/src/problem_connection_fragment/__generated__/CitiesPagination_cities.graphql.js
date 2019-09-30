@@ -8,13 +8,13 @@
 
 /*::
 import type { ReaderFragment } from 'relay-runtime';
-import type { CitiesList_conn$ref } from "./CitiesList_conn.graphql";
+import type { CitiesPage_conn$ref } from "./CitiesPage_conn.graphql";
 import type { FragmentReference } from "relay-runtime";
 declare export opaque type CitiesPagination_cities$ref: FragmentReference;
 declare export opaque type CitiesPagination_cities$fragmentType: CitiesPagination_cities$ref;
 export type CitiesPagination_cities = {|
   +cities: ?{|
-    +$fragmentRefs: CitiesList_conn$ref
+    +$fragmentRefs: CitiesPage_conn$ref
   |},
   +$refType: CitiesPagination_cities$ref,
 |};
@@ -68,7 +68,7 @@ const node/*: ReaderFragment*/ = {
       "selections": [
         {
           "kind": "FragmentSpread",
-          "name": "CitiesList_conn",
+          "name": "CitiesPage_conn",
           "args": null
         }
       ]
@@ -76,5 +76,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '493d97990ce44d06b1d5fcbb7deb6467';
+(node/*: any*/).hash = 'e64b79fc583c5087a1c2b10cfcc66da0';
 module.exports = node;

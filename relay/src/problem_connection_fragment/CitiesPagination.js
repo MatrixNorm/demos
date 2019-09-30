@@ -1,27 +1,9 @@
 import { createRefetchContainer, graphql } from "react-relay";
 import React from "react";
-import CitiesList from "./CitiesList";
+import CitiesPage from "./CitiesPage";
 
 const CitiesPagination = ({ cities, relay }) => {
-
-  function handleNext() {
-    relay.refetch(
-      {
-        first: 3,
-        after: cities.cities.pageInfo.endCursor,
-      },
-      null,
-      () => console.log('refetch done!')
-    )
-
-  }
-
-  return (
-    <div>
-      <CitiesList conn={cities.cities} />
-      <button onClick={handleNext}>NEXT</button>
-    </div>
-  );
+  return <CitiesPage conn={cities.cities} refetch={relay.refetch} />;
 };
 
 export default createRefetchContainer(
@@ -34,7 +16,7 @@ export default createRefetchContainer(
           after: { type: "String" }
         ) {
         cities(first: $first, after: $after) {
-          ...CitiesList_conn
+          ...CitiesPage_conn
         }
       }
     `
