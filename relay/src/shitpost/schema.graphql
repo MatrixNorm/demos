@@ -1,0 +1,115 @@
+interface Node {
+  id: ID!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type Post implements Node {
+  id: ID!
+  title: String!
+  author: User!
+  comments(
+    first: Int,
+    after: String
+  ): CommentConnection 
+}
+
+type User implements Node {
+  id: ID!
+  name: String!
+  posts(
+    first: Int,
+    after: String,
+    orderBy: PostOrderingInput
+  ): PostConnection
+}
+
+type Comment implements Node {
+  id: ID!
+  author: User!
+  text: String!
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge]!
+  orderedBy: PostOrdering!
+}
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+enum PostOrderingFields {
+  createdAt
+  viewsCount
+  commentsCount
+}
+
+type PostOrdering {
+  field: PostOrderingFields!
+  desc: Boolean!
+}
+
+input PostOrderingInput {
+  field: PostOrderingFields!
+  desc: Boolean!
+}
+
+type UserConnection {
+  pageInfo: PageInfo!
+  edges: [UserEdge]!
+  orderedBy: UserOrdering!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
+enum UserOrderingFields {
+  name
+}
+
+type UserOrdering {
+  field: UserOrderingFields!
+  desc: Boolean!
+}
+
+input UserOrderingInput {
+  field: UserOrderingFields!
+  desc: Boolean!
+}
+
+type SearchService {
+  posts(
+    after: String,
+    first: Int,
+    before: String,
+    last: Int,
+    orderBy: PostOrderingInput
+  ): PostConnection
+
+  users(
+    after: String,
+    first: Int,
+    before: String,
+    last: Int,
+    orderBy: UserOrderingInput
+  ): PostConnection
+}
+
+type Query {
+  node(id: ID!): Node
+  searchService: SearchService
+}
+
+schema {
+  query: Query
+}
