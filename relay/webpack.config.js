@@ -85,6 +85,7 @@ registerBuild("hooks_vs_render_props");
 registerBuild("generators_and_stuff");
 registerBuild("problem_numero_one");
 registerBuild("problem_connection_fragment");
+registerBuild("problem_connection_fragment2");
 registerBuild("graphiql_demo");
 
 module.exports = env => {
