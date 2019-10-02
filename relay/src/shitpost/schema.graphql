@@ -2,13 +2,6 @@ interface Node {
   id: ID!
 }
 
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
-}
-
 type Post implements Node {
   id: ID!
   title: String!
@@ -17,33 +10,6 @@ type Post implements Node {
     first: Int,
     after: String
   ): CommentConnection 
-}
-
-type User implements Node {
-  id: ID!
-  name: String!
-  posts(
-    first: Int,
-    after: String,
-    orderBy: PostOrderingInput
-  ): PostConnection
-}
-
-type Comment implements Node {
-  id: ID!
-  author: User!
-  text: String!
-}
-
-type PostConnection {
-  pageInfo: PageInfo!
-  edges: [PostEdge]!
-  orderedBy: PostOrdering!
-}
-
-type PostEdge {
-  node: Post!
-  cursor: String!
 }
 
 enum PostOrderingFields {
@@ -62,15 +28,14 @@ input PostOrderingInput {
   desc: Boolean!
 }
 
-type UserConnection {
-  pageInfo: PageInfo!
-  edges: [UserEdge]!
-  orderedBy: UserOrdering!
-}
-
-type UserEdge {
-  node: User!
-  cursor: String!
+type User implements Node {
+  id: ID!
+  name: String!
+  posts(
+    first: Int,
+    after: String,
+    orderBy: PostOrderingInput
+  ): PostConnection
 }
 
 enum UserOrderingFields {
@@ -87,6 +52,12 @@ input UserOrderingInput {
   desc: Boolean!
 }
 
+type Comment implements Node {
+  id: ID!
+  author: User!
+  text: String!
+}
+
 type SearchService {
   posts(
     after: String,
@@ -94,6 +65,7 @@ type SearchService {
     before: String,
     last: Int,
     orderBy: PostOrderingInput
+    searchTerm: String
   ): PostConnection
 
   users(
@@ -102,6 +74,7 @@ type SearchService {
     before: String,
     last: Int,
     orderBy: UserOrderingInput
+    searchTerm: String
   ): PostConnection
 }
 
@@ -113,3 +86,33 @@ type Query {
 schema {
   query: Query
 }
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge]!
+  orderedBy: PostOrdering!
+}
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type UserConnection {
+  pageInfo: PageInfo!
+  edges: [UserEdge]!
+  orderedBy: UserOrdering!
+}
+
+type UserEdge {
+  node: User!
+  cursor: String!
+}
+
