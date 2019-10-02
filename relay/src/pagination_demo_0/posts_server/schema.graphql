@@ -2,38 +2,12 @@ interface Node {
   id: ID!
 }
 
+""" Post """
+
 type Post implements Node {
   id: ID!
   title: String!
   author: User!
-}
-
-type PostConnection {
-  pageInfo: PageInfo!
-  edges: [PostEdge]!
-  orderBy: PostOrdering!
-}
-
-type PostEdge {
-  node: Post
-  cursor: String!
-}
-
-type User implements Node {
-  id: ID!
-  name: String!
-  posts: [Post]
-}
-
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-  """When paginating backwards, the cursor to continue."""
-  startCursor: String
-  """When paginating forwards, the cursor to continue."""
-  endCursor: String
 }
 
 enum PostOrderingFields {
@@ -49,6 +23,17 @@ type PostOrdering {
 input PostOrderingInput {
   field: PostOrderingFields!
   desc: Boolean!
+}
+
+""" User """
+
+type User implements Node {
+  id: ID!
+  name: String!
+  posts(
+    after: String,
+    first: Int
+  ): PostConnection
 }
 
 """ 
@@ -78,4 +63,24 @@ type Query {
 
 schema {
   query: Query
+}
+
+""" connections """
+
+type PostConnection {
+  pageInfo: PageInfo!
+  edges: [PostEdge]!
+  orderBy: PostOrdering!
+}
+
+type PostEdge {
+  node: Post
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
 }
