@@ -8,7 +8,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const builds = {};
 
-const baseBuild = ({ buildId, pathToMainModule }) => env => {
+const baseBuild = ({ buildId }) => env => {
   const outputPath = env.development
     ? `jsdev/${buildId}`
     : `docs/js/${buildId}`;
@@ -17,7 +17,7 @@ const baseBuild = ({ buildId, pathToMainModule }) => env => {
 
   return {
     entry: {
-      main: pathToMainModule || `./src/${buildId}/main.js`
+      main: `./src/${buildId}/main.js`
     },
     output: {
       path: path.resolve(__dirname, outputPath),
@@ -79,8 +79,8 @@ function registerBuild(buildId) {
 }
 
 registerBuild("relay_hello");
-registerBuild("relay_pagination_demo");
-registerBuild("relay_pagination_demo2");
+registerBuild("pagination_demo_0/demo1");
+registerBuild("pagination_demo_0/demo2");
 registerBuild("hooks_vs_render_props");
 registerBuild("generators_and_stuff");
 registerBuild("problem_numero_one");

@@ -8,7 +8,7 @@
 
 /*::
 import type { ReaderFragment } from 'relay-runtime';
-type PostDetails_post$ref = any;
+import type { PostDetails_post$ref } from "./PostDetails_post.graphql";
 import type { FragmentReference } from "relay-runtime";
 declare export opaque type PostFeed_search$ref: FragmentReference;
 declare export opaque type PostFeed_search$fragmentType: PostFeed_search$ref;
@@ -71,7 +71,7 @@ const node/*: ReaderFragment*/ = {
     {
       "kind": "LocalArgument",
       "name": "orderBy",
-      "type": "PostOrdering",
+      "type": "PostOrderingInput",
       "defaultValue": null
     }
   ],
@@ -196,5 +196,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '67d3ca250c05489354323cfe7100b155';
+(node/*: any*/).hash = '35c81aa496d2228759279ca588a6e38a';
 module.exports = node;

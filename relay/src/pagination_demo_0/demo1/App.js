@@ -20,7 +20,7 @@ const AppQuery = graphql`
                  $after: String
                  $last: Int
                  $before: String
-                 $orderBy: PostOrdering) {
+                 $orderBy: PostOrderingInput) {
     x1: search {
       ...PostFeed_search @arguments(
         first: $first,
@@ -70,7 +70,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{ first: 3, after: null, orderBy: {field: 'createdAt'} }}
+      variables={{ first: 3, after: null, orderBy: {field: 'createdAt', desc: true} }}
       render={render}/>
   )
 }

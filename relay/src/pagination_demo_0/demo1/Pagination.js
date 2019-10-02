@@ -7,74 +7,70 @@
 
 type Connection = {
   +pageInfo: PageInfo,
-  +edges: $ReadOnlyArray<?Edge>,
- }
- 
- type PageInfo = {
-   +hasNextPage: boolean,
-   +hasPreviousPage: boolean,
-   +startCursor: ?string,
-   +endCursor: ?string,
-  }
- 
- type Edge = {
+  +edges: $ReadOnlyArray<?Edge>
+};
+
+type PageInfo = {
+  +hasNextPage: boolean,
+  +hasPreviousPage: boolean,
+  +startCursor: ?string,
+  +endCursor: ?string
+};
+
+type Edge = {
   +node: Object,
-  +cursor: string,
- }
- 
- type Props = {
-   items: ?Connection,
-   refetch: any,
- }
+  +cursor: string
+};
+
+type Props = {
+  items: ?Connection,
+  refetch: any,
+  renderCallback: any
+};
 
 function goNext(items, refetch) {
-  if ( items ) {
+  if (items) {
     refetch(
       {
         first: 3,
         after: items.pageInfo.endCursor,
         last: null,
         before: null,
-        orderBy: null,
+        orderBy: null
       },
       null,
-      () => console.log('next done!'))
+      () => console.log("next done!")
+    );
   }
 }
 
 function goPrev(items, refetch) {
-  if ( items ) {
+  if (items) {
     refetch(
       {
         first: null,
         after: null,
         last: 3,
         before: items.pageInfo.startCursor,
-        orderBy: null,
+        orderBy: null
       },
       null,
-      () => console.log('prev done!'))
+      () => console.log("prev done!")
+    );
   }
-}
-
-type Props = {
-  items: ?Connection,
-  refetch: any,
-  renderCallback: any
 }
 
 // rename items to connection
-const Pagination = ({items, refetch, renderCallback }: Props) => {
-
+const Pagination = ({ items, refetch, renderCallback }: Props) => {
   function handleNext() {
-    goNext(items, refetch)
+    goNext(items, refetch);
   }
 
   function handlePrev() {
-    goPrev(items, refetch)
+    goPrev(items, refetch);
   }
 
-  const nodes = 
+  const nodes =
     items && items.edges
       ? items.edges
           .filter(Boolean)
@@ -82,10 +78,10 @@ const Pagination = ({items, refetch, renderCallback }: Props) => {
           .filter(Boolean)
       : [];
 
-  const hasPrev = items?.pageInfo.hasPreviousPage
-  const hasNext = items?.pageInfo.hasNextPage
+  const hasPrev = items?.pageInfo.hasPreviousPage;
+  const hasNext = items?.pageInfo.hasNextPage;
 
-  return renderCallback({ nodes, hasNext, hasPrev, handleNext, handlePrev })
-}
+  return renderCallback({ nodes, hasNext, hasPrev, handleNext, handlePrev });
+};
 
-export default Pagination
+export default Pagination;

@@ -14,11 +14,13 @@ type PostFeedProps = {|
 
 const PostFeed = ({ relay, search, children }: PostFeedProps) => {
   return (
-    <PostFeedContext.Provider
-      value={{ refetch: relay.refetch, posts: search.posts }}
-    >
-      {children}
-    </PostFeedContext.Provider>
+    <div className="post-feed">
+      <PostFeedContext.Provider
+        value={{ refetch: relay.refetch, posts: search.posts }}
+      >
+        {children}
+      </PostFeedContext.Provider>
+    </div>
   );
 };
 
@@ -32,7 +34,7 @@ export default createRefetchContainer(
           after: { type: "String" }
           last: { type: "Int" }
           before: { type: "String" }
-          orderBy: { type: "PostOrdering" }
+          orderBy: { type: "PostOrderingInput" }
         ) {
         posts(
           first: $first
@@ -64,7 +66,7 @@ export default createRefetchContainer(
       $after: String
       $last: Int
       $before: String
-      $orderBy: PostOrdering
+      $orderBy: PostOrderingInput
     ) {
       search {
         ...PostFeed_search

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash d5708e3c2c7a3f887c438f7d5f951183
+ * @relayHash aac136cd7e47e5a04d6701d583b813eb
  */
 
 /* eslint-disable */
@@ -9,18 +9,18 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-type PostFeed_search$ref = any;
+import type { PostFeed_search$ref } from "./PostFeed_search.graphql";
 export type PostOrderingFields = "createdAt" | "viewsCount";
-export type PostOrdering = {|
+export type PostOrderingInput = {|
   field: PostOrderingFields,
-  desc?: ?boolean,
+  desc: boolean,
 |};
 export type AppQueryVariables = {|
   first?: ?number,
   after?: ?string,
   last?: ?number,
   before?: ?string,
-  orderBy?: ?PostOrdering,
+  orderBy?: ?PostOrderingInput,
 |};
 export type AppQueryResponse = {|
   +x1: ?{|
@@ -43,7 +43,7 @@ query AppQuery(
   $after: String
   $last: Int
   $before: String
-  $orderBy: PostOrdering
+  $orderBy: PostOrderingInput
 ) {
   x1: search {
     ...PostFeed_search_sdb03
@@ -109,7 +109,7 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "orderBy",
-    "type": "PostOrdering",
+    "type": "PostOrderingInput",
     "defaultValue": null
   }
 ],
@@ -324,11 +324,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrdering\n) {\n  x1: search {\n    ...PostFeed_search_sdb03\n  }\n  x2: search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrderingInput\n) {\n  x1: search {\n    ...PostFeed_search_sdb03\n  }\n  x2: search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'fb48c10ca213e78619e925366a9015ed';
+(node/*: any*/).hash = '710372a66c849b684386ce88bb134d05';
 module.exports = node;
