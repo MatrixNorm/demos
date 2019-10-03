@@ -7,9 +7,16 @@ import environment from "./env";
 import City from "./City";
 import type { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 
+type Props = {
+  error: ?Error,
+  props: ?AppQueryResponse
+}
 
-const render = ({ props }: {props: ?AppQueryResponse}) => {
-  if (props) {
+const render = ({ error, props }: Props) => {
+  if (error) {
+    return <h1>fook: {error.toString()}</h1>
+  }
+  if (props && props.randomCity) {
     return <City city={props.randomCity} />;
   }  
 };
