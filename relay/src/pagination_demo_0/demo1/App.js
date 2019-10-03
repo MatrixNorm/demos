@@ -41,35 +41,35 @@ const AppQuery = graphql`
   }
 `;
 
-type Props = {|
-  +error: Error,
+type Props = {
+  +error: ?Error,
   +props: ?AppQueryResponse
-|};
+};
 
 const render = ({ error, props }: Props) => {
   if (error) {
     return <div style={{ color: "red" }}>Error: {error.message}</div>;
   }
-  if (!props) {
-    return <div>Loading...</div>;
+  if (props) {
+    return (
+      <>
+        {props.x1 && (
+          <PostFeed search={props.x1}>
+            <PostPaginationControls.v1 />
+            <PostPagination />
+          </PostFeed>
+        )}
+        {props.x2 && (
+          <PostFeed search={props.x2}>
+            <PostPagination />
+            <br />
+            <PostPaginationControls.v2 />
+          </PostFeed>
+        )}
+      </>
+    );
   }
-  return (
-    <>
-      {props.x1 && (
-        <PostFeed search={props.x1}>
-          <PostPaginationControls.v1 />
-          <PostPagination />
-        </PostFeed>
-      )}
-      {props.x2 && (
-        <PostFeed search={props.x2}>
-          <PostPagination />
-          <br />
-          <PostPaginationControls.v2 />
-        </PostFeed>
-      )}
-    </>
-  );
+  return <div>Loading...</div>;
 };
 
 const App = () => {
