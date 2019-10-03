@@ -87,6 +87,7 @@ registerBuild("problem_numero_one");
 registerBuild("problem_connection_fragment");
 registerBuild("problem_connection_fragment2");
 registerBuild("graphiql_demo");
+registerBuild("flow_fragmentrefs");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;

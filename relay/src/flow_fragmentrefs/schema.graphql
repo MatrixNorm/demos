@@ -1,0 +1,17 @@
+interface Node {
+  id: ID!
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  lat: Float!
+  lng: Float!
+}
+
+type Query {
+  node(id: ID!): Node
+  randomCity: City
+}
+
+
