@@ -1,40 +1,47 @@
 // @flow
 /* globals $PropertyType */
 
-import React, { useContext } from 'react'
-import Pagination from './Pagination'
-import PostDetails from './PostDetails'
-import { PostFeedContext } from './PostFeedContext'
-import type { PostFeed_search } from './__generated__/PostFeed_search.graphql'
+import React, { useContext } from "react";
+import type { RelayRefetchProp } from "react-relay";
+import Pagination from "./Pagination";
+import PostDetails from "./PostDetails";
+import { PostFeedContext, type PostConnection } from "./PostFeedContext";
 
-type PostConnection = $PropertyType<PostFeed_search, 'posts'>
-
-type Props = {| 
-  refetch: any,
-  posts: PostConnection,
-|}
+type Props = {|
+  +refetch: $PropertyType<RelayRefetchProp, "refetch">,
+  +posts: PostConnection
+|};
 
 const PostPagination = () => {
+  const { refetch, posts }: Props = useContext(PostFeedContext);
 
-  const { refetch, posts }: Props = useContext(PostFeedContext)
-
-  const renderCallback = ({ nodes, hasNext, hasPrev, handleNext, handlePrev }) => {
+  const renderCallback = ({
+    nodes,
+    hasNext,
+    hasPrev,
+    handleNext,
+    handlePrev
+  }) => {
     return (
       <div>
         <div>
-          {nodes.map(node => <PostDetails post={node} key={node.id}/>)}
+          {nodes.map(node => (
+            <PostDetails post={node} key={node.id} />
+          ))}
         </div>
         {hasPrev && <button onClick={handlePrev}>PREV</button>}
         {hasNext && <button onClick={handleNext}>NEXT</button>}
       </div>
-    )
-  }
+    );
+  };
 
   return (
-    <Pagination items={posts} 
-                refetch={refetch} 
-                renderCallback={renderCallback} />
-  )
-}
+    <Pagination
+      items={posts}
+      refetch={refetch}
+      renderCallback={renderCallback}
+    />
+  );
+};
 
-export default PostPagination
+export default PostPagination;
