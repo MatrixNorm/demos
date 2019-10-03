@@ -1,18 +1,17 @@
 // @flow
 
 import { createRefetchContainer, graphql, type RelayProp } from "react-relay";
-
 import React from "react";
 import { PostFeedContext } from "./PostFeedContext";
-import type { PostFeed_search as PostFeedType } from "./__generated__/PostFeed_search.graphql";
+import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
-type PostFeedProps = {|
+type Props = {|
   relay: RelayProp,
-  search: PostFeedType,
+  search: PostFeed_search,
   children: any
 |};
 
-const PostFeed = ({ relay, search, children }: PostFeedProps) => {
+const PostFeed = ({ relay, search, children }: Props) => {
   return (
     <div className="post-feed">
       <PostFeedContext.Provider

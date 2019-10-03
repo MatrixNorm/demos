@@ -39,11 +39,11 @@ type User implements Node {
 """ 
   Need this because currently it is impossible to
   alias fragments directly like this:
-
-  query {
-    x: ...SomeFragment
-    y: ..SomeFragment
-  }
+      query {
+        x: ...SomeFragment
+        y: ..SomeFragment
+      }
+  See https://github.com/facebook/relay/issues/1983 
 """
 type PostSearch {
   posts(
@@ -56,8 +56,7 @@ type PostSearch {
 }
 
 type Query {
-  node(id: ID!): Node
-  """ https://github.com/facebook/relay/issues/1983 """
+  node(id: ID!): Node  
   search: PostSearch
 }
 
