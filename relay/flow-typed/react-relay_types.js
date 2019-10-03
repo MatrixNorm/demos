@@ -1,12 +1,19 @@
 // flow-typed signature: 311012da78555b97190c86fa4c196bf3
 // flow-typed version: 443dcee08c/react-relay_v1.x.x/flow_>=v0.47.x
 
+// https://raw.githubusercontent.com/mrtnzlml/quick-payments/8a0fa46a490647aec676fc823c88079e8319dee5/frontend/flow-typed/npm/react-relay_v1.x.x.js
+
 import * as React from 'react';
+
+import {FragmentReference} from 'relay-runtime';
 
 declare module 'react-relay' {
   declare export type RecordState = 'EXISTENT' | 'NONEXISTENT' | 'UNKNOWN';
 
-  declare export type onCompleted = (response: ?Object, errors: ?Array<PayloadError>) => void;
+  declare export type onCompleted = (
+    response: ?Object,
+    errors: ?Array<PayloadError>,
+  ) => void;
   declare export type onError = (error: Error) => void;
 
   declare export type CommitOptions = {
@@ -155,7 +162,9 @@ declare module 'react-relay' {
   };
 
   declare export type ConcreteArgument = ConcreteLiteral | ConcreteVariable;
-  declare export type ConcreteArgumentDefinition = ConcreteLocalArgument | ConcreteRootArgument;
+  declare export type ConcreteArgumentDefinition =
+    | ConcreteLocalArgument
+    | ConcreteRootArgument;
   /**
    * Represents a single ConcreteRoot along with metadata for processing it at
    * runtime. The persisted `id` (or `text`) can be used to fetch the query,
@@ -197,7 +206,9 @@ declare module 'react-relay' {
     kind: 'FragmentSpread',
     name: string,
   };
-  declare export type ConcreteHandle = ConcreteScalarHandle | ConcreteLinkedHandle;
+  declare export type ConcreteHandle =
+    | ConcreteScalarHandle
+    | ConcreteLinkedHandle;
   declare export type ConcreteRootArgument = {
     kind: 'RootArgument',
     name: string,
@@ -299,40 +310,49 @@ declare module 'react-relay' {
     environment: Environment,
   };
 
-  declare type $FragmentRef<T> = {
+  declare export type $FragmentRef<T> = {
     +$fragmentRefs: $PropertyType<T, '$refType'>,
   };
 
   // prettier-ignore
-  declare type $RelayProps<Props, RelayPropT> = $ObjMap<
-    $Diff<Props, { relay: RelayPropT | void }>,
-    // We currently don't know how to preserve Function and Object type
-    // correctly while using `createFragmentContainer`, see:
-    // https://github.com/facebook/relay/commit/2141964373703dcaa9bd49aa3cd2e9efdd09425f
-    (<T: Function>( T) =>  T) &
-    (<T: { +$refType: any }>( T) =>  $FragmentRef<T>) &
-    (<T: { +$refType: any }>(?T) => ?$FragmentRef<T>) &
-    (<T: { +$refType: any }>( $ReadOnlyArray< T>) =>  $ReadOnlyArray< $FragmentRef<T>>) &
-    (<T: { +$refType: any }>(?$ReadOnlyArray< T>) => ?$ReadOnlyArray< $FragmentRef<T>>) &
-    (<T: { +$refType: any }>( $ReadOnlyArray<?T>) =>  $ReadOnlyArray<?$FragmentRef<T>>) &
-    (<T: { +$refType: any }>(?$ReadOnlyArray<?T>) => ?$ReadOnlyArray<?$FragmentRef<T>>) &
-    // see: https://github.com/facebook/relay/blob/v1.7.0-rc.1/packages/react-relay/modern/ReactRelayTypes.js
-    // see: https://github.com/sibelius/relay-modern-network-deep-dive/tree/master/flow-typed
-    (<T>(T) => T)
+  declare export type $RelayProps<Props, RelayPropT> = $ObjMap<
+    $Diff<Props, {relay: RelayPropT | void}>,
+    & (<T: {+$refType: empty}>( T) =>  T)
+    & (<T: {+$refType: empty}>(?T) => ?T)
+    & (<TRef: FragmentReference, T: {+$refType: TRef}>(                 T ) =>                  $FragmentRef<T> )
+    & (<TRef: FragmentReference, T: {+$refType: TRef}>(?                T ) => ?                $FragmentRef<T> )
+    & (<TRef: FragmentReference, T: {+$refType: TRef}>( $ReadOnlyArray< T>) =>  $ReadOnlyArray< $FragmentRef<T>>)
+    & (<TRef: FragmentReference, T: {+$refType: TRef}>(?$ReadOnlyArray< T>) => ?$ReadOnlyArray< $FragmentRef<T>>)
+    & (<TRef: FragmentReference, T: {+$refType: TRef}>( $ReadOnlyArray<?T>) =>  $ReadOnlyArray<?$FragmentRef<T>>)
+    & (<TRef: FragmentReference, T: {+$refType: TRef}>(?$ReadOnlyArray<?T>) => ?$ReadOnlyArray<?$FragmentRef<T>>)
+    & (<T>(T) => T),
   >
 
-  declare export function createFragmentContainer<TComponent: React$ComponentType<any>>(
+  declare export function createFragmentContainer<
+    Props: {},
+    TComponent: React$ComponentType<Props>,
+  >(
     Component: TComponent,
-    fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap,
-  ): React$ComponentType<$RelayProps<React$ElementConfig<TComponent>, RelayProp>>;
+    fragmentSpec: GeneratedNodeMap,
+  ): React$ComponentType<
+    $RelayProps<React$ElementConfig<TComponent>, RelayProp>,
+  >;
 
-  declare export function createRefetchContainer<TComponent: React$ComponentType<*>>(
+  declare export function createRefetchContainer<
+    Props: {},
+    TComponent: React$ComponentType<Props>,
+  >(
     Component: TComponent,
-    fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap,
+    fragmentSpec: GeneratedNodeMap,
     taggedNode: GraphQLTaggedNode,
-  ): React$ComponentType<$RelayProps<React$ElementConfig<TComponent>, RelayProp>>;
+  ): React$ComponentType<
+    $RelayProps<React$ElementConfig<TComponent>, RelayRefetchProp>,
+  >;
 
-  declare type FragmentVariablesGetter = (prevVars: Variables, totalCount: number) => Variables;
+  declare type FragmentVariablesGetter = (
+    prevVars: Variables,
+    totalCount: number,
+  ) => Variables;
 
   declare export type PageInfo = {
     endCursor: ?string,
@@ -358,13 +378,26 @@ declare module 'react-relay' {
     query: GraphQLTaggedNode,
   };
 
-  declare export function createPaginationContainer<TBase: React$ComponentType<*>>(
-    Component: TBase,
-    fragmentSpec: GraphQLTaggedNode | GeneratedNodeMap,
+  declare export function createPaginationContainer<
+    Props: {},
+    TComponent: React$ComponentType<Props>,
+  >(
+    Component: TComponent,
+    fragmentSpec: GeneratedNodeMap,
     connectionConfig: ConnectionConfig,
-  ): TBase;
+  ): React$ComponentType<
+    $RelayProps<React$ElementConfig<TComponent>, RelayPaginationProp>,
+  >;
 
-  declare type Variable = string | null | boolean | number | Variables | void | Array<Variable>;
+  declare type Variable =
+    | string
+    | null
+    | boolean
+    | number
+    | Variables
+    | void
+    | Array<Variable>
+    | {};
   declare export type Variables = ?{[string]: Variable};
   declare export type DataID = string;
 
@@ -406,7 +439,10 @@ declare module 'react-relay' {
 
     has(dataID: DataID): boolean;
 
-    load(dataID: DataID, callback: (error: ?Error, record: ?Record) => void): void;
+    load(
+      dataID: DataID,
+      callback: (error: ?Error, record: ?Record) => void,
+    ): void;
 
     size(): number;
   }
@@ -462,7 +498,11 @@ declare module 'react-relay' {
      * Attempts to load all the records necessary to fulfill the selector into the
      * target record source.
      */
-    resolve(target: MutableRecordSource, selector: Selector, callback: AsyncLoadCallback): void;
+    resolve(
+      target: MutableRecordSource,
+      selector: Selector,
+      callback: AsyncLoadCallback,
+    ): void;
 
     /**
      * Ensure that all the records necessary to fulfill the given selector are
@@ -476,7 +516,10 @@ declare module 'react-relay' {
      * when `notify()` is called *and* records have been published that affect the
      * selector results relative to the last `notify()`.
      */
-    subscribe(snapshot: Snapshot, callback: (snapshot: Snapshot) => void): Disposable;
+    subscribe(
+      snapshot: Snapshot,
+      callback: (snapshot: Snapshot) => void,
+    ): Disposable;
   }
 
   /**
@@ -494,15 +537,27 @@ declare module 'react-relay' {
 
     getLinkedRecords(name: string, args?: ?Variables): ?Array<?RecordProxy>;
 
-    getOrCreateLinkedRecord(name: string, typeName: string, args?: ?Variables): RecordProxy;
+    getOrCreateLinkedRecord(
+      name: string,
+      typeName: string,
+      args?: ?Variables,
+    ): RecordProxy;
 
     getType(): string;
 
     getValue(name: string, args?: ?Variables): mixed;
 
-    setLinkedRecord(record: RecordProxy, name: string, args?: ?Variables): RecordProxy;
+    setLinkedRecord(
+      record: RecordProxy,
+      name: string,
+      args?: ?Variables,
+    ): RecordProxy;
 
-    setLinkedRecords(records: Array<?RecordProxy>, name: string, args?: ?Variables): RecordProxy;
+    setLinkedRecords(
+      records: Array<?RecordProxy>,
+      name: string,
+      args?: ?Variables,
+    ): RecordProxy;
 
     setValue(value: mixed, name: string, args?: ?Variables): RecordProxy;
   }
@@ -513,7 +568,8 @@ declare module 'react-relay' {
    * allowing different implementations that may e.g. create a changeset of
    * the modifications.
    */
-  declare export interface RecordSourceProxy extends IRecordSource<RecordProxy> {
+  declare export interface RecordSourceProxy
+    extends IRecordSource<RecordProxy> {
     create(dataID: DataID, typeName: string): RecordProxy;
 
     delete(dataID: DataID): void;
@@ -527,7 +583,8 @@ declare module 'react-relay' {
    * Extends the RecordSourceProxy interface with methods for accessing the root
    * fields of a Selector.
    */
-  declare export interface RecordSourceSelectorProxy extends IRecordSource<RecordProxy> {
+  declare export interface RecordSourceSelectorProxy
+    extends IRecordSource<RecordProxy> {
     create(dataID: DataID, typeName: string): RecordProxy;
 
     delete(dataID: DataID): void;
@@ -550,9 +607,17 @@ declare module 'react-relay' {
 
     getValue(record: TRecord, name: string, args?: ?Variables): mixed;
 
-    getLinkedRecordID(record: TRecord, name: string, args?: ?Variables): ?DataID;
+    getLinkedRecordID(
+      record: TRecord,
+      name: string,
+      args?: ?Variables,
+    ): ?DataID;
 
-    getLinkedRecordIDs(record: TRecord, name: string, args?: ?Variables): ?Array<?DataID>;
+    getLinkedRecordIDs(
+      record: TRecord,
+      name: string,
+      args?: ?Variables,
+    ): ?Array<?DataID>;
   }
 
   /**
@@ -907,7 +972,14 @@ declare module 'react-relay' {
    * own in-memory cache.
    */
   declare export interface Environment
-    extends CEnvironment<TEnvironment, TFragment, TGraphQLTaggedNode, TNode, TOperation, TPayload> {
+    extends CEnvironment<
+      TEnvironment,
+      TFragment,
+      TGraphQLTaggedNode,
+      TNode,
+      TOperation,
+      TPayload,
+    > {
     /**
      * Applies an optimistic mutation to the store without committing it to the
      * server. The returned Disposable can be used to revert this change at a
@@ -971,7 +1043,10 @@ declare module 'react-relay' {
    * field payload.
    */
   declare export type Handler = {
-    update: (store: RecordSourceProxy, fieldPayload: HandleFieldPayload) => void,
+    update: (
+      store: RecordSourceProxy,
+      fieldPayload: HandleFieldPayload,
+    ) => void,
   };
 
   /**
@@ -1002,7 +1077,9 @@ declare module 'react-relay' {
    * Similar to StoreUpdater, but accepts a proxy tied to a specific selector in
    * order to easily access the root fields of a query/mutation.
    */
-  declare export type SelectorStoreUpdater = (store: RecordSourceSelectorProxy) => void;
+  declare export type SelectorStoreUpdater = (
+    store: RecordSourceSelectorProxy,
+  ) => void;
 
   declare export type CallValue = ?(
     | boolean
@@ -1034,7 +1111,9 @@ declare module 'react-relay' {
     [key: string]: 'APPEND' | 'IGNORE' | 'PREPEND' | 'REFETCH' | 'REMOVE',
   };
 
-  declare export type RangeBehaviors = RangeBehaviorsFunction | RangeBehaviorsObject;
+  declare export type RangeBehaviors =
+    | RangeBehaviorsFunction
+    | RangeBehaviorsObject;
 
   declare export type RelayConcreteNode = mixed;
 
@@ -1124,7 +1203,9 @@ declare module 'react-relay' {
   }
 
   declare export type RelayQuerySet = {[queryName: string]: ?RelayQueryRoot};
-  declare export type ReadyStateChangeCallback = (readyState: ReadyState) => void;
+  declare export type ReadyStateChangeCallback = (
+    readyState: ReadyState,
+  ) => void;
   declare export type Abortable = {
     abort(): void,
   };
@@ -1142,12 +1223,28 @@ declare module 'react-relay' {
   };
 
   declare export interface RelayEnvironmentInterface {
-    forceFetch(querySet: RelayQuerySet, onReadyStateChange: ReadyStateChangeCallback): Abortable;
-    getFragmentResolver(fragment: RelayQueryFragment, onNext: () => void): FragmentResolver;
+    forceFetch(
+      querySet: RelayQuerySet,
+      onReadyStateChange: ReadyStateChangeCallback,
+    ): Abortable;
+    getFragmentResolver(
+      fragment: RelayQueryFragment,
+      onNext: () => void,
+    ): FragmentResolver;
     getStoreData(): RelayStoreData;
-    primeCache(querySet: RelayQuerySet, onReadyStateChange: ReadyStateChangeCallback): Abortable;
-    read(node: RelayQueryNode, dataID: DataID, options?: StoreReaderOptions): ?StoreReaderData;
-    readQuery(root: RelayQueryRoot, options?: StoreReaderOptions): Array<?StoreReaderData>;
+    primeCache(
+      querySet: RelayQuerySet,
+      onReadyStateChange: ReadyStateChangeCallback,
+    ): Abortable;
+    read(
+      node: RelayQueryNode,
+      dataID: DataID,
+      options?: StoreReaderOptions,
+    ): ?StoreReaderData;
+    readQuery(
+      root: RelayQueryRoot,
+      options?: StoreReaderOptions,
+    ): Array<?StoreReaderData>;
   }
 
   declare export type ClassicEnvironment = RelayEnvironmentInterface;
@@ -1266,12 +1363,13 @@ declare module 'react-relay' {
     max_runs: number,
   };
 
-  declare export type RelayPaginationProp = RelayProp & {
+  declare export type RelayPaginationProp = {
+    ...RelayProp,
     hasMore: () => boolean,
     isLoading: () => boolean,
     loadMore: (
       pageSize: number,
-      callback: (error: ?Error) => void,
+      callback: ?(error: ?Error) => void,
       options?: RefetchOptions,
     ) => ?Disposable,
     refetchConnection: (
@@ -1281,9 +1379,12 @@ declare module 'react-relay' {
     ) => ?Disposable,
   };
 
-  declare export type RelayRefetchProp = RelayProp & {
+  declare export type RelayRefetchProp = {
+    ...RelayProp,
     refetch: (
-      refetchVariables: Variables | ((fragmentVariables: Variables) => Variables),
+      refetchVariables:
+        | Variables
+        | ((fragmentVariables: Variables) => Variables),
       renderVariables: ?Variables,
       callback: ?(error: ?Error) => void,
       options?: RefetchOptions,
