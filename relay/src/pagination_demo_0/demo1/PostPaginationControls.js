@@ -9,44 +9,49 @@ type ConfigType = {
 };
 
 const PostPaginationControls = ({ renderCallback }: any) => {
-  const { refetch } = useContext(PostFeedContext);
+  const { state, dispatch } = useContext(PostFeedContext);
 
-  const [config, setConfig] = useState<ConfigType>({
-    createdAt: { desc: false },
-    viewsCount: { desc: true }
-  });
+  const { configuration: config, active: activeField } = state;
 
-  const [activeField, setActiveField] = useState<PostOrderingFields>(
-    "createdAt"
-  );
+  // const [config, setConfig] = useState<ConfigType>({
+  //   createdAt: { desc: false },
+  //   viewsCount: { desc: true }
+  // });
+
+  // const [activeField, setActiveField] = useState<PostOrderingFields>(
+  //   "createdAt"
+  // );
 
   function handleActiveFieldChange(field: PostOrderingFields) {
-    setActiveField(field);
-    const desc = config[field].desc;
-    refetch(
-      {
-        first: 3,
-        after: null,
-        last: null,
-        before: null,
-        orderBy: { field, desc }
-      }
-    );
+    // setActiveField(field);
+    // const desc = config[field].desc;
+    dispatch({
+      type: "ACTIVE_FIELD_CHANGE",
+      payload: { field }
+    });
+    // refetch({
+    //   first: 3,
+    //   after: null,
+    //   last: null,
+    //   before: null,
+    //   orderBy: { field, desc }
+    // });
   }
 
-  function handleDirectionChange(field: PostOrderingFields) {
-    const newDesc = !config[field].desc;
-    const newConfig = { ...config, [field]: { desc: newDesc } };
-    setConfig(newConfig);
-    refetch(
-      {
-        first: 3,
-        after: null,
-        last: null,
-        before: null,
-        orderBy: { field, desc: newDesc }
-      }
-    );
+  function handleDirectionChange() {
+    // const newDesc = !config[field].desc;
+    // const newConfig = { ...config, [field]: { desc: newDesc } };
+    // setConfig(newConfig);
+    dispatch({
+      type: "DIRECTION_CHANGE"
+    });
+    // refetch({
+    //   first: 3,
+    //   after: null,
+    //   last: null,
+    //   before: null,
+    //   orderBy: { field, desc: newDesc }
+    // });
   }
 
   return renderCallback({

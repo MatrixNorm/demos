@@ -1,7 +1,11 @@
 // @flow
 
-import { createRefetchContainer, graphql, type RelayRefetchProp } from "react-relay";
-import React from "react";
+import {
+  createRefetchContainer,
+  graphql,
+  type RelayRefetchProp
+} from "react-relay";
+import React, { useReducer } from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
@@ -12,19 +16,39 @@ type Props = {|
 |};
 
 const PostFeed = ({ relay, search, children }: Props) => {
+  const initialState = {
+    configuration: {
+      createdAt: { desc: false },
+      viewsCount: { desc: true }
+    },
+    active: "createdAt"
+  };
 
-  function refetch (args) {
-    relay.refetch(
-      {...args},
-      null,
-      () => console.log("??? done!")
-    );
+  function reducer(state, action) {
+    switch (action.type) {
+      case "PREV_PAGE":
+        return state;
+      case "NEXTTTTT_PAGE":
+        return state;
+      case "ORDER_CHANGE":
+        return {
+          active: action.payload.field,
+          configuration: {
+            ...state.configuration,
+            [action.payload.field]: action.payload.desc
+          }
+        };
+      default:
+        return state;
+    }
   }
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <div className="post-feed">
       <PostFeedContext.Provider
-        value={{ refetch, posts: search.posts }}
+        value={{ state, dispatch, posts: search.posts }}
       >
         {children}
       </PostFeedContext.Provider>
