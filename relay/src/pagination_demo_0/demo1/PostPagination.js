@@ -2,13 +2,16 @@
 /* globals $PropertyType */
 
 import React, { useContext } from "react";
-import type { RelayRefetchProp } from "react-relay";
 import Pagination from "./Pagination";
 import PostDetails from "./PostDetails";
-import { PostFeedContext, type PostConnection } from "./PostFeedContext";
+import {
+  PostFeedContext,
+  type PostConnection,
+  type RefetchFunction
+} from "./PostFeedContext";
 
 type Props = {|
-  +refetch: $PropertyType<RelayRefetchProp, "refetch">,
+  +refetch: RefetchFunction,
   +posts: PostConnection
 |};
 

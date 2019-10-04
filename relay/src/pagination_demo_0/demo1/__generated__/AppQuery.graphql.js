@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash aac136cd7e47e5a04d6701d583b813eb
+ * @relayHash 586e33b8e04cc27e2043e98370cda6c0
  */
 
 /* eslint-disable */
@@ -23,10 +23,10 @@ export type AppQueryVariables = {|
   orderBy?: ?PostOrderingInput,
 |};
 export type AppQueryResponse = {|
-  +x1: ?{|
+  +search1: ?{|
     +$fragmentRefs: PostFeed_search$ref
   |},
-  +x2: ?{|
+  +search2: ?{|
     +$fragmentRefs: PostFeed_search$ref
   |},
 |};
@@ -45,10 +45,10 @@ query AppQuery(
   $before: String
   $orderBy: PostOrderingInput
 ) {
-  x1: search {
+  search1: search {
     ...PostFeed_search_sdb03
   }
-  x2: search {
+  search2: search {
     ...PostFeed_search_sdb03
   }
 }
@@ -273,7 +273,7 @@ return {
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": "x1",
+        "alias": "search1",
         "name": "search",
         "storageKey": null,
         "args": null,
@@ -283,7 +283,7 @@ return {
       },
       {
         "kind": "LinkedField",
-        "alias": "x2",
+        "alias": "search2",
         "name": "search",
         "storageKey": null,
         "args": null,
@@ -300,7 +300,7 @@ return {
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": "x1",
+        "alias": "search1",
         "name": "search",
         "storageKey": null,
         "args": null,
@@ -310,7 +310,7 @@ return {
       },
       {
         "kind": "LinkedField",
-        "alias": "x2",
+        "alias": "search2",
         "name": "search",
         "storageKey": null,
         "args": null,
@@ -324,11 +324,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrderingInput\n) {\n  x1: search {\n    ...PostFeed_search_sdb03\n  }\n  x2: search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrderingInput\n) {\n  search1: search {\n    ...PostFeed_search_sdb03\n  }\n  search2: search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '710372a66c849b684386ce88bb134d05';
+(node/*: any*/).hash = '051bbae8c3d10b4a0822fef951aa01e4';
 module.exports = node;

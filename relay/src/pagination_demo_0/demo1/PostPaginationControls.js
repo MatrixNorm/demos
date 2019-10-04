@@ -5,6 +5,8 @@ import { PostFeedContext } from './PostFeedContext'
 import type { PostOrderingFields } from './__generated__/AppQuery.graphql'
 
 
+//type ConfigType = 
+
 const PostPaginationControls = ({ renderCallback }: any) => {
 
   const { refetch } = useContext(PostFeedContext)

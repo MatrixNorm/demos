@@ -8,7 +8,10 @@ import PostFeed from "./PostFeed";
 import PostPagination from "./PostPagination";
 import PostPaginationControls from "./PostPaginationControls";
 
-import type { AppQueryResponse } from "./__generated__/AppQuery.graphql";
+import type {
+  AppQueryResponse,
+  AppQueryVariables
+} from "./__generated__/AppQuery.graphql";
 
 const AppQuery = graphql`
   query AppQuery(
@@ -18,7 +21,7 @@ const AppQuery = graphql`
     $before: String
     $orderBy: PostOrderingInput
   ) {
-    x1: search {
+    search1: search {
       ...PostFeed_search
         @arguments(
           first: $first
@@ -28,7 +31,7 @@ const AppQuery = graphql`
           orderBy: $orderBy
         )
     }
-    x2: search {
+    search2: search {
       ...PostFeed_search
         @arguments(
           first: $first
@@ -53,14 +56,14 @@ const render = ({ error, props }: Props) => {
   if (props) {
     return (
       <>
-        {props.x1 && (
-          <PostFeed search={props.x1}>
+        {props.search1 && (
+          <PostFeed search={props.search1}>
             <PostPaginationControls.v1 />
             <PostPagination />
           </PostFeed>
         )}
-        {props.x2 && (
-          <PostFeed search={props.x2}>
+        {props.search2 && (
+          <PostFeed search={props.search2}>
             <PostPagination />
             <br />
             <PostPaginationControls.v2 />
@@ -73,15 +76,16 @@ const render = ({ error, props }: Props) => {
 };
 
 const App = () => {
+  const initialVariables: AppQueryVariables = {
+    first: 3,
+    after: null,
+    orderBy: { field: "createdAt", desc: true }
+  };
   return (
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{
-        first: 3,
-        after: null,
-        orderBy: { field: "createdAt", desc: true }
-      }}
+      variables={{...initialVariables}}
       render={render}
     />
   );
