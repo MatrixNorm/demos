@@ -12,10 +12,19 @@ type Props = {|
 |};
 
 const PostFeed = ({ relay, search, children }: Props) => {
+
+  function refetch (args) {
+    relay.refetch(
+      {...args},
+      null,
+      () => console.log("??? done!")
+    );
+  }
+
   return (
     <div className="post-feed">
       <PostFeedContext.Provider
-        value={{ refetch: relay.refetch, posts: search.posts }}
+        value={{ refetch, posts: search.posts }}
       >
         {children}
       </PostFeedContext.Provider>

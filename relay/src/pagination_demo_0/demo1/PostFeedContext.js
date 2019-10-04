@@ -2,11 +2,12 @@
 /* globals $PropertyType React$Context */
 
 import { createContext } from "react";
-import type { RelayRefetchProp } from "react-relay";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
+import type { PostFeedRefetchQueryVariables } from "./__generated__/PostFeedRefetchQuery.graphql";
 
 export type PostConnection = $PropertyType<PostFeed_search, "posts">;
-export type RefetchFunction = $PropertyType<RelayRefetchProp, "refetch">;
+
+export type RefetchFunction = (PostFeedRefetchQueryVariables) => void
 
 export type ContextValueType = {|
   +refetch: RefetchFunction,
@@ -15,11 +16,7 @@ export type ContextValueType = {|
 
 const defaultContextValue = {
   posts: null,
-  refetch: function() {
-    return {
-      dispose() {}
-    };
-  }
+  refetch: function() {}
 };
 
 export const PostFeedContext: React$Context<ContextValueType> = createContext(

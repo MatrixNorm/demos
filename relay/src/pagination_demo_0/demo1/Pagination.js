@@ -22,9 +22,17 @@ type Edge = {
   +cursor: string
 };
 
+type RefetchVariables = {
+  first?: ?number,
+  after?: ?string,
+  last?: ?number,
+  before?: ?string,
+};
+
+
 type Props = {
   items: ?Connection,
-  refetch: any,
+  refetch: (RefetchVariables) => void,
   renderCallback: any
 };
 
