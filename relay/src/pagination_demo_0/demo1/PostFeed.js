@@ -17,11 +17,11 @@ type Props = {|
 
 const PostFeed = ({ relay, search, children }: Props) => {
   const initialState = {
-    configuration: {
+    config: {
       createdAt: { desc: false },
       viewsCount: { desc: true }
     },
-    active: "createdAt",
+    activeField: "createdAt",
     isLoading: false
   };
 
@@ -31,14 +31,14 @@ const PostFeed = ({ relay, search, children }: Props) => {
         return {
           active: action.payload.field,
           configuration: {
-            ...state.configuration,
+            ...state.config,
             [action.payload.field]: action.payload.desc
           }
         };
       case "LOADING_STARTED":
-        return {...state, isLoading: true};
+        return { ...state, isLoading: true };
       case "LOADING_FINISHED`":
-        return {...state, isLoading: false};
+        return { ...state, isLoading: false };
       default:
         return state;
     }
@@ -59,9 +59,24 @@ const PostFeed = ({ relay, search, children }: Props) => {
           after: search.posts.pageInfo.endCursor
         });
         break;
-      case "ORDER_CHANGE":
-        __refetch({ first: 3 });
+      case "ACTIVE_FIELD_CHANGE": {
+        let { field } = action.payload;
+        let { desc } = state.config[field];
+        __refetch({
+          first: 3,
+          orderBy: { field, desc }
+        });
         break;
+      }
+      case "ORDER_DIRECTION_CHANGE": {
+        let { field } = state.active;
+        let { desc } = state.config[field];
+        __refetch({
+          first: 3,
+          orderBy: { field, desc }
+        });
+        break;
+      }
     }
   }
 

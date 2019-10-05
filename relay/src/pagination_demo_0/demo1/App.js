@@ -58,7 +58,7 @@ const render = ({ error, props }: Props) => {
       <>
         {props.search1 && (
           <PostFeed search={props.search1}>
-            <PostPaginationControls.v1 />
+            <PostPaginationControls />
             <PostPagination />
           </PostFeed>
         )}
@@ -66,7 +66,7 @@ const render = ({ error, props }: Props) => {
           <PostFeed search={props.search2}>
             <PostPagination />
             <br />
-            <PostPaginationControls.v2 />
+            <PostPaginationControls />
           </PostFeed>
         )}
       </>
