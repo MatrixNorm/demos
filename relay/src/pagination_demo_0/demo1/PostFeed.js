@@ -28,7 +28,7 @@ function reducer(state: LocalStateType, action: ActionType): LocalStateType {
       return { ...state, activeField };
     }
     case "ORDER_DIRECTION_CHANGE": {
-      let prev = state.fieldsConfig[state.activeField];
+      let prev = state.fieldsConfig.get(state.activeField);
       let next = { ...prev, desc: !prev.desc };
       let fieldsState = { ...state.fieldsConfig, [state.activeField]: next };
       return { ...state, fieldsState };

@@ -5,8 +5,9 @@ import { createContext } from "react";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
+
 export type LocalStateType = {
-  fieldsConfig: { [key: PostOrderingFields]: { desc: boolean } },
+  fieldsConfig: Map<PostOrderingFields, { desc: boolean }>,
   activeField: PostOrderingFields,
   isLoading: boolean
 };
@@ -28,10 +29,10 @@ export type ContextValueType = {
 };
 
 export const initialLocalState: LocalStateType = {
-  fieldsConfig: {
-    createdAt: { desc: false },
-    viewsCount: { desc: true }
-  },
+  fieldsConfig: new Map([
+    ["createdAt", { desc: false }],
+    ["viewsCount", { desc: true }]
+  ]),
   activeField: "createdAt",
   isLoading: false
 };

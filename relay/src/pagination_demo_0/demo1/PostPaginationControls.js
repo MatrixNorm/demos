@@ -27,7 +27,7 @@ export default function PostPaginationControls() {
 
   return (
     <div className="controls">
-      {Object.entries(fieldsConfig).map(([field, { desc }]) => {
+      {Array.from(fieldsConfig).map(([field, { desc }]) => {
         return (
           <div key={field}>
             <label>
@@ -37,14 +37,14 @@ export default function PostPaginationControls() {
                 checked={activeField === field}
                 onChange={() => handleActiveFieldChange(field)}
               />
-              {labelFn(field)}
+              {labelFn.field(desc)}
             </label>
             <label>
               <input
                 type="checkbox"
                 checked={desc}
                 disabled={activeField !== field}
-                onChange={e => handleOrderDirectionChange(e, "createdAt")}
+                onChange={handleOrderDirectionChange}
               />
               desc
             </label>
