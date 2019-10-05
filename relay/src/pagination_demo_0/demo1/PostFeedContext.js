@@ -3,20 +3,19 @@
 
 import { createContext } from "react";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
-import type { PostFeedRefetchQueryVariables } from "./__generated__/PostFeedRefetchQuery.graphql";
 
 export type PostConnection = $PropertyType<PostFeed_search, "posts">;
 
-export type RefetchFunction = (PostFeedRefetchQueryVariables) => void
-
-export type ContextValueType = {|
-  +refetch: RefetchFunction,
-  +posts: PostConnection
-|};
+export type ContextValueType = {
+  state: any,
+  dispatch: any,
+  posts: PostConnection
+};
 
 const defaultContextValue = {
-  posts: null,
-  refetch: function() {}
+  state: null,
+  dispatch: null,
+  posts: null
 };
 
 export const PostFeedContext: React$Context<ContextValueType> = createContext(

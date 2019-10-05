@@ -1,6 +1,6 @@
 // @flow
 
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 

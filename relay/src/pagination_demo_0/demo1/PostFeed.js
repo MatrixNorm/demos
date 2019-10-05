@@ -15,53 +15,78 @@ type Props = {|
   children: any
 |};
 
-const PostFeed = ({ relay, search, children }: Props) => {
-  const initialState = {
-    config: {
-      createdAt: { desc: false },
-      viewsCount: { desc: true }
-    },
-    activeField: "createdAt",
-    isLoading: false
-  };
+type ActionType =
+  | { type: "PREV_PAGE" }
+  | { type: "NEXT_PAGE" }
+  | { type: "ACTIVE_FIELD_CHANGE", payload: { field: string } }
+  | { type: "ORDER_DIRECTION_CHANGE" }
+  | { type: "LOADING_STARTED" }
+  | { type: "LOADING_FINISHED" };
 
-  function reducer(state, action) {
-    switch (action.type) {
-      case "ORDER_CHANGE":
-        return {
-          active: action.payload.field,
-          configuration: {
-            ...state.config,
-            [action.payload.field]: action.payload.desc
-          }
-        };
-      case "LOADING_STARTED":
-        return { ...state, isLoading: true };
-      case "LOADING_FINISHED`":
-        return { ...state, isLoading: false };
-      default:
-        return state;
+type LocalStateType = {
+  fieldsConfig: any,
+  activeField: string,
+  isLoading: boolean
+};
+
+const initialState: LocalStateType = {
+  fieldsConfig: {
+    createdAt: { desc: false },
+    viewsCount: { desc: true }
+  },
+  activeField: "createdAt",
+  isLoading: false
+};
+
+function reducer(state: LocalStateType, action: ActionType): LocalStateType {
+  switch (action.type) {
+    case "ACTIVE_FIELD_CHANGE": {
+      let activeField = action.payload.field;
+      return { ...state, activeField };
     }
+    case "ORDER_DIRECTION_CHANGE": {
+      let prev = state.fieldsConfig[state.activeField];
+      let next = { ...prev, desc: !prev.desc };
+      let fieldsState = { ...state.fieldsConfig, [state.activeField]: next };
+      return { ...state, fieldsState };
+    }
+    case "LOADING_STARTED":
+      return { ...state, isLoading: true };
+    case "LOADING_FINISHED":
+      return { ...state, isLoading: false };
+    case "PREV_PAGE":
+    case "NEXT_PAGE":
+      return state;
+    default:
+      (action: empty);
+      return state;
   }
+}
 
-  function __dispatch(action) {
+const PostFeed = ({ relay, search: { posts }, children }: Props) => {
+  const [state, dispatch] = useReducer<LocalStateType, ActionType>(
+    reducer,
+    initialState
+  );
+
+  function __dispatch(action: ActionType) {
     dispatch(action);
     switch (action.type) {
       case "PREV_PAGE":
-        __refetch({
+        posts && __refetch({
           last: 3,
-          after: search.posts.pageInfo.startCursor
+          after: posts.pageInfo.startCursor
         });
         break;
       case "NEXT_PAGE":
-        __refetch({
+        posts && __refetch({
           first: 3,
-          after: search.posts.pageInfo.endCursor
+          after: posts.pageInfo.endCursor
         });
         break;
       case "ACTIVE_FIELD_CHANGE": {
-        let { field } = action.payload;
-        let { desc } = state.config[field];
+        let field: string = action.payload.field;
+        let desc: boolean = state.fieldsConfig[field].desc;
         __refetch({
           first: 3,
           orderBy: { field, desc }
@@ -69,8 +94,8 @@ const PostFeed = ({ relay, search, children }: Props) => {
         break;
       }
       case "ORDER_DIRECTION_CHANGE": {
-        let { field } = state.active;
-        let { desc } = state.config[field];
+        let field: string = state.activeField;
+        let desc: boolean = state.fieldsConfig[field].desc;
         __refetch({
           first: 3,
           orderBy: { field, desc }
@@ -88,18 +113,16 @@ const PostFeed = ({ relay, search, children }: Props) => {
       before: null,
       orderBy: null
     };
-    dispatch("LOADING_STARTED");
+    dispatch({ type: "LOADING_STARTED" });
     relay.refetch({ ...defaults, ...kwargs }, () =>
-      dispatch("LOADING_FINISHED")
+      dispatch({ type: "LOADING_FINISHED" })
     );
   }
-
-  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <div className="post-feed">
       <PostFeedContext.Provider
-        value={{ state, dispatch: __dispatch, posts: search.posts }}
+        value={{ state, dispatch: __dispatch, posts }}
       >
         {children}
       </PostFeedContext.Provider>
