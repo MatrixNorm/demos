@@ -13,6 +13,7 @@ import {
   type LocalStateType
 } from "./PostFeedContext";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
+import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
 type Props = {|
   relay: RelayRefetchProp,
@@ -69,7 +70,7 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
           });
         break;
       case "ACTIVE_FIELD_CHANGE": {
-        let field: string = action.payload.field;
+        let field: PostOrderingFields = action.payload.field;
         let desc: boolean = state.fieldsConfig[field].desc;
         __refetch({
           first: 3,
@@ -78,7 +79,7 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
         break;
       }
       case "ORDER_DIRECTION_CHANGE": {
-        let field: string = state.activeField;
+        let field: PostOrderingFields = state.activeField;
         let desc: boolean = state.fieldsConfig[field].desc;
         __refetch({
           first: 3,
