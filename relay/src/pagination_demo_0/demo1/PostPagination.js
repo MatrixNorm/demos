@@ -2,19 +2,10 @@
 
 import React, { useContext } from "react";
 import PostDetails from "./PostDetails";
-import {
-  PostFeedContext,
-  type PostConnection,
-  type RefetchFunction
-} from "./PostFeedContext";
-
-type Props = {|
-  +refetch: RefetchFunction,
-  +posts: PostConnection
-|};
+import { PostFeedContext } from "./PostFeedContext";
 
 const PostPagination = () => {
-  const { dispatch, posts }: Props = useContext(PostFeedContext);
+  const { dispatch, posts } = useContext(PostFeedContext);
 
   const nodes =
     posts && posts.edges

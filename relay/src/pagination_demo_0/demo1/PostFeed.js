@@ -6,7 +6,12 @@ import {
   type RelayRefetchProp
 } from "react-relay";
 import React, { useReducer } from "react";
-import { PostFeedContext } from "./PostFeedContext";
+import {
+  PostFeedContext,
+  initialLocalState,
+  type ActionType,
+  type LocalStateType
+} from "./PostFeedContext";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
 type Props = {|
@@ -14,29 +19,6 @@ type Props = {|
   search: PostFeed_search,
   children: any
 |};
-
-type ActionType =
-  | { type: "PREV_PAGE" }
-  | { type: "NEXT_PAGE" }
-  | { type: "ACTIVE_FIELD_CHANGE", payload: { field: string } }
-  | { type: "ORDER_DIRECTION_CHANGE" }
-  | { type: "LOADING_STARTED" }
-  | { type: "LOADING_FINISHED" };
-
-type LocalStateType = {
-  fieldsConfig: any,
-  activeField: string,
-  isLoading: boolean
-};
-
-const initialState: LocalStateType = {
-  fieldsConfig: {
-    createdAt: { desc: false },
-    viewsCount: { desc: true }
-  },
-  activeField: "createdAt",
-  isLoading: false
-};
 
 function reducer(state: LocalStateType, action: ActionType): LocalStateType {
   switch (action.type) {
@@ -66,23 +48,25 @@ function reducer(state: LocalStateType, action: ActionType): LocalStateType {
 const PostFeed = ({ relay, search: { posts }, children }: Props) => {
   const [state, dispatch] = useReducer<LocalStateType, ActionType>(
     reducer,
-    initialState
+    initialLocalState
   );
 
   function __dispatch(action: ActionType) {
     dispatch(action);
     switch (action.type) {
       case "PREV_PAGE":
-        posts && __refetch({
-          last: 3,
-          after: posts.pageInfo.startCursor
-        });
+        posts &&
+          __refetch({
+            last: 3,
+            after: posts.pageInfo.startCursor
+          });
         break;
       case "NEXT_PAGE":
-        posts && __refetch({
-          first: 3,
-          after: posts.pageInfo.endCursor
-        });
+        posts &&
+          __refetch({
+            first: 3,
+            after: posts.pageInfo.endCursor
+          });
         break;
       case "ACTIVE_FIELD_CHANGE": {
         let field: string = action.payload.field;
@@ -121,9 +105,7 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
 
   return (
     <div className="post-feed">
-      <PostFeedContext.Provider
-        value={{ state, dispatch: __dispatch, posts }}
-      >
+      <PostFeedContext.Provider value={{ state, dispatch: __dispatch, posts }}>
         {children}
       </PostFeedContext.Provider>
     </div>

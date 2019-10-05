@@ -1,12 +1,12 @@
 // @flow
 
 import React, { useContext } from "react";
-import { PostFeedContext } from "./PostFeedContext";
+import { PostFeedContext, type ContextValueType } from "./PostFeedContext";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
 export default function PostPaginationControls() {
-  const { state, dispatch } = useContext(PostFeedContext);
-  const { config, activeField } = state;
+  const { state, dispatch } = useContext<ContextValueType>(PostFeedContext);
+  const { fieldsConfig, activeField } = state;
   const labelFn = {
     createdAt: desc => (desc ? "Recent first" : "Oldest first"),
     viewsCount: desc => (desc ? "Most popular first" : "Least popular first")
@@ -27,7 +27,7 @@ export default function PostPaginationControls() {
 
   return (
     <div className="controls">
-      {Object.entries(config).map(([field, { desc }]) => {
+      {Object.entries(fieldsConfig).map(([field, { desc }]) => {
         return (
           <div key={field}>
             <label>
