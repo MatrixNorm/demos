@@ -21,15 +21,12 @@ const PostFeed = ({ relay, search, children }: Props) => {
       createdAt: { desc: false },
       viewsCount: { desc: true }
     },
-    active: "createdAt"
+    active: "createdAt",
+    isLoading: false
   };
 
   function reducer(state, action) {
     switch (action.type) {
-      case "PREV_PAGE":
-        return state;
-      case "NEXTTTTT_PAGE":
-        return state;
       case "ORDER_CHANGE":
         return {
           active: action.payload.field,
@@ -38,9 +35,48 @@ const PostFeed = ({ relay, search, children }: Props) => {
             [action.payload.field]: action.payload.desc
           }
         };
+      case "LOADING_STARTED":
+        return {...state, isLoading: true};
+      case "LOADING_FINISHED`":
+        return {...state, isLoading: false};
       default:
         return state;
     }
+  }
+
+  function __dispatch(action) {
+    dispatch(action);
+    switch (action.type) {
+      case "PREV_PAGE":
+        __refetch({
+          last: 3,
+          after: search.posts.pageInfo.startCursor
+        });
+        break;
+      case "NEXT_PAGE":
+        __refetch({
+          first: 3,
+          after: search.posts.pageInfo.endCursor
+        });
+        break;
+      case "ORDER_CHANGE":
+        __refetch({ first: 3 });
+        break;
+    }
+  }
+
+  function __refetch(kwargs) {
+    const defaults = {
+      first: null,
+      after: null,
+      last: null,
+      before: null,
+      orderBy: null
+    };
+    dispatch("LOADING_STARTED");
+    relay.refetch({ ...defaults, ...kwargs }, () =>
+      dispatch("LOADING_FINISHED")
+    );
   }
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -48,7 +84,7 @@ const PostFeed = ({ relay, search, children }: Props) => {
   return (
     <div className="post-feed">
       <PostFeedContext.Provider
-        value={{ state, dispatch, posts: search.posts }}
+        value={{ state, dispatch: __dispatch, posts: search.posts }}
       >
         {children}
       </PostFeedContext.Provider>

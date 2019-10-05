@@ -70,6 +70,30 @@ const PostPaginationControls_v1 = () => {
     handleDirectionChange
   }) => (
     <div className="controls">
+      {Object.entries(config).map(([field, {desc}] => {
+        return (
+          <div>
+            <label>
+              <input
+                type="radio"
+                value={field}
+                checked={activeField === field}
+                onChange={() => handleActiveFieldChange(field)}
+              />
+              {config["createdAt"].desc ? "Recent first" : "Oldest first"}
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={cdesc}
+                disabled={activeField !== field}
+                onChange={e => handleDirectionChange(e, "createdAt")}
+              />
+              desc
+            </label>
+          </div>
+        );
+      }))}
       <div>
         <label>
           <input
