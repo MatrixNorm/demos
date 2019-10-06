@@ -37,7 +37,7 @@ export default function PostPaginationControls() {
                 checked={activeField === field}
                 onChange={() => handleActiveFieldChange(field)}
               />
-              {labelFn.field(desc)}
+              {labelFn[field](desc)}
             </label>
             <label>
               <input

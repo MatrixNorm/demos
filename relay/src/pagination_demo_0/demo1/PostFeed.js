@@ -9,7 +9,7 @@ import React from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
-import type { AppQueryVariables } from "./__generated__/AppQuery.graphql";
+import type { PostOrderingInput } from "./__generated__/AppQuery.graphql";
 
 type Props = {|
   relay: RelayRefetchProp,
@@ -17,10 +17,15 @@ type Props = {|
   children: any
 |};
 
+type ConnectionInputArguments =
+  | {| first: number, orderBy: PostOrderingInput |}
+  | {| first: number, after: string |}
+  | {| last: number, before: string |};
+
 const PostFeed = ({ relay, search: { posts }, children }: Props) => {
   const [state, dispatch] = usePostFeedReducer();
 
-  function __refetch(kwargs: AppQueryVariables) {
+  function __refetch(kwargs: ConnectionInputArguments) {
     const defaults = {
       first: null,
       after: null,
@@ -38,22 +43,22 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
     dispatch(action);
     switch (action.type) {
       case "PREV_PAGE":
-        posts &&
+        posts && posts.pageInfo.startCursor &&
           __refetch({
             last: 3,
-            after: posts.pageInfo.startCursor
+            before: posts.pageInfo.startCursor
           });
         break;
       case "NEXT_PAGE":
-        posts &&
-          __refetch({
+        posts && posts.pageInfo.endCursor &&
+          __refetch({ 
             first: 3,
             after: posts.pageInfo.endCursor
           });
         break;
       case "ACTIVE_FIELD_CHANGE": {
         let field = action.payload.field;
-        let desc = state.fieldsConfig.get(field)?.desc
+        let desc = state.fieldsConfig.get(field)?.desc;
         if (typeof desc === "boolean") {
           __refetch({
             first: 3,
@@ -64,7 +69,7 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
       }
       case "ORDER_DIRECTION_CHANGE": {
         let field = state.activeField;
-        let desc = state.fieldsConfig.get(field)?.desc
+        let desc = state.fieldsConfig.get(field)?.desc;
         if (typeof desc === "boolean") {
           __refetch({
             first: 3,
@@ -75,8 +80,6 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
       }
     }
   }
-
-
 
   return (
     <div className="post-feed">
