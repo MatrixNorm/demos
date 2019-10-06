@@ -5,13 +5,9 @@ import {
   graphql,
   type RelayRefetchProp
 } from "react-relay";
-import React, { useReducer } from "react";
-import {
-  PostFeedContext,
-  initialLocalState,
-  type ActionType,
-  type LocalStateType
-} from "./PostFeedContext";
+import React from "react";
+import { PostFeedContext } from "./PostFeedContext";
+import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
@@ -21,36 +17,8 @@ type Props = {|
   children: any
 |};
 
-function reducer(state: LocalStateType, action: ActionType): LocalStateType {
-  switch (action.type) {
-    case "ACTIVE_FIELD_CHANGE": {
-      let activeField = action.payload.field;
-      return { ...state, activeField };
-    }
-    case "ORDER_DIRECTION_CHANGE": {
-      let prev = state.fieldsConfig.get(state.activeField);
-      let next = { ...prev, desc: !prev.desc };
-      let fieldsState = { ...state.fieldsConfig, [state.activeField]: next };
-      return { ...state, fieldsState };
-    }
-    case "LOADING_STARTED":
-      return { ...state, isLoading: true };
-    case "LOADING_FINISHED":
-      return { ...state, isLoading: false };
-    case "PREV_PAGE":
-    case "NEXT_PAGE":
-      return state;
-    default:
-      (action: empty);
-      return state;
-  }
-}
-
 const PostFeed = ({ relay, search: { posts }, children }: Props) => {
-  const [state, dispatch] = useReducer<LocalStateType, ActionType>(
-    reducer,
-    initialLocalState
-  );
+  const [state, dispatch] = usePostFeedReducer();
 
   function __dispatch(action: ActionType) {
     dispatch(action);
