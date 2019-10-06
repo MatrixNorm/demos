@@ -9,7 +9,7 @@ import React from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
-import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
+import type { AppQueryVariables } from "./__generated__/AppQuery.graphql";
 
 type Props = {|
   relay: RelayRefetchProp,
@@ -19,6 +19,20 @@ type Props = {|
 
 const PostFeed = ({ relay, search: { posts }, children }: Props) => {
   const [state, dispatch] = usePostFeedReducer();
+
+  function __refetch(kwargs: AppQueryVariables) {
+    const defaults = {
+      first: null,
+      after: null,
+      last: null,
+      before: null,
+      orderBy: null
+    };
+    dispatch({ type: "LOADING_STARTED" });
+    relay.refetch({ ...defaults, ...kwargs }, () =>
+      dispatch({ type: "LOADING_FINISHED" })
+    );
+  }
 
   function __dispatch(action: ActionType) {
     dispatch(action);
@@ -38,39 +52,31 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
           });
         break;
       case "ACTIVE_FIELD_CHANGE": {
-        let field: PostOrderingFields = action.payload.field;
-        let desc: boolean = state.fieldsConfig[field].desc;
-        __refetch({
-          first: 3,
-          orderBy: { field, desc }
-        });
+        let field = action.payload.field;
+        let desc = state.fieldsConfig.get(field)?.desc
+        if (typeof desc === "boolean") {
+          __refetch({
+            first: 3,
+            orderBy: { field, desc }
+          });
+        }
         break;
       }
       case "ORDER_DIRECTION_CHANGE": {
-        let field: PostOrderingFields = state.activeField;
-        let desc: boolean = state.fieldsConfig[field].desc;
-        __refetch({
-          first: 3,
-          orderBy: { field, desc }
-        });
+        let field = state.activeField;
+        let desc = state.fieldsConfig.get(field)?.desc
+        if (typeof desc === "boolean") {
+          __refetch({
+            first: 3,
+            orderBy: { field, desc }
+          });
+        }
         break;
       }
     }
   }
 
-  function __refetch(kwargs) {
-    const defaults = {
-      first: null,
-      after: null,
-      last: null,
-      before: null,
-      orderBy: null
-    };
-    dispatch({ type: "LOADING_STARTED" });
-    relay.refetch({ ...defaults, ...kwargs }, () =>
-      dispatch({ type: "LOADING_FINISHED" })
-    );
-  }
+
 
   return (
     <div className="post-feed">
