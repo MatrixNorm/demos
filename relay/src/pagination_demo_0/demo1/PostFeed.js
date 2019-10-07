@@ -7,8 +7,9 @@ import {
 } from "react-relay";
 import React from "react";
 import { PostFeedContext } from "./PostFeedContext";
-import { usePostFeedReducer, type ActionType, type PostOrdering } from "./PostFeedHooks";
+import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
+import type { PostOrderingInput } from "./__generated__/AppQuery.graphql";
 
 type Props = {|
   relay: RelayRefetchProp,
@@ -17,7 +18,7 @@ type Props = {|
 |};
 
 type ConnectionInputArguments =
-  | {| first: number, orderBy: PostOrdering |}
+  | {| first: number, orderBy: PostOrderingInput |}
   | {| first: number, after: string |}
   | {| last: number, before: string |};
 

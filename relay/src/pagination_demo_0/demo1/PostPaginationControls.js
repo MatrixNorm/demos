@@ -2,7 +2,6 @@
 
 import React, { useContext } from "react";
 import { PostFeedContext, type ContextValueType  } from "./PostFeedContext";
-import { type FieldsConfigKeysType } from "./PostFeedHooks";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
 export default function PostPaginationControls() {
@@ -26,12 +25,9 @@ export default function PostPaginationControls() {
     });
   }
 
-  const t = Object.keys(fieldsConfig)
-  const s = t.map(k => [k, fieldsConfig[k]])
-
   return (
     <div className="controls">
-      {Array.from(fieldsConfig).map(([field, { desc }]) => {
+      {Object.entries(fieldsConfig).map(([field, { desc }]) => {
         return (
           <div key={field}>
             <label>

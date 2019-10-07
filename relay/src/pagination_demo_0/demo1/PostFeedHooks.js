@@ -1,19 +1,21 @@
 // @flow
-/* globals $Keys */
+/* globals $ElementType */
 
 import { useReducer } from "react";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
-const fieldsConfig: { [key: PostOrderingFields]: { desc: boolean } } = {
+type EnumMap<K: string, V, O: Object = *> = O & { [K]: V & $ElementType<O, K> };
+
+const fieldsConfig: EnumMap<PostOrderingFields, {| desc: true |}> = {
   createdAt: { desc: true },
   viewsCount: { desc: true }
 };
 
-export type FieldsConfigKeysType = $Keys<typeof fieldsConfig>;
+//export type FieldsConfigKeysType = $Keys<typeof fieldsConfig>;
 
 export type LocalStateType = {
-  fieldsConfig: {| [key: FieldsConfigKeysType]: { desc: boolean } |},
-  activeField: FieldsConfigKeysType,
+  fieldsConfig: EnumMap<PostOrderingFields, {| desc: true |}>,
+  activeField: PostOrderingFields,
   isLoading: boolean
 };
 
@@ -24,14 +26,14 @@ export const initialLocalState: LocalStateType = {
 };
 
 export type PostOrdering = {
-  field: FieldsConfigKeysType,
+  field: PostOrderingFields,
   desc: boolean
-}
+};
 
 export type ActionType =
   | { type: "PREV_PAGE" }
   | { type: "NEXT_PAGE" }
-  | { type: "ACTIVE_FIELD_CHANGE", payload: { field: FieldsConfigKeysType } }
+  | { type: "ACTIVE_FIELD_CHANGE", payload: { field: PostOrderingFields } }
   | { type: "ORDER_DIRECTION_CHANGE" }
   | { type: "LOADING_STARTED" }
   | { type: "LOADING_FINISHED" };
@@ -53,10 +55,8 @@ function reducer(state: LocalStateType, action: ActionType): LocalStateType {
     }
     case "ORDER_DIRECTION_CHANGE": {
       let { fieldsConfig, activeField } = state;
-      let prev = fieldsConfig[activeField];
-      let next = { ...prev, desc: !prev.desc };
-      let newFieldsConfig = new Map(fieldsConfig);
-      newFieldsConfig.set(activeField, next);
+      let prevDesc = fieldsConfig[activeField].desc;
+      const newFieldsConfig = { ...fieldsConfig, [activeField]: {desc: !prevDesc} };
       return { ...state, fieldsConfig: newFieldsConfig };
     }
     case "LOADING_STARTED":
