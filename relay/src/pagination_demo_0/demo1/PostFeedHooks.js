@@ -11,7 +11,6 @@ const fieldsConfig: EnumMap<PostOrderingFields, {| desc: true |}> = {
   viewsCount: { desc: true }
 };
 
-
 export type LocalStateType = {
   fieldsConfig: EnumMap<PostOrderingFields, {| desc: true |}>,
   activeField: PostOrderingFields,
@@ -79,6 +78,40 @@ function reducer(
   action: ActionType
 ): [LocalStateType, any] {
   const nextState = _reducer(state[0], action);
-  const command = null;
+  let command = null;
+  switch (action.type) {
+    case "NEXT_PAGE":
+      command = {
+        first: 3,
+        type: "next"
+      };
+      break;
+    case "PREV_PAGE":
+      command = {
+        last: 3,
+        type: "prev"
+      };
+      break;
+    case "ACTIVE_FIELD_CHANGE": {
+      let field = action.payload.field;
+      let desc = nextState.fieldsConfig[field].desc;
+      command = {
+        first: 3,
+        orderBy: { field, desc },
+        type: "init"
+      };
+      break;
+    }
+    case "ORDER_DIRECTION_CHANGE": {
+      let field = nextState.activeField;
+      let desc = nextState.fieldsConfig[field].desc;
+      command = {
+        first: 3,
+        orderBy: { field, desc },
+        type: "init"
+      };
+      break;
+    }
+  }
   return [nextState, command];
 }

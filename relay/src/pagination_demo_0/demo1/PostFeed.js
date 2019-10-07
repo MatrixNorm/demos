@@ -25,6 +25,23 @@ type ConnectionInputArguments =
 const PostFeed = ({ relay, search: { posts }, children }: Props) => {
   const [[state, command], dispatch] = usePostFeedReducer();
 
+  useEffect(function() {
+    if (command) {
+      console.log(command);
+      switch (command.type) {
+        case "next":
+          __refetch({ first: command.first, after: posts.pageInfo.endCursor });
+          break;
+        case "prev":
+          __refetch({ last: command.last, before: posts.pageInfo.startCursor });
+          break;
+        case "init":
+          __refetch({ first: command.first, orderBy: command.orderBy });
+          break;
+      }
+    }
+  });
+
   function __refetch(kwargs: ConnectionInputArguments) {
     const defaults = {
       first: null,
@@ -37,46 +54,6 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
     relay.refetch({ ...defaults, ...kwargs }, null, () =>
       dispatch({ type: "LOADING_FINISHED" })
     );
-  }
-
-  function __dispatch(action: ActionType) {
-    dispatch(action);
-    switch (action.type) {
-      case "PREV_PAGE":
-        posts &&
-          posts.pageInfo.startCursor &&
-          __refetch({
-            last: 3,
-            before: posts.pageInfo.startCursor
-          });
-        break;
-      case "NEXT_PAGE":
-        posts &&
-          posts.pageInfo.endCursor &&
-          __refetch({
-            first: 3,
-            after: posts.pageInfo.endCursor
-          });
-        break;
-      case "ACTIVE_FIELD_CHANGE": {
-        let field = action.payload.field;
-        let desc = state.fieldsConfig[field].desc;
-        __refetch({
-          first: 3,
-          orderBy: { field, desc }
-        });
-        break;
-      }
-      case "ORDER_DIRECTION_CHANGE": {
-        let field = state.activeField;
-        let desc = state.fieldsConfig[field].desc;
-        __refetch({
-          first: 3,
-          orderBy: { field, desc }
-        });
-        break;
-      }
-    }
   }
 
   return (
