@@ -1,7 +1,8 @@
 // @flow
 
 import React, { useContext } from "react";
-import { PostFeedContext, type ContextValueType } from "./PostFeedContext";
+import { PostFeedContext, type ContextValueType  } from "./PostFeedContext";
+import { type FieldsConfigKeysType } from "./PostFeedHooks";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
 export default function PostPaginationControls() {
@@ -24,6 +25,9 @@ export default function PostPaginationControls() {
       type: "ORDER_DIRECTION_CHANGE"
     });
   }
+
+  const t = Object.keys(fieldsConfig)
+  const s = t.map(k => [k, fieldsConfig[k]])
 
   return (
     <div className="controls">

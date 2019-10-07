@@ -7,9 +7,8 @@ import {
 } from "react-relay";
 import React from "react";
 import { PostFeedContext } from "./PostFeedContext";
-import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
+import { usePostFeedReducer, type ActionType, type PostOrdering } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
-import type { PostOrderingInput } from "./__generated__/AppQuery.graphql";
 
 type Props = {|
   relay: RelayRefetchProp,
@@ -18,7 +17,7 @@ type Props = {|
 |};
 
 type ConnectionInputArguments =
-  | {| first: number, orderBy: PostOrderingInput |}
+  | {| first: number, orderBy: PostOrdering |}
   | {| first: number, after: string |}
   | {| last: number, before: string |};
 
@@ -58,24 +57,20 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
         break;
       case "ACTIVE_FIELD_CHANGE": {
         let field = action.payload.field;
-        let desc = state.fieldsConfig.get(field)?.desc;
-        if (typeof desc === "boolean") {
-          __refetch({
-            first: 3,
-            orderBy: { field, desc }
-          });
-        }
+        let desc = state.fieldsConfig[field].desc;
+        __refetch({
+          first: 3,
+          orderBy: { field, desc }
+        });
         break;
       }
       case "ORDER_DIRECTION_CHANGE": {
         let field = state.activeField;
-        let desc = state.fieldsConfig.get(field)?.desc;
-        if (typeof desc === "boolean") {
-          __refetch({
-            first: 3,
-            orderBy: { field, desc }
-          });
-        }
+        let desc = state.fieldsConfig[field].desc;
+        __refetch({
+          first: 3,
+          orderBy: { field, desc }
+        });
         break;
       }
     }

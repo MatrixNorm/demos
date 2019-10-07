@@ -1,18 +1,37 @@
 // @flow
+/* globals $Keys */
 
 import { useReducer } from "react";
 import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
+const fieldsConfig: { [key: PostOrderingFields]: { desc: boolean } } = {
+  createdAt: { desc: true },
+  viewsCount: { desc: true }
+};
+
+export type FieldsConfigKeysType = $Keys<typeof fieldsConfig>;
+
 export type LocalStateType = {
-  fieldsConfig: Map<PostOrderingFields, { desc: boolean }>,
-  activeField: PostOrderingFields,
+  fieldsConfig: {| [key: FieldsConfigKeysType]: { desc: boolean } |},
+  activeField: FieldsConfigKeysType,
   isLoading: boolean
 };
+
+export const initialLocalState: LocalStateType = {
+  fieldsConfig,
+  activeField: "createdAt",
+  isLoading: false
+};
+
+export type PostOrdering = {
+  field: FieldsConfigKeysType,
+  desc: boolean
+}
 
 export type ActionType =
   | { type: "PREV_PAGE" }
   | { type: "NEXT_PAGE" }
-  | { type: "ACTIVE_FIELD_CHANGE", payload: { field: PostOrderingFields } }
+  | { type: "ACTIVE_FIELD_CHANGE", payload: { field: FieldsConfigKeysType } }
   | { type: "ORDER_DIRECTION_CHANGE" }
   | { type: "LOADING_STARTED" }
   | { type: "LOADING_FINISHED" };
@@ -26,15 +45,6 @@ export function usePostFeedReducer() {
   return [state, dispatch];
 }
 
-export const initialLocalState: LocalStateType = {
-  fieldsConfig: new Map([
-    ["createdAt", { desc: false }],
-    ["viewsCount", { desc: true }]
-  ]),
-  activeField: "createdAt",
-  isLoading: false
-};
-
 function reducer(state: LocalStateType, action: ActionType): LocalStateType {
   switch (action.type) {
     case "ACTIVE_FIELD_CHANGE": {
@@ -43,7 +53,7 @@ function reducer(state: LocalStateType, action: ActionType): LocalStateType {
     }
     case "ORDER_DIRECTION_CHANGE": {
       let { fieldsConfig, activeField } = state;
-      let prev = fieldsConfig.get(activeField) || { desc: false };
+      let prev = fieldsConfig[activeField];
       let next = { ...prev, desc: !prev.desc };
       let newFieldsConfig = new Map(fieldsConfig);
       newFieldsConfig.set(activeField, next);
