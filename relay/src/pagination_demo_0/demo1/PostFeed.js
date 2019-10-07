@@ -5,7 +5,7 @@ import {
   graphql,
   type RelayRefetchProp
 } from "react-relay";
-import React from "react";
+import React, { useEffect } from "react";
 import { PostFeedContext } from "./PostFeedContext";
 import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
@@ -23,7 +23,7 @@ type ConnectionInputArguments =
   | {| last: number, before: string |};
 
 const PostFeed = ({ relay, search: { posts }, children }: Props) => {
-  const [state, dispatch] = usePostFeedReducer();
+  const [[state, command], dispatch] = usePostFeedReducer();
 
   function __refetch(kwargs: ConnectionInputArguments) {
     const defaults = {
@@ -81,7 +81,7 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
 
   return (
     <div className="post-feed">
-      <PostFeedContext.Provider value={{ state, dispatch: __dispatch, posts }}>
+      <PostFeedContext.Provider value={{ state, dispatch, posts }}>
         {children}
       </PostFeedContext.Provider>
     </div>

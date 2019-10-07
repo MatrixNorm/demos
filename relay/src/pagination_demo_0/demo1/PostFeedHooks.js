@@ -11,7 +11,6 @@ const fieldsConfig: EnumMap<PostOrderingFields, {| desc: true |}> = {
   viewsCount: { desc: true }
 };
 
-//export type FieldsConfigKeysType = $Keys<typeof fieldsConfig>;
 
 export type LocalStateType = {
   fieldsConfig: EnumMap<PostOrderingFields, {| desc: true |}>,
@@ -39,15 +38,15 @@ export type ActionType =
   | { type: "LOADING_FINISHED" };
 
 export function usePostFeedReducer() {
-  const [state, dispatch] = useReducer<LocalStateType, ActionType>(
+  const [state, dispatch] = useReducer<[LocalStateType, any], ActionType>(
     reducer,
-    initialLocalState
+    [initialLocalState, null]
   );
 
   return [state, dispatch];
 }
 
-function reducer(state: LocalStateType, action: ActionType): LocalStateType {
+function _reducer(state: LocalStateType, action: ActionType): LocalStateType {
   switch (action.type) {
     case "ACTIVE_FIELD_CHANGE": {
       let activeField = action.payload.field;
@@ -56,7 +55,10 @@ function reducer(state: LocalStateType, action: ActionType): LocalStateType {
     case "ORDER_DIRECTION_CHANGE": {
       let { fieldsConfig, activeField } = state;
       let prevDesc = fieldsConfig[activeField].desc;
-      const newFieldsConfig = { ...fieldsConfig, [activeField]: {desc: !prevDesc} };
+      const newFieldsConfig = {
+        ...fieldsConfig,
+        [activeField]: { desc: !prevDesc }
+      };
       return { ...state, fieldsConfig: newFieldsConfig };
     }
     case "LOADING_STARTED":
@@ -70,4 +72,13 @@ function reducer(state: LocalStateType, action: ActionType): LocalStateType {
       (action: empty);
       return state;
   }
+}
+
+function reducer(
+  state: [LocalStateType, any],
+  action: ActionType
+): [LocalStateType, any] {
+  const nextState = _reducer(state[0], action);
+  const command = null;
+  return [nextState, command];
 }
