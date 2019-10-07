@@ -46,7 +46,7 @@ export default function PostPaginationControls() {
                 disabled={activeField !== field}
                 onChange={handleOrderDirectionChange}
               />
-              desc
+              {desc ? "DESC" : "ASC"}
             </label>
           </div>
         );

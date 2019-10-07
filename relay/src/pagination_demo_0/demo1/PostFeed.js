@@ -34,7 +34,7 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
       orderBy: null
     };
     dispatch({ type: "LOADING_STARTED" });
-    relay.refetch({ ...defaults, ...kwargs }, () =>
+    relay.refetch({ ...defaults, ...kwargs }, null, () =>
       dispatch({ type: "LOADING_FINISHED" })
     );
   }
@@ -43,15 +43,17 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
     dispatch(action);
     switch (action.type) {
       case "PREV_PAGE":
-        posts && posts.pageInfo.startCursor &&
+        posts &&
+          posts.pageInfo.startCursor &&
           __refetch({
             last: 3,
             before: posts.pageInfo.startCursor
           });
         break;
       case "NEXT_PAGE":
-        posts && posts.pageInfo.endCursor &&
-          __refetch({ 
+        posts &&
+          posts.pageInfo.endCursor &&
+          __refetch({
             first: 3,
             after: posts.pageInfo.endCursor
           });
