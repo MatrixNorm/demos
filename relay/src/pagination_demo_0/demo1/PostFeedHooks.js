@@ -36,15 +36,6 @@ export type ActionType =
   | { type: "LOADING_STARTED" }
   | { type: "LOADING_FINISHED" };
 
-export function usePostFeedReducer() {
-  const [state, dispatch] = useReducer<[LocalStateType, any], ActionType>(
-    reducer,
-    [initialLocalState, null]
-  );
-
-  return [state, dispatch];
-}
-
 function _reducer(state: LocalStateType, action: ActionType): LocalStateType {
   switch (action.type) {
     case "ACTIVE_FIELD_CHANGE": {
@@ -114,4 +105,13 @@ function reducer(
     }
   }
   return [nextState, command];
+}
+
+export function usePostFeedReducer() {
+  const [state, dispatch] = useReducer<[LocalStateType, any], ActionType>(
+    reducer,
+    [initialLocalState, null]
+  );
+
+  return [state, dispatch];
 }

@@ -30,10 +30,20 @@ const PostFeed = ({ relay, search: { posts }, children }: Props) => {
       console.log(command);
       switch (command.type) {
         case "next":
-          __refetch({ first: command.first, after: posts.pageInfo.endCursor });
+          posts &&
+            posts.pageInfo.endCursor &&
+            __refetch({
+              first: command.first,
+              after: posts.pageInfo.endCursor
+            });
           break;
         case "prev":
-          __refetch({ last: command.last, before: posts.pageInfo.startCursor });
+          posts &&
+            posts.pageInfo.startCursor &&
+            __refetch({
+              last: command.last,
+              before: posts.pageInfo.startCursor
+            });
           break;
         case "init":
           __refetch({ first: command.first, orderBy: command.orderBy });
