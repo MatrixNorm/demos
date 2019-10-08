@@ -7,7 +7,7 @@ import {
 } from "react-relay";
 import React, { useEffect } from "react";
 import { PostFeedContext } from "./PostFeedContext";
-import { usePostFeedReducer, type ActionType } from "./PostFeedHooks";
+import { usePostFeedReducer } from "./PostFeedHooks";
 import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 import type { PostOrderingInput } from "./__generated__/AppQuery.graphql";
 
