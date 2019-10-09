@@ -1,0 +1,39 @@
+interface Node {
+  id: ID!
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  lat: Float!
+  lng: Float!
+}
+
+type Query {
+  node(id: ID!): Node
+  allCities(
+    after: String,
+    first: Int,
+    before: String,
+    last: Int,
+  ): CityConnection
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+type CityConnection {
+  pageInfo: PageInfo!
+  edges: [CityEdge]!
+}
+
+type CityEdge {
+  node: City
+  cursor: String!
+}
+
+
