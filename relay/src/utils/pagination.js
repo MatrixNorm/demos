@@ -1,17 +1,15 @@
 export function paginate(array, { after, first, before, last }) {
   if (first) {
-    return _paginate_forwards(array, first, after);
+    return _paginate_forwards({ array, first, after });
   }
   if (last && before) {
-    return _paginate_backwards(array, last, before);
+    return _paginate_backwards({ array, last, before });
   }
   throw "cannot paginate";
 }
 
-function _paginate_forwards(array, first, after) {
-  const startIndex = after
-    ? array.findIndex(city => city.id === after)
-    : 0;
+export function _paginate_forwards({ array, first, after }) {
+  const startIndex = after ? array.findIndex(city => city.id === after) : 0;
   const endIndex = startIndex + first;
   const nodes = array.slice(startIndex, endIndex);
   const edges = nodes.map(node => ({
@@ -29,6 +27,6 @@ function _paginate_forwards(array, first, after) {
   };
 }
 
-function _paginate_backwards(array, last, before) {
+export function _paginate_backwards({ array, last, before }) {
   const endIndex = array.findIndex(city => city.id === before);
 }
