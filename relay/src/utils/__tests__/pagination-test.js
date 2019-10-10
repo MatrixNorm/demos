@@ -1,5 +1,6 @@
 /* globals describe test expect */
-import { _paginate_forwards } from "../server";
+
+import { _paginate_forwards } from "../pagination";
 
 const testData = [
   { id: "1", x: "C" },
@@ -14,7 +15,7 @@ const testData = [
 ];
 
 describe("_paginate_forwards", () => {
-  const A_I = [...testData]; 
+  const A_I = [...testData];
   A_I.sort((a, b) => (a.x < b.x ? -1 : 1));
   const N = 4;
 
