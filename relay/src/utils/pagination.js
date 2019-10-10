@@ -9,7 +9,7 @@ export function paginate(array, { after, first, before, last }) {
 }
 
 export function _paginate_forwards({ array, first, after }) {
-  const startIndex = after ? array.findIndex(city => city.id === after) : 0;
+  const startIndex = after ? array.findIndex(city => city.id === after) + 1 : 0;
   const endIndex = startIndex + first;
   const nodes = array.slice(startIndex, endIndex);
   const edges = nodes.map(node => ({

@@ -19,7 +19,7 @@ describe("_paginate_forwards", () => {
   A_I.sort((a, b) => (a.x < b.x ? -1 : 1));
   const N = 4;
 
-  test("first page", () => {
+  test("1st page", () => {
     const { edges, pageInfo } = _paginate_forwards({ array: A_I, first: N });
 
     expect(edges).toEqual([
@@ -34,6 +34,48 @@ describe("_paginate_forwards", () => {
       hasPreviousPage: false,
       startCursor: "4",
       endCursor: "6"
+    });
+  });
+
+  test("2nd page", () => {
+    const { edges, pageInfo } = _paginate_forwards({
+      array: A_I,
+      first: N,
+      after: "6"
+    });
+
+    expect(edges).toEqual([
+      { cursor: "9", node: { id: "9", x: "E" } },
+      { cursor: "3", node: { id: "3", x: "F" } },
+      { cursor: "5", node: { id: "5", x: "G" } },
+      { cursor: "2", node: { id: "2", x: "H" } }
+    ]);
+
+    expect(pageInfo).toEqual({
+      hasNextPage: true,
+      hasPreviousPage: true,
+      startCursor: "9",
+      endCursor: "2"
+    });
+  });
+
+  test("3rd page", () => {
+    const { edges, pageInfo } = _paginate_forwards({
+      array: A_I,
+      first: N,
+      after: "2"
+    });
+
+    expect(edges).toEqual([
+      { cursor: "7", node: { id: "7", x: "I" } },
+
+    ]);
+
+    expect(pageInfo).toEqual({
+      hasNextPage: false,
+      hasPreviousPage: true,
+      startCursor: "7",
+      endCursor: "7"
     });
   });
 });
