@@ -1,6 +1,6 @@
 import * as _ from "lodash";
 import citiesData from "./data";
-import { paginate } from "../utils/pagination";
+import { paginate } from "../../utils/pagination";
 
 const citiesByName = _.sortBy(citiesData, c => c.name);
 
