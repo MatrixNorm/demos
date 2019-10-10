@@ -2,7 +2,39 @@ import { Environment, Network, RecordSource, Store } from "relay-runtime";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import typeDefs from "raw-loader!./schema.graphql";
-import resolvers from "./resolvers";
+
+const resolvers = {
+  Query: {
+    foo: () => {
+      return {
+        bar: {
+          baz: {
+            hi: "kek"
+          }
+        }
+      };
+    },
+    user: () => {
+      return {
+        id: "user#1",
+        name: "Bob",
+        address: {
+          id: "address#2",
+          state: "Colorado",
+          city: {
+            id: "city#3",
+            name: "Denver"
+          }
+        }
+      };
+    }
+  },
+  Node: {
+    __resolveType(node) {
+      return node;
+    }
+  }
+};
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const store = new Store(new RecordSource());
@@ -15,4 +47,5 @@ const network = Network.create(async (operation, variables) => {
   return resp;
 });
 
+window.relayStore = store;
 export default new Environment({ network, store });

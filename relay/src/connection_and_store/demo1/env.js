@@ -15,4 +15,5 @@ const network = Network.create(async (operation, variables) => {
   return resp;
 });
 
+window.relayStore = store
 export default new Environment({ network, store });
