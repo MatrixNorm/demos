@@ -7,29 +7,32 @@ import {
 } from "react-relay";
 import React from "react";
 import City from "./City";
+import type { CityList_cities } from "./__generated__/CityList_cities.graphql";
 
 type Props = {|
   relay: RelayRefetchProp,
-  cities: any
+  cities: CityList_cities
 |};
 
 const CityList = ({ relay, cities }: Props) => {
+  console.log(cities);
+  const { allCities } = cities;
   const nodes =
-    cities && cities.edges
-      ? cities.edges
+    allCities && allCities.edges
+      ? allCities.edges
           .filter(Boolean)
           .map(edge => edge.node)
           .filter(Boolean)
       : [];
 
-  const hasPrev = cities?.pageInfo.hasPreviousPage;
-  const hasNext = cities?.pageInfo.hasNextPage;
+  const hasPrev = allCities?.pageInfo.hasPreviousPage;
+  const hasNext = allCities?.pageInfo.hasNextPage;
 
   return (
     <div>
       <div>
         {nodes.map(node => (
-          <City post={node} key={node.id} />
+          <City city={node} key={node.id} />
         ))}
       </div>
       {hasPrev && <button onClick={() => {}}>PREV</button>}
@@ -49,7 +52,8 @@ export default createRefetchContainer(
           last: { type: "Int" }
           before: { type: "String" }
         ) {
-        allCities(first: $first, after: $after, last: $last, before: $before) {
+        allCities(first: $first, after: $after, last: $last, before: $before)
+          @connection(key: "CityList_allCities") {
           edges {
             node {
               id
@@ -75,7 +79,7 @@ export default createRefetchContainer(
       $before: String
     ) {
       ...CityList_cities
-          @arguments(first: $first, after: $after, last: $last, before: $before)
+        @arguments(first: $first, after: $after, last: $last, before: $before)
     }
   `
 );

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash ba2b0f56455da0fc07d9a1251ea57733
+ * @relayHash 2b04e9c2f7c00942a204bfb37f219d04
  */
 
 /* eslint-disable */
@@ -10,7 +10,12 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 import type { CityList_cities$ref } from "./CityList_cities.graphql";
-export type AppQueryVariables = {||};
+export type AppQueryVariables = {|
+  first?: ?number,
+  after?: ?string,
+  last?: ?number,
+  before?: ?string,
+|};
 export type AppQueryResponse = {|
   +$fragmentRefs: CityList_cities$ref
 |};
@@ -22,16 +27,22 @@ export type AppQuery = {|
 
 
 /*
-query AppQuery {
-  ...CityList_cities
+query AppQuery(
+  $first: Int
+  $after: String
+  $last: Int
+  $before: String
+) {
+  ...CityList_cities_pbnwq
 }
 
-fragment CityList_cities on Query {
-  allCities {
+fragment CityList_cities_pbnwq on Query {
+  allCities(first: $first, after: $after, last: $last, before: $before) {
     edges {
       node {
         id
         ...City_city
+        __typename
       }
       cursor
     }
@@ -51,33 +62,82 @@ fragment City_city on City {
 }
 */
 
-const node/*: ConcreteRequest*/ = {
+const node/*: ConcreteRequest*/ = (function(){
+var v0 = [
+  {
+    "kind": "LocalArgument",
+    "name": "first",
+    "type": "Int",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "after",
+    "type": "String",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "last",
+    "type": "Int",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "before",
+    "type": "String",
+    "defaultValue": null
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "after",
+    "variableName": "after"
+  },
+  {
+    "kind": "Variable",
+    "name": "before",
+    "variableName": "before"
+  },
+  {
+    "kind": "Variable",
+    "name": "first",
+    "variableName": "first"
+  },
+  {
+    "kind": "Variable",
+    "name": "last",
+    "variableName": "last"
+  }
+];
+return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
     "name": "AppQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "FragmentSpread",
         "name": "CityList_cities",
-        "args": null
+        "args": (v1/*: any*/)
       }
     ]
   },
   "operation": {
     "kind": "Operation",
     "name": "AppQuery",
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
         "name": "allCities",
         "storageKey": null,
-        "args": null,
+        "args": (v1/*: any*/),
         "concreteType": "CityConnection",
         "plural": false,
         "selections": [
@@ -124,6 +184,13 @@ const node/*: ConcreteRequest*/ = {
                     "kind": "ScalarField",
                     "alias": null,
                     "name": "lng",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "__typename",
                     "args": null,
                     "storageKey": null
                   }
@@ -178,6 +245,15 @@ const node/*: ConcreteRequest*/ = {
             ]
           }
         ]
+      },
+      {
+        "kind": "LinkedHandle",
+        "alias": null,
+        "name": "allCities",
+        "args": (v1/*: any*/),
+        "handle": "connection",
+        "key": "CityList_allCities",
+        "filters": null
       }
     ]
   },
@@ -185,10 +261,11 @@ const node/*: ConcreteRequest*/ = {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  ...CityList_cities\n}\n\nfragment CityList_cities on Query {\n  allCities {\n    edges {\n      node {\n        id\n        ...City_city\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...CityList_cities_pbnwq\n}\n\nfragment CityList_cities_pbnwq on Query {\n  allCities(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        ...City_city\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
     "metadata": {}
   }
 };
+})();
 // prettier-ignore
-(node/*: any*/).hash = 'd0433882868e5893c6d0f626cc6742fe';
+(node/*: any*/).hash = '4cb4fcfaf670f79bc4e993e73a180059';
 module.exports = node;
