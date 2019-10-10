@@ -29,4 +29,19 @@ export function _paginate_forwards({ array, first, after }) {
 
 export function _paginate_backwards({ array, last, before }) {
   const endIndex = array.findIndex(city => city.id === before);
+  const startIndex = Math.max(endIndex - last, 0);
+  const nodes = array.slice(startIndex, endIndex);
+  const edges = nodes.map(node => ({
+    node,
+    cursor: node.id
+  }));
+  return {
+    edges,
+    pageInfo: {
+      hasNextPage: endIndex < array.length,
+      hasPreviousPage: startIndex > 0,
+      startCursor: nodes[0]?.id,
+      endCursor: nodes[nodes.length - 1]?.id
+    }
+  };
 }
