@@ -1,5 +1,6 @@
 /* globals describe test expect */
 
+import * as _ from "lodash";
 import { _paginate_forwards, _paginate_backwards } from "../pagination";
 
 const testData = [
@@ -15,8 +16,7 @@ const testData = [
 ];
 
 describe("_paginate_forwards", () => {
-  const A_I = [...testData];
-  A_I.sort((a, b) => (a.x < b.x ? -1 : 1));
+  const A_I = _.sortBy(testData, item => item.x);
   const N = 4;
 
   test("1st page", () => {
@@ -78,8 +78,7 @@ describe("_paginate_forwards", () => {
 });
 
 describe("_paginate_backwards", () => {
-  const A_I = [...testData];
-  A_I.sort((a, b) => (a.x < b.x ? -1 : 1));
+  const A_I = _.sortBy(testData, item => item.x);
   const N = 3;
 
   test("2nd page from last", () => {
