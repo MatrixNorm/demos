@@ -1,0 +1,19 @@
+interface Node {
+  id: ID!
+}
+
+type Foo {
+  bar: Bar
+}
+
+type Bar {
+  baz: Baz
+}
+
+type Baz {
+  hi: String!
+}
+
+type Query {
+  foo: Foo
+}
