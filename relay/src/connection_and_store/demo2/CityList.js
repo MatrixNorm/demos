@@ -1,16 +1,16 @@
 // @flow
 
 import {
-  createRefetchContainer,
+  createPaginationContainer,
   graphql,
-  type RelayRefetchProp
+  type RelayPaginationProp
 } from "react-relay";
 import React from "react";
-import City from "./City";
+import City from "../demo1/City";
 import type { CityList_cities } from "./__generated__/CityList_cities.graphql";
 
 type Props = {|
-  relay: RelayRefetchProp,
+  relay: RelayPaginationProp,
   cities: CityList_cities
 |};
 
@@ -46,7 +46,7 @@ const CityList = ({ relay, cities }: Props) => {
   );
 };
 
-export default createRefetchContainer(
+export default createPaginationContainer(
   CityList,
   {
     cities: graphql`
@@ -54,16 +54,9 @@ export default createRefetchContainer(
         @argumentDefinitions(
           first: { type: "Int" }
           after: { type: "String" }
-          last: { type: "Int" }
-          before: { type: "String" }
         ) {
-        allCities(
-          first: $first
-          after: $after
-          last: $last
-          before: $before
-        ) #@connection(key: "CityList_allCities")
-        {
+        allCities(first: $first, after: $after)
+          @connection(key: "CityList_allCities") {
           edges {
             node {
               id
@@ -81,15 +74,34 @@ export default createRefetchContainer(
       }
     `
   },
-  graphql`
-    query CityListRefetchQuery(
-      $first: Int
-      $after: String
-      $last: Int
-      $before: String
-    ) {
-      ...CityList_cities
-        @arguments(first: $first, after: $after, last: $last, before: $before)
-    }
-  `
+  {
+    direction: "forward",
+    getConnectionFromProps(props) {
+      return props.cities && props.cities.allCities;
+    },
+    getFragmentVariables(prevVars, totalCount) {
+      return {
+        ...prevVars,
+        count: totalCount
+      };
+    },
+    getVariables(props, { first, after }, fragmentVariables) {
+      return {
+        first,
+        after,
+      };
+    },
+    query: graphql`
+      # Pagination query to be fetched upon calling 'loadMore'.
+      # Notice that we re-use our fragment, and the shape of this query matches our fragment spec.
+      query CityListPaginationQuery(
+        $first: Int!
+        $after: String
+      ) {
+        cities: node(id: $userID) {
+          ...Feed_user @arguments(count: $count, cursor: $cursor, orderBy: $orderBy)
+        }
+      }
+    `
+  }
 );

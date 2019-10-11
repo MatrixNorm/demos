@@ -42,18 +42,7 @@ const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
   "name": "CityList_cities",
   "type": "Query",
-  "metadata": {
-    "connection": [
-      {
-        "count": null,
-        "cursor": null,
-        "direction": "bidirectional",
-        "path": [
-          "allCities"
-        ]
-      }
-    ]
-  },
+  "metadata": null,
   "argumentDefinitions": [
     {
       "kind": "LocalArgument",
@@ -83,10 +72,31 @@ const node/*: ReaderFragment*/ = {
   "selections": [
     {
       "kind": "LinkedField",
-      "alias": "allCities",
-      "name": "__CityList_allCities_connection",
+      "alias": null,
+      "name": "allCities",
       "storageKey": null,
-      "args": null,
+      "args": [
+        {
+          "kind": "Variable",
+          "name": "after",
+          "variableName": "after"
+        },
+        {
+          "kind": "Variable",
+          "name": "before",
+          "variableName": "before"
+        },
+        {
+          "kind": "Variable",
+          "name": "first",
+          "variableName": "first"
+        },
+        {
+          "kind": "Variable",
+          "name": "last",
+          "variableName": "last"
+        }
+      ],
       "concreteType": "CityConnection",
       "plural": false,
       "selections": [
@@ -112,13 +122,6 @@ const node/*: ReaderFragment*/ = {
                   "kind": "ScalarField",
                   "alias": null,
                   "name": "id",
-                  "args": null,
-                  "storageKey": null
-                },
-                {
-                  "kind": "ScalarField",
-                  "alias": null,
-                  "name": "__typename",
                   "args": null,
                   "storageKey": null
                 },
@@ -182,5 +185,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '9eb0febb0b34b291900d5a759bc7bad7';
+(node/*: any*/).hash = '16c13a1a7443ca20347a125a2bbe7529';
 module.exports = node;

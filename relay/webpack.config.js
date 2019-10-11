@@ -89,6 +89,7 @@ registerBuild("problem_connection_fragment2");
 registerBuild("graphiql_demo");
 registerBuild("flow_fragmentrefs");
 registerBuild("connection_and_store/demo1");
+registerBuild("connection_and_store/demo2");
 registerBuild("connection_and_store/normalization_without_ids");
 
 module.exports = env => {
