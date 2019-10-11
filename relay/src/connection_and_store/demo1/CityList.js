@@ -15,7 +15,6 @@ type Props = {|
 |};
 
 const CityList = ({ relay, cities }: Props) => {
-  console.log(cities);
   const { allCities } = cities;
   const nodes =
     allCities && allCities.edges
@@ -28,6 +27,12 @@ const CityList = ({ relay, cities }: Props) => {
   const hasPrev = allCities?.pageInfo.hasPreviousPage;
   const hasNext = allCities?.pageInfo.hasNextPage;
 
+  function onNext() {
+    allCities &&
+      hasNext &&
+      relay.refetch({ first: 3, after: allCities.pageInfo.endCursor });
+  }
+
   return (
     <div>
       <div>
@@ -36,7 +41,7 @@ const CityList = ({ relay, cities }: Props) => {
         ))}
       </div>
       {hasPrev && <button onClick={() => {}}>PREV</button>}
-      {hasNext && <button onClick={() => {}}>NEXT</button>}
+      {hasNext && <button onClick={onNext}>NEXT</button>}
     </div>
   );
 };

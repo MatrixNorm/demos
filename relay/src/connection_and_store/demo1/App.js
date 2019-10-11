@@ -13,7 +13,6 @@ type Props = {
 };
 
 const render = ({ error, props }: Props) => {
-  console.log(props)
   if (error) {
     return <h1>fook: {error.toString()}</h1>;
   }
