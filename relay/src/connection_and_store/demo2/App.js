@@ -4,7 +4,7 @@ import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 
 import environment from "./env";
-import CityList from "./CityList";
+import CityFeed from "./CityFeed";
 import type { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 
 type Props = {
@@ -17,14 +17,14 @@ const render = ({ error, props }: Props) => {
     return <h1>fook: {error.toString()}</h1>;
   }
   if (props) {
-    return <CityList cities={props} />;
+    return <CityFeed cities={props} />;
   }
 };
 
 const AppQuery = graphql`
-  query AppQuery($first: Int, $after: String, $last: Int, $before: String) {
-    ...CityList_cities
-      @arguments(first: $first, after: $after, last: $last, before: $before)
+  query AppQuery($count: Int, $cursor: String) {
+    ...CityFeed_cities
+      @arguments(count: $count, cursor: $cursor)
   }
 `;
 
@@ -33,7 +33,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{ first: 3, after: null }}
+      variables={{ count: 3, cursor: null }}
       render={render}
     />
   );

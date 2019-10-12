@@ -6,3 +6,5 @@
 3. https://github.com/facebook/relay/issues/2509
 
 4. useReducer: dispatch is async?
+
+5. isLoading() in pagination container is bogus: https://github.com/facebook/relay/issues/1973
