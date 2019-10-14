@@ -10,6 +10,7 @@ export function map(observable, fn) {
   return createObservable(subber => {
     return observable.subscribe({
       next: value => {
+        console.log("map: ", value);
         subber.next(fn(value));
       }
     });
@@ -33,7 +34,15 @@ export function fromDomEvent(domEl, eventName) {
   let _id = 0;
 
   const onEvent = event => {
-    Object.values(_subbers).forEach(subber => subber.next(event));
+    // call subbers with the same order as subscriptions were done
+    console.log("fromClick", event);
+    const keys = Object.keys(_subbers).map(Number);
+    keys.sort((x, y) => (x < y ? -1 : 1));
+    for (let k of keys) {
+      let subber = _subbers[k];
+      console.log("fromClick: subber.next", subber.next);
+      subber.next(event);
+    }
   };
 
   const start = () => {
