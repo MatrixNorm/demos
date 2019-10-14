@@ -1,64 +1,31 @@
-function createObservable(howToSubscribeToSomeProducer) {
-  return {
-    subscribe: subber => {
-      howToSubscribeToSomeProducer(subber);
-    }
-  };
-}
+import { fromDomEvent, map, filter } from "./myobservable";
 
-function map(observable, fn) {
-  createObservable(subber => {
-    observable.subscribe({
-      next: value => {
-        subber.next(fn(value));
-      }
-    });
-  });
-}
+const clicks = fromDomEvent(document.getElementById("btn"), "click");
+const timestamps = map(clicks, evt => evt.timeStamp);
+const xStream = map(timestamps, val => Math.floor(val));
+const yStream = map(xStream, val => [val, val % 2]);
+const zStream = map(timestamps, val => [val, Math.random()]);
 
-function filter(observable, pred) {
-  createObservable(subber => {
-    observable.subscribe({
-      next: value => {
-        if (pred(value)) {
-          subber.next(value);
-        }
-      }
-    });
-  });
-}
+const cleanUp = {};
 
-function fromDomEvent(domEl, eventName) {
-  let _subbers = {};
-  let _id = 0;
+cleanUp["clicks"] = clicks.subscribe({
+  next: evt => console.log("clicks: ", evt)
+});
 
-  const onEvent = event => {
-    Object.values(_subbers).every(subber => subber.next(event));
-  };
+cleanUp["timestamps"] = timestamps.subscribe({
+  next: val => console.log("clickTimestamps: ", val)
+});
 
-  const start = () => {
-    domEl.addEventListener(eventName, onEvent);
-  };
+cleanUp["x"] = xStream.subscribe({
+  next: val => console.log("xStream: ", val)
+});
 
-  const cleanUp = () => {
-    domEl.removeEventListener(eventName, onEvent);
-  };
+cleanUp["y"] = yStream.subscribe({
+  next: val => console.log("yStream: ", val)
+});
 
-  const checkForCleanUp = () => {
-    if (Object.keys(_subbers).length === 0) {
-      cleanUp();
-    }
-  };
+cleanUp["z"] = zStream.subscribe({
+  next: val => console.log("zStream: ", val)
+});
 
-  return createObservable(subber => {
-    if (Object.keys(_subbers).length === 0) {
-      start();
-    }
-    let id = _id++;
-    _subbers[id] = subber;
-    return () => {
-      delete _subbers[id];
-      checkForCleanUp();
-    };
-  });
-}
+window.cleanUp = cleanUp;

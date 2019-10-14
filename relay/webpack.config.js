@@ -78,19 +78,20 @@ function registerBuild(buildId) {
   builds[buildId] = baseBuild({ buildId });
 }
 
-registerBuild("relay_hello");
-registerBuild("pagination_demo_0/demo1");
-registerBuild("pagination_demo_0/demo2");
-registerBuild("hooks_vs_render_props");
-registerBuild("generators_and_stuff");
-registerBuild("problem_numero_one");
-registerBuild("problem_connection_fragment");
-registerBuild("problem_connection_fragment2");
-registerBuild("graphiql_demo");
-registerBuild("flow_fragmentrefs");
 registerBuild("connection_and_store/demo1");
 registerBuild("connection_and_store/demo2");
 registerBuild("connection_and_store/normalization_without_ids");
+registerBuild("flow_fragmentrefs");
+registerBuild("generators_and_stuff");
+registerBuild("graphiql_demo");
+registerBuild("hooks_vs_render_props");
+registerBuild("observable");
+registerBuild("pagination_demo_0/demo1");
+registerBuild("pagination_demo_0/demo2");
+registerBuild("problem_numero_one");
+registerBuild("problem_connection_fragment");
+registerBuild("problem_connection_fragment2");
+registerBuild("relay_hello");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
