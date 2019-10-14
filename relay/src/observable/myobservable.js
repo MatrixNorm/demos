@@ -8,7 +8,7 @@ function createObservable(connectToProducer) {
 
 export function map(observable, fn) {
   return createObservable(subber => {
-    observable.subscribe({
+    return observable.subscribe({
       next: value => {
         subber.next(fn(value));
       }
@@ -18,7 +18,7 @@ export function map(observable, fn) {
 
 export function filter(observable, pred) {
   return createObservable(subber => {
-    observable.subscribe({
+    return observable.subscribe({
       next: value => {
         if (pred(value)) {
           subber.next(value);
