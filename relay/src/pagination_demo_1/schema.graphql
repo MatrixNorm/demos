@@ -1,0 +1,48 @@
+interface Node {
+  id: ID!
+}
+
+type Product implements Node {
+  id: ID!
+  name: String!
+  unitPrice: Float
+  unitsInStock: Float
+  discontinued: Boolean
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: Viewer
+}
+
+type Viewer {
+  productPagination(
+    # Page number for displaying
+    page: Int
+    perPage: Int = 20
+  ): ProductPagination  
+}
+
+type ProductPagination {
+  # Total object count.
+  count: Int
+  # Array of objects.
+  items: [Product]
+  # Information to aid in pagination.
+  pageInfo: PaginationInfo!
+}
+
+type PaginationInfo {
+  # Current page number
+  currentPage: Int!
+  # Number of items per page
+  perPage: Int!
+  # Total number of pages
+  pageCount: Int
+  # Total number of items
+  itemCount: Int
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean
+}
