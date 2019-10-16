@@ -6,9 +6,9 @@ type Notebook implements Node {
   id: ID!
   manufacturer: NotebookManufacturer!
   price: Float!
-  cpu: CpuModel!
-  videoCardModel: VideoCardModel!
-  videoCartType: VideoCartType
+  cpu: String!
+  videoCard: String!
+  videoCartType: VideoCartType!
   weight: Float!
   displayDiagonal: Float!
 }
@@ -20,40 +20,25 @@ enum NotebookManufacturer {
   Lenovo
 }
 
-type CpuModel {
-  series: CpuSeries
+enum VideoCartType {
+  Dedicated
+  Integrated
 }
 
-emum CpuManufacturer { 
-  Intel
-  AMD
+input NotebookSearchFilter {
+  price: FloatRangeInput
+  weight: FloatRangeInput
+  cpu: StringSetInput
+  videoCard: StringSetInput
 }
 
-type RangeFilter {
-  lower: Float!
-  inludeLower: Boolean!
-  upper: Float!
-  includeUpper: Boolean!
+input FloatRangeInput {
+  kind: "range"
+  upper: Float
+  lower: Float
 }
 
-type LowerBoundFilter {
-  value: Float!
-  include: Boolean
+input StringSetInput {
+  kind: "inSet"
+  set: [String!]!
 }
-
-type UpperBoundFilter {
-  value: Float!
-  include: Boolean
-}
-
-type LogicalFilter {
-  operator: BooleanOperator!
-  operands: [Filter!]!
-}
-
-enum BooleanOperator {
-  Or
-  And
-}
-
-type Filter = LogicalFilter | RangeFilter | LowerBoundFilter | UpperBoundFilter
