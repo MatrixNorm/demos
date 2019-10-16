@@ -2,6 +2,33 @@ interface Node {
   id: ID!
 }
 
+type Notebook implements Node {
+  id: ID!
+  manufacturer: NotebookManufacturer!
+  price: Float!
+  cpu: CpuModel!
+  videoCardModel: VideoCardModel!
+  videoCartType: VideoCartType
+  weight: Float!
+  displayDiagonal: Float!
+}
+
+enum NotebookManufacturer {
+  Acer
+  Asus
+  HP
+  Lenovo
+}
+
+type CpuModel {
+  series: CpuSeries
+}
+
+emum CpuManufacturer { 
+  Intel
+  AMD
+}
+
 type RangeFilter {
   lower: Float!
   inludeLower: Boolean!
@@ -19,4 +46,14 @@ type UpperBoundFilter {
   include: Boolean
 }
 
-type Filter = RangeFilter | LowerBoundFilter | UpperBoundFilter
+type LogicalFilter {
+  operator: BooleanOperator!
+  operands: [Filter!]!
+}
+
+enum BooleanOperator {
+  Or
+  And
+}
+
+type Filter = LogicalFilter | RangeFilter | LowerBoundFilter | UpperBoundFilter
