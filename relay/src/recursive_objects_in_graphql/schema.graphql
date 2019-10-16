@@ -1,0 +1,13 @@
+interface Node {
+  id: ID!
+}
+
+type RootQuery {
+  message(id: String): Message
+}
+
+type Message implements Node {
+  id: ID!
+  content: String
+  comments: [Message]
+}

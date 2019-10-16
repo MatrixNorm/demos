@@ -1,0 +1,22 @@
+interface Node {
+  id: ID!
+}
+
+type RangeFilter {
+  lower: Float!
+  inludeLower: Boolean!
+  upper: Float!
+  includeUpper: Boolean!
+}
+
+type LowerBoundFilter {
+  value: Float!
+  include: Boolean
+}
+
+type UpperBoundFilter {
+  value: Float!
+  include: Boolean
+}
+
+type Filter = RangeFilter | LowerBoundFilter | UpperBoundFilter
