@@ -4,20 +4,31 @@ interface Node {
 
 type Notebook implements Node {
   id: ID!
-  manufacturer: NotebookManufacturer!
+  manufacturer: Manufacturer!
   price: Float!
-  cpu: String!
-  videoCard: String!
-  videoCartType: VideoCartType!
+  cpu: CPU!
   weight: Float!
   displayDiagonal: Float!
 }
 
-enum NotebookManufacturer {
-  Acer
-  Asus
-  HP
-  Lenovo
+type Manufacturer implements Node {
+  id: ID!
+  brand: String!
+  info: String
+}
+
+type CPU implements Node {
+  id: ID!
+  line: CPULine!
+  model: String!
+  coresNumber: Int!
+  L2cacheSizeInMb: Float!
+}
+
+type CPULine implements Node {
+  id: ID!
+  name: String!
+  info: String
 }
 
 enum VideoCartType {
@@ -25,20 +36,15 @@ enum VideoCartType {
   Integrated
 }
 
-input NotebookSearchFilter {
-  price: FloatRangeInput
-  weight: FloatRangeInput
-  cpu: StringSetInput
-  videoCard: StringSetInput
+input NotebookFilter {
+  price_range: [Float!]
+  weight_range: [Float!]
+  cpu: CPUFilter
 }
 
-input FloatRangeInput {
-  kind: "range"
-  upper: Float
-  lower: Float
-}
-
-input StringSetInput {
-  kind: "inSet"
-  set: [String!]!
+input CPUFilter {
+  line_in: [String!]
+  model_in: [String!]
+  coresNumber_range: [Int!]
+  L2cacheSizeInMb_range: [Int!]
 }
