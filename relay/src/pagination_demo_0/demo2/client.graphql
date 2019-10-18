@@ -1,0 +1,14 @@
+extend type Query {
+  localState: LocalState!
+}
+
+type LocalState {
+  postListingState(id: ID!) PostListingState
+}
+
+type PostListingState implements Node {
+  id: ID!
+  isLoading: Boolean!
+  activeField: PostOrderingFields
+  fieldConfig: [PostOrdering!]!
+}

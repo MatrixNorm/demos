@@ -1,0 +1,8 @@
+
+#app {
+  display: flex;
+}
+
+.post-feed {
+  width: 50%;
+}

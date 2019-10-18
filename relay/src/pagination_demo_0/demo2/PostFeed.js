@@ -1,41 +1,29 @@
 // @flow
 
-import { createRefetchContainer, graphql, type RelayProp } from "react-relay";
-import React, { useState, type ElementType } from "react";
 import {
-  PostFeedContext,
-  type PostFeedContextValueType,
-  type PostConnection
-} from "./PostFeedContext";
+  createRefetchContainer,
+  graphql,
+  type RelayRefetchProp
+} from "react-relay";
+import React from "react";
+import { PostFeedContext } from "./PostFeedContext";
+import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
 
-type PostFeedProps = {|
-  relay: RelayProp,
-  search: { +posts: ?PostConnection },
-  children: ElementType[]
+type Props = {|
+  relay: RelayRefetchProp,
+  search: PostFeed_search,
+  children: any
 |};
 
-const PostFeed = ({ relay, search, children }: PostFeedProps) => {
-  const [isLoading, setIsLoading] = useState(false);
 
-  function customRefetch(refetchVariables) {
-    if (!isLoading) {
-      setIsLoading(true);
-      relay.refetch(refetchVariables, null, () => setIsLoading(false));
-    }
-  }
-  if (search.posts) {
-    const contextValue: PostFeedContextValueType = {
-      refetch: customRefetch,
-      posts: search.posts,
-      isLoading
-    };
-    return (
-      <PostFeedContext.Provider value={contextValue}>
+const PostFeed = ({ relay, search: { posts }, children }: Props) => {
+  return (
+    <div className="post-feed">
+      <PostFeedContext.Provider value={{ state, dispatch, posts }}>
         {children}
       </PostFeedContext.Provider>
-    );
-  }
-  return <h1>fuck you</h1>;
+    </div>
+  );
 };
 
 export default createRefetchContainer(
@@ -70,10 +58,19 @@ export default createRefetchContainer(
             hasPreviousPage
             startCursor
           }
-          orderBy {
-            field
-            desc
-          }
+        }
+      }
+    `,
+    sorting: graphql`
+      fragment PostFeed_sorting on LocalState
+        @argumentDefinitions(
+          postListingId: { type: "ID" }
+        ) {
+        postListingState(id: $postListingId) {
+          id
+          isLoading
+          activeField
+          fieldConfig
         }
       }
     `

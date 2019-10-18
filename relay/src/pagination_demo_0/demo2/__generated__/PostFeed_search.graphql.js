@@ -9,7 +9,6 @@
 /*::
 import type { ReaderFragment } from 'relay-runtime';
 import type { PostDetails_post$ref } from "./PostDetails_post.graphql";
-export type PostOrderingFields = "createdAt" | "viewsCount";
 import type { FragmentReference } from "relay-runtime";
 declare export opaque type PostFeed_search$ref: FragmentReference;
 declare export opaque type PostFeed_search$fragmentType: PostFeed_search$ref;
@@ -27,10 +26,6 @@ export type PostFeed_search = {|
       +endCursor: ?string,
       +hasPreviousPage: boolean,
       +startCursor: ?string,
-    |},
-    +orderBy: {|
-      +field: PostOrderingFields,
-      +desc: boolean,
     |},
   |},
   +$refType: PostFeed_search$ref,
@@ -195,36 +190,11 @@ const node/*: ReaderFragment*/ = {
               "storageKey": null
             }
           ]
-        },
-        {
-          "kind": "LinkedField",
-          "alias": null,
-          "name": "orderBy",
-          "storageKey": null,
-          "args": null,
-          "concreteType": "PostOrdering",
-          "plural": false,
-          "selections": [
-            {
-              "kind": "ScalarField",
-              "alias": null,
-              "name": "field",
-              "args": null,
-              "storageKey": null
-            },
-            {
-              "kind": "ScalarField",
-              "alias": null,
-              "name": "desc",
-              "args": null,
-              "storageKey": null
-            }
-          ]
         }
       ]
     }
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = 'e8b29ec1aa0b948bf2e048b158739847';
+(node/*: any*/).hash = '35c81aa496d2228759279ca588a6e38a';
 module.exports = node;

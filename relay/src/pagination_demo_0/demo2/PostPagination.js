@@ -1,35 +1,50 @@
 // @flow
 
 import React, { useContext } from "react";
-import { pagination } from "./pagination";
 import PostDetails from "./PostDetails";
 import { PostFeedContext } from "./PostFeedContext";
 
 const PostPagination = () => {
-  const { refetch, posts, isLoading } = useContext(PostFeedContext);
+  const { dispatch, posts } = useContext(PostFeedContext);
 
-  if (posts) {
-    const { nodes, hasNext, hasPrev, handleNext, handlePrev } = pagination({
-      refetch,
-      connection: posts
-    });
+  const nodes =
+    posts && posts.edges
+      ? posts.edges
+          .filter(Boolean)
+          .map(edge => edge.node)
+          .filter(Boolean)
+      : [];
 
-    return (
+  const hasPrev = posts?.pageInfo.hasPreviousPage;
+  const hasNext = posts?.pageInfo.hasNextPage;
+
+  return (
+    <div>
       <div>
-        <div>
-          {isLoading ? (
-            <h2>loading...</h2>
-          ) : (
-            nodes.map(node => <PostDetails post={node} key={node.id} />)
-          )}
-        </div>
-        {hasPrev && <button onClick={handlePrev}>PREV</button>}
-        {hasNext && <button onClick={handleNext}>NEXT</button>}
+        {nodes.map(node => (
+          <PostDetails post={node} key={node.id} />
+        ))}
       </div>
-    );
-  } else {
-    return <h1>Shit... no connection</h1>;
-  }
+      {hasPrev && (
+        <button
+          onClick={() => {
+            dispatch({ type: "PREV_PAGE" });
+          }}
+        >
+          PREV
+        </button>
+      )}
+      {hasNext && (
+        <button
+          onClick={() => {
+            dispatch({ type: "NEXT_PAGE" });
+          }}
+        >
+          NEXT
+        </button>
+      )}
+    </div>
+  );
 };
 
 export default PostPagination;

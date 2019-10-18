@@ -8,8 +8,10 @@ import PostFeed from "./PostFeed";
 import PostPagination from "./PostPagination";
 import PostPaginationControls from "./PostPaginationControls";
 
-import type { PostOrderingInput } from "./__generated__/AppQuery.graphql";
-import type { PostFeed_search } from "./__generated__/PostFeed_search.graphql";
+import type {
+  AppQueryResponse,
+  AppQueryVariables
+} from "./__generated__/AppQuery.graphql";
 
 const AppQuery = graphql`
   query AppQuery(
@@ -17,80 +19,81 @@ const AppQuery = graphql`
     $after: String
     $last: Int
     $before: String
-    $orderBy1: PostOrderingInput
-    $orderBy2: PostOrderingInput
+    $orderBy: PostOrderingInput
   ) {
-    x1: search {
+    search1: search {
       ...PostFeed_search
         @arguments(
           first: $first
           after: $after
           last: $last
           before: $before
-          orderBy: $orderBy1
+          orderBy: $orderBy
         )
     }
-    x2: search {
+    sorting1: sorting {
+      ...PostFeed_sorting @arguments(postListingId: $postListingId_1)
+    }
+    search2: search {
       ...PostFeed_search
         @arguments(
           first: $first
           after: $after
           last: $last
           before: $before
-          orderBy: $orderBy2
+          orderBy: $orderBy
         )
+    }
+    sorting2: sorting {
+      ...PostFeed_sorting @arguments(postListingId: $postListingId_2)
     }
   }
 `;
 
-type RenderProps = {|
-  +error: Error,
-  +props: {|
-    x1: ?PostFeed_search,
-    x2: ?PostFeed_search
-  |}
-|};
+type Props = {
+  +error: ?Error,
+  +props: ?AppQueryResponse
+};
 
-const render = ({ error, props }: RenderProps) => {
+const render = ({ error, props }: Props) => {
   if (error) {
     return <div style={{ color: "red" }}>Error: {error.message}</div>;
   }
-  if (!props) {
-    return <h1>Loading...</h1>;
+  if (props) {
+    return (
+      <>
+        {props.search1 && (
+          <PostFeed search={props.search1}>
+            <PostPaginationControls />
+            <PostPagination />
+          </PostFeed>
+        )}
+        {props.search2 && (
+          <PostFeed search={props.search2}>
+            <PostPagination />
+            <br />
+            <PostPaginationControls />
+          </PostFeed>
+        )}
+      </>
+    );
   }
-  // XXX flow does not type check here at all !!!
-  return (
-    <>
-      {props.x1  && (
-        <PostFeed search={props.x1}>
-          <PostPaginationControls.v1 />
-          <PostPagination />
-        </PostFeed>
-      )}
-      {props.x2  && (
-        <PostFeed search={props.x2}>
-          <PostPagination />
-          <br />
-          <PostPaginationControls.v2 />
-        </PostFeed>
-      )}
-    </>
-  );
+  return <div>Loading...</div>;
 };
 
 const App = () => {
-  const orderBy1: PostOrderingInput = { field: "createdAt", desc: true };
-  const orderBy2: PostOrderingInput = { field: "viewsCount", desc: true };
+  const initialVariables = {
+    first: 3,
+    after: null,
+    orderBy: { field: "createdAt", desc: true },
+    postListingId_1: 'client:post-listing-1',
+    postListingId_2: 'client:post-listing-2'
+  };
   return (
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{
-        first: 3,
-        after: null,
-        orderBy1,
-        orderBy2
-      }}
+      variables={{ ...initialVariables }}
       render={render}
     />
   );

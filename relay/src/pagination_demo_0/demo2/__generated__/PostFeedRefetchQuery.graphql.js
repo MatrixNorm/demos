@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 7505a7a4e9737bf2924e9edbb4b46404
+ * @relayHash 014a65c7c6225a9470a78fa9dc844acb
  */
 
 /* eslint-disable */
@@ -61,10 +61,6 @@ fragment PostFeed_search_sdb03 on PostSearch {
       endCursor
       hasPreviousPage
       startCursor
-    }
-    orderBy {
-      field
-      desc
     }
   }
 }
@@ -289,31 +285,6 @@ return {
                     "storageKey": null
                   }
                 ]
-              },
-              {
-                "kind": "LinkedField",
-                "alias": null,
-                "name": "orderBy",
-                "storageKey": null,
-                "args": null,
-                "concreteType": "PostOrdering",
-                "plural": false,
-                "selections": [
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "field",
-                    "args": null,
-                    "storageKey": null
-                  },
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "desc",
-                    "args": null,
-                    "storageKey": null
-                  }
-                ]
               }
             ]
           }
@@ -325,7 +296,7 @@ return {
     "operationKind": "query",
     "name": "PostFeedRefetchQuery",
     "id": null,
-    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrderingInput\n) {\n  search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n    orderBy {\n      field\n      desc\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
+    "text": "query PostFeedRefetchQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n  $orderBy: PostOrderingInput\n) {\n  search {\n    ...PostFeed_search_sdb03\n  }\n}\n\nfragment PostFeed_search_sdb03 on PostSearch {\n  posts(first: $first, after: $after, last: $last, before: $before, orderBy: $orderBy) {\n    edges {\n      node {\n        id\n        ...PostDetails_post\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment PostDetails_post on Post {\n  title\n  author {\n    name\n    id\n  }\n}\n",
     "metadata": {}
   }
 };

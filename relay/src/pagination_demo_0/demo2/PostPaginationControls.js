@@ -1,142 +1,56 @@
 // @flow
 
 import React, { useContext } from "react";
-import { PostFeedContext } from "./PostFeedContext";
-import { usePostPaginationControls } from "./postPaginationControlsHook";
+import { PostFeedContext, type ContextValueType  } from "./PostFeedContext";
+import type { PostOrderingFields } from "./__generated__/AppQuery.graphql";
 
-const PostPaginationControls_v1 = () => {
-  const {
-    refetch,
-    posts: { orderBy }
-  } = useContext(PostFeedContext);
+export default function PostPaginationControls() {
+  const { state, dispatch } = useContext<ContextValueType>(PostFeedContext);
+  const { fieldsConfig, activeField } = state;
+  const labelFn = {
+    createdAt: desc => (desc ? "Recent first" : "Oldest first"),
+    viewsCount: desc => (desc ? "Most popular first" : "Least popular first")
+  };
 
-  const {
-    config,
-    activeField,
-    handleActiveFieldChange,
-    handleDirectionChange
-  } = usePostPaginationControls(refetch, orderBy);
+  function handleActiveFieldChange(field: PostOrderingFields) {
+    dispatch({
+      type: "ACTIVE_FIELD_CHANGE",
+      payload: { field }
+    });
+  }
 
-  return (
-    <div className="controls">
-      <div>
-        <label>
-          <input
-            type="radio"
-            value="createdAt"
-            checked={activeField === "createdAt"}
-            onChange={() => handleActiveFieldChange("createdAt")}
-          />
-          {config["createdAt"].desc ? "Recent first" : "Oldest first"}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={config["createdAt"].desc}
-            disabled={activeField !== "createdAt"}
-            onChange={e =>
-              handleDirectionChange({
-                field: "createdAt",
-                desc: e.target.checked
-              })
-            }
-          />
-          desc
-        </label>
-      </div>
-      <div>
-        <label>
-          <input
-            type="radio"
-            value="viewsCount"
-            checked={activeField === "viewsCount"}
-            onChange={() => handleActiveFieldChange("viewsCount")}
-          />
-          {config["viewsCount"].desc
-            ? "Most popular first"
-            : "Least popular first"}
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={config["viewsCount"].desc}
-            disabled={activeField !== "viewsCount"}
-            onChange={e =>
-              handleDirectionChange({
-                field: "viewsCount",
-                desc: e.target.checked
-              })
-            }
-          />
-          desc
-        </label>
-      </div>
-    </div>
-  );
-};
-
-const PostPaginationControls_v2 = () => {
-  const {
-    refetch,
-    posts: { orderBy }
-  } = useContext(PostFeedContext);
-
-  const {
-    config,
-    activeField,
-    handleActiveFieldChange,
-    handleDirectionChange
-  } = usePostPaginationControls(refetch, orderBy);
-
-  const Input = ({ field }) => (
-    <input
-      type="radio"
-      value={field}
-      checked={activeField === field}
-      onChange={() => handleActiveFieldChange(field)}
-    />
-  );
-
-  const Button = ({ field, children }) => (
-    <button
-      type="button"
-      onClick={() =>
-        activeField === field &&
-        handleDirectionChange({
-          field,
-          desc: !config[field].desc
-        })
-      }
-    >
-      {children}
-    </button>
-  );
+  function handleOrderDirectionChange() {
+    dispatch({
+      type: "ORDER_DIRECTION_CHANGE"
+    });
+  }
 
   return (
     <div className="controls">
-      <div>
-        <label>
-          <Input field="createdAt" />
-          <Button field="createdAt">
-            {config["createdAt"].desc ? "Recent first" : "Oldest first"}
-          </Button>
-        </label>
-      </div>
-      <div>
-        <label>
-          <Input field="viewsCount" />
-          <Button field="viewsCount">
-            {config["viewsCount"].desc
-              ? "Most popular first"
-              : "Least popular first"}
-          </Button>
-        </label>
-      </div>
+      {Object.entries(fieldsConfig).map(([field, { desc }]) => {
+        return (
+          <div key={field}>
+            <label>
+              <input
+                type="radio"
+                value={field}
+                checked={activeField === field}
+                onChange={() => handleActiveFieldChange(field)}
+              />
+              {labelFn[field](desc)}
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={desc}
+                disabled={activeField !== field}
+                onChange={handleOrderDirectionChange}
+              />
+              {desc ? "DESC" : "ASC"}
+            </label>
+          </div>
+        );
+      })}
     </div>
   );
-};
-
-export default {
-  v1: PostPaginationControls_v1,
-  v2: PostPaginationControls_v2
-};
+}
