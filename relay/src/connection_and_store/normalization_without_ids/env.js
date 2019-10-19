@@ -14,9 +14,9 @@ const resolvers = {
         }
       };
     },
-    user: () => {
+    user: (_, {id}) => {
       return {
-        id: "user#1",
+        id,
         name: "Bob",
         address: {
           id: "address#2",

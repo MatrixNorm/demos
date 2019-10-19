@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 9b1b95adfe39485a039c5dc5661ab5c4
+ * @relayHash 1dd881e019c6f31a8b663ef50b888d72
  */
 
 /* eslint-disable */
@@ -9,7 +9,10 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type AppQueryVariables = {||};
+export type AppQueryVariables = {|
+  userId1: string,
+  userId2: string,
+|};
 export type AppQueryResponse = {|
   +foo: ?{|
     +bar: ?{|
@@ -18,7 +21,19 @@ export type AppQueryResponse = {|
       |}
     |}
   |},
-  +user: ?{|
+  +user1: ?{|
+    +id: string,
+    +name: string,
+    +address: {|
+      +state: string,
+      +city: {|
+        +id: string,
+        +name: string,
+      |},
+    |},
+  |},
+  +user2: ?{|
+    +id: string,
     +name: string,
     +address: {|
       +state: string,
@@ -37,7 +52,10 @@ export type AppQuery = {|
 
 
 /*
-query AppQuery {
+query AppQuery(
+  $userId1: ID!
+  $userId2: ID!
+) {
   foo {
     bar {
       baz {
@@ -45,7 +63,8 @@ query AppQuery {
       }
     }
   }
-  user {
+  user1: user(id: $userId1) {
+    id
     name
     address {
       state
@@ -55,13 +74,38 @@ query AppQuery {
       }
       id
     }
+  }
+  user2: user(id: $userId2) {
     id
+    name
+    address {
+      state
+      city {
+        id
+        name
+      }
+      id
+    }
   }
 }
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = {
+var v0 = [
+  {
+    "kind": "LocalArgument",
+    "name": "userId1",
+    "type": "ID!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "userId2",
+    "type": "ID!",
+    "defaultValue": null
+  }
+],
+v1 = {
   "kind": "LinkedField",
   "alias": null,
   "name": "foo",
@@ -101,20 +145,13 @@ var v0 = {
     }
   ]
 },
-v1 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "name",
-  "args": null,
-  "storageKey": null
-},
-v2 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "state",
-  "args": null,
-  "storageKey": null
-},
+v2 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "userId1"
+  }
+],
 v3 = {
   "kind": "ScalarField",
   "alias": null,
@@ -123,6 +160,20 @@ v3 = {
   "storageKey": null
 },
 v4 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "name",
+  "args": null,
+  "storageKey": null
+},
+v5 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "state",
+  "args": null,
+  "storageKey": null
+},
+v6 = {
   "kind": "LinkedField",
   "alias": null,
   "name": "city",
@@ -132,9 +183,51 @@ v4 = {
   "plural": false,
   "selections": [
     (v3/*: any*/),
-    (v1/*: any*/)
+    (v4/*: any*/)
   ]
-};
+},
+v7 = [
+  (v3/*: any*/),
+  (v4/*: any*/),
+  {
+    "kind": "LinkedField",
+    "alias": null,
+    "name": "address",
+    "storageKey": null,
+    "args": null,
+    "concreteType": "Address",
+    "plural": false,
+    "selections": [
+      (v5/*: any*/),
+      (v6/*: any*/)
+    ]
+  }
+],
+v8 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "userId2"
+  }
+],
+v9 = [
+  (v3/*: any*/),
+  (v4/*: any*/),
+  {
+    "kind": "LinkedField",
+    "alias": null,
+    "name": "address",
+    "storageKey": null,
+    "args": null,
+    "concreteType": "Address",
+    "plural": false,
+    "selections": [
+      (v5/*: any*/),
+      (v6/*: any*/),
+      (v3/*: any*/)
+    ]
+  }
+];
 return {
   "kind": "Request",
   "fragment": {
@@ -142,68 +235,56 @@ return {
     "name": "AppQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
-      (v0/*: any*/),
+      (v1/*: any*/),
       {
         "kind": "LinkedField",
-        "alias": null,
+        "alias": "user1",
         "name": "user",
         "storageKey": null,
-        "args": null,
+        "args": (v2/*: any*/),
         "concreteType": "User",
         "plural": false,
-        "selections": [
-          (v1/*: any*/),
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "address",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "Address",
-            "plural": false,
-            "selections": [
-              (v2/*: any*/),
-              (v4/*: any*/)
-            ]
-          }
-        ]
+        "selections": (v7/*: any*/)
+      },
+      {
+        "kind": "LinkedField",
+        "alias": "user2",
+        "name": "user",
+        "storageKey": null,
+        "args": (v8/*: any*/),
+        "concreteType": "User",
+        "plural": false,
+        "selections": (v7/*: any*/)
       }
     ]
   },
   "operation": {
     "kind": "Operation",
     "name": "AppQuery",
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
-      (v0/*: any*/),
+      (v1/*: any*/),
       {
         "kind": "LinkedField",
-        "alias": null,
+        "alias": "user1",
         "name": "user",
         "storageKey": null,
-        "args": null,
+        "args": (v2/*: any*/),
         "concreteType": "User",
         "plural": false,
-        "selections": [
-          (v1/*: any*/),
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "address",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "Address",
-            "plural": false,
-            "selections": [
-              (v2/*: any*/),
-              (v4/*: any*/),
-              (v3/*: any*/)
-            ]
-          },
-          (v3/*: any*/)
-        ]
+        "selections": (v9/*: any*/)
+      },
+      {
+        "kind": "LinkedField",
+        "alias": "user2",
+        "name": "user",
+        "storageKey": null,
+        "args": (v8/*: any*/),
+        "concreteType": "User",
+        "plural": false,
+        "selections": (v9/*: any*/)
       }
     ]
   },
@@ -211,11 +292,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  foo {\n    bar {\n      baz {\n        hi\n      }\n    }\n  }\n  user {\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n    id\n  }\n}\n",
+    "text": "query AppQuery(\n  $userId1: ID!\n  $userId2: ID!\n) {\n  foo {\n    bar {\n      baz {\n        hi\n      }\n    }\n  }\n  user1: user(id: $userId1) {\n    id\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n  }\n  user2: user(id: $userId2) {\n    id\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '52078cdd495f12507b1d0bd79f937ab1';
+(node/*: any*/).hash = '232120c7e559e8821a099a47eca0e020';
 module.exports = node;

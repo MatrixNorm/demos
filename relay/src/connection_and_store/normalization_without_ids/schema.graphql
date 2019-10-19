@@ -34,5 +34,5 @@ type City implements Node {
 
 type Query {
   foo: Foo
-  user: User
+  user(id: ID!): User
 }
