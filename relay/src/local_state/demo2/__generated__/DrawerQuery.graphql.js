@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash f5dca2a09823a78e291ab5b69e5c1d12
+ * @relayHash 08558235bd887162c4d92c761eec674b
  */
 
 /* eslint-disable */
@@ -9,23 +9,23 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type AppQueryVariables = {||};
-export type AppQueryResponse = {|
+export type DrawerQueryVariables = {||};
+export type DrawerQueryResponse = {|
   +__typename: string,
-  +remote: string,
-  +local: string,
+  +settings: {|
+    +isDrawerOpen: boolean
+  |},
 |};
-export type AppQuery = {|
-  variables: AppQueryVariables,
-  response: AppQueryResponse,
+export type DrawerQuery = {|
+  variables: DrawerQueryVariables,
+  response: DrawerQueryResponse,
 |};
 */
 
 
 /*
-query AppQuery {
+query DrawerQuery {
   __typename
-  remote
 }
 */
 
@@ -39,21 +39,25 @@ var v0 = [
     "storageKey": null
   },
   {
-    "kind": "ScalarField",
-    "alias": null,
-    "name": "remote",
-    "args": null,
-    "storageKey": null
-  },
-  {
     "kind": "ClientExtension",
     "selections": [
       {
-        "kind": "ScalarField",
+        "kind": "LinkedField",
         "alias": null,
-        "name": "local",
+        "name": "settings",
+        "storageKey": null,
         "args": null,
-        "storageKey": null
+        "concreteType": "Settings",
+        "plural": false,
+        "selections": [
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "isDrawerOpen",
+            "args": null,
+            "storageKey": null
+          }
+        ]
       }
     ]
   }
@@ -62,7 +66,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "AppQuery",
+    "name": "DrawerQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": [],
@@ -70,19 +74,19 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "AppQuery",
+    "name": "DrawerQuery",
     "argumentDefinitions": [],
     "selections": (v0/*: any*/)
   },
   "params": {
     "operationKind": "query",
-    "name": "AppQuery",
+    "name": "DrawerQuery",
     "id": null,
-    "text": "query AppQuery {\n  __typename\n  remote\n}\n",
+    "text": "query DrawerQuery {\n  __typename\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'f647f0c8c97b817addff2b07100e44dc';
+(node/*: any*/).hash = '0422c70ef955056613ac1f737e681143';
 module.exports = node;

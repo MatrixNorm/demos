@@ -1,16 +1,16 @@
 // @flow
 
 import React from "react";
-import {QueryRenderer} from "react-relay";
+import { QueryRenderer, graphql } from "react-relay";
 import environment from "./env";
 
 const openStyles = {
   display: "block"
-}
+};
 
 const closedStyles = {
-  display: "hidden"
-}
+  display: "none"
+};
 
 function Drawer() {
   return (
@@ -18,6 +18,7 @@ function Drawer() {
       environment={environment}
       query={graphql`
         query DrawerQuery {
+          __typename
           settings {
             isDrawerOpen
           }

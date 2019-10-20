@@ -1,7 +1,7 @@
 // @flow
 
 import React from "react";
-import { commitLocalUpdate } from "relay-runtime";
+import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
 import { createFragmentContainer, graphql } from "react-relay";
 import environment from "./env";
 
@@ -11,7 +11,7 @@ function DrawerButton({ settings }) {
     <button
       onClick={() => {
         commitLocalUpdate(environment, store => {
-          const record = store.getRoot().getLinkedRecord("settings");
+          const record = store.get(ROOT_ID).getLinkedRecord("settings");
           record.setValue(!settings.isDrawerOpen, "isDrawerOpen");
         });
       }}
@@ -23,7 +23,7 @@ function DrawerButton({ settings }) {
 
 export default createFragmentContainer(DrawerButton, {
   settings: graphql`
-    fragment DrawerButton on Settings {
+    fragment DrawerButton_settings on Settings {
       isDrawerOpen
     }
   `

@@ -15,7 +15,7 @@ function Header() {
             name
           }
           settings {
-            ...DrawerButton
+            ...DrawerButton_settings
           }
         }
       `}

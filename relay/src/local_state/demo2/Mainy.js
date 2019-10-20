@@ -5,7 +5,7 @@ import { QueryRenderer, graphql } from "react-relay";
 import environment from "./env";
 
 const openStyles = {
-  display: "hidden"
+  display: "none"
 }
 
 const closedStyles = {
@@ -17,7 +17,8 @@ function Mainy() {
     <QueryRenderer
       environment={environment}
       query={graphql`
-        query MainQuery {
+        query MainyQuery {
+          __typename
           settings {
             isDrawerOpen
           }
@@ -29,8 +30,8 @@ function Mainy() {
         if (!props) return <div>loading...</div>;
         return (
           <main style={props.settings.isDrawerOpen ? openStyles : closedStyles}>
-            This is the main content. Sorry, but we're suffering from content
-            drought!
+            This is the main content. Sorry, but 
+            we're suffering from content drought!
           </main>
         );
       }}

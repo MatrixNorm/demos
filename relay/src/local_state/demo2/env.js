@@ -45,7 +45,7 @@ commitLocalUpdate(environment, store => {
   const dataID = `client:${__typename}`;
   const record = store.create(dataID, __typename);
 
-  record.setValue(true, "isDrawerOpen");
+  record.setValue(false, "isDrawerOpen");
 
   environment.retain({
     dataID,
