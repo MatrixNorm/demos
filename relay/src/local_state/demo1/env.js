@@ -1,5 +1,4 @@
-import { Environment, Network, RecordSource, Store } from "relay-runtime";
-import { commitLocalUpdate } from "react-relay";
+import { Environment, Network, RecordSource, Store, commitLocalUpdate } from "relay-runtime";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import typeDefs from "raw-loader!./schema.graphql";

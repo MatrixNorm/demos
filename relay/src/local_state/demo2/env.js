@@ -1,13 +1,21 @@
-import { Environment, Network, RecordSource, Store } from "relay-runtime";
-import { commitLocalUpdate } from "react-relay";
+import {
+  Environment,
+  Network,
+  RecordSource,
+  Store,
+  commitLocalUpdate
+} from "relay-runtime";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import typeDefs from "raw-loader!./schema.graphql";
 
 const resolvers = {
   Query: {
-    remote: () => {
-      return "REMOTE";
+    user: () => {
+      return {
+        id: "user#1",
+        name: "Bob"
+      };
     }
   },
   Node: {
@@ -31,7 +39,21 @@ const network = Network.create(async (operation, variables) => {
 const environment = new Environment({ network, store });
 
 commitLocalUpdate(environment, store => {
-  store.getRoot().setValue("LOCAL", "local");
+  const fieldKey = "settings";
+  const __typename = "Settings";
+
+  const dataID = `client:${__typename}`;
+  const record = store.create(dataID, __typename);
+
+  record.setValue(true, "isDrawerOpen");
+
+  environment.retain({
+    dataID,
+    variables: {},
+    node: { selections: [] }
+  });
+
+  store.getRoot().setLinkedRecord(record, fieldKey);
 });
 
 window.relayEnv = environment;

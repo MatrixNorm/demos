@@ -8,10 +8,7 @@ import PostFeed from "./PostFeed";
 import PostPagination from "./PostPagination";
 import PostPaginationControls from "./PostPaginationControls";
 
-import type {
-  AppQueryResponse,
-  AppQueryVariables
-} from "./__generated__/AppQuery.graphql";
+import type { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 
 const AppQuery = graphql`
   query AppQuery(
@@ -86,8 +83,8 @@ const App = () => {
     first: 3,
     after: null,
     orderBy: { field: "createdAt", desc: true },
-    postListingId_1: 'client:post-listing-1',
-    postListingId_2: 'client:post-listing-2'
+    postListingId_1: "client:post-listing-1",
+    postListingId_2: "client:post-listing-2"
   };
   return (
     <QueryRenderer

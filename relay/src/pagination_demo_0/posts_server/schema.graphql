@@ -41,7 +41,7 @@ type User implements Node {
   alias fragments directly like this:
       query {
         x: ...SomeFragment
-        y: ..SomeFragment
+        y: ...SomeFragment
       }
   See https://github.com/facebook/relay/issues/1983 
 """
@@ -56,7 +56,10 @@ type PostSearch {
 }
 
 type Query {
-  node(id: ID!): Node  
+  node(id: ID!): Node
+  """ XXX: rename to viewer
+      see https://github.com/nodkz/example-fragments-relay/blob/master/schema.graphql
+  """
   search: PostSearch
 }
 
