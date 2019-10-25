@@ -14,7 +14,7 @@ const resolvers = {
         }
       };
     },
-    user: (_, {id}) => {
+    user: (_, { id }) => {
       return {
         id,
         name: "Bob",
@@ -47,5 +47,6 @@ const network = Network.create(async (operation, variables) => {
   return resp;
 });
 
-window.relayStore = store;
-export default new Environment({ network, store });
+const env = new Environment({ network, store });
+window.relayEnv = env;
+export default env;

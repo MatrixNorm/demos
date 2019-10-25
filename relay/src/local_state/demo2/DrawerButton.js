@@ -1,6 +1,7 @@
 // @flow
 
 import React from "react";
+//$FlowFixMe
 import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
 import { createFragmentContainer, graphql } from "react-relay";
 import environment from "./env";

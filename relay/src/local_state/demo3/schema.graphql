@@ -1,0 +1,32 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: Viewer
+}
+
+type Viewer {
+  cities(
+    continent: Continent!,
+    pageNo: Int!
+  ): CitiesPagination
+}
+
+type CitiesPagination {
+  nodes: [City!]
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+enum Continent {
+  NorthAmerica
+  Europe
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  population: Float!
+}
