@@ -3,5 +3,6 @@ extend type Query {
 }
 
 type LocalSettings {
+  availableContinents: [Continent!]!
   selectedContinent: Continent!
 }
