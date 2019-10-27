@@ -3,11 +3,11 @@
 import React from "react";
 //$FlowFixMe
 import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
-import { createFragmentContainer, graphql } from "react-relay";
+import { createFragmentContainer, graphql, QueryRenderer } from "react-relay";
 import environment from "./env";
 
 function PaginationWrapper({ settings }) {
-  const { availableContinents, selectedContinent } = settings;
+  const { allContinents, selectedContinent } = settings;
 
   function handleChange(newSelectedContinent) {
     commitLocalUpdate(environment, store => {
@@ -17,21 +17,28 @@ function PaginationWrapper({ settings }) {
   }
 
   return (
-    <select value={selectedContinent} onChange={e => handleChange(e.target.value)}>
-      {availableContinents.map(continent => {
-        return (
-          <option value={continent} key={continent}>
-            {continent}
-          </option>
-        );
-      })}
-    </select>
+    <>
+      <select
+        value={selectedContinent}
+        onChange={e => handleChange(e.target.value)}
+      >
+        {allContinents.map(continent => {
+          return (
+            <option value={continent} key={continent}>
+              {continent}
+            </option>
+          );
+        })}
+      </select>
+      <XXX continent={selectedContinent} />
+    </>
   );
 }
 
 export default createFragmentContainer(PaginationWrapper, {
   localSettings: graphql`
     fragment PaginationWrapper_localSettings on LocalSettings {
+      allContinents
       selectedContinent
     }
   `

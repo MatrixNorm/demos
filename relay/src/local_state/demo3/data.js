@@ -36,7 +36,7 @@ const euroCities = [
   ["Krasnodar", "1,000,007"]
 ];
 
-const naCities =[
+const naCities = [
   ["Mexico City", "8,918,653"],
   ["New York City", "8,550,405"],
   ["Los Angeles", "3,971,883"],
@@ -78,3 +78,8 @@ const naCities =[
   ["San Francisco", "864,816"],
   ["Indianapolis", "853,173"]
 ];
+
+export default {
+  Europe: euroCities.map(i => ({ name: i[0], population: i[1] })),
+  NorthAmerica: naCities.map(i => ({ name: i[0], population: i[1] }))
+};

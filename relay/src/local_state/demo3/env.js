@@ -39,13 +39,14 @@ const network = Network.create(async (operation, variables) => {
 const environment = new Environment({ network, store });
 
 commitLocalUpdate(environment, store => {
-  const fieldKey = "settings";
-  const __typename = "Settings";
+  const fieldKey = "localSettings";
+  const __typename = "LocalSettings";
 
   const dataID = `client:${__typename}`;
   const record = store.create(dataID, __typename);
 
-  record.setValue(false, "isDrawerOpen");
+  record.setValue("Europe", "selectedContinent");
+  record.setValue(["Europe", "NorthAmerica"], "allContinents");
 
   environment.retain({
     dataID,
