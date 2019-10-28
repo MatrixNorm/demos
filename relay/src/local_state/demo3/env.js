@@ -8,22 +8,7 @@ import {
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import typeDefs from "raw-loader!./schema.graphql";
-
-const resolvers = {
-  Query: {
-    user: () => {
-      return {
-        id: "user#1",
-        name: "Bob"
-      };
-    }
-  },
-  Node: {
-    __resolveType(node) {
-      return node;
-    }
-  }
-};
+import resolvers from "./resolvers";
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const store = new Store(new RecordSource());
@@ -53,7 +38,7 @@ commitLocalUpdate(environment, store => {
     variables: {},
     node: { selections: [] }
   });
-
+  console.log(store.getRoot())
   store.getRoot().setLinkedRecord(record, fieldKey);
 });
 
