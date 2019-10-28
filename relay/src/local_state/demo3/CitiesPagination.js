@@ -7,15 +7,24 @@ import {
   type RelayRefetchProp
 } from "react-relay";
 
-const Pagination = ({ relay, cities }) => {
+const CitiesPagination = ({ relay, cities }) => {
   const nodes = cities && cities.nodes ? cities.nodes : [];
 
   const hasPrev = cities?.hasPreviousPage;
   const hasNext = cities?.hasNextPage;
+  const pageNo = cities?.pageNo;
 
-  function prevPagePlease() {}
+  function prevPagePlease() {
+    hasPrev && relay.refetch(prevVars => {
+      return {...prevVars, pageNo: pageNo + 1}
+    });
+  }
 
-  function nextPagePlease() {}
+  function nextPagePlease() {
+    hasNext && relay.refetch(prevVars => {
+      return {...prevVars, pageNo: pageNo - 1}
+    });
+  }
 
   return (
     <div>
@@ -34,7 +43,7 @@ const Pagination = ({ relay, cities }) => {
 };
 
 export default createRefetchContainer(
-  Pagination,
+  CitiesPagination,
   {
     cities: graphql`
       fragment CitiesPagination_cities on Viewer

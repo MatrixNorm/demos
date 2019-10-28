@@ -85,7 +85,7 @@ const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{...initialVariables}}
+      variables={{ ...initialVariables }}
       render={render}
     />
   );

@@ -16,6 +16,7 @@ type Viewer {
 
 type CitiesPagination {
   nodes: [City!]
+  pageNo: Int!
   hasNextPage: Boolean!
   hasPrevPage: Boolean!
 }
