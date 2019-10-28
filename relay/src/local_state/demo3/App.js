@@ -1,9 +1,8 @@
 // @flow
 
 import { QueryRenderer, graphql } from "react-relay";
-//$FlowFixMe
-import { ROOT_ID, commitLocalUpdate } from "relay-runtime"; 
 import React from "react";
+import CitiesView from "./CitiesView";
 import environment from "./env";
 
 function App() {
@@ -12,8 +11,9 @@ function App() {
       query={graphql`
         query AppQuery {
           __typename
-          remote
-          local
+          localSettings {
+            ...CitiesView_localSettings
+          }
         }
       `}
       environment={environment}
@@ -21,19 +21,7 @@ function App() {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return (
-          <>
-            <div>{props.local || ""}</div>
-            <input
-              value={props.local || ""}
-              onChange={e =>
-                commitLocalUpdate(environment, store => {
-                  store.get(ROOT_ID).setValue(e.target.value, "local");
-                })
-              }
-            />
-          </>
-        );
+        return <CitiesView props={props} />;
       }}
     />
   );

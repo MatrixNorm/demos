@@ -87,6 +87,7 @@ registerBuild("graphiql_demo");
 registerBuild("hooks_vs_render_props");
 registerBuild("local_state/demo1");
 registerBuild("local_state/demo2");
+registerBuild("local_state/demo3");
 registerBuild("observable");
 registerBuild("pagination_demo_0/demo1");
 registerBuild("pagination_demo_0/demo2");

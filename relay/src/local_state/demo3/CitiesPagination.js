@@ -15,15 +15,17 @@ const CitiesPagination = ({ relay, cities }) => {
   const pageNo = cities?.pageNo;
 
   function prevPagePlease() {
-    hasPrev && relay.refetch(prevVars => {
-      return {...prevVars, pageNo: pageNo + 1}
-    });
+    hasPrev &&
+      relay.refetch(prevVars => {
+        return { ...prevVars, pageNo: pageNo + 1 };
+      });
   }
 
   function nextPagePlease() {
-    hasNext && relay.refetch(prevVars => {
-      return {...prevVars, pageNo: pageNo - 1}
-    });
+    hasNext &&
+      relay.refetch(prevVars => {
+        return { ...prevVars, pageNo: pageNo - 1 };
+      });
   }
 
   return (
@@ -64,12 +66,10 @@ export default createRefetchContainer(
     `
   },
   graphql`
-    query PaginationRefetchQuery($continent: Continent!, $pageNo: Int!) {
+    query CitiesPaginationRefetchQuery($continent: Continent!, $pageNo: Int!) {
       viewer {
-        cities {
-          ...CitiesPagination_cities
-            @arguments(continent: $continent, pageNo: $pageNo)
-        }
+        ...CitiesPagination_cities
+          @arguments(continent: $continent, pageNo: $pageNo)
       }
     }
   `

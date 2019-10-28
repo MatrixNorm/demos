@@ -9,7 +9,7 @@ function CitiesPaginationWrapper({ continent }: any) {
   return (
     <QueryRenderer
       query={graphql`
-        query CitiesPaginationWrapperQuery(continent: Continent!, pageNo: Int!) {
+        query CitiesPaginationWrapperQuery($continent: Continent!, $pageNo: Int!) {
           viewer {
             ...CitiesPagination_cities
             
