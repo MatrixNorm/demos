@@ -11,12 +11,11 @@ function CitiesPaginationWrapper({ continent }: any) {
       query={graphql`
         query CitiesPaginationWrapperQuery($continent: Continent!, $pageNo: Int!) {
           viewer {
-            ...CitiesPagination_cities
-            
-            @arguments(
-              continent: $continent
-              pageNo: $pageNo
-            )
+            ...CitiesPagination_cities            
+              @arguments(
+                continent: $continent
+                pageNo: $pageNo
+              )
           }
         }
       `}

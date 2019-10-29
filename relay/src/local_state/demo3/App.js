@@ -21,7 +21,7 @@ function App() {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <CitiesView props={props} />;
+        return <CitiesView localSettings={props.localSettings} />;
       }}
     />
   );

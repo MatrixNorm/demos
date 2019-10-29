@@ -7,8 +7,8 @@ import { createFragmentContainer, graphql } from "react-relay";
 import CitiesPaginationWrapper from "./CitiesPaginationWrapper";
 import environment from "./env";
 
-function CitiesView({ settings }) {
-  const { allContinents, selectedContinent } = settings;
+function CitiesView({ localSettings }) {
+  const { allContinents, selectedContinent } = localSettings;
 
   function handleChange(newSelectedContinent) {
     commitLocalUpdate(environment, store => {

@@ -29,5 +29,5 @@ enum Continent {
 type City implements Node {
   id: ID!
   name: String!
-  population: Float!
+  population: String!
 }

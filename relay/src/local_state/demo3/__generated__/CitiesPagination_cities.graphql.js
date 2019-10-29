@@ -16,7 +16,7 @@ export type CitiesPagination_cities = {|
     +nodes: ?$ReadOnlyArray<{|
       +id: string,
       +name: string,
-      +population: number,
+      +population: string,
     |}>,
     +hasNextPage: boolean,
     +hasPrevPage: boolean,

@@ -80,6 +80,6 @@ const naCities = [
 ];
 
 export default {
-  Europe: euroCities.map(i => ({ name: i[0], population: i[1] })),
-  NorthAmerica: naCities.map(i => ({ name: i[0], population: i[1] }))
+  Europe: euroCities.map((rec, i) => ({ id:i, name: rec[0], population: rec[1] })),
+  NorthAmerica: naCities.map((rec, i) => ({ id:i, name: rec[0], population: rec[1] }))
 };
