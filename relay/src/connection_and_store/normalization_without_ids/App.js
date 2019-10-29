@@ -23,9 +23,8 @@ const AppQuery = graphql`
   query AppQuery($userId1: ID!, $userId2: ID!) {
     foo {
       bar {
-        baz {
-          hi
-        }
+        x
+        y
       }
     }
     user1: user(id: $userId1) {

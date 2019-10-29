@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 1dd881e019c6f31a8b663ef50b888d72
+ * @relayHash b1c692334f9aaf343dacc8abeb4229de
  */
 
 /* eslint-disable */
@@ -16,9 +16,8 @@ export type AppQueryVariables = {|
 export type AppQueryResponse = {|
   +foo: ?{|
     +bar: ?{|
-      +baz: ?{|
-        +hi: string
-      |}
+      +x: number,
+      +y: number,
     |}
   |},
   +user1: ?{|
@@ -58,9 +57,8 @@ query AppQuery(
 ) {
   foo {
     bar {
-      baz {
-        hi
-      }
+      x
+      y
     }
   }
   user1: user(id: $userId1) {
@@ -124,22 +122,18 @@ v1 = {
       "plural": false,
       "selections": [
         {
-          "kind": "LinkedField",
+          "kind": "ScalarField",
           "alias": null,
-          "name": "baz",
-          "storageKey": null,
+          "name": "x",
           "args": null,
-          "concreteType": "Baz",
-          "plural": false,
-          "selections": [
-            {
-              "kind": "ScalarField",
-              "alias": null,
-              "name": "hi",
-              "args": null,
-              "storageKey": null
-            }
-          ]
+          "storageKey": null
+        },
+        {
+          "kind": "ScalarField",
+          "alias": null,
+          "name": "y",
+          "args": null,
+          "storageKey": null
         }
       ]
     }
@@ -292,11 +286,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $userId1: ID!\n  $userId2: ID!\n) {\n  foo {\n    bar {\n      baz {\n        hi\n      }\n    }\n  }\n  user1: user(id: $userId1) {\n    id\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n  }\n  user2: user(id: $userId2) {\n    id\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n  }\n}\n",
+    "text": "query AppQuery(\n  $userId1: ID!\n  $userId2: ID!\n) {\n  foo {\n    bar {\n      x\n      y\n    }\n  }\n  user1: user(id: $userId1) {\n    id\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n  }\n  user2: user(id: $userId2) {\n    id\n    name\n    address {\n      state\n      city {\n        id\n        name\n      }\n      id\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '232120c7e559e8821a099a47eca0e020';
+(node/*: any*/).hash = '197b343f5c2d33d62c4c0cb46ee30bf1';
 module.exports = node;

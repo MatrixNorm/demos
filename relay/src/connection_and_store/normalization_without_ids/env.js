@@ -7,11 +7,7 @@ const resolvers = {
   Query: {
     foo: () => {
       return {
-        bar: {
-          baz: {
-            hi: "kek"
-          }
-        }
+        bar: { x: 1, y: 2 }
       };
     },
     user: (_, { id }) => {
