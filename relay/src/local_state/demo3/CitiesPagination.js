@@ -8,7 +8,7 @@ import {
 } from "react-relay";
 
 const CitiesPagination = ({ relay, cities }) => {
-  const nodes = cities && cities.nodes ? cities.nodes : [];
+  const nodes = cities && cities.cities && cities.cities.nodes ? cities.cities.nodes : [];
 
   const hasPrev = cities?.hasPreviousPage;
   const hasNext = cities?.hasNextPage;
@@ -33,8 +33,8 @@ const CitiesPagination = ({ relay, cities }) => {
       <div>
         {nodes.map(node => (
           <div key={node.id}>
-            <h4>node.name</h4>
-            <div>node.population</div>
+            <h4>{node.name}</h4>
+            <div>{node.population}</div>
           </div>
         ))}
       </div>

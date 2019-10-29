@@ -9,13 +9,13 @@ function CitiesPaginationWrapper({ continent }: any) {
   return (
     <QueryRenderer
       query={graphql`
-        query CitiesPaginationWrapperQuery($continent: Continent!, $pageNo: Int!) {
+        query CitiesPaginationWrapperQuery(
+          $continent: Continent!
+          $pageNo: Int!
+        ) {
           viewer {
-            ...CitiesPagination_cities            
-              @arguments(
-                continent: $continent
-                pageNo: $pageNo
-              )
+            ...CitiesPagination_cities
+              @arguments(continent: $continent, pageNo: $pageNo)
           }
         }
       `}
@@ -24,7 +24,7 @@ function CitiesPaginationWrapper({ continent }: any) {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <CitiesPagination />;
+        return <CitiesPagination cities={props.viewer} />;
       }}
     />
   );
