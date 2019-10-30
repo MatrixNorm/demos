@@ -12,7 +12,7 @@ import type { FragmentReference } from "relay-runtime";
 declare export opaque type CitiesPagination_cities$ref: FragmentReference;
 declare export opaque type CitiesPagination_cities$fragmentType: CitiesPagination_cities$ref;
 export type CitiesPagination_cities = {|
-  +cities: ?{|
+  +citiesPagination: ?{|
     +nodes: ?$ReadOnlyArray<{|
       +id: string,
       +name: string,
@@ -20,6 +20,7 @@ export type CitiesPagination_cities = {|
     |}>,
     +hasNextPage: boolean,
     +hasPrevPage: boolean,
+    +pageNo: number,
   |},
   +$refType: CitiesPagination_cities$ref,
 |};
@@ -54,7 +55,7 @@ const node/*: ReaderFragment*/ = {
     {
       "kind": "LinkedField",
       "alias": null,
-      "name": "cities",
+      "name": "citiesPagination",
       "storageKey": null,
       "args": [
         {
@@ -116,11 +117,18 @@ const node/*: ReaderFragment*/ = {
           "name": "hasPrevPage",
           "args": null,
           "storageKey": null
+        },
+        {
+          "kind": "ScalarField",
+          "alias": null,
+          "name": "pageNo",
+          "args": null,
+          "storageKey": null
         }
       ]
     }
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = 'e06be7cfb4e7a78b9b71bef047351ddd';
+(node/*: any*/).hash = '9fd9a80914b23154103538203ff68217';
 module.exports = node;

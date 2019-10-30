@@ -12,7 +12,7 @@ export default {
     }
   },
   Viewer: {
-    cities: (up, { continent, pageNo }) => {
+    citiesPagination: (up, { continent, pageNo }) => {
       console.log(continent, pageNo)
       const pageSize = 5;
       const cities = data[continent];

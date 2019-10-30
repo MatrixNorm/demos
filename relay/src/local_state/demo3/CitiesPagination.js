@@ -8,23 +8,24 @@ import {
 } from "react-relay";
 
 const CitiesPagination = ({ relay, cities }) => {
-  const nodes = cities && cities.cities && cities.cities.nodes ? cities.cities.nodes : [];
+  const nodes = cities?.citiesPagination?.nodes || [];
 
-  const hasPrev = cities?.hasPreviousPage;
-  const hasNext = cities?.hasNextPage;
-  const pageNo = cities?.pageNo;
+  const hasPrev = cities?.citiesPagination?.hasPrevPage;
+  const hasNext = cities?.citiesPagination?.hasNextPage;
+  const pageNo = cities?.citiesPagination?.pageNo;
+  console.log(pageNo);
 
   function prevPagePlease() {
     hasPrev &&
       relay.refetch(prevVars => {
-        return { ...prevVars, pageNo: pageNo + 1 };
+        return { ...prevVars, pageNo: pageNo - 1 };
       });
   }
 
   function nextPagePlease() {
     hasNext &&
       relay.refetch(prevVars => {
-        return { ...prevVars, pageNo: pageNo - 1 };
+        return { ...prevVars, pageNo: pageNo + 1 };
       });
   }
 
@@ -38,8 +39,11 @@ const CitiesPagination = ({ relay, cities }) => {
           </div>
         ))}
       </div>
-      {hasPrev && <button onClick={prevPagePlease}>PREV</button>}
-      {hasNext && <button onClick={nextPagePlease}>NEXT</button>}
+      <div>
+        <button onClick={prevPagePlease}>PREV</button>
+        <span>{pageNo}</span>
+        <button onClick={nextPagePlease}>NEXT</button>
+      </div>
     </div>
   );
 };
@@ -53,7 +57,7 @@ export default createRefetchContainer(
           continent: { type: "Continent!" }
           pageNo: { type: "Int!" }
         ) {
-        cities(continent: $continent, pageNo: $pageNo) {
+        citiesPagination(continent: $continent, pageNo: $pageNo) {
           nodes {
             id
             name
@@ -61,6 +65,7 @@ export default createRefetchContainer(
           }
           hasNextPage
           hasPrevPage
+          pageNo
         }
       }
     `

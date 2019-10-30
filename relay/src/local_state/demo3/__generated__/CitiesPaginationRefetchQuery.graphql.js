@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash a5478eb145247d7fddf5b68941179d82
+ * @relayHash 2afb2de3c3483a0380da16ff56b7d6c7
  */
 
 /* eslint-disable */
@@ -38,7 +38,7 @@ query CitiesPaginationRefetchQuery(
 }
 
 fragment CitiesPagination_cities_BhjEZ on Viewer {
-  cities(continent: $continent, pageNo: $pageNo) {
+  citiesPagination(continent: $continent, pageNo: $pageNo) {
     nodes {
       id
       name
@@ -46,6 +46,7 @@ fragment CitiesPagination_cities_BhjEZ on Viewer {
     }
     hasNextPage
     hasPrevPage
+    pageNo
   }
 }
 */
@@ -121,7 +122,7 @@ return {
           {
             "kind": "LinkedField",
             "alias": null,
-            "name": "cities",
+            "name": "citiesPagination",
             "storageKey": null,
             "args": (v1/*: any*/),
             "concreteType": "CitiesPagination",
@@ -172,6 +173,13 @@ return {
                 "name": "hasPrevPage",
                 "args": null,
                 "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "pageNo",
+                "args": null,
+                "storageKey": null
               }
             ]
           }
@@ -183,7 +191,7 @@ return {
     "operationKind": "query",
     "name": "CitiesPaginationRefetchQuery",
     "id": null,
-    "text": "query CitiesPaginationRefetchQuery(\n  $continent: Continent!\n  $pageNo: Int!\n) {\n  viewer {\n    ...CitiesPagination_cities_BhjEZ\n  }\n}\n\nfragment CitiesPagination_cities_BhjEZ on Viewer {\n  cities(continent: $continent, pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n  }\n}\n",
+    "text": "query CitiesPaginationRefetchQuery(\n  $continent: Continent!\n  $pageNo: Int!\n) {\n  viewer {\n    ...CitiesPagination_cities_BhjEZ\n  }\n}\n\nfragment CitiesPagination_cities_BhjEZ on Viewer {\n  citiesPagination(continent: $continent, pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
     "metadata": {}
   }
 };

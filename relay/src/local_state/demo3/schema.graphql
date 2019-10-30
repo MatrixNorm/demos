@@ -8,7 +8,7 @@ type Query {
 }
 
 type Viewer {
-  cities(
+  citiesPagination(
     continent: Continent!,
     pageNo: Int!
   ): CitiesPagination
