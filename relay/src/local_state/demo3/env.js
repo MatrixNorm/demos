@@ -5,7 +5,8 @@ import {
   Store,
   commitLocalUpdate
 } from "relay-runtime";
-import { graphql } from "graphql";
+
+import { graphql, parse } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import typeDefs from "raw-loader!./schema.graphql";
 import resolvers from "./resolvers";
@@ -13,9 +14,20 @@ import resolvers from "./resolvers";
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const store = new Store(new RecordSource());
 
+function isArtifactOfLocalQuery(operationAst) {
+  if (operationAst.definitions.length !== 1) return false;
+  let selectionSet = operationAst.definitions[0].selectionSet;
+  if (selectionSet.selections.length !== 1) return false;
+  let field = selectionSet.selections[0];
+  return field.name.value === "__typename";
+}
+
 const network = Network.create(async (operation, variables) => {
   console.log(operation.text, variables);
-  await new Promise(resolve => setTimeout(resolve, 10));
+  if (isArtifactOfLocalQuery(parse(operation.text))) {
+    return { data: { __typename: "Query" } };
+  }
+  await new Promise(resolve => setTimeout(resolve, 100));
   const resp = await graphql(schema, operation.text, {}, undefined, variables);
   console.log(resp);
   return resp;
@@ -38,7 +50,7 @@ commitLocalUpdate(environment, store => {
     variables: {},
     node: { selections: [] }
   });
-  console.log(store.getRoot())
+  console.log(store.getRoot());
   store.getRoot().setLinkedRecord(record, fieldKey);
 });
 
