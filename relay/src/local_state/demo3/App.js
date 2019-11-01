@@ -1,14 +1,14 @@
 // @flow
 
-import { QueryRenderer, graphql } from "react-relay";
+//$FlowFixMe
+import { LocalQueryRenderer, graphql } from "react-relay";
 import React from "react";
 import CitiesView from "./CitiesView";
 import environment from "./env";
 
 function App() {
   return (
-    <QueryRenderer
-      // __typename: https://github.com/facebook/relay/issues/2471
+    <LocalQueryRenderer
       query={graphql`
         query AppQuery {
           __typename

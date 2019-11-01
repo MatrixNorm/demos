@@ -14,19 +14,19 @@ import resolvers from "./resolvers";
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const store = new Store(new RecordSource());
 
-function isArtifactOfLocalQuery(ast) {
-  if (ast.definitions.length !== 1) return false;
-  let selectionSet = ast.definitions[0].selectionSet;
-  if (selectionSet.selections.length !== 1) return false;
-  let field = selectionSet.selections[0];
-  return field.name.value === "__typename";
-}
+// function isArtifactOfLocalQuery(ast) {
+//   if (ast.definitions.length !== 1) return false;
+//   let selectionSet = ast.definitions[0].selectionSet;
+//   if (selectionSet.selections.length !== 1) return false;
+//   let field = selectionSet.selections[0];
+//   return field.name.value === "__typename";
+// }
 
 const network = Network.create(async (operation, variables) => {
   console.log(operation.text, variables);
-  if (isArtifactOfLocalQuery(parse(operation.text))) {
-    return { data: { __typename: "Query" } };
-  }
+  // if (isArtifactOfLocalQuery(parse(operation.text))) {
+  //   return { data: { __typename: "Query" } };
+  // }
   await new Promise(resolve => setTimeout(resolve, 100));
   const resp = await graphql(schema, operation.text, {}, undefined, variables);
   console.log(resp);
