@@ -6,7 +6,7 @@ import {
   commitLocalUpdate
 } from "relay-runtime";
 
-import { graphql, parse } from "graphql";
+import { graphql, parse, visit } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import typeDefs from "raw-loader!./schema.graphql";
 import resolvers from "./resolvers";
@@ -14,9 +14,9 @@ import resolvers from "./resolvers";
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const store = new Store(new RecordSource());
 
-function isArtifactOfLocalQuery(operationAst) {
-  if (operationAst.definitions.length !== 1) return false;
-  let selectionSet = operationAst.definitions[0].selectionSet;
+function isArtifactOfLocalQuery(ast) {
+  if (ast.definitions.length !== 1) return false;
+  let selectionSet = ast.definitions[0].selectionSet;
   if (selectionSet.selections.length !== 1) return false;
   let field = selectionSet.selections[0];
   return field.name.value === "__typename";
