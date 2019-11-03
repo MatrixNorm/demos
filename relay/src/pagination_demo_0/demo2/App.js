@@ -1,9 +1,7 @@
 // @flow
 
-import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
-
-import environment from "./Environment";
+import PostsView from "./PostsView";
 
 const App = () => {
   return (
