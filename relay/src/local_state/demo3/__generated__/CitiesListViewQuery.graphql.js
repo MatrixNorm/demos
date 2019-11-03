@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 1434329c61449f3b01ea4c674057ea22
+ * @relayHash fed8c9c81201a6590e8a2f951889a59b
  */
 
 /* eslint-disable */
@@ -11,24 +11,24 @@
 import type { ConcreteRequest } from 'relay-runtime';
 import type { CitiesPagination_cities$ref } from "./CitiesPagination_cities.graphql";
 export type Continent = "Europe" | "NorthAmerica";
-export type CitiesPaginationWrapperQueryVariables = {|
+export type CitiesListViewQueryVariables = {|
   continent: Continent,
   pageNo: number,
 |};
-export type CitiesPaginationWrapperQueryResponse = {|
+export type CitiesListViewQueryResponse = {|
   +viewer: ?{|
     +$fragmentRefs: CitiesPagination_cities$ref
   |}
 |};
-export type CitiesPaginationWrapperQuery = {|
-  variables: CitiesPaginationWrapperQueryVariables,
-  response: CitiesPaginationWrapperQueryResponse,
+export type CitiesListViewQuery = {|
+  variables: CitiesListViewQueryVariables,
+  response: CitiesListViewQueryResponse,
 |};
 */
 
 
 /*
-query CitiesPaginationWrapperQuery(
+query CitiesListViewQuery(
   $continent: Continent!
   $pageNo: Int!
 ) {
@@ -82,7 +82,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "CitiesPaginationWrapperQuery",
+    "name": "CitiesListViewQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -107,7 +107,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "CitiesPaginationWrapperQuery",
+    "name": "CitiesListViewQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -189,13 +189,13 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "CitiesPaginationWrapperQuery",
+    "name": "CitiesListViewQuery",
     "id": null,
-    "text": "query CitiesPaginationWrapperQuery(\n  $continent: Continent!\n  $pageNo: Int!\n) {\n  viewer {\n    ...CitiesPagination_cities_BhjEZ\n  }\n}\n\nfragment CitiesPagination_cities_BhjEZ on Viewer {\n  citiesPagination(continent: $continent, pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
+    "text": "query CitiesListViewQuery(\n  $continent: Continent!\n  $pageNo: Int!\n) {\n  viewer {\n    ...CitiesPagination_cities_BhjEZ\n  }\n}\n\nfragment CitiesPagination_cities_BhjEZ on Viewer {\n  citiesPagination(continent: $continent, pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'ea8cca6197db9c43ce3ab819cc44f160';
+(node/*: any*/).hash = 'd8b1635b8d53ffb35670f63a53216907';
 module.exports = node;

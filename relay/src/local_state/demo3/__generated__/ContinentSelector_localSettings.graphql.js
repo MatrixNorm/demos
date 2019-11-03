@@ -10,24 +10,24 @@
 import type { ReaderFragment } from 'relay-runtime';
 export type Continent = "Europe" | "NorthAmerica";
 import type { FragmentReference } from "relay-runtime";
-declare export opaque type CitiesView_localSettings$ref: FragmentReference;
-declare export opaque type CitiesView_localSettings$fragmentType: CitiesView_localSettings$ref;
-export type CitiesView_localSettings = {|
+declare export opaque type ContinentSelector_localSettings$ref: FragmentReference;
+declare export opaque type ContinentSelector_localSettings$fragmentType: ContinentSelector_localSettings$ref;
+export type ContinentSelector_localSettings = {|
   +allContinents: $ReadOnlyArray<Continent>,
   +selectedContinent: Continent,
-  +$refType: CitiesView_localSettings$ref,
+  +$refType: ContinentSelector_localSettings$ref,
 |};
-export type CitiesView_localSettings$data = CitiesView_localSettings;
-export type CitiesView_localSettings$key = {
-  +$data?: CitiesView_localSettings$data,
-  +$fragmentRefs: CitiesView_localSettings$ref,
+export type ContinentSelector_localSettings$data = ContinentSelector_localSettings;
+export type ContinentSelector_localSettings$key = {
+  +$data?: ContinentSelector_localSettings$data,
+  +$fragmentRefs: ContinentSelector_localSettings$ref,
 };
 */
 
 
 const node/*: ReaderFragment*/ = {
   "kind": "Fragment",
-  "name": "CitiesView_localSettings",
+  "name": "ContinentSelector_localSettings",
   "type": "LocalSettings",
   "metadata": null,
   "argumentDefinitions": [],
@@ -54,5 +54,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '7c870e2d97d8310d3f4be3ae267df438';
+(node/*: any*/).hash = '02f548cbb367fd8ffe126e4c9c1f2fa6';
 module.exports = node;

@@ -50,7 +50,7 @@ commitLocalUpdate(environment, store => {
     variables: {},
     node: { selections: [] }
   });
-  console.log(store.getRoot());
+  //console.log(store.getRoot());
   store.getRoot().setLinkedRecord(record, fieldKey);
 });
 

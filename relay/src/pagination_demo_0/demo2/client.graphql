@@ -8,7 +8,6 @@ type LocalState {
 
 type PostListingState implements Node {
   id: ID!
-  isLoading: Boolean!
   activeField: PostOrderingFields
-  fieldConfig: [PostOrdering!]!
+  allOrderings: [PostOrdering!]!
 }

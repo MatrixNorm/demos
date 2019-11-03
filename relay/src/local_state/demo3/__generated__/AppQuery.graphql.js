@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash cc5ea1b90820759b5318571b5c341334
+ * @relayHash 78f202f08121a6ea4cdbef2bff1e0ba9
  */
 
 /* eslint-disable */
@@ -9,12 +9,13 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-import type { CitiesView_localSettings$ref } from "./CitiesView_localSettings.graphql";
+import type { CitiesListView_localSettings$ref } from "./CitiesListView_localSettings.graphql";
+import type { ContinentSelector_localSettings$ref } from "./ContinentSelector_localSettings.graphql";
 export type AppQueryVariables = {||};
 export type AppQueryResponse = {|
   +__typename: string,
   +localSettings: {|
-    +$fragmentRefs: CitiesView_localSettings$ref
+    +$fragmentRefs: ContinentSelector_localSettings$ref & CitiesListView_localSettings$ref
   |},
 |};
 export type AppQuery = {|
@@ -62,7 +63,12 @@ return {
             "selections": [
               {
                 "kind": "FragmentSpread",
-                "name": "CitiesView_localSettings",
+                "name": "ContinentSelector_localSettings",
+                "args": null
+              },
+              {
+                "kind": "FragmentSpread",
+                "name": "CitiesListView_localSettings",
                 "args": null
               }
             ]
@@ -119,5 +125,5 @@ return {
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '56ec9874cfde929684b6084761b55c3e';
+(node/*: any*/).hash = 'e5ef5f858bb71694ec72087d3479d597';
 module.exports = node;

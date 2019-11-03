@@ -4,10 +4,10 @@ import React from "react";
 //$FlowFixMe
 import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
 import { createFragmentContainer, graphql } from "react-relay";
-import CitiesPaginationWrapper from "./CitiesPaginationWrapper";
+
 import environment from "./env";
 
-function CitiesView({ localSettings }) {
+function ContinentSelector({ localSettings }) {
   const { allContinents, selectedContinent } = localSettings;
 
   function handleChange(newSelectedContinent) {
@@ -18,27 +18,24 @@ function CitiesView({ localSettings }) {
   }
 
   return (
-    <>
-      <select
-        value={selectedContinent}
-        onChange={e => handleChange(e.target.value)}
-      >
-        {allContinents.map(continent => {
-          return (
-            <option value={continent} key={continent}>
-              {continent}
-            </option>
-          );
-        })}
-      </select>
-      <CitiesPaginationWrapper continent={selectedContinent} />
-    </>
+    <select
+      value={selectedContinent}
+      onChange={e => handleChange(e.target.value)}
+    >
+      {allContinents.map(continent => {
+        return (
+          <option value={continent} key={continent}>
+            {continent}
+          </option>
+        );
+      })}
+    </select>
   );
 }
 
-export default createFragmentContainer(CitiesView, {
+export default createFragmentContainer(ContinentSelector, {
   localSettings: graphql`
-    fragment CitiesView_localSettings on LocalSettings {
+    fragment ContinentSelector_localSettings on LocalSettings {
       allContinents
       selectedContinent
     }
