@@ -7,7 +7,12 @@ import {
   type RelayRefetchProp
 } from "react-relay";
 
-const CitiesPagination = ({ relay, cities }) => {
+type Props = {
+  relay: RelayRefetchProp,
+  cities: any
+}
+
+const CitiesPagination = ({ relay, cities }: Props) => {
   const nodes = cities?.citiesPagination?.nodes || [];
 
   const hasPrev = cities?.citiesPagination?.hasPrevPage;
