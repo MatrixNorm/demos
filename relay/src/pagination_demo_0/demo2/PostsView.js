@@ -34,7 +34,7 @@ function PostsView({ listingId }: any) {
   );
 }
 
-//             <PostsListing localSettings={props.localSettings} />
+// <PostsListing localSettings={props.localSettings} />
 
 export default PostsView;
 

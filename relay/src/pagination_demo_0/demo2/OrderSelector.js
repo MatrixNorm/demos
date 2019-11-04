@@ -2,7 +2,7 @@ import React from "react";
 import { createFragmentContainer, graphql } from "react-relay";
 //$FlowFixMe
 import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
-import environment from "./env";
+import environment from "./Environment";
 
 function OrderSelector({ state }) {
   const { activeField, allOrderings } = state;
@@ -34,7 +34,12 @@ export default createFragmentContainer(OrderSelector, {
   state: graphql`
     fragment OrderSelector_state on PostListingState {
       activeField
-      allOrderings
+      allOrderings {
+        field
+        desc
+        fieldDescription_ASC
+        fieldDescription_DESC
+      }
     }
   `
 });

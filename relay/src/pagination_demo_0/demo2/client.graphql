@@ -8,7 +8,7 @@ extend type PostOrdering {
 }
 
 type LocalState {
-  postListingState(id: ID!) PostListingState
+  postListingState(id: ID!): PostListingState
 }
 
 type PostListingState implements Node {
