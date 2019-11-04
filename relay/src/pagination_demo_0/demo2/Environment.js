@@ -24,8 +24,6 @@ const network = Network.create(async (operation, variables) => {
 const environment = new Environment({ network, store });
 
 commitLocalUpdate(environment, store => {
-  
-
   const postOrderingRecords = [
     store
       .create("client:PostOrdering:0:createdAt", "PostOrdering")
@@ -52,42 +50,40 @@ commitLocalUpdate(environment, store => {
       .setValue("xxx", "fieldDescription_ASC")
       .setValue("yyy", "fieldDescription_DESC")
   ];
-  console.log(2222222222222);
-  // const postListingStateRecords = [
-  //   store
-  //     .create("client:PostListingState:0", "PostListingState")
-  //     .setValue("createdAt", "activeField")
-  //     .setLinkedRecords(
-  //       [postOrderingRecords[0], postOrderingRecords[1]],
-  //       "allOrderings"
-  //     ),
-  //   store
-  //     .create("client:PostListingState:1", "PostListingState")
-  //     .setValue("viewsCount", "activeField")
-  //     .setValue(
-  //       [postOrderingRecords[2], postOrderingRecords[3]],
-  //       "allOrderings"
-  //     )
-  // ];
+  //console.log(2222222222222);
+  const PostListingState_0 = store
+    .create("client:PostListingState:0", "PostListingState")
+    .setValue("createdAt", "activeField")
+    .setLinkedRecords(
+      [postOrderingRecords[0], postOrderingRecords[1]],
+      "allOrderings"
+    );
+  const PostListingState_1 = store
+    .create("client:PostListingState:1", "PostListingState")
+    .setValue("createdAt", "activeField")
+    .setLinkedRecords(
+      [postOrderingRecords[2], postOrderingRecords[3]],
+      "allOrderings"
+    );
 
-  // const localStateRecord = store.create("client:localState", "LocalState");
-  // localStateRecord.setLinkedRecord(
-  //   postListingStateRecords[0],
-  //   "postListingState",
-  //   { id: "0" }
-  // );
-  // localStateRecord.setLinkedRecord(
-  //   postListingStateRecords[1],
-  //   "postListingState",
-  //   { id: "1" }
-  // );
-  // store.getRoot().setLinkedRecord(localStateRecord, "localState");
+  const localStateRecord = store.create("client:localState", "LocalState");
+  localStateRecord.setLinkedRecord(
+    PostListingState_0,
+    "postListingState",
+    { id: "0" }
+  );
+  localStateRecord.setLinkedRecord(
+    PostListingState_1,
+    "postListingState",
+    { id: "1" }
+  );
+  store.getRoot().setLinkedRecord(localStateRecord, "localState");
 
-  // environment.retain({
-  //   dataID: "client:localState",
-  //   variables: {},
-  //   node: { selections: [] }
-  // });
+  environment.retain({
+    dataID: "client:localState",
+    variables: {},
+    node: { selections: [] }
+  });
   // //console.log(store.getRoot());
 });
 
