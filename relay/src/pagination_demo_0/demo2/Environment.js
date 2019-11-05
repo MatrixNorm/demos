@@ -50,7 +50,6 @@ commitLocalUpdate(environment, store => {
       .setValue("xxx", "fieldDescription_ASC")
       .setValue("yyy", "fieldDescription_DESC")
   ];
-  //console.log(2222222222222);
   const PostListingState_0 = store
     .create("client:PostListingState:0", "PostListingState")
     .setValue("createdAt", "activeField")

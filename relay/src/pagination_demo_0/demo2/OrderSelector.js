@@ -12,7 +12,7 @@ function OrderSelector({ state }) {
       const record = store
         .get(ROOT_ID)
         .getLinkedRecord("localState")
-        .getLinkedRecord("postListingState");
+        .getLinkedRecord("postListingState", { id: "0" });
       record.setValue(newActiveField, "activeField");
     });
   }
