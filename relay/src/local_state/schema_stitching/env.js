@@ -21,7 +21,6 @@ const network = Network.create(async (operation, variables) => {
   console.log(operation.text, variables);
 
   const queryAST = parse(operation.text);
-  console.log(queryAST);
 
   const clientQueryAST = visit(queryAST, {
     enter(node, key, parent) {
@@ -69,7 +68,7 @@ const network = Network.create(async (operation, variables) => {
   });
 
   console.log(clientQueryAST);
-  console.log(serverQueryAST);
+  //console.log(serverQueryAST);
 
   let serverResp = {};
   let clientResp = {};

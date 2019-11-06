@@ -1,4 +1,3 @@
-import { print } from "graphql/language/printer";
 import data from "./data";
 
 export const clientResolvers = {
@@ -15,6 +14,9 @@ export const clientResolvers = {
   LocalSettings: {
     selectedContinent: () => {
       return "Europe";
+    },
+    allContinents: () => {
+      return ["Europe", "NorthAmerica"]
     }
   },
   Node: {
@@ -31,12 +33,27 @@ export const serverResolvers = {
       return {};
     },
     test: () => {
-      return "QWERTY"
+      return "QWERTY";
     }
   },
   Node: {
     __resolveType(node) {
       return node;
+    }
+  },
+  Viewer: {
+    citiesPagination: (up, { continent, pageNo }) => {
+      console.log(continent, pageNo)
+      const pageSize = 5;
+      const cities = data[continent];
+      const begNdx = pageNo * pageSize;
+      const endNdx = (pageNo + 1) * pageSize - 1;
+      return {
+        nodes: cities.slice(begNdx, endNdx),
+        pageNo: pageNo,
+        hasNextPage: endNdx < cities.length - 1,
+        hasPrevPage: begNdx > 0
+      };
     }
   }
 };

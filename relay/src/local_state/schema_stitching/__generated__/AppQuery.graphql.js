@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash a9f294b0fbdf6e3d321096a213af97d0
+ * @relayHash d6c5f3482665bb6146c069e3d356b5b9
  */
 
 /* eslint-disable */
@@ -9,11 +9,12 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
+import type { CitiesListView_localSettings$ref } from "./CitiesListView_localSettings.graphql";
 import type { ContinentSelector_localSettings$ref } from "./ContinentSelector_localSettings.graphql";
 export type AppQueryVariables = {||};
 export type AppQueryResponse = {|
   +localSettings: {|
-    +$fragmentRefs: ContinentSelector_localSettings$ref
+    +$fragmentRefs: ContinentSelector_localSettings$ref & CitiesListView_localSettings$ref
   |},
   +test: string,
 |};
@@ -28,8 +29,13 @@ export type AppQuery = {|
 query AppQuery {
   localSettings {
     ...ContinentSelector_localSettings
+    ...CitiesListView_localSettings
   }
   test
+}
+
+fragment CitiesListView_localSettings on LocalSettings {
+  selectedContinent
 }
 
 fragment ContinentSelector_localSettings on LocalSettings {
@@ -67,6 +73,11 @@ return {
           {
             "kind": "FragmentSpread",
             "name": "ContinentSelector_localSettings",
+            "args": null
+          },
+          {
+            "kind": "FragmentSpread",
+            "name": "CitiesListView_localSettings",
             "args": null
           }
         ]
@@ -111,11 +122,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  localSettings {\n    ...ContinentSelector_localSettings\n  }\n  test\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
+    "text": "query AppQuery {\n  localSettings {\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n  test\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '96a51c918e97adebee0ea7dcb28f8a32';
+(node/*: any*/).hash = '0dcba13dcab92c1b0030c5a5119e9e9d';
 module.exports = node;

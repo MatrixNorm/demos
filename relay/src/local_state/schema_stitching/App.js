@@ -4,7 +4,7 @@
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 import ContinentSelector from "./ContinentSelector";
-// import CitiesListView from "./CitiesListView";
+import CitiesListView from "./CitiesListView";
 import environment from "./env";
 
 function App() {
@@ -14,6 +14,7 @@ function App() {
         query AppQuery {
           localSettings {
             ...ContinentSelector_localSettings
+            ...CitiesListView_localSettings
           }
           test
         }
@@ -26,6 +27,7 @@ function App() {
         return (
           <div>
             <ContinentSelector localSettings={props.localSettings} />
+            <CitiesListView localSettings={props.localSettings} />
           </div>
         );
       }}
