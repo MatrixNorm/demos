@@ -1,0 +1,8 @@
+extend type Query {
+  localSettings: LocalSettings!
+}
+
+type LocalSettings {
+  allContinents: [Continent!]!
+  selectedContinent: Continent!
+}
