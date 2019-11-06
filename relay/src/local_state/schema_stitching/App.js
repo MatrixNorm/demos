@@ -3,7 +3,7 @@
 //$FlowFixMe
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
-// import ContinentSelector from "./ContinentSelector";
+import ContinentSelector from "./ContinentSelector";
 // import CitiesListView from "./CitiesListView";
 import environment from "./env";
 
@@ -13,8 +13,9 @@ function App() {
       query={graphql`
         query AppQuery {
           localSettings {
-            selectedContinent
+            ...ContinentSelector_localSettings
           }
+          test
         }
       `}
       environment={environment}
@@ -22,7 +23,11 @@ function App() {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <div>{props.localSettings.selectedContinent}</div>;
+        return (
+          <div>
+            <ContinentSelector localSettings={props.localSettings} />
+          </div>
+        );
       }}
     />
   );

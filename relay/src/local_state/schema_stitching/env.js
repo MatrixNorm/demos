@@ -21,6 +21,7 @@ const network = Network.create(async (operation, variables) => {
   console.log(operation.text, variables);
 
   const queryAST = parse(operation.text);
+  console.log(queryAST);
 
   const clientQueryAST = visit(queryAST, {
     enter(node, key, parent) {
@@ -60,7 +61,7 @@ const network = Network.create(async (operation, variables) => {
   let clientResp = {};
 
   if (isQueryNotEmpty(serverQueryAST)) {
-    console.log(1111111)
+    console.log(1111111);
     await new Promise(resolve => setTimeout(resolve, 100));
     serverResp = await graphql(
       serverSchema,
@@ -72,7 +73,7 @@ const network = Network.create(async (operation, variables) => {
   }
 
   if (isQueryNotEmpty(clientQueryAST)) {
-    console.log(2222222)
+    console.log(2222222);
     clientResp = await graphql(
       clientSchema,
       print(clientQueryAST),
@@ -82,10 +83,11 @@ const network = Network.create(async (operation, variables) => {
     );
   }
 
+  const resp = { data: { ...serverResp.data, ...clientResp.data } };
   console.log(serverResp);
   console.log(clientResp);
-
-  return {data: {...serverResp.data, ...clientResp.data}};
+  console.log(resp);
+  return resp;
 });
 
 const store = new Store(new RecordSource());

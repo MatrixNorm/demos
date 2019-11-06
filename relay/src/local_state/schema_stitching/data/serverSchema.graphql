@@ -5,6 +5,7 @@ interface Node {
 type Query {
   node(id: ID!): Node
   viewer: Viewer
+  test: String!
 }
 
 type Viewer {

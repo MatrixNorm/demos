@@ -29,6 +29,9 @@ export const serverResolvers = {
     viewer: () => {
       console.log("viewer");
       return {};
+    },
+    test: () => {
+      return "QWERTY"
     }
   },
   Node: {

@@ -14,5 +14,5 @@ const clientExt = fs.readFileSync(
 
 const clientSchema = extendSchema(buildSchema(serverSchema), parse(clientExt));
 
-fs.writeFileSync(`${__dirname}/schema.graphql`, printSchema(clientSchema))
+fs.writeFileSync(`${__dirname}/clientSchema.graphql`, printSchema(clientSchema))
 
