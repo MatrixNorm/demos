@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 093fbf5ec32b049cfdc2d375c3ff4374
+ * @relayHash bf1d3a5f4ced03779c75cbd1e7fb7059
  */
 
 /* eslint-disable */
@@ -14,8 +14,7 @@ export type AppQueryVariables = {||};
 export type AppQueryResponse = {|
   +localSettings: {|
     +selectedContinent: Continent
-  |},
-  +foo: string,
+  |}
 |};
 export type AppQuery = {|
   variables: AppQueryVariables,
@@ -29,7 +28,6 @@ query AppQuery {
   localSettings {
     selectedContinent
   }
-  foo
 }
 */
 
@@ -52,13 +50,6 @@ var v0 = [
         "storageKey": null
       }
     ]
-  },
-  {
-    "kind": "ScalarField",
-    "alias": null,
-    "name": "foo",
-    "args": null,
-    "storageKey": null
   }
 ];
 return {
@@ -81,11 +72,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  localSettings {\n    selectedContinent\n  }\n  foo\n}\n",
+    "text": "query AppQuery {\n  localSettings {\n    selectedContinent\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '6029a74645ae96b42b2d0fa1bdd46c6a';
+(node/*: any*/).hash = 'e8a2a1fb202c4b84206e95fb693e28ea';
 module.exports = node;

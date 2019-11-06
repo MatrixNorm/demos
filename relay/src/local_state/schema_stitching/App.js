@@ -15,7 +15,6 @@ function App() {
           localSettings {
             selectedContinent
           }
-          foo
         }
       `}
       environment={environment}

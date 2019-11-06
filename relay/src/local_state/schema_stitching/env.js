@@ -1,25 +1,26 @@
-import {
-  Environment,
-  Network,
-  RecordSource,
-  Store,
-  commitLocalUpdate
-} from "relay-runtime";
-
+import { Environment, Network, RecordSource, Store } from "relay-runtime";
 import { graphql, parse, visit, print } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
-import typeDefs from "raw-loader!./data/schema.graphql";
-import resolvers from "./resolvers";
+import serverSchemaTxt from "raw-loader!./data/serverSchema.graphql";
+import schemaTxt from "raw-loader!./data/schema.graphql";
+import { serverResolvers, clientResolvers } from "./resolvers";
+import { isQueryNotEmpty } from "../../utils/graphql";
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
-const store = new Store(new RecordSource());
+const serverSchema = makeExecutableSchema({
+  typeDefs: serverSchemaTxt,
+  resolvers: serverResolvers
+});
+const clientSchema = makeExecutableSchema({
+  typeDefs: schemaTxt,
+  resolvers: clientResolvers
+});
 
 const network = Network.create(async (operation, variables) => {
   console.log(operation.text, variables);
 
   const queryAST = parse(operation.text);
 
-  const clientAST = visit(queryAST, {
+  const clientQueryAST = visit(queryAST, {
     enter(node, key, parent) {
       if (
         node.kind === "SelectionSet" &&
@@ -31,13 +32,10 @@ const network = Network.create(async (operation, variables) => {
           return selection.name.value === "localSettings";
         });
         return nodeCopy;
-        // console.log(nodeCopy.selections.filter(selection => {
-        //   return selection.name.value !== "localSettings"
-        // }));
       }
     }
   });
-  const serverAST = visit(queryAST, {
+  const serverQueryAST = visit(queryAST, {
     enter(node, key, parent) {
       if (
         node.kind === "SelectionSet" &&
@@ -53,15 +51,42 @@ const network = Network.create(async (operation, variables) => {
     }
   });
 
-  console.log(print(clientAST))
-  console.log(print(serverAST))
+  console.log(clientQueryAST);
+  console.log(serverQueryAST);
 
-  await new Promise(resolve => setTimeout(resolve, 100));
-  const resp = await graphql(schema, operation.text, {}, undefined, variables);
-  console.log(resp);
-  return resp;
+  let serverResp = {};
+  let clientResp = {};
+
+  if (isQueryNotEmpty(serverQueryAST)) {
+    console.log(1111111)
+    await new Promise(resolve => setTimeout(resolve, 100));
+    serverResp = await graphql(
+      serverSchema,
+      print(serverQueryAST),
+      {},
+      undefined,
+      variables
+    );
+  }
+
+  if (isQueryNotEmpty(clientQueryAST)) {
+    console.log(2222222)
+    clientResp = await graphql(
+      clientSchema,
+      print(clientQueryAST),
+      {},
+      undefined,
+      variables
+    );
+  }
+
+  console.log(serverResp);
+  console.log(clientResp);
+
+  return {data: {...serverResp.data, ...clientResp.data}};
 });
 
+const store = new Store(new RecordSource());
 const environment = new Environment({ network, store });
 
 window.relayEnv = environment;
