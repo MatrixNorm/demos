@@ -1,8 +1,10 @@
 import { Environment, Network, RecordSource, Store } from "relay-runtime";
 import { graphql, parse, visit, print } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
+
 import serverSchemaTxt from "raw-loader!./data/serverSchema.graphql";
-import schemaTxt from "raw-loader!./data/schema.graphql";
+import clientSchemaTxt from "raw-loader!./data/clientSchema.graphql";
+
 import { serverResolvers, clientResolvers } from "./resolvers";
 import { isQueryNotEmpty } from "../../utils/graphql";
 
@@ -11,7 +13,7 @@ const serverSchema = makeExecutableSchema({
   resolvers: serverResolvers
 });
 const clientSchema = makeExecutableSchema({
-  typeDefs: schemaTxt,
+  typeDefs: clientSchemaTxt,
   resolvers: clientResolvers
 });
 

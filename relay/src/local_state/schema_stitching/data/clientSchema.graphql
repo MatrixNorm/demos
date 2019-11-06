@@ -1,8 +1,37 @@
-extend type Query {
-  localSettings: LocalSettings!
+type CitiesPagination {
+  nodes: [City!]
+  pageNo: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  population: String!
+}
+
+enum Continent {
+  Europe
+  NorthAmerica
 }
 
 type LocalSettings {
   allContinents: [Continent!]!
   selectedContinent: Continent!
+}
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: Viewer
+  localSettings: LocalSettings!
+  foo: String!
+}
+
+type Viewer {
+  citiesPagination(continent: Continent!, pageNo: Int!): CitiesPagination
 }

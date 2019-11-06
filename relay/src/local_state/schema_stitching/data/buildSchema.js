@@ -7,12 +7,12 @@ const serverSchema = fs.readFileSync(
   `${__dirname}/serverSchema.graphql`,
   "utf8"
 );
-const clientSchema = fs.readFileSync(
-  `${__dirname}/clientSchema.graphql`,
+const clientExt = fs.readFileSync(
+  `${__dirname}/clientExt.graphql`,
   "utf8"
 );
 
-const schema = extendSchema(buildSchema(serverSchema), parse(clientSchema));
+const clientSchema = extendSchema(buildSchema(serverSchema), parse(clientExt));
 
-fs.writeFileSync(`${__dirname}/schema.graphql`, printSchema(schema))
+fs.writeFileSync(`${__dirname}/schema.graphql`, printSchema(clientSchema))
 
