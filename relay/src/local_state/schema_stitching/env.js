@@ -38,6 +38,14 @@ const network = Network.create(async (operation, variables) => {
       }
     }
   });
+
+  const clientQueryFragments = [];
+  visit(clientQueryAST, {
+    FragmentDefinition(node) {
+      clientQueryFragments.push(node.name.value);
+    }
+  });
+
   const serverQueryAST = visit(queryAST, {
     enter(node, key, parent) {
       if (
@@ -50,6 +58,12 @@ const network = Network.create(async (operation, variables) => {
           return selection.name.value !== "localSettings";
         });
         return nodeCopy;
+      }
+      if (
+        node.kind === "FragmentDefinition" &&
+        clientQueryFragments.includes(node.name.value)
+      ) {
+        return null;
       }
     }
   });
