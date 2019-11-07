@@ -2,12 +2,7 @@ import data from "./data";
 
 export const clientResolvers = {
   Query: {
-    viewer: () => {
-      console.log("viewer");
-      return {};
-    },
     localSettings: () => {
-      console.log("localSettings");
       return {};
     }
   },
@@ -16,7 +11,7 @@ export const clientResolvers = {
       return "Europe";
     },
     allContinents: () => {
-      return ["Europe", "NorthAmerica"]
+      return ["Europe", "NorthAmerica"];
     }
   },
   Node: {
@@ -29,7 +24,6 @@ export const clientResolvers = {
 export const serverResolvers = {
   Query: {
     viewer: () => {
-      console.log("viewer");
       return {};
     },
     test: () => {
@@ -43,7 +37,7 @@ export const serverResolvers = {
   },
   Viewer: {
     citiesPagination: (up, { continent, pageNo }) => {
-      console.log(continent, pageNo)
+      console.log(continent, pageNo);
       const pageSize = 5;
       const cities = data[continent];
       const begNdx = pageNo * pageSize;

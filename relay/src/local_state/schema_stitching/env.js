@@ -18,11 +18,9 @@ const clientSchema = makeExecutableSchema({
 });
 
 const network = Network.create(async (operation, variables) => {
-  console.log(operation.text, variables);
-
+  //console.log(operation.text, variables);
   const queryAST = parse(operation.text);
   //console.log(queryAST);
-
   const clientQueryFragments = [];
 
   let clientQueryAST = visit(queryAST, {
@@ -54,15 +52,16 @@ const network = Network.create(async (operation, variables) => {
     }
   });
   // remove non-local fragments from client query
-  visit(clientQueryAST, {
+  clientQueryAST = visit(clientQueryAST, {
     enter(node) {
-      if (node.kind === "FragmentSpread") {
+      if (
+        node.kind === "FragmentSpread" &&
+        !clientQueryFragments.includes(node.name.value)
+      ) {
         return null;
       }
     }
   });
-
-  //console.log(77777777, clientQueryFragments);
 
   const serverQueryAST = visit(queryAST, {
     enter(node, key, parent) {
@@ -90,17 +89,17 @@ const network = Network.create(async (operation, variables) => {
   });
 
   console.log("============");
-  console.log(clientQueryAST);
-  console.log(print(clientQueryAST));
-  console.log(serverQueryAST);
-  console.log(print(serverQueryAST));
+  //console.log(clientQueryAST);
+  console.log("client: ", print(clientQueryAST));
+  //console.log(serverQueryAST);
+  console.log("server: ", print(serverQueryAST));
   console.log("############");
 
   let serverResp = {};
   let clientResp = {};
 
   if (isQueryNotEmpty(serverQueryAST)) {
-    console.log(1111111);
+    console.log("Server query is not empty");
     await new Promise(resolve => setTimeout(resolve, 100));
     serverResp = await graphql(
       serverSchema,
@@ -112,7 +111,7 @@ const network = Network.create(async (operation, variables) => {
   }
 
   if (isQueryNotEmpty(clientQueryAST)) {
-    console.log(2222222);
+    console.log("Client query is not empty");
     clientResp = await graphql(
       clientSchema,
       print(clientQueryAST),
