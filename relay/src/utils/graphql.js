@@ -1,5 +1,17 @@
-
+import { visit } from "graphql";
 
 export function isQueryNotEmpty(queryAST) {
-  return queryAST.definitions.some(def => def.selectionSet.selections.length !== 0)
+  let isNonEmpty = true;
+  visit(queryAST, {
+    enter(node) {
+      if (
+        node.kind === "OperationDefinition" &&
+        node.operation === "query" &&
+        node.selectionSet === null
+      ) {
+        isNonEmpty = false;
+      }
+    }
+  });
+  return isNonEmpty;
 }

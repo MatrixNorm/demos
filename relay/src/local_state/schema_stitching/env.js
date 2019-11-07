@@ -21,29 +21,48 @@ const network = Network.create(async (operation, variables) => {
   console.log(operation.text, variables);
 
   const queryAST = parse(operation.text);
+  //console.log(queryAST);
 
-  const clientQueryAST = visit(queryAST, {
+  const clientQueryFragments = [];
+
+  let clientQueryAST = visit(queryAST, {
     enter(node, key, parent) {
       if (
         node.kind === "SelectionSet" &&
-        parent.kind === "OperationDefinition"
+        parent.kind === "OperationDefinition" &&
+        parent.operation === "query"
       ) {
         const nodeCopy = JSON.parse(JSON.stringify(node));
-
-        nodeCopy.selections = nodeCopy.selections.filter(selection => {
+        const clientSelections = nodeCopy.selections.filter(selection => {
           return selection.name.value === "localSettings";
         });
+        if (clientSelections.length === 0) {
+          return null;
+        }
+
+        visit(clientSelections, {
+          enter(node) {
+            if (node.kind === "FragmentSpread") {
+              clientQueryFragments.push(node.name.value);
+            }
+          }
+        });
+
+        nodeCopy.selections = clientSelections;
         return nodeCopy;
       }
     }
   });
-
-  const clientQueryFragments = [];
+  // remove non-local fragments from client query
   visit(clientQueryAST, {
-    FragmentDefinition(node) {
-      clientQueryFragments.push(node.name.value);
+    enter(node) {
+      if (node.kind === "FragmentSpread") {
+        return null;
+      }
     }
   });
+
+  //console.log(77777777, clientQueryFragments);
 
   const serverQueryAST = visit(queryAST, {
     enter(node, key, parent) {
@@ -52,10 +71,13 @@ const network = Network.create(async (operation, variables) => {
         parent.kind === "OperationDefinition"
       ) {
         const nodeCopy = JSON.parse(JSON.stringify(node));
-
-        nodeCopy.selections = nodeCopy.selections.filter(selection => {
+        const serverSelections = nodeCopy.selections.filter(selection => {
           return selection.name.value !== "localSettings";
         });
+        if (serverSelections.length === 0) {
+          return null;
+        }
+        nodeCopy.selections = serverSelections;
         return nodeCopy;
       }
       if (
@@ -67,8 +89,12 @@ const network = Network.create(async (operation, variables) => {
     }
   });
 
+  console.log("============");
   console.log(clientQueryAST);
-  //console.log(serverQueryAST);
+  console.log(print(clientQueryAST));
+  console.log(serverQueryAST);
+  console.log(print(serverQueryAST));
+  console.log("############");
 
   let serverResp = {};
   let clientResp = {};
