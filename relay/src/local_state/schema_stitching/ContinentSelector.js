@@ -9,7 +9,9 @@ import environment from "./env";
 
 const mutation = graphql`
   mutation ContinentSelectorMutation($continent: Continent!) {
-    updateSelectedContinent(continent: $continent) @local
+    updateSelectedContinent(continent: $continent) @local {
+      selectedContinent
+    }
   }
 `;
 
@@ -21,6 +23,10 @@ function ContinentSelector({ localSettings }) {
     commitMutation(environment, {
       mutation,
       variables,
+      // updater: store => {
+      //   //const payload = store.getRootField("updateSelectedContinent");
+      //   console.log(store);
+      // },
       onCompleted: (response, errors) => {
         console.log("Response received from server.", response, errors);
       },

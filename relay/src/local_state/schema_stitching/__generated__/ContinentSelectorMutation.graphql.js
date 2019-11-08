@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash dc730bd1f2165ef7c7d7b2a9245fe884
+ * @relayHash 8c154c076b81bebf8e97aff6afbaad54
  */
 
 /* eslint-disable */
@@ -14,7 +14,9 @@ export type ContinentSelectorMutationVariables = {|
   continent: Continent
 |};
 export type ContinentSelectorMutationResponse = {|
-  +updateSelectedContinent: Continent
+  +updateSelectedContinent: ?{|
+    +selectedContinent: Continent
+  |}
 |};
 export type ContinentSelectorMutation = {|
   variables: ContinentSelectorMutationVariables,
@@ -27,7 +29,9 @@ export type ContinentSelectorMutation = {|
 mutation ContinentSelectorMutation(
   $continent: Continent!
 ) {
-  updateSelectedContinent(continent: $continent) @local
+  updateSelectedContinent(continent: $continent) @local {
+    selectedContinent
+  }
 }
 */
 
@@ -42,9 +46,10 @@ var v0 = [
 ],
 v1 = [
   {
-    "kind": "ScalarField",
+    "kind": "LinkedField",
     "alias": null,
     "name": "updateSelectedContinent",
+    "storageKey": null,
     "args": [
       {
         "kind": "Variable",
@@ -52,7 +57,17 @@ v1 = [
         "variableName": "continent"
       }
     ],
-    "storageKey": null
+    "concreteType": "LocalSettings",
+    "plural": false,
+    "selections": [
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "selectedContinent",
+        "args": null,
+        "storageKey": null
+      }
+    ]
   }
 ];
 return {
@@ -75,11 +90,11 @@ return {
     "operationKind": "mutation",
     "name": "ContinentSelectorMutation",
     "id": null,
-    "text": "mutation ContinentSelectorMutation(\n  $continent: Continent!\n) {\n  updateSelectedContinent(continent: $continent) @local\n}\n",
+    "text": "mutation ContinentSelectorMutation(\n  $continent: Continent!\n) {\n  updateSelectedContinent(continent: $continent) @local {\n    selectedContinent\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'c7315366c068e66e54b0ec8717b873d7';
+(node/*: any*/).hash = 'b9b6d53a3cb745ee782cef1b8b78b52f';
 module.exports = node;

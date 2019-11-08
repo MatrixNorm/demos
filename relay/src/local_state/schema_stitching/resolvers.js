@@ -1,5 +1,10 @@
 import data from "./data";
 
+const localSettings = {
+  selectedContinent: "Europe",
+  allContinents: ["Europe", "NorthAmerica"]
+}
+
 export const clientResolvers = {
   Query: {
     localSettings: () => {
@@ -8,15 +13,21 @@ export const clientResolvers = {
   },
   LocalSettings: {
     selectedContinent: () => {
-      return "Europe";
+      return localSettings.selectedContinent;
     },
     allContinents: () => {
-      return ["Europe", "NorthAmerica"];
+      return localSettings.allContinents;
     }
   },
   Node: {
     __resolveType(node) {
       return node;
+    }
+  },
+  Mutation: {
+    updateSelectedContinent: (_, { continent }) => {
+      localSettings.selectedContinent = continent;
+      return continent
     }
   }
 };

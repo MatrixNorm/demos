@@ -1,7 +1,7 @@
 directive @local on FIELD
 
 extend type Mutation {
-  updateSelectedContinent(continent: Continent!): Continent!
+  updateSelectedContinent(continent: Continent!): LocalSettings
 }
 
 extend type Query {
