@@ -1,6 +1,5 @@
 // @flow
 
-//$FlowFixMe
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 import ContinentSelector from "./ContinentSelector";
@@ -12,7 +11,7 @@ function App() {
     <QueryRenderer
       query={graphql`
         query AppQuery {
-          localSettings {
+          localSettings @local {
             ...ContinentSelector_localSettings
             ...CitiesListView_localSettings
           }

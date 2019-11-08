@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash d6c5f3482665bb6146c069e3d356b5b9
+ * @relayHash 1d7d5aa8a17fe799f57447406803a19d
  */
 
 /* eslint-disable */
@@ -27,7 +27,7 @@ export type AppQuery = {|
 
 /*
 query AppQuery {
-  localSettings {
+  localSettings @local {
     ...ContinentSelector_localSettings
     ...CitiesListView_localSettings
   }
@@ -122,11 +122,11 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  localSettings {\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n  test\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
+    "text": "query AppQuery {\n  localSettings @local {\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n  test\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '0dcba13dcab92c1b0030c5a5119e9e9d';
+(node/*: any*/).hash = 'd741571d6d09d02e96d60e6effd7f9c0';
 module.exports = node;

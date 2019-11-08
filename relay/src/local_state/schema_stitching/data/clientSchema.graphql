@@ -1,3 +1,5 @@
+directive @local on FIELD
+
 type CitiesPagination {
   nodes: [City!]
   pageNo: Int!
@@ -19,6 +21,11 @@ enum Continent {
 type LocalSettings {
   allContinents: [Continent!]!
   selectedContinent: Continent!
+}
+
+type Mutation {
+  dummy(x: Int!): Int!
+  updateSelectedContinent(continent: Continent!): Continent!
 }
 
 interface Node {

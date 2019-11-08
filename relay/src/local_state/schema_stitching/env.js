@@ -32,7 +32,9 @@ const network = Network.create(async (operation, variables) => {
       ) {
         const nodeCopy = JSON.parse(JSON.stringify(node));
         const clientSelections = nodeCopy.selections.filter(selection => {
-          return selection.name.value === "localSettings";
+          return selection.directives.some(
+            directive => directive.name.value === "local"
+          );
         });
         if (clientSelections.length === 0) {
           return null;
@@ -71,7 +73,9 @@ const network = Network.create(async (operation, variables) => {
       ) {
         const nodeCopy = JSON.parse(JSON.stringify(node));
         const serverSelections = nodeCopy.selections.filter(selection => {
-          return selection.name.value !== "localSettings";
+          return !selection.directives.some(
+            directive => directive.name.value === "local"
+          );
         });
         if (serverSelections.length === 0) {
           return null;

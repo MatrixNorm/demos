@@ -1,3 +1,9 @@
+directive @local on FIELD
+
+extend type Mutation {
+  updateSelectedContinent(continent: Continent!): Continent!
+}
+
 extend type Query {
   localSettings: LocalSettings!
 }

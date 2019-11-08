@@ -2,6 +2,10 @@ interface Node {
   id: ID!
 }
 
+type Mutation {
+  dummy(x: Int!): Int!
+}
+
 type Query {
   node(id: ID!): Node
   viewer: Viewer
