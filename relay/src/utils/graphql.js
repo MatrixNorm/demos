@@ -6,7 +6,7 @@ export function isQueryNotEmpty(queryAST) {
     enter(node) {
       if (
         node.kind === "OperationDefinition" &&
-        node.operation === "query" &&
+        (node.operation === "query" || node.operation === "mutation") &&
         node.selectionSet === null
       ) {
         isNonEmpty = false;

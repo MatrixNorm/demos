@@ -7,33 +7,29 @@ import { commitMutation, createFragmentContainer, graphql } from "react-relay";
 
 import environment from "./env";
 
-// const mutation = graphql`
-//   mutation UpdateSelectedContinentMutation($continent: Continent!) {
-//     updateSelectedContinent(continent: $continent) {
-//       selectedContinent
-//     }
-//   }
-// `;
+const mutation = graphql`
+  mutation ContinentSelectorMutation($continent: Continent!) {
+    updateSelectedContinent(continent: $continent) @local
+  }
+`;
 
 function ContinentSelector({ localSettings }) {
   const { allContinents, selectedContinent } = localSettings;
 
-  function handleChange(newSelectedContinent) {
-    // commitMutation(
-    //   environment,
-    //   {
-    //     mutation,
-    //     variables,
-    //     onCompleted: (response, errors) => {
-    //       console.log('Response received from server.')
-    //     },
-    //     onError: err => console.error(err),
-    //   },
-    // );
-    commitLocalUpdate(environment, store => {
-      const record = store.get(ROOT_ID).getLinkedRecord("localSettings");
-      record.setValue(newSelectedContinent, "selectedContinent");
+  function handleChange(continent) {
+    const variables = { continent };
+    commitMutation(environment, {
+      mutation,
+      variables,
+      onCompleted: (response, errors) => {
+        console.log("Response received from server.", response, errors);
+      },
+      onError: err => console.error(err)
     });
+    // commitLocalUpdate(environment, store => {
+    //   const record = store.get(ROOT_ID).getLinkedRecord("localSettings");
+    //   record.setValue(newSelectedContinent, "selectedContinent");
+    // });
   }
 
   return (

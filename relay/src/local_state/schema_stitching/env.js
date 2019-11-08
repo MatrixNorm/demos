@@ -20,7 +20,7 @@ const clientSchema = makeExecutableSchema({
 const network = Network.create(async (operation, variables) => {
   //console.log(operation.text, variables);
   const queryAST = parse(operation.text);
-  //console.log(queryAST);
+  console.log(queryAST);
   const clientQueryFragments = [];
 
   let clientQueryAST = visit(queryAST, {
@@ -28,7 +28,7 @@ const network = Network.create(async (operation, variables) => {
       if (
         node.kind === "SelectionSet" &&
         parent.kind === "OperationDefinition" &&
-        parent.operation === "query"
+        (parent.operation === "query" || parent.operation === "mutation")
       ) {
         const nodeCopy = JSON.parse(JSON.stringify(node));
         const clientSelections = nodeCopy.selections.filter(selection => {
@@ -69,7 +69,8 @@ const network = Network.create(async (operation, variables) => {
     enter(node, key, parent) {
       if (
         node.kind === "SelectionSet" &&
-        parent.kind === "OperationDefinition"
+        parent.kind === "OperationDefinition" &&
+        (parent.operation === "query" || parent.operation === "mutation")
       ) {
         const nodeCopy = JSON.parse(JSON.stringify(node));
         const serverSelections = nodeCopy.selections.filter(selection => {
@@ -93,9 +94,9 @@ const network = Network.create(async (operation, variables) => {
   });
 
   console.log("============");
-  //console.log(clientQueryAST);
+  console.log(clientQueryAST);
   console.log("client: ", print(clientQueryAST));
-  //console.log(serverQueryAST);
+  console.log(serverQueryAST);
   console.log("server: ", print(serverQueryAST));
   console.log("############");
 
