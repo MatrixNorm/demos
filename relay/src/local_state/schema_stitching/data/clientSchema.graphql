@@ -19,13 +19,14 @@ enum Continent {
 }
 
 type LocalSettings {
+  id: ID!
   allContinents: [Continent!]!
   selectedContinent: Continent!
 }
 
 type Mutation {
   dummy(x: Int!): Int!
-  updateSelectedContinent(continent: Continent!): LocalSettings
+  updateSelectedContinent(input: UpdateSelectedContinentInput!): UpdateSelectedContinentPayload!
 }
 
 interface Node {
@@ -37,6 +38,16 @@ type Query {
   viewer: Viewer
   test: String!
   localSettings: LocalSettings!
+}
+
+input UpdateSelectedContinentInput {
+  continent: Continent!
+  clientMutationId: String
+}
+
+type UpdateSelectedContinentPayload {
+  continent: Continent!
+  clientMutationId: String
 }
 
 type Viewer {

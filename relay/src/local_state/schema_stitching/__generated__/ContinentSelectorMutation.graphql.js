@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8c154c076b81bebf8e97aff6afbaad54
+ * @relayHash 11b44dd52c29f9744b621ff469b734e1
  */
 
 /* eslint-disable */
@@ -10,12 +10,17 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 export type Continent = "Europe" | "NorthAmerica";
+export type UpdateSelectedContinentInput = {|
+  continent: Continent,
+  clientMutationId?: ?string,
+|};
 export type ContinentSelectorMutationVariables = {|
-  continent: Continent
+  input: UpdateSelectedContinentInput
 |};
 export type ContinentSelectorMutationResponse = {|
-  +updateSelectedContinent: ?{|
-    +selectedContinent: Continent
+  +updateSelectedContinent: {|
+    +continent: Continent,
+    +clientMutationId: ?string,
   |}
 |};
 export type ContinentSelectorMutation = {|
@@ -27,10 +32,11 @@ export type ContinentSelectorMutation = {|
 
 /*
 mutation ContinentSelectorMutation(
-  $continent: Continent!
+  $input: UpdateSelectedContinentInput!
 ) {
-  updateSelectedContinent(continent: $continent) @local {
-    selectedContinent
+  updateSelectedContinent(input: $input) @local {
+    continent
+    clientMutationId
   }
 }
 */
@@ -39,8 +45,8 @@ const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "continent",
-    "type": "Continent!",
+    "name": "input",
+    "type": "UpdateSelectedContinentInput!",
     "defaultValue": null
   }
 ],
@@ -53,17 +59,24 @@ v1 = [
     "args": [
       {
         "kind": "Variable",
-        "name": "continent",
-        "variableName": "continent"
+        "name": "input",
+        "variableName": "input"
       }
     ],
-    "concreteType": "LocalSettings",
+    "concreteType": "UpdateSelectedContinentPayload",
     "plural": false,
     "selections": [
       {
         "kind": "ScalarField",
         "alias": null,
-        "name": "selectedContinent",
+        "name": "continent",
+        "args": null,
+        "storageKey": null
+      },
+      {
+        "kind": "ScalarField",
+        "alias": null,
+        "name": "clientMutationId",
         "args": null,
         "storageKey": null
       }
@@ -90,11 +103,11 @@ return {
     "operationKind": "mutation",
     "name": "ContinentSelectorMutation",
     "id": null,
-    "text": "mutation ContinentSelectorMutation(\n  $continent: Continent!\n) {\n  updateSelectedContinent(continent: $continent) @local {\n    selectedContinent\n  }\n}\n",
+    "text": "mutation ContinentSelectorMutation(\n  $input: UpdateSelectedContinentInput!\n) {\n  updateSelectedContinent(input: $input) @local {\n    continent\n    clientMutationId\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'b9b6d53a3cb745ee782cef1b8b78b52f';
+(node/*: any*/).hash = 'c6cb7c713deedad3ad902e31389d4fde';
 module.exports = node;

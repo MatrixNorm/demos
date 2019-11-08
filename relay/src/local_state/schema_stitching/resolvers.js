@@ -1,14 +1,15 @@
 import data from "./data";
 
 const localSettings = {
+  id: "localSettings#singleton",
   selectedContinent: "Europe",
   allContinents: ["Europe", "NorthAmerica"]
-}
+};
 
 export const clientResolvers = {
   Query: {
     localSettings: () => {
-      return {};
+      return { id: localSettings.id };
     }
   },
   LocalSettings: {
@@ -25,9 +26,10 @@ export const clientResolvers = {
     }
   },
   Mutation: {
-    updateSelectedContinent: (_, { continent }) => {
-      localSettings.selectedContinent = continent;
-      return continent
+    updateSelectedContinent: (_, args) => {
+      console.log(args);
+      localSettings.selectedContinent = args.input.continent;
+      return { continent: localSettings.selectedContinent };
     }
   }
 };

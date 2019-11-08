@@ -12,6 +12,7 @@ function App() {
       query={graphql`
         query AppQuery {
           localSettings @local {
+            id
             ...ContinentSelector_localSettings
             ...CitiesListView_localSettings
           }

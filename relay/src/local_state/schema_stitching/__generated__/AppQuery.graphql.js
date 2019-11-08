@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 1d7d5aa8a17fe799f57447406803a19d
+ * @relayHash e2ac0a8074e504751071d2c27db0bfe1
  */
 
 /* eslint-disable */
@@ -14,7 +14,8 @@ import type { ContinentSelector_localSettings$ref } from "./ContinentSelector_lo
 export type AppQueryVariables = {||};
 export type AppQueryResponse = {|
   +localSettings: {|
-    +$fragmentRefs: ContinentSelector_localSettings$ref & CitiesListView_localSettings$ref
+    +id: string,
+    +$fragmentRefs: ContinentSelector_localSettings$ref & CitiesListView_localSettings$ref,
   |},
   +test: string,
 |};
@@ -28,6 +29,7 @@ export type AppQuery = {|
 /*
 query AppQuery {
   localSettings @local {
+    id
     ...ContinentSelector_localSettings
     ...CitiesListView_localSettings
   }
@@ -46,6 +48,13 @@ fragment ContinentSelector_localSettings on LocalSettings {
 
 const node/*: ConcreteRequest*/ = (function(){
 var v0 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "id",
+  "args": null,
+  "storageKey": null
+},
+v1 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "test",
@@ -70,6 +79,7 @@ return {
         "concreteType": "LocalSettings",
         "plural": false,
         "selections": [
+          (v0/*: any*/),
           {
             "kind": "FragmentSpread",
             "name": "ContinentSelector_localSettings",
@@ -82,7 +92,7 @@ return {
           }
         ]
       },
-      (v0/*: any*/)
+      (v1/*: any*/)
     ]
   },
   "operation": {
@@ -99,6 +109,7 @@ return {
         "concreteType": "LocalSettings",
         "plural": false,
         "selections": [
+          (v0/*: any*/),
           {
             "kind": "ScalarField",
             "alias": null,
@@ -115,18 +126,18 @@ return {
           }
         ]
       },
-      (v0/*: any*/)
+      (v1/*: any*/)
     ]
   },
   "params": {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery {\n  localSettings @local {\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n  test\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
+    "text": "query AppQuery {\n  localSettings @local {\n    id\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n  test\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'd741571d6d09d02e96d60e6effd7f9c0';
+(node/*: any*/).hash = '45144a25cf61b5b5bd287c3b312b855f';
 module.exports = node;

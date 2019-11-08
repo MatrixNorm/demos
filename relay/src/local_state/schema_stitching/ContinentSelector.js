@@ -2,40 +2,39 @@
 
 import React from "react";
 //$FlowFixMe
-import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
+import { ROOT_ID } from "relay-runtime";
 import { commitMutation, createFragmentContainer, graphql } from "react-relay";
 
-import environment from "./env";
-
 const mutation = graphql`
-  mutation ContinentSelectorMutation($continent: Continent!) {
-    updateSelectedContinent(continent: $continent) @local {
-      selectedContinent
+  mutation ContinentSelectorMutation($input: UpdateSelectedContinentInput!) {
+    updateSelectedContinent(input: $input) @local {
+      continent
+      clientMutationId
     }
   }
 `;
 
-function ContinentSelector({ localSettings }) {
+function ContinentSelector({ relay, localSettings }) {
   const { allContinents, selectedContinent } = localSettings;
 
   function handleChange(continent) {
-    const variables = { continent };
-    commitMutation(environment, {
+    const variables = { input: { continent } };
+    commitMutation(relay.environment, {
       mutation,
       variables,
-      // updater: store => {
-      //   //const payload = store.getRootField("updateSelectedContinent");
-      //   console.log(store);
-      // },
+      updater: store => {
+        const payload = store.getRootField("updateSelectedContinent");
+        const continent = payload.getValue("continent");
+        store
+          .get("localSettings#singleton")
+          .setValue(continent, "selectedContinent");
+      },
       onCompleted: (response, errors) => {
-        console.log("Response received from server.", response, errors);
+        console.log(response);
+
       },
       onError: err => console.error(err)
     });
-    // commitLocalUpdate(environment, store => {
-    //   const record = store.get(ROOT_ID).getLinkedRecord("localSettings");
-    //   record.setValue(newSelectedContinent, "selectedContinent");
-    // });
   }
 
   return (
