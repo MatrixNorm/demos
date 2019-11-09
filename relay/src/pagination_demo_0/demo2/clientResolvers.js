@@ -2,55 +2,57 @@ const localState = {
   postListing: {
     "1": {
       id: "1",
-      activeField: "createdAt",
-      allOrderings: [
-        {
+      sorting: ["createdAt", "viewsCount"],
+      orders: {
+        createdAt: {
           field: "createdAt",
           desc: false,
           fieldDescription_ASC: "AAA",
-          fieldDescription_DESC: "BBB"
+          fieldDescription_DESC: "BBB",
+          isActive: true
         },
-        {
+        viewsCount: {
           field: "viewsCount",
           desc: false,
           fieldDescription_ASC: "XXX",
           fieldDescription_DESC: "YYY"
         }
-      ]
+      }
     },
     "2": {
       id: "2",
-      activeField: "createdAt",
-      allOrderings: [
-        {
+      sorting: ["createdAt", "viewsCount"],
+      orders: {
+        createdAt: {
           field: "createdAt",
           desc: false,
           fieldDescription_ASC: "AAA",
           fieldDescription_DESC: "BBB"
         },
-        {
+        viewsCount: {
           field: "viewsCount",
           desc: false,
           fieldDescription_ASC: "XXX",
-          fieldDescription_DESC: "YYY"
+          fieldDescription_DESC: "YYY",
+          isActive: true
         }
-      ]
+      }
     }
   }
 };
 
 export const clientResolvers = {
   Query: {
-    localState: (_, { id }) => {
-      return { id };
+    localState: () => {
+      console.log("localState");
+      return {};
     }
   },
   LocalState: {
-    activeField: ({ id }) => {
-      return localState.postListing[id].activeField;
-    },
-    allOrderings: ({ id }) => {
-      return localState.postListing[id].allOrderings;
+    postListing: ({ id }) => {
+      console.log("postListing");
+      const x = localState.postListing[id];
+      return x.sorting(field => x.orders[field]);
     }
   },
   Node: {
@@ -67,7 +69,8 @@ export const clientResolvers = {
     },
     togglePostListingDirection: (_, { input }) => {
       console.log(input);
-      const activeField = localState.postListing[input.postListingId].activeField;
+      const activeField =
+        localState.postListing[input.postListingId].activeField;
       return { ...input };
     }
   }
