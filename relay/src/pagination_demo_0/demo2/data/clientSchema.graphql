@@ -1,5 +1,23 @@
+directive @local on FIELD
+
+input ChangePostListingActiveFieldInput {
+  postListingId: ID!
+  activeField: PostOrderingField!
+}
+
+type ChangePostListingActiveFieldPayload {
+  postListingId: ID!
+  activeField: PostOrderingField!
+}
+
 type LocalState {
   postListing(id: ID!): PostListing
+}
+
+type Mutation {
+  dummy(x: Int!): Int!
+  changePostListingActiveField(input: ChangePostListingActiveFieldInput!): ChangePostListingActiveFieldPayload!
+  togglePostListingDirection(input: TogglePostListingDirectionInput!): TogglePostListingDirectionPayload!
 }
 
 interface Node {
@@ -34,24 +52,28 @@ type PostEdge {
 
 type PostListing implements Node {
   id: ID!
-  activeField: PostOrderingFields
-  allOrderings: [PostOrdering!]!
+  activeField: PostOrderingField!
+  allOrderings: [PostListingOrdering!]!
 }
 
-type PostOrdering {
-  field: PostOrderingFields!
-  desc: Boolean!
+type PostListingOrdering {
+  order: PostOrdering!
   fieldDescription_ASC: String!
   fieldDescription_DESC: String!
 }
 
-enum PostOrderingFields {
+type PostOrdering {
+  field: PostOrderingField!
+  desc: Boolean!
+}
+
+enum PostOrderingField {
   createdAt
   viewsCount
 }
 
 input PostOrderingInput {
-  field: PostOrderingFields!
+  field: PostOrderingField!
   desc: Boolean!
 }
 
@@ -77,6 +99,14 @@ type Query {
   """
   search: PostSearch
   localState: LocalState!
+}
+
+input TogglePostListingDirectionInput {
+  postListingId: ID!
+}
+
+type TogglePostListingDirectionPayload {
+  postListingId: ID!
 }
 
 """ User """

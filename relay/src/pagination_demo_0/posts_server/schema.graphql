@@ -2,6 +2,10 @@ interface Node {
   id: ID!
 }
 
+type Mutation {
+  dummy(x: Int!): Int!
+}
+
 """ Post """
 
 type Post implements Node {
@@ -10,18 +14,18 @@ type Post implements Node {
   author: User!
 }
 
-enum PostOrderingFields {
+enum PostOrderingField {
   createdAt
   viewsCount
 }
 
 type PostOrdering {
-  field: PostOrderingFields!
+  field: PostOrderingField!
   desc: Boolean!
 }
 
 input PostOrderingInput {
-  field: PostOrderingFields!
+  field: PostOrderingField!
   desc: Boolean!
 }
 

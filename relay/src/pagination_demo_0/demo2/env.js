@@ -2,15 +2,16 @@ import { Environment, Network, RecordSource, Store } from "relay-runtime";
 import { graphql, parse, print } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 
-import serverSchemaTxt from "raw-loader!./data/serverSchema.graphql";
-import clientSchemaTxt from "raw-loader!./data/clientSchema.graphql";
-
-import { serverResolvers, clientResolvers } from "./resolvers";
+import serverResolvers from "../posts_server/server";
+import { clientResolvers } from "./clientResolvers";
 import {
   isOperationNotEmpty,
   cutClientPart,
   cutRemotePart
 } from "../../utils/graphql";
+
+import serverSchemaTxt from "raw-loader!../posts_server/schema.graphql";
+import clientSchemaTxt from "raw-loader!./data/clientSchema.graphql";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
