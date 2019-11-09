@@ -6,7 +6,7 @@ input ChangePostListingActiveFieldInput {
 }
 
 type ChangePostListingActiveFieldPayload {
-  postListingId: ID!
+  postListing: PostListing!
 }
 
 input TogglePostListingDirectionInput {
@@ -14,7 +14,7 @@ input TogglePostListingDirectionInput {
 }
 
 type TogglePostListingDirectionPayload {
-  postListingId: ID!
+  postListing: PostListing!
 }
 
 extend type Mutation {
@@ -35,7 +35,6 @@ type PostListingOrdering {
   order: PostOrdering!
   fieldDescription_ASC: String!
   fieldDescription_DESC: String!
-  isActive: Boolean!
 }
 
 type LocalState {
@@ -44,5 +43,6 @@ type LocalState {
 
 type PostListing implements Node {
   id: ID!
-  allOrderings: [PostListingOrdering!]!
+  activeField: PostOrderingField!
+  configuration: [PostListingOrdering!]!
 }
