@@ -6,7 +6,11 @@ import serverSchemaTxt from "raw-loader!./data/serverSchema.graphql";
 import clientSchemaTxt from "raw-loader!./data/clientSchema.graphql";
 
 import { serverResolvers, clientResolvers } from "./resolvers";
-import { isQueryNotEmpty } from "../../utils/graphql";
+import {
+  isOperationNotEmpty,
+  cutClientPart,
+  cutRemotePart
+} from "../../utils/graphql";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
@@ -19,107 +23,39 @@ const clientSchema = makeExecutableSchema({
 
 const network = Network.create(async (operation, variables) => {
   //console.log(operation.text, variables);
-  const queryAST = parse(operation.text);
-  console.log(queryAST);
-  const clientQueryFragments = [];
+  const operationAST = parse(operation.text);
+  //console.log(operationAST);
 
-  let clientQueryAST = visit(queryAST, {
-    enter(node, key, parent) {
-      if (
-        node.kind === "SelectionSet" &&
-        parent.kind === "OperationDefinition" &&
-        (parent.operation === "query" || parent.operation === "mutation")
-      ) {
-        const nodeCopy = JSON.parse(JSON.stringify(node));
-        const clientSelections = nodeCopy.selections.filter(selection => {
-          return selection.directives.some(
-            directive => directive.name.value === "local"
-          );
-        });
-        if (clientSelections.length === 0) {
-          return null;
-        }
-
-        visit(clientSelections, {
-          enter(node) {
-            if (node.kind === "FragmentSpread") {
-              clientQueryFragments.push(node.name.value);
-            }
-          }
-        });
-
-        nodeCopy.selections = clientSelections;
-        return nodeCopy;
-      }
-    }
-  });
-  // remove non-local fragments from client query
-  clientQueryAST = visit(clientQueryAST, {
-    enter(node) {
-      if (
-        node.kind === "FragmentSpread" &&
-        !clientQueryFragments.includes(node.name.value)
-      ) {
-        return null;
-      }
-    }
-  });
-
-  const serverQueryAST = visit(queryAST, {
-    enter(node, key, parent) {
-      if (
-        node.kind === "SelectionSet" &&
-        parent.kind === "OperationDefinition" &&
-        (parent.operation === "query" || parent.operation === "mutation")
-      ) {
-        const nodeCopy = JSON.parse(JSON.stringify(node));
-        const serverSelections = nodeCopy.selections.filter(selection => {
-          return !selection.directives.some(
-            directive => directive.name.value === "local"
-          );
-        });
-        if (serverSelections.length === 0) {
-          return null;
-        }
-        nodeCopy.selections = serverSelections;
-        return nodeCopy;
-      }
-      if (
-        node.kind === "FragmentDefinition" &&
-        clientQueryFragments.includes(node.name.value)
-      ) {
-        return null;
-      }
-    }
-  });
+  const { clientAST, clientFragments } = cutClientPart(operationAST);
+  const serverAST = cutRemotePart(operationAST, clientFragments);
 
   console.log("============");
-  console.log(clientQueryAST);
-  console.log("client: ", print(clientQueryAST));
-  console.log(serverQueryAST);
-  console.log("server: ", print(serverQueryAST));
+  console.log(clientAST);
+  console.log("client: ", print(clientAST));
+  console.log(serverAST);
+  console.log("server: ", print(serverAST));
   console.log("############");
 
   let serverResp = {};
   let clientResp = {};
 
-  if (isQueryNotEmpty(serverQueryAST)) {
+  if (isOperationNotEmpty(serverAST)) {
     console.log("Server query is not empty");
     await new Promise(resolve => setTimeout(resolve, 100));
     serverResp = await graphql(
       serverSchema,
-      print(serverQueryAST),
+      print(serverAST),
       {},
       undefined,
       variables
     );
   }
 
-  if (isQueryNotEmpty(clientQueryAST)) {
+  if (isOperationNotEmpty(clientAST)) {
     console.log("Client query is not empty");
     clientResp = await graphql(
       clientSchema,
-      print(clientQueryAST),
+      print(clientAST),
       {},
       undefined,
       variables

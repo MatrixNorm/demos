@@ -1,0 +1,18 @@
+extend type Query {
+  localState: LocalState!
+}
+
+extend type PostOrdering {
+  fieldDescription_ASC: String!
+  fieldDescription_DESC: String!
+}
+
+type LocalState {
+  postListing(id: ID!): PostListing
+}
+
+type PostListing implements Node {
+  id: ID!
+  activeField: PostOrderingFields
+  allOrderings: [PostOrdering!]!
+}
