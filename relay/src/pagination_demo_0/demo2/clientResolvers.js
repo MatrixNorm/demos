@@ -1,7 +1,7 @@
 const localState = {
   postListing: {
-    "1": {
-      id: "1",
+    "postListing#1": {
+      id: "postListing#1",
       activeField: "createdAt",
       sorting: ["createdAt", "viewsCount"],
       orders: {
@@ -19,8 +19,8 @@ const localState = {
         }
       }
     },
-    "2": {
-      id: "2",
+    "postListing#2": {
+      id: "postListing#2",
       activeField: "viewsCount",
       sorting: ["createdAt", "viewsCount"],
       orders: {
@@ -45,7 +45,10 @@ function postListingDbToGql(dbObj) {
   return {
     id: dbObj.id,
     activeField: dbObj.activeField,
-    configuration: dbObj.sorting(field => dbObj.orders[field])
+    configuration: dbObj.sorting.map(field => {
+      const x = dbObj.orders[field];
+      return {...x, order: {...x}}
+    })
   };
 }
 
@@ -57,8 +60,8 @@ export const clientResolvers = {
     }
   },
   LocalState: {
-    postListing: ({ id }) => {
-      console.log("postListing");
+    postListing: (parent, { id }) => {
+      console.log("postListing", id);
       const x = localState.postListing[id];
       return postListingDbToGql(x);
     }

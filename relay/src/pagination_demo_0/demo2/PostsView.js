@@ -1,19 +1,17 @@
 // @flow
-
 import React from "react";
 //$FlowFixMe
-import { LocalQueryRenderer, graphql } from "react-relay";
+import { QueryRenderer, graphql } from "react-relay";
 import OrderSelector from "./OrderSelector";
-import environment from "./Environment";
+import environment from "./env";
 
 function PostsView({ listingId }: any) {
   return (
-    <LocalQueryRenderer
+    <QueryRenderer
       query={graphql`
         query PostsViewQuery($listingId: ID!) {
-          __typename
-          localState {
-            postListingState(id: $listingId) {
+          localState @local {
+            postListing(id: $listingId) {
               ...OrderSelector_state
             }
           }
@@ -26,7 +24,7 @@ function PostsView({ listingId }: any) {
         if (!props) return <h3>loading...</h3>;
         return (
           <div>
-            <OrderSelector state={props.localState.postListingState} />
+            <OrderSelector state={props.localState.postListing} />
           </div>
         );
       }}

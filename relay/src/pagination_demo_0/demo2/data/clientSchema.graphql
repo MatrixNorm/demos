@@ -6,8 +6,7 @@ input ChangePostListingActiveFieldInput {
 }
 
 type ChangePostListingActiveFieldPayload {
-  postListingId: ID!
-  activeField: PostOrderingField!
+  postListing: PostListing!
 }
 
 type LocalState {
@@ -53,7 +52,7 @@ type PostEdge {
 type PostListing implements Node {
   id: ID!
   activeField: PostOrderingField!
-  allOrderings: [PostListingOrdering!]!
+  configuration: [PostListingOrdering!]!
 }
 
 type PostListingOrdering {
@@ -106,7 +105,7 @@ input TogglePostListingDirectionInput {
 }
 
 type TogglePostListingDirectionPayload {
-  postListingId: ID!
+  postListing: PostListing!
 }
 
 """ User """

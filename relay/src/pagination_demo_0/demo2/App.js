@@ -6,8 +6,8 @@ import PostsView from "./PostsView";
 const App = () => {
   return (
     <div>
-      <PostsView listingId="0" />
-      <PostsView listingId="1" />
+      <PostsView listingId="postListing#1" />
+      <PostsView listingId="postListing#2" />
     </div>
   );
 };

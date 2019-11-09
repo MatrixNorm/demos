@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash fde898e7e697ac3a39310312a44f02ea
+ * @relayHash 5950af312d005a06a1261ad5da6fe4f5
  */
 
 /* eslint-disable */
@@ -14,12 +14,11 @@ export type PostsViewQueryVariables = {|
   listingId: string
 |};
 export type PostsViewQueryResponse = {|
-  +__typename: string,
   +localState: {|
-    +postListingState: ?{|
+    +postListing: ?{|
       +$fragmentRefs: OrderSelector_state$ref
     |}
-  |},
+  |}
 |};
 export type PostsViewQuery = {|
   variables: PostsViewQueryVariables,
@@ -29,8 +28,27 @@ export type PostsViewQuery = {|
 
 
 /*
-query PostsViewQuery {
-  __typename
+query PostsViewQuery(
+  $listingId: ID!
+) {
+  localState @local {
+    postListing(id: $listingId) {
+      ...OrderSelector_state
+      id
+    }
+  }
+}
+
+fragment OrderSelector_state on PostListing {
+  activeField
+  configuration {
+    order {
+      field
+      desc
+    }
+    fieldDescription_ASC
+    fieldDescription_DESC
+  }
 }
 */
 
@@ -43,14 +61,7 @@ var v0 = [
     "defaultValue": null
   }
 ],
-v1 = {
-  "kind": "ScalarField",
-  "alias": null,
-  "name": "__typename",
-  "args": null,
-  "storageKey": null
-},
-v2 = [
+v1 = [
   {
     "kind": "Variable",
     "name": "id",
@@ -66,34 +77,28 @@ return {
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
-      (v1/*: any*/),
       {
-        "kind": "ClientExtension",
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "localState",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "LocalState",
+        "plural": false,
         "selections": [
           {
             "kind": "LinkedField",
             "alias": null,
-            "name": "localState",
+            "name": "postListing",
             "storageKey": null,
-            "args": null,
-            "concreteType": "LocalState",
+            "args": (v1/*: any*/),
+            "concreteType": "PostListing",
             "plural": false,
             "selections": [
               {
-                "kind": "LinkedField",
-                "alias": null,
-                "name": "postListingState",
-                "storageKey": null,
-                "args": (v2/*: any*/),
-                "concreteType": "PostListingState",
-                "plural": false,
-                "selections": [
-                  {
-                    "kind": "FragmentSpread",
-                    "name": "OrderSelector_state",
-                    "args": null
-                  }
-                ]
+                "kind": "FragmentSpread",
+                "name": "OrderSelector_state",
+                "args": null
               }
             ]
           }
@@ -106,43 +111,48 @@ return {
     "name": "PostsViewQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
-      (v1/*: any*/),
       {
-        "kind": "ClientExtension",
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "localState",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "LocalState",
+        "plural": false,
         "selections": [
           {
             "kind": "LinkedField",
             "alias": null,
-            "name": "localState",
+            "name": "postListing",
             "storageKey": null,
-            "args": null,
-            "concreteType": "LocalState",
+            "args": (v1/*: any*/),
+            "concreteType": "PostListing",
             "plural": false,
             "selections": [
               {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "activeField",
+                "args": null,
+                "storageKey": null
+              },
+              {
                 "kind": "LinkedField",
                 "alias": null,
-                "name": "postListingState",
+                "name": "configuration",
                 "storageKey": null,
-                "args": (v2/*: any*/),
-                "concreteType": "PostListingState",
-                "plural": false,
+                "args": null,
+                "concreteType": "PostListingOrdering",
+                "plural": true,
                 "selections": [
-                  {
-                    "kind": "ScalarField",
-                    "alias": null,
-                    "name": "activeField",
-                    "args": null,
-                    "storageKey": null
-                  },
                   {
                     "kind": "LinkedField",
                     "alias": null,
-                    "name": "allOrderings",
+                    "name": "order",
                     "storageKey": null,
                     "args": null,
                     "concreteType": "PostOrdering",
-                    "plural": true,
+                    "plural": false,
                     "selections": [
                       {
                         "kind": "ScalarField",
@@ -157,31 +167,31 @@ return {
                         "name": "desc",
                         "args": null,
                         "storageKey": null
-                      },
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "fieldDescription_ASC",
-                        "args": null,
-                        "storageKey": null
-                      },
-                      {
-                        "kind": "ScalarField",
-                        "alias": null,
-                        "name": "fieldDescription_DESC",
-                        "args": null,
-                        "storageKey": null
                       }
                     ]
                   },
                   {
                     "kind": "ScalarField",
                     "alias": null,
-                    "name": "id",
+                    "name": "fieldDescription_ASC",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "fieldDescription_DESC",
                     "args": null,
                     "storageKey": null
                   }
                 ]
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "id",
+                "args": null,
+                "storageKey": null
               }
             ]
           }
@@ -193,11 +203,11 @@ return {
     "operationKind": "query",
     "name": "PostsViewQuery",
     "id": null,
-    "text": "query PostsViewQuery {\n  __typename\n}\n",
+    "text": "query PostsViewQuery(\n  $listingId: ID!\n) {\n  localState @local {\n    postListing(id: $listingId) {\n      ...OrderSelector_state\n      id\n    }\n  }\n}\n\nfragment OrderSelector_state on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n    fieldDescription_ASC\n    fieldDescription_DESC\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '19802346acc13f679083066d98bec0fe';
+(node/*: any*/).hash = 'fb30a2aafb02ed12d0fafaba64129bd6';
 module.exports = node;

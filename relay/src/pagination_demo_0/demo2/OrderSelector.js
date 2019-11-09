@@ -2,26 +2,26 @@ import React from "react";
 import { createFragmentContainer, graphql } from "react-relay";
 //$FlowFixMe
 import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
-import environment from "./Environment";
 
-function OrderSelector({ state }) {
-  const { activeField, allOrderings } = state;
+
+function OrderSelector({ relay, state }) {
+  const { activeField, configuration } = state;
 
   function handleChange(newActiveField) {
-    commitLocalUpdate(environment, store => {
-      const record = store
-        .get(ROOT_ID)
-        .getLinkedRecord("localState")
-        .getLinkedRecord("postListingState", { id: "0" });
-      record.setValue(newActiveField, "activeField");
-    });
+    // commitLocalUpdate(environment, store => {
+    //   const record = store
+    //     .get(ROOT_ID)
+    //     .getLinkedRecord("localState")
+    //     .getLinkedRecord("postListingState", { id: "0" });
+    //   record.setValue(newActiveField, "activeField");
+    // });
   }
 
   return (
     <select value={activeField} onChange={e => handleChange(e.target.value)}>
-      {allOrderings.map(ordering => {
+      {configuration.map(ordering => {
         return (
-          <option value={ordering.field} key={ordering.field}>
+          <option value={ordering.order.field} key={ordering.order.field}>
             {ordering.fieldDescription_ASC}
           </option>
         );
@@ -32,11 +32,13 @@ function OrderSelector({ state }) {
 
 export default createFragmentContainer(OrderSelector, {
   state: graphql`
-    fragment OrderSelector_state on PostListingState {
+    fragment OrderSelector_state on PostListing {
       activeField
-      allOrderings {
-        field
-        desc
+      configuration {
+        order {
+          field
+          desc
+        }
         fieldDescription_ASC
         fieldDescription_DESC
       }
