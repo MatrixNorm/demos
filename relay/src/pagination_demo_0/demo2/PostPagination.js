@@ -1,22 +1,21 @@
 // @flow
 
-import React, { useContext } from "react";
+import { createRefetchContainer, graphql } from "react-relay";
+import React from "react";
 import PostDetails from "./PostDetails";
-import { PostFeedContext } from "./PostFeedContext";
 
-const PostPagination = () => {
-  const { dispatch, posts } = useContext(PostFeedContext);
+const PostPagination = ({ viewer }) => {
+  const {postConnection} = viewer;
 
-  const nodes =
-    posts && posts.edges
-      ? posts.edges
-          .filter(Boolean)
-          .map(edge => edge.node)
-          .filter(Boolean)
-      : [];
+  const nodes = postConnection
+    ? postConnection.edges
+        .filter(Boolean)
+        .map(edge => edge.node)
+        .filter(Boolean)
+    : [];
 
-  const hasPrev = posts?.pageInfo.hasPreviousPage;
-  const hasNext = posts?.pageInfo.hasNextPage;
+  const hasPrev = postConnection?.pageInfo.hasPreviousPage;
+  const hasNext = postConnection?.pageInfo.hasNextPage;
 
   return (
     <div>
@@ -47,4 +46,60 @@ const PostPagination = () => {
   );
 };
 
-export default PostPagination;
+export default createRefetchContainer(
+  PostPagination,
+  {
+    viewer: graphql`
+      fragment PostPagination_viewer on Viewer
+        @argumentDefinitions(
+          first: { type: "Int" }
+          after: { type: "String" }
+          last: { type: "Int" }
+          before: { type: "String" }
+          orderBy: { type: "PostOrderingInput" }
+        ) {
+        postConnection(
+          first: $first
+          after: $after
+          last: $last
+          before: $before
+          orderBy: $orderBy
+        ) {
+          edges {
+            node {
+              id
+              ...PostDetails_post
+            }
+            cursor
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+            hasPreviousPage
+            startCursor
+          }
+        }
+      }
+    `
+  },
+  graphql`
+    query PostPaginationRefetchQuery(
+      $first: Int
+      $after: String
+      $last: Int
+      $before: String
+      $orderBy: PostOrderingInput
+    ) {
+      viewer {
+        ...PostPagination_viewer
+          @arguments(
+            first: $first
+            after: $after
+            last: $last
+            before: $before
+            orderBy: $orderBy
+          )
+      }
+    }
+  `
+);

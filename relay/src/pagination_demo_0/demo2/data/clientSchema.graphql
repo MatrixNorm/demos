@@ -76,27 +76,9 @@ input PostOrderingInput {
   desc: Boolean!
 }
 
-"""
-Need this because currently it is impossible to
-alias fragments directly like this:
-    query {
-      x: ...SomeFragment
-      y: ...SomeFragment
-    }
-See https://github.com/facebook/relay/issues/1983 
-"""
-type PostSearch {
-  posts(after: String, first: Int, before: String, last: Int, orderBy: PostOrderingInput): PostConnection
-}
-
 type Query {
   node(id: ID!): Node
-
-  """
-   XXX: rename to viewer
-  see https://github.com/nodkz/example-fragments-relay/blob/master/schema.graphql
-  """
-  search: PostSearch
+  viewer: Viewer
   localState: LocalState!
 }
 
@@ -113,4 +95,17 @@ type User implements Node {
   id: ID!
   name: String!
   posts(after: String, first: Int): PostConnection
+}
+
+"""
+Need this because currently it is impossible to
+alias fragments directly like this:
+    query {
+      x: ...SomeFragment
+      y: ...SomeFragment
+    }
+See https://github.com/facebook/relay/issues/1983 
+"""
+type Viewer {
+  postConnection(after: String, first: Int, before: String, last: Int, orderBy: PostOrderingInput): PostConnection
 }

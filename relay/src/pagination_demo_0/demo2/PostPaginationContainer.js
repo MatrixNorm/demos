@@ -2,6 +2,7 @@
 
 import React from "react";
 import { createFragmentContainer, QueryRenderer, graphql } from "react-relay";
+import PostPagination from './PostPagination'
 
 function PostPaginationContainer({ relay, order }) {
   const { activeField, configuration } = order;
@@ -19,8 +20,8 @@ function PostPaginationContainer({ relay, order }) {
           $before: String
           $orderBy: PostOrderingInput
         ) {
-          search {
-            ...PostFeed_search
+          viewer {
+            ...PostPagination_viewer
               @arguments(
                 first: $first
                 after: $after
@@ -36,7 +37,7 @@ function PostPaginationContainer({ relay, order }) {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <CitiesPagination cities={props.viewer} />;
+        return <PostPagination viewer={props.viewer} />;
       }}
     />
   );

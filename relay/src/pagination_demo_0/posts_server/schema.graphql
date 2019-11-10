@@ -49,8 +49,8 @@ type User implements Node {
       }
   See https://github.com/facebook/relay/issues/1983 
 """
-type PostSearch {
-  posts(
+type Viewer {
+  postConnection(
     after: String,
     first: Int,
     before: String,
@@ -61,14 +61,7 @@ type PostSearch {
 
 type Query {
   node(id: ID!): Node
-  """ XXX: rename to viewer
-      see https://github.com/nodkz/example-fragments-relay/blob/master/schema.graphql
-  """
-  search: PostSearch
-}
-
-schema {
-  query: Query
+  viewer: Viewer
 }
 
 """ connections """

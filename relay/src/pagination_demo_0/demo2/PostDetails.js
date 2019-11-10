@@ -13,8 +13,8 @@ const PostDetails = (props: Props) => {
   const post = props.post;
   return (
     <div>
-      <h1>{post.title}</h1>
-      <h3>by {post.author.name}</h3>
+      <h3>{post.title}</h3>
+      <i>by {post.author.name}</i>
     </div>
   )
 }

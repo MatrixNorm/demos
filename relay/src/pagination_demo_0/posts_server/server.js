@@ -76,12 +76,12 @@ const resolvers = {
       }
       return null;
     },
-    search: () => {
+    viewer: () => {
       return {};
     }
   },
-  PostSearch: {
-    posts: (_: mixed, args: PostSearchPostsArgs) => {
+  Viewer: {
+    postConnection: (_: mixed, args: PostSearchPostsArgs) => {
       //console.log(args)
       const { first, after, last, before, orderBy } = args;
 
