@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 5950af312d005a06a1261ad5da6fe4f5
+ * @relayHash 43e02068754fccce04543398a6f53234
  */
 
 /* eslint-disable */
@@ -10,13 +10,14 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 import type { OrderSelector_state$ref } from "./OrderSelector_state.graphql";
+import type { PostPaginationContainer_order$ref } from "./PostPaginationContainer_order.graphql";
 export type PostsViewQueryVariables = {|
   listingId: string
 |};
 export type PostsViewQueryResponse = {|
   +localState: {|
     +postListing: ?{|
-      +$fragmentRefs: OrderSelector_state$ref
+      +$fragmentRefs: OrderSelector_state$ref & PostPaginationContainer_order$ref
     |}
   |}
 |};
@@ -34,6 +35,7 @@ query PostsViewQuery(
   localState @local {
     postListing(id: $listingId) {
       ...OrderSelector_state
+      ...PostPaginationContainer_order
       id
     }
   }
@@ -48,6 +50,16 @@ fragment OrderSelector_state on PostListing {
     }
     fieldDescription_ASC
     fieldDescription_DESC
+  }
+}
+
+fragment PostPaginationContainer_order on PostListing {
+  activeField
+  configuration {
+    order {
+      field
+      desc
+    }
   }
 }
 */
@@ -98,6 +110,11 @@ return {
               {
                 "kind": "FragmentSpread",
                 "name": "OrderSelector_state",
+                "args": null
+              },
+              {
+                "kind": "FragmentSpread",
+                "name": "PostPaginationContainer_order",
                 "args": null
               }
             ]
@@ -203,11 +220,11 @@ return {
     "operationKind": "query",
     "name": "PostsViewQuery",
     "id": null,
-    "text": "query PostsViewQuery(\n  $listingId: ID!\n) {\n  localState @local {\n    postListing(id: $listingId) {\n      ...OrderSelector_state\n      id\n    }\n  }\n}\n\nfragment OrderSelector_state on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n    fieldDescription_ASC\n    fieldDescription_DESC\n  }\n}\n",
+    "text": "query PostsViewQuery(\n  $listingId: ID!\n) {\n  localState @local {\n    postListing(id: $listingId) {\n      ...OrderSelector_state\n      ...PostPaginationContainer_order\n      id\n    }\n  }\n}\n\nfragment OrderSelector_state on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n    fieldDescription_ASC\n    fieldDescription_DESC\n  }\n}\n\nfragment PostPaginationContainer_order on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'fb30a2aafb02ed12d0fafaba64129bd6';
+(node/*: any*/).hash = '42feb14f12993c6062165b08c7577811';
 module.exports = node;

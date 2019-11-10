@@ -3,6 +3,7 @@ import React from "react";
 //$FlowFixMe
 import { QueryRenderer, graphql } from "react-relay";
 import OrderSelector from "./OrderSelector";
+import PostPaginationContainer from "./PostPaginationContainer";
 import environment from "./env";
 
 function PostsView({ listingId }: any) {
@@ -13,6 +14,7 @@ function PostsView({ listingId }: any) {
           localState @local {
             postListing(id: $listingId) {
               ...OrderSelector_state
+              ...PostPaginationContainer_order
             }
           }
         }
@@ -25,6 +27,7 @@ function PostsView({ listingId }: any) {
         return (
           <div>
             <OrderSelector state={props.localState.postListing} />
+            <PostPaginationContainer order={props.localState.postListing} />
           </div>
         );
       }}

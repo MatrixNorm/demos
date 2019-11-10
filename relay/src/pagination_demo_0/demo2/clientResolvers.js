@@ -8,14 +8,14 @@ const localState = {
         createdAt: {
           field: "createdAt",
           desc: false,
-          fieldDescription_ASC: "AAA",
-          fieldDescription_DESC: "BBB"
+          fieldDescription_ASC: "Recent first",
+          fieldDescription_DESC: "Oldest first"
         },
         viewsCount: {
           field: "viewsCount",
           desc: false,
-          fieldDescription_ASC: "XXX",
-          fieldDescription_DESC: "YYY"
+          fieldDescription_ASC: "Most popular first",
+          fieldDescription_DESC: "Least popular first"
         }
       }
     },
@@ -27,14 +27,14 @@ const localState = {
         createdAt: {
           field: "createdAt",
           desc: false,
-          fieldDescription_ASC: "AAA",
-          fieldDescription_DESC: "BBB"
+          fieldDescription_ASC: "Recent first",
+          fieldDescription_DESC: "Oldest first"
         },
         viewsCount: {
           field: "viewsCount",
           desc: false,
-          fieldDescription_ASC: "XXX",
-          fieldDescription_DESC: "YYY"
+          fieldDescription_ASC: "Most popular first",
+          fieldDescription_DESC: "Least popular first"
         }
       }
     }
