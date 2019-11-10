@@ -4,8 +4,8 @@ import { createRefetchContainer, graphql } from "react-relay";
 import React from "react";
 import PostDetails from "./PostDetails";
 
-const PostPagination = ({ viewer }) => {
-  const {postConnection} = viewer;
+const PostPagination = ({ relay, viewer }) => {
+  const { postConnection } = viewer;
 
   const nodes = postConnection
     ? postConnection.edges
@@ -16,6 +16,20 @@ const PostPagination = ({ viewer }) => {
 
   const hasPrev = postConnection?.pageInfo.hasPreviousPage;
   const hasNext = postConnection?.pageInfo.hasNextPage;
+
+  function prevPagePlease() {
+    hasPrev &&
+      relay.refetch(prevVars => {
+        return { ...prevVars, pageNo: pageNo - 1 };
+      });
+  }
+
+  function nextPagePlease() {
+    hasNext &&
+      relay.refetch(prevVars => {
+        return { ...prevVars, pageNo: pageNo + 1 };
+      });
+  }
 
   return (
     <div>

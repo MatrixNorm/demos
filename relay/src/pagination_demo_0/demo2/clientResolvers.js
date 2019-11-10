@@ -47,7 +47,7 @@ function postListingDbToGql(dbObj) {
     activeField: dbObj.activeField,
     configuration: dbObj.sorting.map(field => {
       const x = dbObj.orders[field];
-      return {...x, order: {...x}}
+      return { ...x, order: { ...x } };
     })
   };
 }
@@ -76,7 +76,7 @@ export const clientResolvers = {
       console.log(input);
       const x = localState.postListing[input.postListingId];
       x.activeField = input.activeField;
-      return postListingDbToGql(x);
+      return { postListing: postListingDbToGql(x) };
     },
     togglePostListingDirection: (_, { input }) => {
       console.log(input);

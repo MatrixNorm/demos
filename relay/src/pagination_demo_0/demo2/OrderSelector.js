@@ -1,20 +1,15 @@
 import React from "react";
 import { createFragmentContainer, graphql } from "react-relay";
-//$FlowFixMe
-import { commitLocalUpdate, ROOT_ID } from "relay-runtime";
-
+import * as ChangePostListingActiveFieldMutation from "./ChangePostListingActiveFieldMutation";
 
 function OrderSelector({ relay, state }) {
   const { activeField, configuration } = state;
 
-  function handleChange(newActiveField) {
-    // commitLocalUpdate(environment, store => {
-    //   const record = store
-    //     .get(ROOT_ID)
-    //     .getLinkedRecord("localState")
-    //     .getLinkedRecord("postListingState", { id: "0" });
-    //   record.setValue(newActiveField, "activeField");
-    // });
+  function handleChange(activeField) {
+    ChangePostListingActiveFieldMutation.commit(relay.environment, {
+      postListingId: state.id,
+      activeField
+    });
   }
 
   return (
@@ -33,6 +28,7 @@ function OrderSelector({ relay, state }) {
 export default createFragmentContainer(OrderSelector, {
   state: graphql`
     fragment OrderSelector_state on PostListing {
+      id
       activeField
       configuration {
         order {

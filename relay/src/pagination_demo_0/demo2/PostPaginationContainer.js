@@ -2,14 +2,13 @@
 
 import React from "react";
 import { createFragmentContainer, QueryRenderer, graphql } from "react-relay";
-import PostPagination from './PostPagination'
+import PostPagination from "./PostPagination";
 
 function PostPaginationContainer({ relay, order }) {
   const { activeField, configuration } = order;
   const activeOrdering = configuration.find(
     ordering => ordering.order.field === activeField
   ).order;
-  console.log(111111111111111111, activeOrdering);
   return (
     <QueryRenderer
       query={graphql`

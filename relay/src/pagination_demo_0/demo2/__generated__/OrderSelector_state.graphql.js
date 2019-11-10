@@ -13,6 +13,7 @@ import type { FragmentReference } from "relay-runtime";
 declare export opaque type OrderSelector_state$ref: FragmentReference;
 declare export opaque type OrderSelector_state$fragmentType: OrderSelector_state$ref;
 export type OrderSelector_state = {|
+  +id: string,
   +activeField: PostOrderingField,
   +configuration: $ReadOnlyArray<{|
     +order: {|
@@ -39,6 +40,13 @@ const node/*: ReaderFragment*/ = {
   "metadata": null,
   "argumentDefinitions": [],
   "selections": [
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "id",
+      "args": null,
+      "storageKey": null
+    },
     {
       "kind": "ScalarField",
       "alias": null,
@@ -99,5 +107,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '90379521d8c6bfc6288ce595878d93e7';
+(node/*: any*/).hash = '67bc489ef0c2195bda38f2ee320a90ae';
 module.exports = node;

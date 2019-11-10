@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 43e02068754fccce04543398a6f53234
+ * @relayHash d26772b35d34142a4357e40b3e2265cd
  */
 
 /* eslint-disable */
@@ -42,6 +42,7 @@ query PostsViewQuery(
 }
 
 fragment OrderSelector_state on PostListing {
+  id
   activeField
   configuration {
     order {
@@ -149,6 +150,13 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
+                "name": "id",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
                 "name": "activeField",
                 "args": null,
                 "storageKey": null
@@ -202,13 +210,6 @@ return {
                     "storageKey": null
                   }
                 ]
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "id",
-                "args": null,
-                "storageKey": null
               }
             ]
           }
@@ -220,7 +221,7 @@ return {
     "operationKind": "query",
     "name": "PostsViewQuery",
     "id": null,
-    "text": "query PostsViewQuery(\n  $listingId: ID!\n) {\n  localState @local {\n    postListing(id: $listingId) {\n      ...OrderSelector_state\n      ...PostPaginationContainer_order\n      id\n    }\n  }\n}\n\nfragment OrderSelector_state on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n    fieldDescription_ASC\n    fieldDescription_DESC\n  }\n}\n\nfragment PostPaginationContainer_order on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n  }\n}\n",
+    "text": "query PostsViewQuery(\n  $listingId: ID!\n) {\n  localState @local {\n    postListing(id: $listingId) {\n      ...OrderSelector_state\n      ...PostPaginationContainer_order\n      id\n    }\n  }\n}\n\nfragment OrderSelector_state on PostListing {\n  id\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n    fieldDescription_ASC\n    fieldDescription_DESC\n  }\n}\n\nfragment PostPaginationContainer_order on PostListing {\n  activeField\n  configuration {\n    order {\n      field\n      desc\n    }\n  }\n}\n",
     "metadata": {}
   }
 };
