@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 0529f1494423e0d1e703bcef514f5053
+ * @relayHash b9c3e6b89fb2d6a3a20b79c44906c781
  */
 
 /* eslint-disable */
@@ -11,22 +11,22 @@
 import type { ConcreteRequest } from 'relay-runtime';
 import type { CitiesListView_localSettings$ref } from "./CitiesListView_localSettings.graphql";
 import type { ContinentSelector_localSettings$ref } from "./ContinentSelector_localSettings.graphql";
-export type AppQueryVariables = {||};
-export type AppQueryResponse = {|
+export type CitiesListPageQueryVariables = {||};
+export type CitiesListPageQueryResponse = {|
   +localSettings: {|
     +id: string,
     +$fragmentRefs: ContinentSelector_localSettings$ref & CitiesListView_localSettings$ref,
   |}
 |};
-export type AppQuery = {|
-  variables: AppQueryVariables,
-  response: AppQueryResponse,
+export type CitiesListPageQuery = {|
+  variables: CitiesListPageQueryVariables,
+  response: CitiesListPageQueryResponse,
 |};
 */
 
 
 /*
-query AppQuery {
+query CitiesListPageQuery {
   localSettings {
     id
     ...ContinentSelector_localSettings
@@ -56,7 +56,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "AppQuery",
+    "name": "CitiesListPageQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": [],
@@ -87,7 +87,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "AppQuery",
+    "name": "CitiesListPageQuery",
     "argumentDefinitions": [],
     "selections": [
       {
@@ -120,13 +120,13 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "AppQuery",
+    "name": "CitiesListPageQuery",
     "id": null,
-    "text": "query AppQuery {\n  localSettings {\n    id\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
+    "text": "query CitiesListPageQuery {\n  localSettings {\n    id\n    ...ContinentSelector_localSettings\n    ...CitiesListView_localSettings\n  }\n}\n\nfragment CitiesListView_localSettings on LocalSettings {\n  selectedContinent\n}\n\nfragment ContinentSelector_localSettings on LocalSettings {\n  allContinents\n  selectedContinent\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a4a722ae6e5f08e90f9e02e4baf5c05c';
+(node/*: any*/).hash = '9e8231b8ebd247652bbc9e24ad7b3cc6';
 module.exports = node;

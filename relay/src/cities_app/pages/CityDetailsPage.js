@@ -10,9 +10,11 @@ export default function CityDetailsPage({ cityId }) {
       query={graphql`
         query CityDetailsPageQuery($cityId: ID!) {
           node(id: $cityId) {
-            id
-            name
-            population
+            ... on City {
+              id
+              name
+              population
+            }
           }
         }
       `}
