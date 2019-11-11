@@ -39,12 +39,14 @@ export const serverResolvers = {
     viewer: () => {
       return {};
     },
-    test: () => {
-      return "QWERTY";
+    node: (_, { id }) => {
+      console.log({ id });
+      return { id };
     }
   },
   Node: {
     __resolveType(node) {
+      console.log({ node });
       return node;
     }
   },

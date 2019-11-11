@@ -21,7 +21,7 @@ export default function CityDetailsPage() {
         }
       `}
       environment={environment}
-      variables={{ id: cityId }}
+      variables={{ cityId }}
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
