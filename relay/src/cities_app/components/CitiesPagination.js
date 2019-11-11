@@ -1,6 +1,7 @@
 // @flow
 
 import React from "react";
+import { Link } from "react-router-dom";
 import {
   createRefetchContainer,
   graphql,
@@ -10,7 +11,7 @@ import {
 type Props = {
   relay: RelayRefetchProp,
   cities: any
-}
+};
 
 const CitiesPagination = ({ relay, cities }: Props) => {
   const nodes = cities?.citiesPagination?.nodes || [];
@@ -39,7 +40,7 @@ const CitiesPagination = ({ relay, cities }: Props) => {
       <div>
         {nodes.map(node => (
           <div key={node.id}>
-            <h4>{node.name}</h4>
+            <h4><Link to={`/city/${node.id}`}>{node.name}</Link></h4>
             <div>{node.population}</div>
           </div>
         ))}

@@ -1,10 +1,12 @@
 // @flow
 
 import React from "react";
+import { useParams } from "react-router-dom";
 import { QueryRenderer, graphql } from "react-relay";
 import environment from "../env";
 
-export default function CityDetailsPage({ cityId }) {
+export default function CityDetailsPage() {
+  let { cityId } = useParams();
   return (
     <QueryRenderer
       query={graphql`
@@ -19,7 +21,7 @@ export default function CityDetailsPage({ cityId }) {
         }
       `}
       environment={environment}
-      variables={{}}
+      variables={{ id: cityId }}
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;

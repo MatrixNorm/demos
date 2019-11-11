@@ -21,11 +21,14 @@ const baseBuild = ({ buildId }) => env => {
     },
     output: {
       path: path.resolve(__dirname, outputPath),
-      filename: "[name].js"
+      filename: "[name].js",
+      publicPath: "/"
     },
     mode: mode,
     devServer: {
-      contentBase: `jsdev/${buildId}`
+      //contentBase: `jsdev/${buildId}`,
+      publicPath: "/",
+      historyApiFallback: true
     },
     devtool: "source-map",
     plugins: [
