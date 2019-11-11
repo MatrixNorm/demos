@@ -89,6 +89,7 @@ registerBuild("local_state/demo1");
 registerBuild("local_state/demo2");
 registerBuild("local_state/demo3");
 registerBuild("local_state/schema_stitching");
+registerBuild("local_state/two_environments");
 registerBuild("observable");
 registerBuild("pagination_demo_0/demo1");
 registerBuild("pagination_demo_0/demo2");

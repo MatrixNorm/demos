@@ -1,0 +1,38 @@
+interface Node {
+  id: ID!
+}
+
+type Mutation {
+  dummy(x: Int!): Int!
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: Viewer
+  test: String!
+}
+
+type Viewer {
+  citiesPagination(
+    continent: Continent!,
+    pageNo: Int!
+  ): CitiesPagination
+}
+
+type CitiesPagination {
+  nodes: [City!]
+  pageNo: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+enum Continent {
+  Europe
+  NorthAmerica
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  population: String!
+}

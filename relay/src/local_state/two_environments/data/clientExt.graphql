@@ -1,0 +1,23 @@
+input UpdateSelectedContinentInput {
+  continent: Continent!
+  clientMutationId: String
+}
+
+type UpdateSelectedContinentPayload {
+  continent: Continent!
+  clientMutationId: String
+}
+
+extend type Mutation {
+  updateSelectedContinent(input: UpdateSelectedContinentInput!): UpdateSelectedContinentPayload!
+}
+
+extend type Query {
+  localSettings: LocalSettings!
+}
+
+type LocalSettings {
+  id: ID!
+  allContinents: [Continent!]!
+  selectedContinent: Continent!
+}
