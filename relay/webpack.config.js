@@ -78,6 +78,7 @@ function registerBuild(buildId) {
   builds[buildId] = baseBuild({ buildId });
 }
 
+registerBuild("cities_app");
 registerBuild("connection_and_store/demo1");
 registerBuild("connection_and_store/demo2");
 registerBuild("connection_and_store/normalization_without_ids");
