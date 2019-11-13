@@ -89,6 +89,7 @@ registerBuild("flow_fragmentrefs");
 registerBuild("generators_and_stuff");
 registerBuild("graphiql_demo");
 registerBuild("hooks_vs_render_props");
+registerBuild("indexeddb");
 registerBuild("local_state/demo1");
 registerBuild("local_state/demo2");
 registerBuild("local_state/demo3");
