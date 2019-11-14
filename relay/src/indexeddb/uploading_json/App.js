@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Dexie from "dexie";
+import db from './db'
 
 function App() {
   const inputEl = useRef(null);
@@ -13,15 +13,8 @@ function App() {
     const file = inputEl.current.files[0];
     const reader = new FileReader();
     reader.onload = evt => {
-      console.log(111111);
       const data = JSON.parse(evt.target.result);
-
-      const db = new Dexie("indexeddb/demo1-v1");
-
-      db.version(1).stores({
-        cities: "id"
-      });
-
+      console.log("Start data import");
       db.table("cities")
         .bulkPut(data)
         .then(() => {
