@@ -1,22 +1,30 @@
 import React, { useEffect, useState } from "react";
 import Dexie from "dexie";
+import config from "./config";
 import ImportData from "./ImportData";
 import ViewData from "./ViewData";
 
 export default function App() {
-  const [isCitiesIdbStoreExists, setIsCitiesIdbStoreExists] = useState(null);
+  const [citiesIdbStoreExists, setcitiesIdbStoreExists] = useState(null);
 
   useEffect(function() {
-    new Dexie("indexeddb/uploading_json").open().then(db => {
-      const tableNames = db.tables.map(t => t.name);
-      setIsCitiesIdbStoreExists(tableNames.includes("cities"));
-    });
+    async function inner() {
+      const isDbExists = await Dexie.exists(config.dbName);
+      if (isDbExists) {
+        const db = await new Dexie(config.dbName).open();
+        const tableNames = db.tables.map(t => t.name);
+        setcitiesIdbStoreExists(tableNames.includes("cities"));
+      } else {
+        setcitiesIdbStoreExists(false);
+      }
+    }
+    inner();
   }, []);
 
-  if (isCitiesIdbStoreExists === null) {
+  if (citiesIdbStoreExists === null) {
     return null;
   }
-  if (isCitiesIdbStoreExists) {
+  if (citiesIdbStoreExists) {
     return <ViewData />;
   }
   return <ImportData />;

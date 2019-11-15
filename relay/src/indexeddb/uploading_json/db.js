@@ -1,6 +1,7 @@
 import Dexie from "dexie";
+import config from './config'
 
-const db = new Dexie("indexeddb/uploading_json");
+const db = new Dexie(config.dbName);
 
 db.version(1).stores({
   cities: "id, city, lat, lng, country"
