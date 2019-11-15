@@ -1,42 +1,23 @@
-import React, { useRef } from "react";
-import db from './db'
+import React, { useEffect, useState } from "react";
+import Dexie from "dexie";
+import ImportData from "./ImportData";
+import ViewData from "./ViewData";
 
-function App() {
-  const inputEl = useRef(null);
+export default function App() {
+  const [isCitiesIdbStoreExists, setIsCitiesIdbStoreExists] = useState(null);
 
-  function onInputFileChange() {
-    const file = inputEl.current.files[0];
-    console.log(file.size);
+  useEffect(function() {
+    new Dexie("indexeddb/uploading_json").open().then(db => {
+      const tableNames = db.tables.map(t => t.name);
+      setIsCitiesIdbStoreExists(tableNames.includes("cities"));
+    });
+  }, []);
+
+  if (isCitiesIdbStoreExists === null) {
+    return null;
   }
-
-  function onImportButtonSubmit() {
-    const file = inputEl.current.files[0];
-    const reader = new FileReader();
-    reader.onload = evt => {
-      const data = JSON.parse(evt.target.result);
-      console.log("Start data import");
-      db.table("cities")
-        .bulkPut(data)
-        .then(() => {
-          console.log("Data import complete");
-        });
-    };
-    reader.readAsBinaryString(file);
+  if (isCitiesIdbStoreExists) {
+    return <ViewData />;
   }
-
-  return (
-    <>
-      <input
-        ref={inputEl}
-        onChange={onInputFileChange}
-        type="file"
-        id="selectFiles"
-      />
-      <button id="import" onClick={onImportButtonSubmit}>
-        Import
-      </button>
-    </>
-  );
+  return <ImportData />;
 }
-
-export default App;
