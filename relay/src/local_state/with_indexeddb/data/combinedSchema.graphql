@@ -1,0 +1,53 @@
+type CitiesPagination {
+  nodes: [City!]
+  pageNo: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  population: String!
+}
+
+enum Continent {
+  Europe
+  NorthAmerica
+}
+
+type LocalSettings {
+  id: ID!
+  allContinents: [Continent!]!
+  selectedContinent: Continent!
+}
+
+type Mutation {
+  dummy(x: Int!): Int!
+  updateSelectedContinent(input: UpdateSelectedContinentInput!): UpdateSelectedContinentPayload!
+}
+
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: Viewer
+  test: String!
+  localSettings: LocalSettings!
+}
+
+input UpdateSelectedContinentInput {
+  continent: Continent!
+  clientMutationId: String
+}
+
+type UpdateSelectedContinentPayload {
+  continent: Continent!
+  clientMutationId: String
+}
+
+type Viewer {
+  citiesPagination(continent: Continent!, pageNo: Int!): CitiesPagination
+}
