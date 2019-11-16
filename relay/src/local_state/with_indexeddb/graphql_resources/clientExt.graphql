@@ -1,0 +1,51 @@
+extend type Query {
+  localSettings: LocalSettings!
+}
+
+type LocalSettings {
+  id: ID!
+  cityFilters: [CityFilter!]
+  pinnedCityFilterId: ID
+}
+
+type CityFilter {
+  id: ID!
+  name: String!
+  country: String
+  population_range: [Float, Float]
+  orderBy: CitiesOrderAttr!
+  orderByDesc: Boolean
+}
+
+enum CitiesOrderAttr {
+  name
+  population
+  lat
+  lng
+  country
+}
+
+extend type Mutation {
+  createCityFilter(input: CreateCityFilterInput!): CreateCityFilterPayload!
+  pinCityFilter(input: PinCityFilterInput!): PinCityFilterPayload!
+}
+
+input CreateCityFilterInput {
+  name: String!
+  country: String
+  population_range: [Float, Float]
+  orderBy: CitiesOrderAttr!
+  orderByDesc: Boolean
+}
+
+type CreateCityFilterPayload {
+  filterId: ID!
+}
+
+input PinCityFilterInput {
+  filterId: ID!
+}
+
+type PinCityFilterPayload {
+  filterId: ID!
+}
