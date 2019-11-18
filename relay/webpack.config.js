@@ -68,6 +68,11 @@ const baseBuild = ({ buildId }) => env => {
           }
         },
         {
+          test: /\.js$/,
+          use: ["source-map-loader"],
+          enforce: "pre"
+        },
+        {
           test: /\.css$/,
           exclude: /node_modules/,
           use: ["style-loader", "css-loader"]
@@ -102,6 +107,7 @@ registerBuild("pagination_demo_0/demo2");
 registerBuild("problem_numero_one");
 registerBuild("problem_connection_fragment");
 registerBuild("problem_connection_fragment2");
+registerBuild("react_router/demo1");
 registerBuild("relay_hello");
 
 module.exports = env => {
