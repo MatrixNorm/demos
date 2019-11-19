@@ -1,5 +1,3 @@
-import data from "./data";
-
 const localSettings = {
   id: "localSettings#singleton",
   selectedContinent: "Europe",

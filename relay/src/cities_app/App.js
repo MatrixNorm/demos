@@ -1,8 +1,8 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-import SettingsPage from './pages/SettingsPage'
-import CityDetailsPage from './pages/CityDetailsPage'
-import CitiesListPage from './pages/CitiesListPage'
+import SettingsPage from "./pages/SettingsPage";
+import HomePage from "./pages/HomePage";
+import ReimportDataPage from "./pages/ReimportDataPage";
 
 export default function App() {
   return (
@@ -16,17 +16,20 @@ export default function App() {
             <li>
               <Link to="/settings">Settings</Link>
             </li>
+            <li>
+              <Link to="/reimport">Re-Import Data</Link>
+            </li>
           </ul>
         </nav>
         <Switch>
+          <Route exact path="/">
+            <HomePage />
+          </Route>
           <Route path="/settings">
             <SettingsPage />
           </Route>
-          <Route path="/city/:cityId">
-            <CityDetailsPage />
-          </Route>
-          <Route path="/">
-            <CitiesListPage />
+          <Route path="/reimport">
+            <ReimportDataPage />
           </Route>
         </Switch>
       </div>

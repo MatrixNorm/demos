@@ -69,6 +69,7 @@ const baseBuild = ({ buildId }) => env => {
         },
         {
           test: /\.js$/,
+          exclude: /(graphql-tools|deprecated-decorator)/,
           use: ["source-map-loader"],
           enforce: "pre"
         },
