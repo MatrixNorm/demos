@@ -9,12 +9,10 @@ type Mutation {
 type Query {
   node(id: ID!): Node
   viewer: Viewer
-  test: String!
 }
 
 type Viewer {
   citiesPagination(
-    continent: Continent!,
     pageNo: Int!
   ): CitiesPagination
 }
@@ -26,13 +24,11 @@ type CitiesPagination {
   hasPrevPage: Boolean!
 }
 
-enum Continent {
-  Europe
-  NorthAmerica
-}
-
 type City implements Node {
   id: ID!
   name: String!
-  population: String!
+  country: String!
+  population: Int!
+  lat: Float!
+  lng: Float!
 }
