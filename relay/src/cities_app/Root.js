@@ -1,3 +1,5 @@
+// @flow
+
 import React, { useEffect, useState } from "react";
 import Dexie from "dexie";
 import config from "./config";

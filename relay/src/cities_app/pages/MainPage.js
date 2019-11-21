@@ -9,10 +9,24 @@ export default function MainPage() {
     <QueryRenderer
       query={graphql`
         query MainPageQuery {
-          citiesMetadata
+          citiesMetadata {
+            countries
+            population_lower_bound
+            population_upper_bound
+            lat_lower_bound
+            lat_upper_bound
+            lng_lower_bound
+            lng_upper_bound
+          }
           viewer {
-            cityFilters
-            pinnedCityFilter
+            cityFilters {
+              id
+              name
+            }
+            pinnedCityFilter {
+              id
+              name
+            }
           }
         }
       `}

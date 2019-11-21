@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 72cc6293afb1d1366428685a2ac30845
+ * @relayHash 30d2608b323877185b1ae113931764f7
  */
 
 /* eslint-disable */
@@ -16,7 +16,7 @@ export type CityDetailsPageQueryResponse = {|
   +node: ?{|
     +id?: string,
     +name?: string,
-    +population?: string,
+    +population?: number,
   |}
 |};
 export type CityDetailsPageQuery = {|

@@ -1,45 +1,26 @@
-const localSettings = {
-  id: "localSettings#singleton",
-  selectedContinent: "Europe",
-  allContinents: ["Europe", "NorthAmerica"]
-};
-
-export const clientResolvers = {
-  Query: {
-    localSettings: () => {
-      return { id: localSettings.id };
-    }
-  },
-  LocalSettings: {
-    selectedContinent: () => {
-      return localSettings.selectedContinent;
-    },
-    allContinents: () => {
-      return localSettings.allContinents;
-    }
-  },
-  Node: {
-    __resolveType(node) {
-      return node;
-    }
-  },
-  Mutation: {
-    updateSelectedContinent: (_, args) => {
-      console.log(args);
-      localSettings.selectedContinent = args.input.continent;
-      return { continent: localSettings.selectedContinent };
-    }
-  }
-};
-
 export const serverResolvers = {
   Query: {
     viewer: () => {
-      return {};
+      return { id: 1 };
     },
     node: (_, { id }) => {
       console.log({ id });
       return { id };
+    },
+    citiesPagination: (parent, args) => {
+      console.log(citiesPagination);
+      return {};
+    },
+    citiesMetadata: () => {
+      return {
+        countries: ["A", "B"],
+        population_lower_bound: 123,
+        population_upper_bound: 9999,
+        lat_lower_bound: 0.2,
+        lat_upper_bound: 60.7,
+        lng_lower_bound: 20.6,
+        lng_upper_bound: 80.9
+      };
     }
   },
   Node: {
@@ -48,19 +29,9 @@ export const serverResolvers = {
       return node;
     }
   },
-  Viewer: {
-    citiesPagination: (up, { continent, pageNo }) => {
-      console.log(continent, pageNo);
-      const pageSize = 5;
-      const cities = data[continent];
-      const begNdx = pageNo * pageSize;
-      const endNdx = (pageNo + 1) * pageSize - 1;
-      return {
-        nodes: cities.slice(begNdx, endNdx),
-        pageNo: pageNo,
-        hasNextPage: endNdx < cities.length - 1,
-        hasPrevPage: begNdx > 0
-      };
+  User: {
+    cityFilters: () => {
+      return;
     }
   }
 };

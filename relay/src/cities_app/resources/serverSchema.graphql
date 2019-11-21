@@ -39,16 +39,20 @@ type City implements Node {
 
 type CitiesMetadata {
   countries: [String!]
-  populationRange: [Int!, Int!]
-  latRange: [Float!, Float!]
-  lngRange: [Float!, Float!]
+  population_lower_bound: Int!
+  population_upper_bound: Int!
+  lat_lower_bound: Float!
+  lat_upper_bound: Float!
+  lng_lower_bound: Float!
+  lng_upper_bound: Float!
 }
 
 type CityFilter implements Node {
   id: ID!
   name: String!
   country: String
-  population_range: [Float, Float]
+  population_gte: Float
+  population_lse: Float
   orderBy: CitiesOrderAttr!
   orderByDesc: Boolean
 }
