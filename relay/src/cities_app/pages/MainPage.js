@@ -3,6 +3,8 @@
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 import environment from "../env";
+import CitiesPaginationParametersPanel from "../components/CitiesPaginationParametersPanel";
+import CitiesPaginationListPanel from "../components/CitiesPaginationListPanel";
 
 export default function MainPage() {
   return (
@@ -10,13 +12,7 @@ export default function MainPage() {
       query={graphql`
         query MainPageQuery {
           citiesMetadata {
-            countries
-            population_lower_bound
-            population_upper_bound
-            lat_lower_bound
-            lat_upper_bound
-            lng_lower_bound
-            lng_upper_bound
+            ...CitiesPaginationParametersPanel_params
           }
           viewer {
             cityFilters {
@@ -35,7 +31,12 @@ export default function MainPage() {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <div>ok boomer</div>;
+        return (
+          <div>
+            <CitiesPaginationParametersPanel params={props.citiesMetadata} />
+            <CitiesPaginationListPanel />
+          </div>
+        );
       }}
     />
   );

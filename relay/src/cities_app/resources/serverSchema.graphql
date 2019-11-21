@@ -38,7 +38,7 @@ type City implements Node {
 }
 
 type CitiesMetadata {
-  countries: [String!]
+  countries: [String!]!
   population_lower_bound: Int!
   population_upper_bound: Int!
   lat_lower_bound: Float!

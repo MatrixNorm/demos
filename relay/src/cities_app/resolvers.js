@@ -8,8 +8,13 @@ export const serverResolvers = {
       return { id };
     },
     citiesPagination: (parent, args) => {
-      console.log(citiesPagination);
-      return {};
+      console.log("citiesPagination", parent, args);
+      return {
+        nodes: [],
+        pageNo: args.pageNo,
+        hasNextPage: true,
+        hasPrevPage: false
+      };
     },
     citiesMetadata: () => {
       return {
