@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import SettingsPage from "./pages/SettingsPage";
-import HomePage from "./pages/HomePage";
+import MainPage from "./pages/MainPage";
 import ReimportDataPage from "./pages/ReimportDataPage";
 
 export default function App() {
@@ -23,7 +23,7 @@ export default function App() {
         </nav>
         <Switch>
           <Route exact path="/">
-            <HomePage />
+            <MainPage />
           </Route>
           <Route path="/settings">
             <SettingsPage />

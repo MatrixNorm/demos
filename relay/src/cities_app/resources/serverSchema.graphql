@@ -1,0 +1,62 @@
+interface Node {
+  id: ID!
+}
+
+type Mutation {
+  dummy(x: Int!): Int!
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: User
+  citiesPagination(
+    pageNo: Int!
+  ): CitiesPagination
+  citiesMetadata: CitiesMetadata
+}
+
+type User implements Node {
+  id: ID!
+  cityFilters: [CityFilter!]
+  pinnedCityFilter: CityFilter
+}
+
+type CitiesPagination {
+  nodes: [City!]
+  pageNo: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  country: String!
+  population: Int!
+  lat: Float!
+  lng: Float!
+}
+
+type CitiesMetadata {
+  countries: [String!]
+  populationRange: [Int!, Int!]
+  latRange: [Float!, Float!]
+  lngRange: [Float!, Float!]
+}
+
+type CityFilter implements Node {
+  id: ID!
+  name: String!
+  country: String
+  population_range: [Float, Float]
+  orderBy: CitiesOrderAttr!
+  orderByDesc: Boolean
+}
+
+enum CitiesOrderAttr {
+  name
+  population
+  lat
+  lng
+  country
+}
