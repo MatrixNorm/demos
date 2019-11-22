@@ -12,7 +12,6 @@ import type { FragmentReference } from "relay-runtime";
 declare export opaque type CitiesPaginationParametersPanel_params$ref: FragmentReference;
 declare export opaque type CitiesPaginationParametersPanel_params$fragmentType: CitiesPaginationParametersPanel_params$ref;
 export type CitiesPaginationParametersPanel_params = {|
-  +countries: $ReadOnlyArray<string>,
   +population_lower_bound: number,
   +population_upper_bound: number,
   +lat_lower_bound: number,
@@ -36,13 +35,6 @@ const node/*: ReaderFragment*/ = {
   "metadata": null,
   "argumentDefinitions": [],
   "selections": [
-    {
-      "kind": "ScalarField",
-      "alias": null,
-      "name": "countries",
-      "args": null,
-      "storageKey": null
-    },
     {
       "kind": "ScalarField",
       "alias": null,
@@ -88,5 +80,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '99578bcd3d60849547ef8f7d9285689e';
+(node/*: any*/).hash = 'fa45d379d6965abe3427819447416379';
 module.exports = node;

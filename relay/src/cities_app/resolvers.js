@@ -18,7 +18,6 @@ export const serverResolvers = {
     },
     citiesMetadata: () => {
       return {
-        countries: ["A", "B"],
         population_lower_bound: 123,
         population_upper_bound: 9999,
         lat_lower_bound: 0.2,

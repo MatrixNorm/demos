@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8a3c080ebe4e858bddfb1615223c0df1
+ * @relayHash 51ef405b624831b58fe81f2ce0cafd0a
  */
 
 /* eslint-disable */
@@ -52,7 +52,6 @@ query MainPageQuery {
 }
 
 fragment CitiesPaginationParametersPanel_params on CitiesMetadata {
-  countries
   population_lower_bound
   population_upper_bound
   lat_lower_bound
@@ -157,13 +156,6 @@ return {
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "countries",
-            "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
             "name": "population_lower_bound",
             "args": null,
             "storageKey": null
@@ -225,7 +217,7 @@ return {
     "operationKind": "query",
     "name": "MainPageQuery",
     "id": null,
-    "text": "query MainPageQuery {\n  citiesMetadata {\n    ...CitiesPaginationParametersPanel_params\n  }\n  viewer {\n    cityFilters {\n      id\n      name\n    }\n    pinnedCityFilter {\n      id\n      name\n    }\n    id\n  }\n}\n\nfragment CitiesPaginationParametersPanel_params on CitiesMetadata {\n  countries\n  population_lower_bound\n  population_upper_bound\n  lat_lower_bound\n  lat_upper_bound\n  lng_lower_bound\n  lng_upper_bound\n}\n",
+    "text": "query MainPageQuery {\n  citiesMetadata {\n    ...CitiesPaginationParametersPanel_params\n  }\n  viewer {\n    cityFilters {\n      id\n      name\n    }\n    pinnedCityFilter {\n      id\n      name\n    }\n    id\n  }\n}\n\nfragment CitiesPaginationParametersPanel_params on CitiesMetadata {\n  population_lower_bound\n  population_upper_bound\n  lat_lower_bound\n  lat_upper_bound\n  lng_lower_bound\n  lng_upper_bound\n}\n",
     "metadata": {}
   }
 };

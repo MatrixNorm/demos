@@ -1,12 +1,13 @@
 // @flow
 
 import { QueryRenderer, graphql } from "react-relay";
-import React from "react";
+import React, { useState } from "react";
 import environment from "../env";
 import CitiesPaginationParametersPanel from "../components/CitiesPaginationParametersPanel";
 import CitiesPaginationListPanel from "../components/CitiesPaginationListPanel";
 
 export default function MainPage() {
+  const [searchParams, setSearchParams] = useState({})
   return (
     <QueryRenderer
       query={graphql`

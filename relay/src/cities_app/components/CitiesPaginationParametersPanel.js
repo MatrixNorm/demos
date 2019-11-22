@@ -11,15 +11,15 @@ type Props = {
 function CitiesPaginationParametersPanel({ params }: Props) {
   return (
     <div>
-      <select value={""} onChange={e => console.log(e.target.value)}>
-        {params.countries.map(country => {
-          return (
-            <option value={country} key={country}>
-              {country}
-            </option>
-          );
-        })}
-      </select>
+      <div>
+        <span>Country</span>
+        <input className="bp3-input" type="text" />
+      </div>
+      <div>
+        <span>Population</span>
+        <input className="bp3-input" type="text" />
+        <input className="bp3-input" type="text" />
+      </div>
     </div>
   );
 }
@@ -27,7 +27,6 @@ function CitiesPaginationParametersPanel({ params }: Props) {
 export default createFragmentContainer(CitiesPaginationParametersPanel, {
   params: graphql`
     fragment CitiesPaginationParametersPanel_params on CitiesMetadata {
-      countries
       population_lower_bound
       population_upper_bound
       lat_lower_bound

@@ -1,3 +1,3 @@
 export default {
-  dbName: "indexeddb/uploading_json"
+  dbName: "cities_app"
 };
