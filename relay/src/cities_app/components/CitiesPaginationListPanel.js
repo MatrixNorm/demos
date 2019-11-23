@@ -3,22 +3,14 @@
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
 import environment from "../env";
+import CitiesPagination from "./CitiesPagination";
 
 function CitiesPaginationListPanel() {
   return (
     <QueryRenderer
       query={graphql`
-        query CitiesPaginationListPanelQuery {
-          citiesPagination(pageNo: 0) {
-            nodes {
-              id
-              name
-              country
-            }
-            pageNo
-            hasNextPage
-            hasPrevPage
-          }
+        query CitiesPaginationListPanelQuery($pageNo: Int!) {
+          ...CitiesPagination_cities @arguments(pageNo: $pageNo)
         }
       `}
       environment={environment}
@@ -26,11 +18,7 @@ function CitiesPaginationListPanel() {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return (
-          <div>
-            shit
-          </div>
-        );
+        return <CitiesPagination cities={props.cities} />
       }}
     />
   );

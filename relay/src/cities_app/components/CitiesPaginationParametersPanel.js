@@ -11,15 +11,7 @@ type Props = {
 function CitiesPaginationParametersPanel({ params }: Props) {
   return (
     <div>
-      <div>
-        <span>Country</span>
-        <input className="bp3-input" type="text" />
-      </div>
-      <div>
-        <span>Population</span>
-        <input className="bp3-input" type="text" />
-        <input className="bp3-input" type="text" />
-      </div>
+      <CountryFilter />
     </div>
   );
 }
@@ -36,3 +28,22 @@ export default createFragmentContainer(CitiesPaginationParametersPanel, {
     }
   `
 });
+
+function CountryFilter() {
+  return (
+    <div>
+      <span>Country</span>
+      <input className="bp3-input" type="text" />
+    </div>
+  );
+}
+
+function PopulationFilter() {
+  return (
+    <div>
+      <span>Population</span>
+      <input className="bp3-input" type="text" />
+      <input className="bp3-input" type="text" />
+    </div>
+  );
+}

@@ -1,3 +1,6 @@
+import Dexie from "dexie";
+import db from "./db";
+
 export const serverResolvers = {
   Query: {
     viewer: () => {
@@ -7,23 +10,34 @@ export const serverResolvers = {
       console.log({ id });
       return { id };
     },
-    citiesPagination: (parent, args) => {
+    citiesPagination: async (parent, args) => {
       console.log("citiesPagination", parent, args);
+      const pageSize = 10;
+      const nodes = await db
+        .table("cities")
+        .where("population")
+        .above(Dexie.minKey)
+        .offset(args.pageNo * pageSize)
+        .limit(pageSize)
+        .toArray();
       return {
-        nodes: [],
+        nodes,
         pageNo: args.pageNo,
         hasNextPage: true,
         hasPrevPage: false
       };
     },
-    citiesMetadata: () => {
+    citiesMetadata: async () => {
+      const t = db.table("cities");
       return {
-        population_lower_bound: 123,
-        population_upper_bound: 9999,
-        lat_lower_bound: 0.2,
-        lat_upper_bound: 60.7,
-        lng_lower_bound: 20.6,
-        lng_upper_bound: 80.9
+        population_lower_bound: (await t.orderBy("population").first())
+          .population,
+        population_upper_bound: (await t.orderBy("population").last())
+          .population,
+        lat_lower_bound: (await t.orderBy("lat").first()).lat,
+        lat_upper_bound: (await t.orderBy("lat").last()).lat,
+        lng_lower_bound: (await t.orderBy("lng").first()).lng,
+        lng_upper_bound: (await t.orderBy("lng").last()).lng
       };
     }
   },

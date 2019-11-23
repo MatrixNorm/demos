@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash b08836685957762fad8e0c2cf17b8bdb
+ * @relayHash 7ffa301c5401d82751e193fe0fa36b7f
  */
 
 /* eslint-disable */
@@ -10,21 +10,21 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 import type { CitiesPagination_cities$ref } from "./CitiesPagination_cities.graphql";
-export type CitiesPaginationListPanelQueryVariables = {|
+export type CitiesPaginationRefetchQueryVariables = {|
   pageNo: number
 |};
-export type CitiesPaginationListPanelQueryResponse = {|
+export type CitiesPaginationRefetchQueryResponse = {|
   +$fragmentRefs: CitiesPagination_cities$ref
 |};
-export type CitiesPaginationListPanelQuery = {|
-  variables: CitiesPaginationListPanelQueryVariables,
-  response: CitiesPaginationListPanelQueryResponse,
+export type CitiesPaginationRefetchQuery = {|
+  variables: CitiesPaginationRefetchQueryVariables,
+  response: CitiesPaginationRefetchQueryResponse,
 |};
 */
 
 
 /*
-query CitiesPaginationListPanelQuery(
+query CitiesPaginationRefetchQuery(
   $pageNo: Int!
 ) {
   ...CitiesPagination_cities_2HjlGh
@@ -64,7 +64,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "CitiesPaginationListPanelQuery",
+    "name": "CitiesPaginationRefetchQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -78,7 +78,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "CitiesPaginationListPanelQuery",
+    "name": "CitiesPaginationRefetchQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -149,13 +149,13 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "CitiesPaginationListPanelQuery",
+    "name": "CitiesPaginationRefetchQuery",
     "id": null,
-    "text": "query CitiesPaginationListPanelQuery(\n  $pageNo: Int!\n) {\n  ...CitiesPagination_cities_2HjlGh\n}\n\nfragment CitiesPagination_cities_2HjlGh on Query {\n  citiesPagination(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
+    "text": "query CitiesPaginationRefetchQuery(\n  $pageNo: Int!\n) {\n  ...CitiesPagination_cities_2HjlGh\n}\n\nfragment CitiesPagination_cities_2HjlGh on Query {\n  citiesPagination(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '3bf92d047af77e3c5850ff6b187a4dc1';
+(node/*: any*/).hash = 'c40d33b2d78ca55c979a83ee656478f0';
 module.exports = node;
