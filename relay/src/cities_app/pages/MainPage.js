@@ -33,9 +33,13 @@ export default function MainPage() {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
         return (
-          <div>
-            <CitiesPaginationParametersPanel params={props.citiesMetadata} />
-            <CitiesPaginationListPanel />
+          <div style={{display: "flex"}}>
+            <div style={{flex: 1}}>
+             <CitiesPaginationParametersPanel params={props.citiesMetadata} />
+            </div>
+            <div style={{flex: 2}}>
+             <CitiesPaginationListPanel />
+            </div>
           </div>
         );
       }}

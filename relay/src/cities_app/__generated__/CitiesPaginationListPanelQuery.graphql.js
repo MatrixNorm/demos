@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash b08836685957762fad8e0c2cf17b8bdb
+ * @relayHash fca1bf41610823c06354f080aeec03bb
  */
 
 /* eslint-disable */
@@ -35,7 +35,10 @@ fragment CitiesPagination_cities_2HjlGh on Query {
     nodes {
       id
       name
+      country
       population
+      lat
+      lng
     }
     hasNextPage
     hasPrevPage
@@ -116,7 +119,28 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
+                "name": "country",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
                 "name": "population",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "lat",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "lng",
                 "args": null,
                 "storageKey": null
               }
@@ -151,7 +175,7 @@ return {
     "operationKind": "query",
     "name": "CitiesPaginationListPanelQuery",
     "id": null,
-    "text": "query CitiesPaginationListPanelQuery(\n  $pageNo: Int!\n) {\n  ...CitiesPagination_cities_2HjlGh\n}\n\nfragment CitiesPagination_cities_2HjlGh on Query {\n  citiesPagination(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
+    "text": "query CitiesPaginationListPanelQuery(\n  $pageNo: Int!\n) {\n  ...CitiesPagination_cities_2HjlGh\n}\n\nfragment CitiesPagination_cities_2HjlGh on Query {\n  citiesPagination(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      country\n      population\n      lat\n      lng\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
     "metadata": {}
   }
 };

@@ -12,7 +12,7 @@ export const serverResolvers = {
     },
     citiesPagination: async (parent, args) => {
       console.log("citiesPagination", parent, args);
-      const pageSize = 10;
+      const pageSize = 5;
       const nodes = await db
         .table("cities")
         .where("population")

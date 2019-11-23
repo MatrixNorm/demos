@@ -16,7 +16,10 @@ export type CitiesPagination_cities = {|
     +nodes: ?$ReadOnlyArray<{|
       +id: string,
       +name: string,
+      +country: string,
       +population: number,
+      +lat: number,
+      +lng: number,
     |}>,
     +hasNextPage: boolean,
     +hasPrevPage: boolean,
@@ -87,7 +90,28 @@ const node/*: ReaderFragment*/ = {
             {
               "kind": "ScalarField",
               "alias": null,
+              "name": "country",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
               "name": "population",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "lat",
+              "args": null,
+              "storageKey": null
+            },
+            {
+              "kind": "ScalarField",
+              "alias": null,
+              "name": "lng",
               "args": null,
               "storageKey": null
             }
@@ -119,5 +143,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = 'def1c0f605ee4a7e38fdfc329834da69';
+(node/*: any*/).hash = 'e54061551f5985bafc85aecb3df16963';
 module.exports = node;

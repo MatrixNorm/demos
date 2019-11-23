@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 7ffa301c5401d82751e193fe0fa36b7f
+ * @relayHash 1599770e69494e4c9b16036a20ee8c45
  */
 
 /* eslint-disable */
@@ -35,7 +35,10 @@ fragment CitiesPagination_cities_2HjlGh on Query {
     nodes {
       id
       name
+      country
       population
+      lat
+      lng
     }
     hasNextPage
     hasPrevPage
@@ -116,7 +119,28 @@ return {
               {
                 "kind": "ScalarField",
                 "alias": null,
+                "name": "country",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
                 "name": "population",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "lat",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "lng",
                 "args": null,
                 "storageKey": null
               }
@@ -151,7 +175,7 @@ return {
     "operationKind": "query",
     "name": "CitiesPaginationRefetchQuery",
     "id": null,
-    "text": "query CitiesPaginationRefetchQuery(\n  $pageNo: Int!\n) {\n  ...CitiesPagination_cities_2HjlGh\n}\n\nfragment CitiesPagination_cities_2HjlGh on Query {\n  citiesPagination(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
+    "text": "query CitiesPaginationRefetchQuery(\n  $pageNo: Int!\n) {\n  ...CitiesPagination_cities_2HjlGh\n}\n\nfragment CitiesPagination_cities_2HjlGh on Query {\n  citiesPagination(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      country\n      population\n      lat\n      lng\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
     "metadata": {}
   }
 };

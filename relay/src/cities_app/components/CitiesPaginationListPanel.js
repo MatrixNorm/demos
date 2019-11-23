@@ -18,7 +18,7 @@ function CitiesPaginationListPanel() {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <CitiesPagination cities={props.cities} />
+        return <CitiesPagination cities={props} />
       }}
     />
   );

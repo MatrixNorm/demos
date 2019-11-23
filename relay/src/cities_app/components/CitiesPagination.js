@@ -43,6 +43,7 @@ const CitiesPagination = ({ relay, cities }: Props) => {
             <h4>
               <Link to={`/city/${node.id}`}>{node.name}</Link>
             </h4>
+            <div>{node.country}</div>
             <div>{node.population}</div>
           </div>
         ))}
@@ -66,7 +67,10 @@ export default createRefetchContainer(
           nodes {
             id
             name
+            country
             population
+            lat
+            lng
           }
           hasNextPage
           hasPrevPage
