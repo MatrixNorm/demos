@@ -1,31 +1,30 @@
 // @flow
 
 import React from "react";
-import {
-  createRefetchContainer,
-  graphql,
-} from "react-relay";
+import { createRefetchContainer, graphql } from "react-relay";
 
 function AutoComplete({ relay, suggestions }) {
-  console.log(suggestions)
-  return <div>iii</div>;
+  console.log(suggestions);
+
+  function handleFetchRequest() {
+    relay.refetch({ query: "", limit: 3 }, null, () => console.log("refetch"));
+  }
+
+  return <button onClick={handleFetchRequest}>Fetch</button>;
 }
 
 export default createRefetchContainer(
   AutoComplete,
   {
-    suggestions: graphql`
-      fragment AutoComplete_suggestions on Viewer {        
-      }
-    `
+    // suggestions: graphql`
+    //   fragment AutoComplete_suggestions on Viewer {
+    //   }
+    // `
   },
   graphql`
-    query AutoCompleteRefetchQuery($query: String) {
+    query AutoCompleteRefetchQuery($query: String!) {
       viewer {
-        searchCountries(query: $query, limit: 5) {
-          id
-          name
-        }
+        searchCountries(query: $query, limit: 5)
       }
     }
   `

@@ -110,6 +110,7 @@ registerBuild("problem_connection_fragment");
 registerBuild("problem_connection_fragment2");
 registerBuild("react_router/demo1");
 registerBuild("relay_hello");
+registerBuild("ui/autosuggest");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
