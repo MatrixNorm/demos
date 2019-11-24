@@ -1,0 +1,12 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  node(id: ID!): Node
+  viewer: Viewer!
+}
+
+type Viewer {
+  searchCountries(query: String!, limit: Int!): [String!]
+}
