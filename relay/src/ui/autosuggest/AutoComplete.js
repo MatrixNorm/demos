@@ -7,7 +7,9 @@ function AutoComplete({ relay, suggestions }) {
   console.log(suggestions);
 
   function handleFetchRequest() {
-    relay.refetch({ query: "", limit: 3 }, null, () => console.log("refetch"));
+    relay.refetch({ query: "", limit: 3 }, null, () =>
+      console.log("refetch")
+    );
   }
 
   return <button onClick={handleFetchRequest}>Fetch</button>;
@@ -16,15 +18,20 @@ function AutoComplete({ relay, suggestions }) {
 export default createRefetchContainer(
   AutoComplete,
   {
-    // suggestions: graphql`
-    //   fragment AutoComplete_suggestions on Viewer {
-    //   }
-    // `
+    suggestions: graphql`
+      fragment AutoComplete_suggestions on Viewer
+        @argumentDefinitions(
+          query: { type: "String!" }
+          limit: { type: "Int!" }
+        ) {
+        searchCountries(query: $query, limit: $limit) 
+      }
+    `
   },
   graphql`
-    query AutoCompleteRefetchQuery($query: String!) {
+    query AutoCompleteRefetchQuery($query: String!, $limit: Int!) {
       viewer {
-        searchCountries(query: $query, limit: 5)
+        ...AutoComplete_suggestions @arguments(query: $query, limit: $limit)
       }
     }
   `

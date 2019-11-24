@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash a6be9eb0bf687f8e6532c5a9db06a749
+ * @relayHash 7755d278918152ad890e08614cca95cd
  */
 
 /* eslint-disable */
@@ -9,12 +9,14 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
+import type { AutoComplete_suggestions$ref } from "./AutoComplete_suggestions.graphql";
 export type AutoCompleteRefetchQueryVariables = {|
-  query: string
+  query: string,
+  limit: number,
 |};
 export type AutoCompleteRefetchQueryResponse = {|
   +viewer: {|
-    +searchCountries: ?$ReadOnlyArray<string>
+    +$fragmentRefs: AutoComplete_suggestions$ref
   |}
 |};
 export type AutoCompleteRefetchQuery = {|
@@ -27,10 +29,15 @@ export type AutoCompleteRefetchQuery = {|
 /*
 query AutoCompleteRefetchQuery(
   $query: String!
+  $limit: Int!
 ) {
   viewer {
-    searchCountries(query: $query, limit: 5)
+    ...AutoComplete_suggestions_3HzzW
   }
+}
+
+fragment AutoComplete_suggestions_3HzzW on Viewer {
+  searchCountries(query: $query, limit: $limit)
 }
 */
 
@@ -41,37 +48,24 @@ var v0 = [
     "name": "query",
     "type": "String!",
     "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "limit",
+    "type": "Int!",
+    "defaultValue": null
   }
 ],
 v1 = [
   {
-    "kind": "LinkedField",
-    "alias": null,
-    "name": "viewer",
-    "storageKey": null,
-    "args": null,
-    "concreteType": "Viewer",
-    "plural": false,
-    "selections": [
-      {
-        "kind": "ScalarField",
-        "alias": null,
-        "name": "searchCountries",
-        "args": [
-          {
-            "kind": "Literal",
-            "name": "limit",
-            "value": 5
-          },
-          {
-            "kind": "Variable",
-            "name": "query",
-            "variableName": "query"
-          }
-        ],
-        "storageKey": null
-      }
-    ]
+    "kind": "Variable",
+    "name": "limit",
+    "variableName": "limit"
+  },
+  {
+    "kind": "Variable",
+    "name": "query",
+    "variableName": "query"
   }
 ];
 return {
@@ -82,23 +76,59 @@ return {
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
-    "selections": (v1/*: any*/)
+    "selections": [
+      {
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "viewer",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "Viewer",
+        "plural": false,
+        "selections": [
+          {
+            "kind": "FragmentSpread",
+            "name": "AutoComplete_suggestions",
+            "args": (v1/*: any*/)
+          }
+        ]
+      }
+    ]
   },
   "operation": {
     "kind": "Operation",
     "name": "AutoCompleteRefetchQuery",
     "argumentDefinitions": (v0/*: any*/),
-    "selections": (v1/*: any*/)
+    "selections": [
+      {
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "viewer",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "Viewer",
+        "plural": false,
+        "selections": [
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "searchCountries",
+            "args": (v1/*: any*/),
+            "storageKey": null
+          }
+        ]
+      }
+    ]
   },
   "params": {
     "operationKind": "query",
     "name": "AutoCompleteRefetchQuery",
     "id": null,
-    "text": "query AutoCompleteRefetchQuery(\n  $query: String!\n) {\n  viewer {\n    searchCountries(query: $query, limit: 5)\n  }\n}\n",
+    "text": "query AutoCompleteRefetchQuery(\n  $query: String!\n  $limit: Int!\n) {\n  viewer {\n    ...AutoComplete_suggestions_3HzzW\n  }\n}\n\nfragment AutoComplete_suggestions_3HzzW on Viewer {\n  searchCountries(query: $query, limit: $limit)\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '30407d42bfac0445bba8044758c286b7';
+(node/*: any*/).hash = 'd147e02ca84c86e86e60e5c2ab57b4b2';
 module.exports = node;
