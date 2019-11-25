@@ -11,8 +11,7 @@ export default function App() {
       query={graphql`
         query AppQuery($query: String!, $limit: Int!) {
           viewer {
-            __typename
-            ...AutoComplete_suggestions @arguments(query: $query, limit: $limit)
+            searchCountries(query: $query, limit: $limit)
           }
         }
       `}
