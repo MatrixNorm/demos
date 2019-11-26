@@ -77,7 +77,14 @@ function SuggestionsContainer({ query, limit, handleSuggestionsClose }) {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <div onClick={handleSuggestionsClose}>Suggestions</div>;
+        console.log(props.viewer.searchCountries)
+        return (
+          <ul onClick={handleSuggestionsClose}>
+            {props.viewer.searchCountries.map(country => (
+              <li key={country}>{country}</li>
+            ))}
+          </ul>
+        )
       }}
     />
   );

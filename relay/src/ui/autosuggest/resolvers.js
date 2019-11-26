@@ -1,3 +1,5 @@
+import { countryList } from "./data";
+
 export default {
   Query: {
     viewer: () => {
@@ -8,8 +10,11 @@ export default {
     }
   },
   Viewer: {
-    searchCountries: ({ query, limit }) => {
-      return ["Foo", "Bar"];
+    searchCountries: (parent, { query, limit }) => {
+      console.log(query)
+      return countryList.filter(country =>
+        country.toLowerCase().startsWith(query.toLowerCase())
+      );
     }
   },
   Node: {
