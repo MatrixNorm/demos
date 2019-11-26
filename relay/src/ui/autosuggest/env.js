@@ -11,7 +11,7 @@ const schema = makeExecutableSchema({
 
 const network = Network.create(async (operation, variables) => {
   console.log(operation.text)
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(resolve => setTimeout(resolve, 1000));
   const resp = await graphql(
     schema,
     operation.text,

@@ -14,7 +14,7 @@ export default {
       console.log(query)
       return countryList.filter(country =>
         country.toLowerCase().startsWith(query.toLowerCase())
-      );
+      ).slice(0, 4);
     }
   },
   Node: {

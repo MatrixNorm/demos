@@ -48,9 +48,18 @@ export default function AutoSuggest() {
     dispatch({ type: "CLOSE_SUGGESTIONS" });
   };
 
+  const onInputBlur = () => {
+    dispatch({ type: "CLOSE_SUGGESTIONS" });
+  };
+
   return (
     <div>
-      <input type="text" ref={inputEl} onChange={handleInputChange} />
+      <input
+        type="text"
+        ref={inputEl}
+        onChange={handleInputChange}
+        onBlur={onInputBlur}
+      />
       {state.showSuggestions && (
         <SuggestionsContainer
           query={state.inputValue}
@@ -77,14 +86,14 @@ function SuggestionsContainer({ query, limit, handleSuggestionsClose }) {
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        console.log(props.viewer.searchCountries)
+        console.log(props.viewer.searchCountries);
         return (
           <ul onClick={handleSuggestionsClose}>
             {props.viewer.searchCountries.map(country => (
               <li key={country}>{country}</li>
             ))}
           </ul>
-        )
+        );
       }}
     />
   );
