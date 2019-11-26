@@ -1,4 +1,4 @@
-class FSM {
+export class FSM {
   constructor(createStateToInputHandlerMap, initialState) {
     this._subscribers = [];
 
@@ -17,12 +17,35 @@ class FSM {
       inputHandler: this.stateToInputHandlerMap[initialState]()
     };
   }
-  send() {
-    this.current.inputHandler();
+  send(input) {
+    this.current.inputHandler(input);
   }
   subscribe(subscriber) {
     this._subscribers.push(subscriber);
   }
 }
 
-export default FSM;
+export function createDebounceStateMachine(timeout) {
+  const inputHandlersFactory = function(transit) {
+    return {
+      TYPING: function() {
+        let timeoutId = setTimeout(() => {
+          transit("IDLE", "USER_STOPPED_TYPING");
+        }, timeout);
+
+        return () => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            transit("IDLE", "USER_STOPPED_TYPING");
+          }, timeout);
+        };
+      },
+      IDLE: function() {
+        return () => {
+          transit("TYPING", "USER_STARTED_TYPING");
+        };
+      }
+    };
+  };
+  return new FSM(inputHandlersFactory, "IDLE");
+}
