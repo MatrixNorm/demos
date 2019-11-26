@@ -10,7 +10,9 @@ function reducer(state, action) {
     case "USER_STARTED_TYPING":
       return { ...state, showSuggestions: false };
     case "USER_STOPPED_TYPING":
-      return { ...state, showSuggestions: true };
+      return { ...state, showSuggestions: action.inputValue.trim().length > 0 };
+    case "CLOSE_SUGGESTIONS":
+      return { ...state, showSuggestions: false };
     default:
       return state;
   }
@@ -25,7 +27,7 @@ export default function App() {
     fsm.subscribe({
       onOutput: output => {
         console.log({ type: output });
-        dispatch({ type: output });
+        dispatch({ type: output, inputValue: inputEl.current.value });
       }
     });
     return () => {
@@ -33,10 +35,16 @@ export default function App() {
     };
   }, []);
 
+  const handleSuggestionsClose = () => {
+    dispatch({ type: "CLOSE_SUGGESTIONS" });
+  };
+
   return (
     <>
       <input type="text" ref={inputEl} onChange={handleChange} />
-      {state.showSuggestions && <div>suggestions</div>}
+      {state.showSuggestions && (
+        <div onClick={handleSuggestionsClose}>suggestions</div>
+      )}
     </>
   );
 }
