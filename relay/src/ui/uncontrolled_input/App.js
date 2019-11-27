@@ -61,12 +61,12 @@ export default function App() {
 
 function SuggestionList({ onSelect }) {
   const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
-  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [selectedIdx, setSelectedIdx] = useState(null);
 
-  const onMouseEnterListItem = useCallback(index => {
-    setHoveredIdx(index);
+  const onSelectListItem = useCallback(index => {
+    setSelectedIdx(index);
   }, []);
-  console.log("render", hoveredIdx, onMouseEnterListItem);
+  console.log("render", selectedIdx);
   return (
     <div onClick={onSelect}>
       <ul
@@ -79,8 +79,8 @@ function SuggestionList({ onSelect }) {
           <SuggestionListItem
             key={j}
             index={j}
-            onMouseEnter={onMouseEnterListItem}
-            isHovered={j === hoveredIdx}
+            onSelectListItem={onSelectListItem}
+            // isHovered={j === hoveredIdx}
             text={item}
           />
         ))}
@@ -92,9 +92,9 @@ function SuggestionList({ onSelect }) {
 const SuggestionListItem = React.memo(function({
   index,
   text,
-  isHovered,
-  onMouseEnter
+  onSelectListItem
 }) {
+  const [isHovered, setIsHovered] = useState(false);
   console.log(text, isHovered);
   const style = isHovered
     ? css`
@@ -102,7 +102,12 @@ const SuggestionListItem = React.memo(function({
       `
     : css``;
   return (
-    <li css={style} onMouseOver={() => onMouseEnter(index)}>
+    <li
+      css={style}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onSelectListItem(index)}
+    >
       {text}
     </li>
   );
