@@ -1,4 +1,14 @@
-import React, { useMemo, useRef, useReducer } from "react";
+// @flow
+
+import React, {
+  useCallback,
+  useMemo,
+  useRef,
+  useReducer,
+  useState
+} from "react";
+/** @jsx jsx */
+import { css, jsx } from "@emotion/core";
 import { createDebounceStateMachine } from "../../utils/fsm";
 
 const initialState = {
@@ -43,8 +53,57 @@ export default function App() {
     <>
       <input type="text" ref={inputEl} onChange={handleChange} />
       {state.showSuggestions && (
-        <div onClick={handleSuggestionsClose}>suggestions</div>
+        <SuggestionList onSelect={handleSuggestionsClose} />
       )}
     </>
   );
 }
+
+function SuggestionList({ onSelect }) {
+  const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+
+  const onMouseEnterListItem = useCallback(index => {
+    setHoveredIdx(index);
+  }, []);
+  console.log("render", hoveredIdx, onMouseEnterListItem);
+  return (
+    <div onClick={onSelect}>
+      <ul
+        css={css`
+          padding: 0;
+          margin: 0;
+        `}
+      >
+        {items.map((item, j) => (
+          <SuggestionListItem
+            key={j}
+            index={j}
+            onMouseEnter={onMouseEnterListItem}
+            isHovered={j === hoveredIdx}
+            text={item}
+          />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const SuggestionListItem = React.memo(function({
+  index,
+  text,
+  isHovered,
+  onMouseEnter
+}) {
+  console.log(text, isHovered);
+  const style = isHovered
+    ? css`
+        background-color: #dedcdc;
+      `
+    : css``;
+  return (
+    <li css={style} onMouseOver={() => onMouseEnter(index)}>
+      {text}
+    </li>
+  );
+});
