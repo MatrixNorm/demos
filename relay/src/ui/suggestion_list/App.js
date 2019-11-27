@@ -1,44 +1,44 @@
-import React, {
-  useCallback,
-  useContext,
-  useReducer,
-  useRef,
-  useState
-} from "react";
+import React, { useContext, useReducer, useState } from "react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 
-const ReduxContext = React.createContext();
+const DispatchContext = React.createContext();
 
 function reducer(state, action) {
   switch (action.type) {
     case "USER_SELECTED_SUGGESTION":
       return { ...state, inputValue: action.suggestion };
+    case "TEXT_INPUT_CHANGE":
+      return { ...state, inputValue: action.inputValue };
     default:
       return state;
   }
 }
 
 export default function App() {
-  const inputEl = useRef(null);
   const [state, dispatch] = useReducer(reducer, { inputValue: "" });
   console.log("render", state);
   return (
-    <ReduxContext.Provider value={{ state, dispatch }}>
-      <input type="text" ref={inputEl} />
-      <SuggestionList />
-    </ReduxContext.Provider>
+    <div>
+      <input
+        type="text"
+        value={state.inputValue}
+        onChange={e =>
+          dispatch({
+            type: "TEXT_INPUT_CHANGE",
+            inputValue: e.target.value
+          })
+        }
+      />
+      <DispatchContext.Provider value={dispatch}>
+        <SuggestionList />
+      </DispatchContext.Provider>
+    </div>
   );
 }
 
-function SuggestionList() {
+const SuggestionList = React.memo(function() {
   const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
-  const [selectedIdx, setSelectedIdx] = useState(null);
-
-  // const onSelectListItem = useCallback(index => {
-  //   setSelectedIdx(index);
-  // }, []);
-  console.log("render", selectedIdx);
   return (
     <div>
       <ul
@@ -53,11 +53,11 @@ function SuggestionList() {
       </ul>
     </div>
   );
-}
+});
 
-const SuggestionListItem = React.memo(function({ index, text }) {
+const SuggestionListItem = React.memo(function({ text }) {
   const [isHovered, setIsHovered] = useState(false);
-  const { dispatch } = useContext(ReduxContext);
+  const dispatch = useContext(DispatchContext);
   console.log(text, isHovered);
   const style = isHovered
     ? css`
