@@ -49,3 +49,17 @@ export function createDebounceStateMachine(timeout) {
   };
   return new FSM(inputHandlersFactory, "IDLE");
 }
+
+export function debounce(fn, timeout) {
+  const fsm = createDebounceStateMachine(timeout);
+  fsm.subscribe({
+    onOutput: output => {
+      if (output === "USER_STOPPED_TYPING") {
+        fn();
+      }
+    }
+  });
+  return params => {
+    fsm.send(params);
+  };
+}

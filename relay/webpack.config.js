@@ -113,6 +113,7 @@ registerBuild("react_router/demo1");
 registerBuild("relay_hello");
 registerBuild("ui/autosuggest");
 registerBuild("ui/suggestion_list");
+registerBuild("ui/suggestion_list_loading_on_typing");
 registerBuild("ui/uncontrolled_input");
 
 module.exports = env => {
