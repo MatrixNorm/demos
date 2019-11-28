@@ -87,8 +87,8 @@ function reducer(state, action) {
 }
 
 export default function App() {
+  console.log("render: App");
   const [state, dispatch] = useReducer(reducer, initialState);
-  console.log("render: App", state);
 
   function handleKeyDown(e) {
     console.log(e.keyCode);
