@@ -23,18 +23,26 @@ function reducer(state, action) {
       return { ...state, inputValue: action.inputValue };
     case "SET_SELECTED_INDEX":
       return { ...state, selectedIndex: action.value };
-    case "INCREMENT_SELECTED_INDEX":
+    case "INCREMENT_SELECTED_INDEX": {
+      let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
       return {
         ...state,
-        selectedIndex: (state.selectedIndex + 1) % state.suggestionsLength
+        selectedIndex,
+        inputValue: state.suggestions[selectedIndex]
       };
-    case "DECREMENT_SELECTED_INDEX":
+    }
+
+    case "DECREMENT_SELECTED_INDEX": {
+      let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
       return {
         ...state,
-        selectedIndex: (state.selectedIndex - 1) % state.suggestionsLength
+        selectedIndex,
+        inputValue: state.suggestions[selectedIndex]
       };
-    case "SET_SUGGESTION_LIST_LENGTH":
-      return { ...state, suggestionsLength: action.value };
+    }
+
+    case "SUGGESTION_LIST_LOADED":
+      return { ...state, suggestions: action.value };
     default:
       return state;
   }
@@ -84,7 +92,7 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
   const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
 
   useEffect(() => {
-    dispatch({ type: "SET_SUGGESTION_LIST_LENGTH", value: 5 });
+    dispatch({ type: "SUGGESTION_LIST_LOADED", value: items });
   }, []);
 
   const handleMouseLeaveList = useCallback(() => {
