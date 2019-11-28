@@ -2,15 +2,18 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useState
 } from "react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
+import { debounce } from "../../utils/fsm";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
-  ARROW_UP: 38
+  ARROW_UP: 38,
+  ENTER: 13
 };
 
 const DispatchContext = React.createContext();
@@ -18,18 +21,46 @@ const DispatchContext = React.createContext();
 const initialState = {
   inputValue: "",
   selectedIndex: null,
-  suggestionsLength: null
+  suggestions: null,
+  showDropdown: false
 };
 
 function reducer(state, action) {
   switch (action.type) {
+    case "SHOW_DROPDOWN":
+      return {
+        ...state,
+        showDropdown: true
+      };
     case "USER_SELECTED_SUGGESTION":
-      return { ...state, inputValue: action.suggestion };
+      return {
+        ...state,
+        inputValue: action.suggestion,
+        selectedIndex: null,
+        suggestions: null,
+        showDropdown: false
+      };
+    case "USER_CLOSED_SUGGESTION":
+      return {
+        ...state,
+        selectedIndex: null,
+        suggestions: null,
+        showDropdown: false
+      };
     case "TEXT_INPUT_CHANGE":
-      return { ...state, inputValue: action.inputValue };
+      return {
+        ...state,
+        inputValue: action.inputValue,
+        selectedIndex: null,
+        suggestions: null,
+        showDropdown: false
+      };
     case "SET_SELECTED_INDEX":
       return { ...state, selectedIndex: action.value };
     case "INCREMENT_SELECTED_INDEX": {
+      if (!state.showDropdown) {
+        return state;
+      }
       let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
       return {
         ...state,
@@ -38,6 +69,9 @@ function reducer(state, action) {
       };
     }
     case "DECREMENT_SELECTED_INDEX": {
+      if (!state.showDropdown) {
+        return state;
+      }
       let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
       return {
         ...state,
@@ -57,28 +91,43 @@ export default function App() {
   console.log("render: App", state);
 
   function handleKeyDown(e) {
+    console.log(e.keyCode);
     if (e.keyCode === KEY_CODE.ARROW_DOWN) {
       dispatch({ type: "INCREMENT_SELECTED_INDEX", value: null });
     }
     if (e.keyCode === KEY_CODE.ARROW_UP) {
       dispatch({ type: "DECREMENT_SELECTED_INDEX", value: null });
     }
+    if (e.keyCode === KEY_CODE.ENTER) {
+      dispatch({ type: "USER_CLOSED_SUGGESTION" });
+    }
   }
+
+  function handleTextInputChange(e) {
+    dispatch({
+      type: "TEXT_INPUT_CHANGE",
+      inputValue: e.target.value
+    });
+    showDropdown();
+  }
+
+  const showDropdown = useMemo(() => {
+    return debounce(() => {
+      dispatch({ type: "SHOW_DROPDOWN" });
+    }, 500);
+  }, []);
 
   return (
     <div onKeyDown={handleKeyDown}>
       <input
         type="text"
         value={state.inputValue}
-        onChange={e =>
-          dispatch({
-            type: "TEXT_INPUT_CHANGE",
-            inputValue: e.target.value
-          })
-        }
+        onChange={handleTextInputChange}
       />
       <DispatchContext.Provider value={dispatch}>
-        <SuggestionList selectedIndex={state.selectedIndex} />
+        {state.showDropdown && (
+          <SuggestionList selectedIndex={state.selectedIndex} />
+        )}
       </DispatchContext.Provider>
     </div>
   );

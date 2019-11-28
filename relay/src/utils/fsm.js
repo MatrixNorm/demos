@@ -28,21 +28,21 @@ export class FSM {
 export function createDebounceStateMachine(timeout) {
   const inputHandlersFactory = function(transit) {
     return {
-      TYPING: function() {
+      BUSY: function() {
         let timeoutId = setTimeout(() => {
-          transit("IDLE", "USER_STOPPED_TYPING");
+          transit("IDLE", "RELEASED");
         }, timeout);
 
         return () => {
           clearTimeout(timeoutId);
           timeoutId = setTimeout(() => {
-            transit("IDLE", "USER_STOPPED_TYPING");
+            transit("IDLE", "RELEASED");
           }, timeout);
         };
       },
       IDLE: function() {
         return () => {
-          transit("TYPING", "USER_STARTED_TYPING");
+          transit("BUSY");
         };
       }
     };
@@ -52,14 +52,16 @@ export function createDebounceStateMachine(timeout) {
 
 export function debounce(fn, timeout) {
   const fsm = createDebounceStateMachine(timeout);
+  let _paramsBox= [];
   fsm.subscribe({
     onOutput: output => {
-      if (output === "USER_STOPPED_TYPING") {
-        fn();
+      if (output === "RELEASED") {
+        fn(_paramsBox[0]);
       }
     }
   });
   return params => {
-    fsm.send(params);
+    _paramsBox[0] = params
+    fsm.send();
   };
 }
