@@ -15,6 +15,12 @@ const KEY_CODE = {
 
 const DispatchContext = React.createContext();
 
+const initialState = {
+  inputValue: "",
+  selectedIndex: null,
+  suggestionsLength: null
+};
+
 function reducer(state, action) {
   switch (action.type) {
     case "USER_SELECTED_SUGGESTION":
@@ -31,7 +37,6 @@ function reducer(state, action) {
         inputValue: state.suggestions[selectedIndex]
       };
     }
-
     case "DECREMENT_SELECTED_INDEX": {
       let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
       return {
@@ -40,19 +45,12 @@ function reducer(state, action) {
         inputValue: state.suggestions[selectedIndex]
       };
     }
-
     case "SUGGESTION_LIST_LOADED":
       return { ...state, suggestions: action.value };
     default:
       return state;
   }
 }
-
-const initialState = {
-  inputValue: "",
-  selectedIndex: null,
-  suggestionsLength: null
-};
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -122,8 +120,8 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
 });
 
 const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
+  console.log("render: ListItem", text, isHovered);
   const dispatch = useContext(DispatchContext);
-  console.log("rende: ListItem", text, isHovered);
   const style = isHovered
     ? css`
         background-color: #dedcdc;
