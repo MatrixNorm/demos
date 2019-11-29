@@ -7,7 +7,7 @@ import React, {
   useState
 } from "react";
 import * as xs from "xstate";
-import { useMachine } from '@xstate/react';
+import { useMachine } from "@xstate/react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 import { debounce } from "../../utils/fsm";
@@ -19,7 +19,7 @@ const KEY_CODE = {
 };
 
 const ddMachine = xs.Machine({
-  id: "uiMachine",
+  id: "ddMachine",
   initial: "dropdownClosed",
   states: {
     dropdownClosed: {
@@ -36,25 +36,30 @@ const ddMachine = xs.Machine({
       states: {
         loading: {
           on: {
-            REQUEST_FAILED: "dropdownOpen.error",
-            REQUEST_SUCCEEDED: "dropdownOpen.loaded"
+            REQUEST_FAILED: "error",
+            REQUEST_SUCCEEDED: "loaded"
           }
         },
         error: {},
         loaded: {
-          context: {},
+          context: {
+            selectedSuggestion: null
+          },
           initial: "SUGGESTION_NOT_SELECTED",
           states: {
             SUGGESTION_NOT_SELECTED: {
               on: {
-                ARROW_DOWN: "dropdownOpen.loaded.SUGGESTION_SELECTED",
-                MOUSE_ENTER_LIST_ITEM: "dropdownOpen.loaded.SUGGESTION_SELECTED"
+                SELECT_SUGGESTION: {
+                  target: "SUGGESTION_SELECTED",
+                  actions: xs.assign({
+                    selectedSuggestion: (context, event) => event.suggestion
+                  })
+                }
               }
             },
             SUGGESTION_SELECTED: {
               on: {
-                MOUSE_LEAVE_LIST_AREA:
-                  "dropdownOpen.loaded.SUGGESTION_NOT_SELECTED"
+                MOUSE_LEAVED_LIST_AREA: "SUGGESTION_NOT_SELECTED"
               }
             }
           }
