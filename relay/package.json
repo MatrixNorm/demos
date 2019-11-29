@@ -12,6 +12,7 @@
   "dependencies": {
     "@blueprintjs/core": "^3.21.0",
     "@emotion/core": "^10.0.22",
+    "@xstate/react": "^0.8.1",
     "codemirror-graphql": "^0.9.0",
     "dexie": "^2.0.4",
     "graphiql": "^0.14.2",
@@ -23,7 +24,8 @@
     "react-dom": "^16.8.4",
     "react-relay": "^7.0.0",
     "react-router-dom": "^5.1.2",
-    "relay-compiler": "^7.0.0"
+    "relay-compiler": "^7.0.0",
+    "xstate": "^4.7.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
