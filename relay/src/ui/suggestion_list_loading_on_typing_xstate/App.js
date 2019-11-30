@@ -3,7 +3,6 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
   useState
 } from "react";
 import * as xs from "xstate";
@@ -18,8 +17,13 @@ const KEY_CODE = {
   ENTER: 13
 };
 
-const ddMachine = xs.Machine({
-  id: "ddMachine",
+
+const suggestionMachine = xs.Machine({
+  id: "suggestionMachine",
+  context: {
+    selectedSuggestion: null,
+    cursorIndex: null
+  },
   initial: "dropdownClosed",
   states: {
     dropdownClosed: {
@@ -40,30 +44,40 @@ const ddMachine = xs.Machine({
             REQUEST_SUCCEEDED: "loaded"
           }
         },
-        error: {},
+        error: {
+          final: true
+        },
         loaded: {
-          context: {
-            selectedSuggestion: null
-          },
-          initial: "SUGGESTION_NOT_SELECTED",
-          states: {
-            SUGGESTION_NOT_SELECTED: {
-              on: {
-                SELECT_SUGGESTION: {
-                  target: "SUGGESTION_SELECTED",
-                  actions: xs.assign({
-                    selectedSuggestion: (context, event) => event.suggestion
-                  })
-                }
-              }
+          on: {
+            MOUSE_ENTERED_ITEM: {
+              actions: xs.assign({
+                cursorIndex: (_ctx, evt) => evt.itemIndex
+              })
             },
-            SUGGESTION_SELECTED: {
-              on: {
-                MOUSE_LEAVED_LIST_AREA: "SUGGESTION_NOT_SELECTED"
-              }
+            MOUSE_LEAVED_LIST: {
+              actions: xs.assign({
+                cursorIndex: null
+              })
+            },
+            MOUSE_CLICKED_ITEM: {
+              target: 'dropdownClosed',
+              actions: xs.assign({
+                selectedSuggestion: (_ctx, evt) => evt.itemValue,
+                cursorIndex: null
+              })
+            },
+            KEY_ARROW_DOWN: {
+              actions: xs.assign({
+                cursorIndex: (ctx) => ctx.cursorIndex ? (ctx.cursorIndex + 1) % ctx.items.length : 0
+              })
+            },
+            KEY_ARROW_UP: {
+              actions: xs.assign({
+                cursorIndex: (ctx) => ctx.cursorIndex ? (ctx.cursorIndex - 1) % ctx.items.length : null
+              })
             }
           }
-        }
+         }
       }
     }
   }
@@ -73,7 +87,7 @@ const DispatchContext = React.createContext();
 
 export default function App() {
   console.log("render: App");
-  const [current, send] = useMachine(ddMachine);
+  const [current, send] = useMachine(suggestionMachine);
 
   function handleKeyDown(e) {
     console.log(e.keyCode);
