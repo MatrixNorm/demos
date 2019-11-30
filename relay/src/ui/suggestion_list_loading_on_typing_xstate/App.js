@@ -5,10 +5,11 @@ import React, {
   useMemo,
   useState
 } from "react";
-import * as xs from "xstate";
+
 import { useMachine } from "@xstate/react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
+import { suggestionMachine } from "./machine";
 import { debounce } from "../../utils/fsm";
 
 const KEY_CODE = {
@@ -16,72 +17,6 @@ const KEY_CODE = {
   ARROW_UP: 38,
   ENTER: 13
 };
-
-
-const suggestionMachine = xs.Machine({
-  id: "suggestionMachine",
-  context: {
-    selectedSuggestion: null,
-    cursorIndex: null
-  },
-  initial: "dropdownClosed",
-  states: {
-    dropdownClosed: {
-      on: {
-        USER_STOPPED_TYPING: "dropdownOpen"
-      }
-    },
-    dropdownOpen: {
-      on: {
-        INPUT_BLUR: "dropdownClosed",
-        USER_RESUMED_TYPING: "dropdownClosed"
-      },
-      initial: "loading",
-      states: {
-        loading: {
-          on: {
-            REQUEST_FAILED: "error",
-            REQUEST_SUCCEEDED: "loaded"
-          }
-        },
-        error: {
-          final: true
-        },
-        loaded: {
-          on: {
-            MOUSE_ENTERED_ITEM: {
-              actions: xs.assign({
-                cursorIndex: (_ctx, evt) => evt.itemIndex
-              })
-            },
-            MOUSE_LEAVED_LIST: {
-              actions: xs.assign({
-                cursorIndex: null
-              })
-            },
-            MOUSE_CLICKED_ITEM: {
-              target: 'dropdownClosed',
-              actions: xs.assign({
-                selectedSuggestion: (_ctx, evt) => evt.itemValue,
-                cursorIndex: null
-              })
-            },
-            KEY_ARROW_DOWN: {
-              actions: xs.assign({
-                cursorIndex: (ctx) => ctx.cursorIndex ? (ctx.cursorIndex + 1) % ctx.items.length : 0
-              })
-            },
-            KEY_ARROW_UP: {
-              actions: xs.assign({
-                cursorIndex: (ctx) => ctx.cursorIndex ? (ctx.cursorIndex - 1) % ctx.items.length : null
-              })
-            }
-          }
-         }
-      }
-    }
-  }
-});
 
 const DispatchContext = React.createContext();
 
@@ -92,39 +27,30 @@ export default function App() {
   function handleKeyDown(e) {
     console.log(e.keyCode);
     if (e.keyCode === KEY_CODE.ARROW_DOWN) {
-      dispatch({ type: "INCREMENT_SELECTED_INDEX", value: null });
+      send({ type: "KEY_ARROW_DOWN" });
     }
     if (e.keyCode === KEY_CODE.ARROW_UP) {
-      dispatch({ type: "DECREMENT_SELECTED_INDEX", value: null });
+      send({ type: "KEY_ARROW_UP" });
     }
     if (e.keyCode === KEY_CODE.ENTER) {
-      dispatch({ type: "USER_CLOSED_SUGGESTION" });
+      send({ type: "KEY_ENTER" });
     }
   }
-
-  function handleTextInputChange(e) {
-    dispatch({
-      type: "TEXT_INPUT_CHANGE",
-      inputValue: e.target.value
-    });
-    showDropdown();
-  }
-
-  const showDropdown = useMemo(() => {
-    return debounce(() => {
-      dispatch({ type: "SHOW_DROPDOWN" });
-    }, 500);
-  }, []);
 
   return (
     <div onKeyDown={handleKeyDown}>
       <input
         type="text"
-        value={state.inputValue}
-        onChange={handleTextInputChange}
+        value={current.context.inputValue}
+        onChange={e =>
+          send({
+            type: "TEXT_INPUT_CHANGE",
+            inputValue: e.target.value
+          })
+        }
       />
-      <DispatchContext.Provider value={dispatch}>
-        {state.showDropdown && (
+      <DispatchContext.Provider value={send}>
+        {current.matches("dropdownOpen") && (
           <SuggestionList selectedIndex={state.selectedIndex} />
         )}
       </DispatchContext.Provider>
@@ -169,7 +95,7 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
 
 const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
   console.log("render: ListItem", text, isHovered);
-  const dispatch = useContext(DispatchContext);
+  const send = useContext(DispatchContext);
   const style = isHovered
     ? css`
         background-color: #dedcdc;
@@ -179,12 +105,12 @@ const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
     <li
       css={style}
       onMouseEnter={() =>
-        dispatch({ type: "SET_SELECTED_INDEX", value: index })
+        send({ type: "MOUSE_ENTERED_ITEM", itemIndex: index })
       }
       onClick={() =>
-        dispatch({
-          type: "USER_SELECTED_SUGGESTION",
-          suggestion: text
+        send({
+          type: "MOUSE_CLICKED_ITEM",
+          itemValue: text
         })
       }
     >
