@@ -69,7 +69,7 @@ const baseBuild = ({ buildId }) => env => {
         },
         {
           test: /\.js$/,
-          exclude: /(graphql-tools|deprecated-decorator)/,
+          exclude: /(graphql-tools|deprecated-decorator|xstate)/,
           use: ["source-map-loader"],
           enforce: "pre"
         },
@@ -116,6 +116,7 @@ registerBuild("ui/autosuggest");
 registerBuild("ui/suggestion_list");
 registerBuild("ui/suggestion_list_loading_on_typing");
 registerBuild("ui/uncontrolled_input");
+registerBuild("xstate/debounce");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;

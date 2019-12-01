@@ -7,6 +7,7 @@ const debounceMachine = Machine({
   context: {
     inputValue: ""
   },
+  initial: "idle",
   states: {
     idle: {
       on: {
@@ -40,10 +41,15 @@ export default function App() {
   console.log(current);
 
   return (
-    <input
-      type="text"
-      onChange={e => send({ type: "typing", value: e.target.value })}
-      value={current.context.inputValue}
-    />
+    <>
+    <div>
+      <input
+        type="text"
+        onChange={e => send({ type: "TYPING", value: e.target.value })}
+        value={current.context.inputValue}
+      />
+    </div>
+    {current.matches('typing') && <div>typing...</div>}
+    </>
   );
 }
