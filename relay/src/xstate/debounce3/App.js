@@ -1,7 +1,5 @@
 import React, { useMemo } from "react";
-import { Machine, assign, interpret } from "xstate";
-import { useService } from "@xstate/react";
-import * as deb from './debounce'
+import * as deb from "./debounce";
 
 export default function App() {
   console.log("render: App");
