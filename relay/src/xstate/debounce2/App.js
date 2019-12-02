@@ -28,6 +28,7 @@ function debounceMachineFactory({
       typing: {
         on: {
           TYPING: {
+            target: 'typing',
             actions: "updateInputValue"
           }
         },
@@ -49,14 +50,13 @@ function TextInputDebounced({ initialValue, onStartTyping, onFinishTyping }) {
       machineId: "debMachine",
       debounceDuration: 2000,
       initialInputValue: initialValue
-    }),
-    {
+    }).withConfig({
       actions: {
         updateInputValue: assign({ inputValue: (_ctx, evt) => evt.value }),
         onStartTyping: ctx => onStartTyping(ctx.inputValue),
         onFinishTyping: ctx => onFinishTyping(ctx.inputValue)
       }
-    }
+    })
   );
 
   useEffect(() => {
@@ -92,9 +92,7 @@ export default function App() {
         onStartTyping={onStartTyping}
         onFinishTyping={onFinishTyping}
       />
-      <button onClick={() => setInputInitialValue('')}>
-        Reset input
-      </button>
+      <button onClick={() => setInputInitialValue("")}>Reset input</button>
     </>
   );
 }
