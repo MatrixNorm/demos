@@ -117,6 +117,7 @@ registerBuild("ui/suggestion_list");
 registerBuild("ui/suggestion_list_loading_on_typing");
 registerBuild("ui/uncontrolled_input");
 registerBuild("xstate/debounce");
+registerBuild("xstate/debounce2");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
