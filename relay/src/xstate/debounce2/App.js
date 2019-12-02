@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Machine, assign } from "xstate";
 import { useMachine } from "@xstate/react";
 
@@ -19,6 +19,9 @@ function debounceMachineFactory({
           TYPING: {
             target: "typing",
             actions: ["updateInputValue", "onStartTyping"]
+          },
+          RESET: {
+            actions: "updateInputValue"
           }
         }
       },
@@ -40,7 +43,7 @@ function debounceMachineFactory({
 }
 
 function TextInputDebounced({ initialValue, onStartTyping, onFinishTyping }) {
-  console.log("render: TextInputDebounced");
+  console.log("render: TextInputDebounced", initialValue);
   const [current, send] = useMachine(
     debounceMachineFactory({
       machineId: "debMachine",
@@ -56,16 +59,10 @@ function TextInputDebounced({ initialValue, onStartTyping, onFinishTyping }) {
     }
   );
 
-  // console.log(current);
-
-  // useEffect(() => {
-  //   if (current.matches("idle") && current.changed) {
-  //     onFinishTyping(current.context.inputValue);
-  //   }
-  //   if (current.matches("typing") && current.changed) {
-  //     onStartTyping(current.context.inputValue);
-  //   }
-  // }, [current, send]);
+  useEffect(() => {
+    console.log("useEffect");
+    send({ type: "RESET", value: initialValue });
+  }, [initialValue]);
 
   return (
     <input
@@ -80,13 +77,13 @@ export default function App() {
   console.log("render: App");
   const [inputInitialValue, setInputInitialValue] = useState("");
 
-  function onStartTyping(inputValue) {
+  const onStartTyping = useCallback(inputValue => {
     console.log("StartTyping", inputValue);
-  }
+  });
 
-  function onFinishTyping(inputValue) {
+  const onFinishTyping = useCallback(inputValue => {
     console.log("FinishTyping", inputValue);
-  }
+  });
 
   return (
     <>
@@ -95,9 +92,7 @@ export default function App() {
         onStartTyping={onStartTyping}
         onFinishTyping={onFinishTyping}
       />
-      <button
-        onClick={() => setInputInitialValue(Math.random().toString())}
-      >
+      <button onClick={() => setInputInitialValue('')}>
         Reset input
       </button>
     </>
