@@ -58,28 +58,33 @@ function TextInputDebounced({ service }) {
   );
 }
 
+function makeService({
+  debounceDuration,
+  initialInputValue,
+  onStartTyping,
+  onFinishTyping
+}) {
+  const defs = debounceMachineDefinition({
+    machineId: "debounceMachine",
+    debounceDuration: debounceDuration || 2000,
+    initialInputValue: initialInputValue || ""
+  });
+  const opts = {
+    actions: {
+      updateInputValue: assign({ inputValue: (_ctx, evt) => evt.value }),
+      onStartTyping: ctx => onStartTyping(ctx.inputValue),
+      onFinishTyping: ctx => onFinishTyping(ctx.inputValue)
+    }
+  };
+  const machine = Machine(defs, opts);
+  const service = interpret(machine);
+  service.start();
+  return service;
+}
+
 export default function App() {
   console.log("render: App");
 
-  const service = useMemo(() => {
-    const defs = debounceMachineDefinition({
-      machineId: "debounceMachine",
-      debounceDuration: 2000,
-      initialInputValue: ""
-    });
-    const opts = {
-      actions: {
-        updateInputValue: assign({ inputValue: (_ctx, evt) => evt.value }),
-        onStartTyping: ctx => onStartTyping(ctx.inputValue),
-        onFinishTyping: ctx => onFinishTyping(ctx.inputValue)
-      }
-    };
-    const machine = Machine(defs, opts);
-    const service = interpret(machine);
-    service.start();
-    return service;
-  });
-  console.log(service);
   const onStartTyping = inputValue => {
     console.log("StartTyping", inputValue);
   };
@@ -87,6 +92,15 @@ export default function App() {
   const onFinishTyping = inputValue => {
     console.log("FinishTyping", inputValue);
   };
+
+  const service = useMemo(() => {
+    return makeService({
+      debounceDuration: 2000,
+      initialInputValue: "",
+      onStartTyping,
+      onFinishTyping
+    });
+  });
 
   return (
     <div>
