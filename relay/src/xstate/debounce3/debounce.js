@@ -43,7 +43,22 @@ function debounceMachineDefinition({
   };
 }
 
-export function makeService({
+export function TextInputDebounced({ service }) {
+  console.log("render: TextInputDebounced");
+  const [current, send] = useService(service);
+  return (
+    <div>
+      <input
+        type="text"
+        onChange={e => send({ type: "TYPING", value: e.target.value })}
+        value={current.context.inputValue}
+      />
+      {current.matches("typing") && <i>typing...</i>}
+    </div>
+  );
+}
+
+export function createElement({
   debounceDuration = 500,
   initialInputValue = "",
   onStartTyping,
@@ -64,20 +79,8 @@ export function makeService({
   const machine = Machine(defs, opts);
   const service = interpret(machine);
   service.start();
-  return [service, value => service.send({ type: "RESET", value })];
-}
-
-export function TextInputDebounced({ service }) {
-  console.log("render: TextInputDebounced");
-  const [current, send] = useService(service);
-  return (
-    <div>
-      <input
-        type="text"
-        onChange={e => send({ type: "TYPING", value: e.target.value })}
-        value={current.context.inputValue}
-      />
-      {current.matches("typing") && <i>typing...</i>}
-    </div>
-  );
+  return [
+    React.createElement(TextInputDebounced, { service }),
+    value => service.send({ type: "RESET", value })
+  ];
 }

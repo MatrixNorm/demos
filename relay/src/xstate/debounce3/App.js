@@ -4,14 +4,14 @@ import * as deb from "./debounce";
 export default function App() {
   console.log("render: App");
 
-  const [service, resetInput] = useMemo(() => {
+  const [inputEl, resetInput] = useMemo(() => {
     const onStartTyping = inputValue => {
       console.log("StartTyping", inputValue);
     };
     const onFinishTyping = inputValue => {
       console.log("FinishTyping", inputValue);
     };
-    return deb.makeService({
+    return deb.createElement({
       debounceDuration: 2000,
       initialInputValue: "",
       onStartTyping,
@@ -21,7 +21,7 @@ export default function App() {
 
   return (
     <div>
-      <deb.TextInputDebounced service={service} />
+      {inputEl}
       <button onClick={() => resetInput("")}>Reset input</button>
     </div>
   );
