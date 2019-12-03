@@ -44,15 +44,15 @@ function debounceMachineDefinition({
 }
 
 export function makeService({
-  debounceDuration,
-  initialInputValue,
+  debounceDuration = 500,
+  initialInputValue = "",
   onStartTyping,
   onFinishTyping
 }) {
   const defs = debounceMachineDefinition({
     machineId: "debounceMachine",
-    debounceDuration: debounceDuration || 2000,
-    initialInputValue: initialInputValue || ""
+    debounceDuration,
+    initialInputValue
   });
   const opts = {
     actions: {
