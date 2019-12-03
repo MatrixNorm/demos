@@ -10,7 +10,7 @@ import { useMachine } from "@xstate/react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 import { suggestionMachine } from "./machine";
-import { debounce } from "../../utils/fsm";
+import { createElement as createDebouncedInput } from "../../xstate/debounce3/debounce";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
@@ -37,18 +37,24 @@ export default function App() {
     }
   }
 
+  const [inputEl, resetInput] = useMemo(() => {
+    const onStartTyping = inputValue => {
+      console.log("StartTyping", inputValue);
+    };
+    const onFinishTyping = inputValue => {
+      console.log("FinishTyping", inputValue);
+    };
+    return createDebouncedInput({
+      debounceDuration: 2000,
+      initialInputValue: "",
+      onStartTyping,
+      onFinishTyping
+    });
+  });
+
   return (
     <div onKeyDown={handleKeyDown}>
-      <input
-        type="text"
-        value={current.context.inputValue}
-        onChange={e =>
-          send({
-            type: "TEXT_INPUT_CHANGE",
-            inputValue: e.target.value
-          })
-        }
-      />
+      {inputEl}
       <DispatchContext.Provider value={send}>
         {current.matches("dropdownOpen") && (
           <SuggestionList selectedIndex={state.selectedIndex} />
@@ -64,7 +70,7 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
   const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
 
   useEffect(() => {
-    dispatch({ type: "SUGGESTION_LIST_LOADED", value: items });
+    send({ type: "SUGGESTION_LIST_LOADED", value: items });
   }, []);
 
   const handleMouseLeaveList = useCallback(() => {

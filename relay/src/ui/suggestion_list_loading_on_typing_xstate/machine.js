@@ -1,63 +1,36 @@
-import { Machine, assign, interpret } from "xstate";
-
-const debounceMachineDef = {
-  context: {
-    timeoutId: null,
-    fnArgs: undefined
-  },
-  states: {
-    idle: {
-      on: {
-        HAPPENING: {
-          target: "happening"
-        }
-      }
-    },
-    happening: {
-      HAPPENING: {
-        action: null
-      },
-      TIMEOUT: {
-        target: "idle"
-      }
-    }
-  }
-};
-
-function debounce(fn, duration) {
-  const machine = Machine(debounceMachineDef);
-  const service = interpret(machine).onTransition(state => {
-    console.log(state.value);
-  });
-  return fnArgs => {
-    service.send({ type: "HAPPENING", fnArgs });
-  };
-}
+import { Machine, assign } from "xstate";
 
 export const suggestionMachine = Machine({
   id: "suggestionMachine",
   context: {
+    open: false,
     items: null,
     selectedSuggestion: null,
     cursorIndex: null
   },
-  initial: "dropdownClosed",
+  initial: "closed",
   states: {
-    dropdownClosed: {
+    closed: {
       on: {
-        USER_STOPPED_TYPING: "dropdownOpen"
+        USER_ASKED_FOR_SUGGESTIONS: "open"
       }
     },
-    dropdownOpen: {
+    open: {
+      enter: [
+        assign({
+          open: true
+        })
+      ],
       exit: [
         assign({
+          open: false,
           items: null,
           cursorIndex: null
         })
       ],
       on: {
-        INPUT_BLUR: "dropdownClosed",
-        USER_RESUMED_TYPING: "dropdownClosed"
+        INPUT_BLUR: "closed",
+        USER_RESUMED_TYPING: "closed"
       },
       initial: "loading",
       states: {
@@ -88,7 +61,7 @@ export const suggestionMachine = Machine({
               })
             },
             MOUSE_CLICKED_ITEM: {
-              target: "dropdownClosed",
+              target: "closed",
               actions: assign({
                 selectedSuggestion: (_ctx, evt) => evt.itemValue
               })
@@ -104,11 +77,11 @@ export const suggestionMachine = Machine({
                 cursorIndex: ctx =>
                   ctx.cursorIndex
                     ? (ctx.cursorIndex - 1) % ctx.items.length
-                    : null
+                    : ctx.items.length - 1
               })
             },
             KEY_ENTER: {
-              target: "dropdownClosed"
+              target: "closed"
             }
           }
         }
