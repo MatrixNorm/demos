@@ -1,43 +1,71 @@
-import { Machine, assign } from "xstate";
+import { assign } from "xstate";
 
-export const suggestionMachineDef = {
-  id: "suggestionMachine",
-  context: {
-    open: false,
-    items: null,
-    cursorIndex: null
-  },
-  initial: "idle",
+const happyStateDef = {
+  initial: "happy/cursor_off",
   states: {
-    idle: {
+    "happy/cursor_off": {
       on: {
-        USER_ASKED_FOR_SUGGESTIONS: "working"
+        MOUSE_ENTERED_ITEM: {
+          target: "happy/cursor_on",
+          actions: assign({
+            cursorIndex: (_ctx, evt) => evt.itemIndex
+          })
+        },
+        KEY_ARROW_DOWN: {
+          target: "happy/cursor_on",
+          actions: [
+            assign({
+              cursorIndex: 0
+            }),
+            "setTextInput"
+          ]
+        },
+        KEY_ARROW_UP: {
+          target: "happy/cursor_on",
+          actions: [
+            assign({
+              cursorIndex: ctx => ctx.items.length - 1
+            }),
+            "setTextInput"
+          ]
+        }
       }
     },
-    working: {
-      enter: [
-        assign({
-          open: true
-        })
-      ],
-      exit: [
-        assign({
-          open: false,
-          items: null,
-          cursorIndex: null
-        })
-      ],
+    "happy/cursor_on": {
       on: {
-        USER_RESUMED_TYPING: "idle"
-      },
-      initial: "loading_items",
-      states: {
-        loading_items: {
-          on: {
-            REQUEST_DONE: "items_load_done"
-          }
+        MOUSE_ENTERED_ITEM: {
+          actions: assign({
+            cursorIndex: (_ctx, evt) => evt.itemIndex
+          })
         },
-        items_load_done: { ...loadDoneDef }
+        MOUSE_LEAVED_LIST: {
+          target: "happy/cursor_off"
+        },
+        MOUSE_CLICKED_ITEM: {
+          target: "idle",
+          actions: [
+            assign({
+              cursorIndex: (_ctx, evt) => evt.itemIndex
+            }),
+            "setTextInput"
+          ]
+        },
+        KEY_ARROW_DOWN: {
+          actions: [
+            assign({
+              cursorIndex: ctx => (ctx.cursorIndex + 1) % ctx.items.length
+            }),
+            "setTextInput"
+          ]
+        },
+        KEY_ARROW_UP: {
+          actions: [
+            assign({
+              cursorIndex: ctx => (ctx.cursorIndex - 1) % ctx.items.length
+            }),
+            "setTextInput"
+          ]
+        }
       }
     }
   }
@@ -67,45 +95,42 @@ const loadDoneDef = {
     },
     "items_load_done/error": {},
     "items_load_done/empty_items_list": {},
-    "items_load_done/happy_state": { ...happyStateDef }
+    "items_load_done/happy": { ...happyStateDef }
   }
 };
 
-const happyStateDef = {
-  on: {
-    MOUSE_ENTERED_ITEM: {
-      actions: assign({
-        cursorIndex: (_ctx, evt) => evt.itemIndex
-      })
+export const suggestionMachineDef = {
+  id: "suggestionMachine",
+  context: {
+    items: null,
+    cursorIndex: null
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      on: {
+        USER_ASKED_FOR_SUGGESTIONS: "working"
+      }
     },
-    MOUSE_LEAVED_LIST: {
-      actions: assign({
-        cursorIndex: null
-      })
-    },
-    MOUSE_CLICKED_ITEM: {
-      target: "idle",
-      actions: "action/setTextInput"
-    },
-    KEY_ARROW_DOWN: {
-      actions: [
+    working: {
+      exit: [
         assign({
-          cursorIndex: ctx =>
-            ctx.cursorIndex ? (ctx.cursorIndex + 1) % ctx.items.length : 0
-        }),
-        "action/setTextInput"
-      ]
-    },
-    KEY_ARROW_UP: {
-      actions: [
-        assign({
-          cursorIndex: ctx =>
-            ctx.cursorIndex
-              ? (ctx.cursorIndex - 1) % ctx.items.length
-              : ctx.items.length - 1
-        }),
-        "action/setTextInput"
-      ]
+          items: null,
+          cursorIndex: null
+        })
+      ],
+      on: {
+        USER_RESUMED_TYPING: "idle"
+      },
+      initial: "loading_items",
+      states: {
+        loading_items: {
+          on: {
+            REQUEST_DONE: "items_load_done"
+          }
+        },
+        items_load_done: { ...loadDoneDef }
+      }
     }
   }
 };
