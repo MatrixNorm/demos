@@ -1,21 +1,20 @@
 import { Machine, assign } from "xstate";
 
-export const suggestionMachine = Machine({
+export const suggestionMachineDef = {
   id: "suggestionMachine",
   context: {
     open: false,
     items: null,
-    selectedSuggestion: null,
     cursorIndex: null
   },
-  initial: "closed",
+  initial: "idle",
   states: {
-    closed: {
+    idle: {
       on: {
-        USER_ASKED_FOR_SUGGESTIONS: "open"
+        USER_ASKED_FOR_SUGGESTIONS: "working"
       }
     },
-    open: {
+    working: {
       enter: [
         assign({
           open: true
@@ -29,63 +28,84 @@ export const suggestionMachine = Machine({
         })
       ],
       on: {
-        INPUT_BLUR: "closed",
-        USER_RESUMED_TYPING: "closed"
+        USER_RESUMED_TYPING: "idle"
       },
-      initial: "loading",
+      initial: "loading_items",
       states: {
-        loading: {
+        loading_items: {
           on: {
-            REQUEST_FAILED: "error",
-            REQUEST_SUCCEEDED: {
-              target: "loaded",
-              actions: assign({
-                items: (_ctx, evt) => evt.items
-              })
-            }
+            REQUEST_DONE: "items_load_done"
           }
         },
-        error: {
-          final: true
-        },
-        loaded: {
-          on: {
-            MOUSE_ENTERED_ITEM: {
-              actions: assign({
-                cursorIndex: (_ctx, evt) => evt.itemIndex
-              })
-            },
-            MOUSE_LEAVED_LIST: {
-              actions: assign({
-                cursorIndex: null
-              })
-            },
-            MOUSE_CLICKED_ITEM: {
-              target: "closed",
-              actions: assign({
-                selectedSuggestion: (_ctx, evt) => evt.itemValue
-              })
-            },
-            KEY_ARROW_DOWN: {
-              actions: assign({
-                cursorIndex: ctx =>
-                  ctx.cursorIndex ? (ctx.cursorIndex + 1) % ctx.items.length : 0
-              })
-            },
-            KEY_ARROW_UP: {
-              actions: assign({
-                cursorIndex: ctx =>
-                  ctx.cursorIndex
-                    ? (ctx.cursorIndex - 1) % ctx.items.length
-                    : ctx.items.length - 1
-              })
-            },
-            KEY_ENTER: {
-              target: "closed"
-            }
-          }
-        }
+        items_load_done: { ...loadDoneDef }
       }
     }
   }
-});
+};
+
+const loadDoneDef = {
+  on: {
+    INPUT_BLUR: "idle",
+    KEY_ENTER: "idle"
+  },
+  initial: "items_load_done/entry",
+  states: {
+    "items_load_done/entry": {
+      on: {
+        "": [
+          {
+            target: "items_load_done/error",
+            cond: "items_load_done/isError"
+          },
+          {
+            target: "items_load_done/empty_items_list",
+            cond: "items_load_done/isEmpty"
+          },
+          { target: "items_load_done/happy" }
+        ]
+      }
+    },
+    "items_load_done/error": {},
+    "items_load_done/empty_items_list": {},
+    "items_load_done/happy_state": { ...happyStateDef }
+  }
+};
+
+const happyStateDef = {
+  on: {
+    MOUSE_ENTERED_ITEM: {
+      actions: assign({
+        cursorIndex: (_ctx, evt) => evt.itemIndex
+      })
+    },
+    MOUSE_LEAVED_LIST: {
+      actions: assign({
+        cursorIndex: null
+      })
+    },
+    MOUSE_CLICKED_ITEM: {
+      target: "idle",
+      actions: "action/setTextInput"
+    },
+    KEY_ARROW_DOWN: {
+      actions: [
+        assign({
+          cursorIndex: ctx =>
+            ctx.cursorIndex ? (ctx.cursorIndex + 1) % ctx.items.length : 0
+        }),
+        "action/setTextInput"
+      ]
+    },
+    KEY_ARROW_UP: {
+      actions: [
+        assign({
+          cursorIndex: ctx =>
+            ctx.cursorIndex
+              ? (ctx.cursorIndex - 1) % ctx.items.length
+              : ctx.items.length - 1
+        }),
+        "action/setTextInput"
+      ]
+    }
+  }
+};
