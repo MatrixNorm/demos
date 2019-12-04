@@ -109,7 +109,16 @@ export const suggestionMachineDef = {
   states: {
     idle: {
       on: {
-        USER_ASKED_FOR_SUGGESTIONS: "working"
+        USER_ASKED_FOR_SUGGESTIONS: [
+          { target: "working", cond: "serchTermIsValid" },
+          { target: "invalid" }
+        ]
+      }
+    },
+    invalid: {
+      on: {
+        USER_RESUMED_TYPING: "idle",
+        INPUT_BLUR: "idle"
       }
     },
     working: {
