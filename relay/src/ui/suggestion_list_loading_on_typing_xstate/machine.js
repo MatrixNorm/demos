@@ -2,18 +2,18 @@ import { assign } from "xstate";
 
 const happyStateDef = {
   exit: assign({ items: null, cursorIndex: null }),
-  initial: "happy/cursor_off",
+  initial: "cursor_off",
   states: {
-    "happy/cursor_off": {
+    cursor_off: {
       on: {
         MOUSE_ENTERED_ITEM: {
-          target: "happy/cursor_on",
+          target: "cursor_on",
           actions: assign({
             cursorIndex: (_ctx, evt) => evt.itemIndex
           })
         },
         KEY_ARROW_DOWN: {
-          target: "happy/cursor_on",
+          target: "cursor_on",
           actions: [
             assign({
               cursorIndex: 0
@@ -22,7 +22,7 @@ const happyStateDef = {
           ]
         },
         KEY_ARROW_UP: {
-          target: "happy/cursor_on",
+          target: "cursor_on",
           actions: [
             assign({
               cursorIndex: ctx => ctx.items.length - 1
@@ -32,7 +32,7 @@ const happyStateDef = {
         }
       }
     },
-    "happy/cursor_on": {
+    cursor_on: {
       on: {
         MOUSE_ENTERED_ITEM: {
           actions: assign({
@@ -40,7 +40,7 @@ const happyStateDef = {
           })
         },
         MOUSE_LEAVED_LIST: {
-          target: "happy/cursor_off"
+          target: "cursor_off"
         },
         MOUSE_CLICKED_ITEM: {
           target: "#idle",
@@ -77,21 +77,21 @@ const loadDoneDef = {
     INPUT_BLUR: "#idle",
     KEY_ENTER: "#idle"
   },
-  initial: "items_load_done/entry",
+  initial: "entry",
   states: {
-    "items_load_done/entry": {
+    entry: {
       on: {
         "": [
           {
-            target: "items_load_done/error",
+            target: "error",
             cond: "items_load_done/isError"
           },
           {
-            target: "items_load_done/empty_items_list",
+            target: "empty_items_list",
             cond: "items_load_done/isEmpty"
           },
           {
-            target: "items_load_done/happy",
+            target: "happy",
             actions: assign({
               items: (_ctx, evt) => {
                 console.log(111, _ctx, evt);
@@ -102,9 +102,9 @@ const loadDoneDef = {
         ]
       }
     },
-    "items_load_done/error": {},
-    "items_load_done/empty_items_list": {},
-    "items_load_done/happy": { ...happyStateDef }
+    error: {},
+    empty_items_list: {},
+    happy: { ...happyStateDef }
   }
 };
 
@@ -120,7 +120,7 @@ export const suggestionMachineDef = {
       id: "idle",
       on: {
         USER_ASKED_FOR_SUGGESTIONS: [
-          { target: "working", cond: "serchTermIsValid" },
+          { target: "loading", cond: "serchTermIsValid" },
           { target: "invalid" }
         ]
       }
@@ -131,19 +131,12 @@ export const suggestionMachineDef = {
         INPUT_BLUR: "idle"
       }
     },
-    working: {
+    loading: {
       on: {
+        REQUEST_DONE: "loading_result",
         USER_START_TYPING: "idle"
-      },
-      initial: "loading_items",
-      states: {
-        loading_items: {
-          on: {
-            REQUEST_DONE: "items_load_done"
-          }
-        },
-        items_load_done: { ...loadDoneDef }
       }
-    }
+    },
+    loading_result: { ...loadDoneDef }
   }
 };

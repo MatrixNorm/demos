@@ -53,7 +53,7 @@ export default function App() {
       send({ type: "USER_ASKED_FOR_SUGGESTIONS", query: inputValue });
     };
     return createDebouncedInput({
-      debounceDuration: 2000,
+      debounceDuration: 5000,
       initialInputValue: "",
       onStartTyping,
       onFinishTyping
@@ -77,7 +77,7 @@ export default function App() {
     <div onKeyDown={handleKeyDown}>
       {inputEl}
       <SendContext.Provider value={send}>
-        {current.matches("working") && (
+        {(current.matches("loading_result") || current.matches("loading")) && (
           <SuggestionList cursorIndex={current.context.cursorIndex} />
         )}
       </SendContext.Provider>
@@ -86,16 +86,20 @@ export default function App() {
 }
 
 const SuggestionList = React.memo(function({ cursorIndex }) {
+  // imitating Relay's <QueryRenderer>
   console.log("render: SuggestionList", cursorIndex);
   const send = useContext(SendContext);
   const [items, setItems] = useState(null);
 
   useEffect(() => {
-    setTimeout(() => {
-      let data = ["Aa", "Bb", "Cc", "Dd", "Ee"]
+    const timerId = setTimeout(() => {
+      let data = ["Aa", "Bb", "Cc", "Dd", "Ee"];
       setItems(data);
       send({ type: "REQUEST_DONE", payload: data });
-    }, 2000);
+    }, 10000);
+    return () => {
+      clearTimeout(timerId);
+    };
   }, []);
 
   return (
