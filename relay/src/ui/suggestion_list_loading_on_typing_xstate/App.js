@@ -6,10 +6,11 @@ import React, {
   useState
 } from "react";
 
+import { Machine } from "xstate";
 import { useMachine } from "@xstate/react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
-import { suggestionMachine } from "./machine";
+import { suggestionMachineDef } from "./machine";
 import { createElement as createDebouncedInput } from "../../xstate/debounce3/debounce";
 
 const KEY_CODE = {
@@ -18,24 +19,17 @@ const KEY_CODE = {
   ENTER: 13
 };
 
-const DispatchContext = React.createContext();
+const SendContext = React.createContext();
 
 export default function App() {
   console.log("render: App");
-  const [current, send] = useMachine(suggestionMachine);
-
-  function handleKeyDown(e) {
-    console.log(e.keyCode);
-    if (e.keyCode === KEY_CODE.ARROW_DOWN) {
-      send({ type: "KEY_ARROW_DOWN" });
-    }
-    if (e.keyCode === KEY_CODE.ARROW_UP) {
-      send({ type: "KEY_ARROW_UP" });
-    }
-    if (e.keyCode === KEY_CODE.ENTER) {
-      send({ type: "KEY_ENTER" });
-    }
-  }
+  const [current, send] = useMachine(
+    Machine(suggestionMachineDef, {
+      actions: {
+        setTextInput: ctx => resetInput(ctx.items["cursorIndex"])
+      }
+    })
+  );
 
   const [inputEl, resetInput] = useMemo(() => {
     const onStartTyping = inputValue => {
@@ -52,29 +46,41 @@ export default function App() {
     });
   });
 
+  function handleKeyDown(e) {
+    console.log(e.keyCode);
+    if (e.keyCode === KEY_CODE.ARROW_DOWN) {
+      send({ type: "KEY_ARROW_DOWN" });
+    }
+    if (e.keyCode === KEY_CODE.ARROW_UP) {
+      send({ type: "KEY_ARROW_UP" });
+    }
+    if (e.keyCode === KEY_CODE.ENTER) {
+      send({ type: "KEY_ENTER" });
+    }
+  }
+
   return (
     <div onKeyDown={handleKeyDown}>
       {inputEl}
-      <DispatchContext.Provider value={send}>
-        {current.matches("dropdownOpen") && (
-          <SuggestionList selectedIndex={state.selectedIndex} />
+      <SendContext.Provider value={send}>
+        {current.matches("working") && (
+          <SuggestionList selectedIndex={current.context.cursorIndex} />
         )}
-      </DispatchContext.Provider>
+      </SendContext.Provider>
     </div>
   );
 }
 
-const SuggestionList = React.memo(function({ selectedIndex }) {
+const SuggestionList = React.memo(function({ cursorIndex }) {
   console.log("render: SuggestionList");
-  const dispatch = useContext(DispatchContext);
-  const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
+  const send = useContext(SendContext);
+  const [items, setItems] = useState(null);
 
   useEffect(() => {
-    send({ type: "SUGGESTION_LIST_LOADED", value: items });
-  }, []);
-
-  const handleMouseLeaveList = useCallback(() => {
-    dispatch({ type: "SET_SELECTED_INDEX", value: null });
+    setTimeout(() => {
+      setItems(["Aa", "Bb", "Cc", "Dd", "Ee"]);
+      send({ type: "REQUEST_DONE", value: items });
+    }, 2000);
   }, []);
 
   return (
@@ -84,16 +90,17 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
           padding: 0;
           margin: 0;
         `}
-        onMouseLeave={handleMouseLeaveList}
+        onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}
       >
-        {items.map((item, j) => (
-          <SuggestionListItem
-            key={j}
-            index={j}
-            text={item}
-            isHovered={j === selectedIndex}
-          />
-        ))}
+        {items &&
+          items.map((item, j) => (
+            <SuggestionListItem
+              key={j}
+              index={j}
+              text={item}
+              isHovered={j === cursorIndex}
+            />
+          ))}
       </ul>
     </div>
   );
@@ -101,7 +108,7 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
 
 const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
   console.log("render: ListItem", text, isHovered);
-  const send = useContext(DispatchContext);
+  const send = useContext(SendContext);
   const style = isHovered
     ? css`
         background-color: #dedcdc;
@@ -116,7 +123,7 @@ const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
       onClick={() =>
         send({
           type: "MOUSE_CLICKED_ITEM",
-          itemValue: text
+          itemIndex: index
         })
       }
     >

@@ -1,6 +1,7 @@
 import { assign } from "xstate";
 
 const happyStateDef = {
+  exit: assign({ items: null, cursorIndex: null }),
   initial: "happy/cursor_off",
   states: {
     "happy/cursor_off": {
@@ -122,12 +123,6 @@ export const suggestionMachineDef = {
       }
     },
     working: {
-      exit: [
-        assign({
-          items: null,
-          cursorIndex: null
-        })
-      ],
       on: {
         USER_RESUMED_TYPING: "idle"
       },
