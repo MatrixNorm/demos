@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState
-} from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 
 import { Machine } from "xstate";
 import { useMachine } from "@xstate/react";
@@ -32,10 +26,10 @@ export default function App() {
         serchTermIsValid: (_, evt) => {
           return evt.query && evt.query.trim().length > 0;
         },
-        "items_load_done/isError": (_, evt) => {
+        isLoadingError: (_, evt) => {
           evt.isError || !Array.isArray(evt.payload);
         },
-        "items_load_done/isEmpty": (_, evt) => {
+        isItemsListEmpty: (_, evt) => {
           let p = evt.payload;
           !evt.isError && Array.isArray(p) && p.length > 0;
         }
@@ -44,21 +38,19 @@ export default function App() {
   );
 
   const [inputEl, resetInput] = useMemo(() => {
-    const onStartTyping = inputValue => {
-      console.log("StartTyping", inputValue);
-      send({ type: "USER_START_TYPING" });
-    };
-    const onFinishTyping = inputValue => {
-      console.log("FinishTyping", inputValue);
-      send({ type: "USER_ASKED_FOR_SUGGESTIONS", query: inputValue });
-    };
     return createDebouncedInput({
-      debounceDuration: 5000,
+      debounceDuration: 2000,
       initialInputValue: "",
-      onStartTyping,
-      onFinishTyping
+      onStartTyping: inputValue => {
+        console.log("StartTyping", inputValue);
+        send({ type: "USER_START_TYPING" });
+      },
+      onFinishTyping: inputValue => {
+        console.log("FinishTyping", inputValue);
+        send({ type: "USER_ASKED_FOR_SUGGESTIONS", query: inputValue });
+      }
     });
-  });
+  }, []);
 
   function handleKeyDown(e) {
     console.log(e.keyCode);
@@ -78,16 +70,15 @@ export default function App() {
       {inputEl}
       <SendContext.Provider value={send}>
         {(current.matches("loading_result") || current.matches("loading")) && (
-          <SuggestionList cursorIndex={current.context.cursorIndex} />
+          <MockQueryRenderer cursorIndex={current.context.cursorIndex} />
         )}
       </SendContext.Provider>
     </div>
   );
 }
 
-const SuggestionList = React.memo(function({ cursorIndex }) {
-  // imitating Relay's <QueryRenderer>
-  console.log("render: SuggestionList", cursorIndex);
+const MockQueryRenderer = React.memo(function({ cursorIndex /* XXX */  }) {
+  console.log("render: MockQueryRenderer", cursorIndex);
   const send = useContext(SendContext);
   const [items, setItems] = useState(null);
 
@@ -96,12 +87,15 @@ const SuggestionList = React.memo(function({ cursorIndex }) {
       let data = ["Aa", "Bb", "Cc", "Dd", "Ee"];
       setItems(data);
       send({ type: "REQUEST_DONE", payload: data });
-    }, 10000);
+    }, 3000);
     return () => {
       clearTimeout(timerId);
     };
   }, []);
 
+  if (items === null) {
+    return <div>loading...</div>;
+  }
   return (
     <div>
       <ul
@@ -111,15 +105,14 @@ const SuggestionList = React.memo(function({ cursorIndex }) {
         `}
         onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}
       >
-        {items &&
-          items.map((item, j) => (
-            <SuggestionListItem
-              key={j}
-              index={j}
-              text={item}
-              isHovered={j === cursorIndex}
-            />
-          ))}
+        {items.map((item, j) => (
+          <SuggestionListItem
+            key={j}
+            index={j}
+            text={item}
+            isHovered={j === cursorIndex}
+          />
+        ))}
       </ul>
     </div>
   );

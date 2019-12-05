@@ -84,11 +84,11 @@ const loadDoneDef = {
         "": [
           {
             target: "error",
-            cond: "items_load_done/isError"
+            cond: "isLoadingError"
           },
           {
             target: "empty_items_list",
-            cond: "items_load_done/isEmpty"
+            cond: "isItemsListEmpty"
           },
           {
             target: "happy",
