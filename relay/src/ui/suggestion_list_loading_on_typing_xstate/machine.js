@@ -43,7 +43,7 @@ const happyStateDef = {
           target: "happy/cursor_off"
         },
         MOUSE_CLICKED_ITEM: {
-          target: "idle",
+          target: "#idle",
           actions: [
             assign({
               cursorIndex: (_ctx, evt) => evt.itemIndex
@@ -74,8 +74,8 @@ const happyStateDef = {
 
 const loadDoneDef = {
   on: {
-    INPUT_BLUR: "idle",
-    KEY_ENTER: "idle"
+    INPUT_BLUR: "#idle",
+    KEY_ENTER: "#idle"
   },
   initial: "items_load_done/entry",
   states: {
@@ -90,7 +90,15 @@ const loadDoneDef = {
             target: "items_load_done/empty_items_list",
             cond: "items_load_done/isEmpty"
           },
-          { target: "items_load_done/happy" }
+          {
+            target: "items_load_done/happy",
+            actions: assign({
+              items: (_ctx, evt) => {
+                console.log(111, _ctx, evt);
+                return evt.payload;
+              }
+            })
+          }
         ]
       }
     },
@@ -109,6 +117,7 @@ export const suggestionMachineDef = {
   initial: "idle",
   states: {
     idle: {
+      id: "idle",
       on: {
         USER_ASKED_FOR_SUGGESTIONS: [
           { target: "working", cond: "serchTermIsValid" },
@@ -118,13 +127,13 @@ export const suggestionMachineDef = {
     },
     invalid: {
       on: {
-        USER_RESUMED_TYPING: "idle",
+        USER_START_TYPING: "idle",
         INPUT_BLUR: "idle"
       }
     },
     working: {
       on: {
-        USER_RESUMED_TYPING: "idle"
+        USER_START_TYPING: "idle"
       },
       initial: "loading_items",
       states: {

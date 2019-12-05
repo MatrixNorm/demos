@@ -115,6 +115,7 @@ registerBuild("relay_hello");
 registerBuild("ui/autosuggest");
 registerBuild("ui/suggestion_list");
 registerBuild("ui/suggestion_list_loading_on_typing");
+registerBuild("ui/suggestion_list_loading_on_typing_xstate");
 registerBuild("ui/uncontrolled_input");
 registerBuild("xstate/debounce");
 registerBuild("xstate/debounce2");

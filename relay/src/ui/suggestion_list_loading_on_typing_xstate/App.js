@@ -27,6 +27,18 @@ export default function App() {
     Machine(suggestionMachineDef, {
       actions: {
         setTextInput: ctx => resetInput(ctx.items["cursorIndex"])
+      },
+      guards: {
+        serchTermIsValid: (_, evt) => {
+          return evt.query && evt.query.trim().length > 0;
+        },
+        "items_load_done/isError": (_, evt) => {
+          evt.isError || !Array.isArray(evt.payload);
+        },
+        "items_load_done/isEmpty": (_, evt) => {
+          let p = evt.payload;
+          !evt.isError && Array.isArray(p) && p.length > 0;
+        }
       }
     })
   );
@@ -34,9 +46,11 @@ export default function App() {
   const [inputEl, resetInput] = useMemo(() => {
     const onStartTyping = inputValue => {
       console.log("StartTyping", inputValue);
+      send({ type: "USER_START_TYPING" });
     };
     const onFinishTyping = inputValue => {
       console.log("FinishTyping", inputValue);
+      send({ type: "USER_ASKED_FOR_SUGGESTIONS", query: inputValue });
     };
     return createDebouncedInput({
       debounceDuration: 2000,
@@ -58,13 +72,13 @@ export default function App() {
       send({ type: "KEY_ENTER" });
     }
   }
-
+  console.log(current, current.context);
   return (
     <div onKeyDown={handleKeyDown}>
       {inputEl}
       <SendContext.Provider value={send}>
         {current.matches("working") && (
-          <SuggestionList selectedIndex={current.context.cursorIndex} />
+          <SuggestionList cursorIndex={current.context.cursorIndex} />
         )}
       </SendContext.Provider>
     </div>
@@ -72,14 +86,15 @@ export default function App() {
 }
 
 const SuggestionList = React.memo(function({ cursorIndex }) {
-  console.log("render: SuggestionList");
+  console.log("render: SuggestionList", cursorIndex);
   const send = useContext(SendContext);
   const [items, setItems] = useState(null);
 
   useEffect(() => {
     setTimeout(() => {
-      setItems(["Aa", "Bb", "Cc", "Dd", "Ee"]);
-      send({ type: "REQUEST_DONE", value: items });
+      let data = ["Aa", "Bb", "Cc", "Dd", "Ee"]
+      setItems(data);
+      send({ type: "REQUEST_DONE", payload: data });
     }, 2000);
   }, []);
 
