@@ -72,71 +72,55 @@ const happyStateDef = {
   }
 };
 
-const loadDoneDef = {
-  on: {
-    INPUT_BLUR: "#idle",
-    KEY_ENTER: "#idle"
-  },
-  initial: "entry",
-  states: {
-    entry: {
-      on: {
-        "": [
-          {
-            target: "error",
-            cond: "isLoadingError"
-          },
-          {
-            target: "empty_items_list",
-            cond: "isItemsListEmpty"
-          },
-          {
-            target: "happy",
-            actions: assign({
-              items: (_ctx, evt) => {
-                console.log(111, _ctx, evt);
-                return evt.payload;
-              }
-            })
-          }
-        ]
-      }
-    },
-    error: {},
-    empty_items_list: {},
-    happy: { ...happyStateDef }
-  }
-};
-
 export const suggestionMachineDef = {
   id: "suggestionMachine",
   context: {
+    inputValue: "",
     items: null,
     cursorIndex: null
   },
-  initial: "idle",
+  initial: "notTyping",
   states: {
-    idle: {
-      id: "idle",
+    notTyping: {
+      id: "notTyping",
+      initial: "idle",
       on: {
-        USER_ASKED_FOR_SUGGESTIONS: [
-          { target: "loading", cond: "serchTermIsValid" },
-          { target: "invalid" }
+        TYPING: "typing"
+      },
+      states: {
+        idle: {
+          id: "#idle"
+        },
+        loading: {},
+        blurable: {
+          on: {
+            BLUR: { target: "#idle" }
+          },
+          states: {
+            dismissable: {
+              states: {
+                invalidInput: {},
+                loadingError: {},
+                emptyList: {}
+              }
+            },
+            happyLoading: { ...happyStateDef }
+          }
+        }
+      }
+    },
+    typing: {
+      on: {
+        TYPING_STOPS: [
+          {
+            target: "#invalidInput",
+            cond: "isInputInvalid"
+          },
+          {
+            target: "#loading"
+          }
         ]
       }
-    },
-    invalid: {
-      on: {
-        USER_START_TYPING: "idle",
-        INPUT_BLUR: "idle"
-      }
-    },
-    loading: {
-      on: {
-        REQUEST_DONE: "loading_result",
-        USER_START_TYPING: "idle"
-      }
-    },
-    loading_result: { ...loadDoneDef }
+    }
   }
 };
