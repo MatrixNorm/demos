@@ -1,6 +1,6 @@
 import { assign } from "xstate";
 
-const happyStateDef = {
+const requestOkDef = {
   exit: assign({ items: null, cursorIndex: null }),
   initial: "cursor_off",
   states: {
@@ -72,55 +72,91 @@ const happyStateDef = {
   }
 };
 
-export const suggestionMachineDef = {
-  id: "suggestionMachine",
-  context: {
+export const createSuggestionMachine = function({
+  fetchSuggestions,
+  isQueryValid
+}) {
+  const initialContext = {
     inputValue: "",
     items: null,
-    cursorIndex: null
-  },
-  initial: "notTyping",
-  states: {
-    notTyping: {
-      id: "notTyping",
-      initial: "idle",
-      on: {
-        TYPING: "typing"
+    cursorIndex: null,
+    errorMsg: null
+  };
+
+  return {
+    id: "suggestionMachine",
+    context: initialContext,
+    initial: "notTyping",
+    states: {
+      typing: {
+        on: {
+          TYPING_STOP: [
+            { target: "notTyping.loading", cond: isQueryValid },
+            {
+              target: "invalidQuery"
+            }
+          ]
+        }
       },
-      states: {
-        idle: {
-          id: "#idle"
+      notTyping: {
+        initial: "idle",
+        on: {
+          TYPING: {
+            target: "typing",
+            actions: assign({
+              inputValue: (_, evt) => evt.inputValue
+            })
+          }
         },
-        loading: {},
-        blurable: {
-          on: {
-            BLUR: { target: "#idle" }
+        states: {
+          idle: {
+            id: "#idle"
           },
-          states: {
-            dismissable: {
-              states: {
-                invalidInput: {},
-                loadingError: {},
-                emptyList: {}
+          bad: {
+            exit: {
+              actions: assign({ errorMsg: null })
+            },
+            on: {
+              INPUT_BLUR: {
+                target: "idle"
+              },
+              DISMISS: {
+                target: "idle"
               }
             },
-            happyLoading: { ...happyStateDef }
-          }
+            states: {
+              invalidQuery: {},
+              requestError: {},
+              requestEmpty: {}
+            }
+          },
+          loading: {
+            invoke: {
+              id: "getSuggestions",
+              src: ctx => fetchSuggestions(ctx.inputValue),
+              onDone: [
+                {
+                  target: "requestOk",
+                  cond: (_ctx, evt) => {
+                    let items = evt.data.items;
+                    return items && items.length > 0;
+                  },
+                  actions: assign({ items: (_ctx, evt) => evt.data.items })
+                },
+                {
+                  target: "bad.requestEmpty",
+                  actions: assign({ errorMsg: "No Suggestions" })
+                }
+              ],
+              onError: {
+                target: "bad.requestError",
+                actions: assign({ errorMsg: "Request Error" })
+              }
+            }
+          },
+          requestOk: { ...requestOkDef }
         }
       }
-    },
-    typing: {
-      on: {
-        TYPING_STOPS: [
-          {
-            target: "#invalidInput",
-            cond: "isInputInvalid"
-          },
-          {
-            target: "#loading"
-          }
-        ]
-      }
     }
-  }
+  };
 };
