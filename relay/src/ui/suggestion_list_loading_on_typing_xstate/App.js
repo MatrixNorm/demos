@@ -12,7 +12,6 @@ const KEY_CODE = {
   ENTER: 13
 };
 
-const StateContext = React.createContext();
 const SendContext = React.createContext();
 
 export default function App() {
@@ -24,8 +23,8 @@ export default function App() {
           new Promise(resolve => {
             setTimeout(
               () =>
-                resolve({ data: { items: ["Aa", "Bb", "Cc", "Dd", "Ee"] } }),
-              1000
+                resolve({ items: ["Aa", "Bb", "Cc", "Dd", "Ee"] }),
+              1000000000000000000
             );
           }),
         isQueryValid: q => q && q.trim().length > 0
@@ -45,21 +44,21 @@ export default function App() {
       send({ type: "KEY_ENTER" });
     }
   }
-  console.log(current, current.context);
   return (
     <div>
+      <div>{JSON.stringify(current.value)}</div>
       <input
         value={current.context.inputValue}
         onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
         onKeyDown={handleKeyDown}
       />
-      <StateContext.Provider value={current}>
-        <SendContext.Provider value={send}>
-          {current.matches("notTyping.loading") && <Loading />}
-          {current.matches("notTyping.bad") && <Bad />}
-          {current.matches("notTyping.requestOk") && <RequestOk />}
-        </SendContext.Provider>
-      </StateContext.Provider>
+      <SendContext.Provider value={send}>
+        {current.matches("notTyping.loading") && <Loading />}
+        {current.matches("notTyping.bad") && <Bad />}
+        {current.matches("notTyping.requestOk") && (
+          <RequestOk state={current.context} />
+        )}
+      </SendContext.Provider>
     </div>
   );
 }
@@ -74,20 +73,19 @@ const Bad = () => {
   return <p>shit</p>;
 };
 
-const RequestOk = () => {
+const RequestOk = ({ state }) => {
   console.log("render: RequestOk");
   const send = useContext(SendContext);
-  const state = useContext(StateContext);
 
   return (
     <div>
       <ul onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}>
-        {state.context.items.map((item, j) => (
-          <SuggestionListItem
+        {state.items.map((item, j) => (
+          <Item
             key={j}
             index={j}
             text={item}
-            isHovered={j === state.context.cursorIndex}
+            isHovered={j === state.cursorIndex}
           />
         ))}
       </ul>
@@ -95,7 +93,7 @@ const RequestOk = () => {
   );
 };
 
-const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
+const Item = React.memo(function({ text, index, isHovered }) {
   console.log("render: ListItem", text, isHovered);
   const send = useContext(SendContext);
   const style = isHovered

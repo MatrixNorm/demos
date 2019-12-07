@@ -14,8 +14,21 @@ export const createSuggestionMachine = function({ fetchItems, isQueryValid }) {
     states: {
       typing: {
         on: {
-          TYPING_STOP: [
-            { target: "notTyping.loading", cond: isQueryValid },
+          TYPING: {
+            target: "typing",
+            actions: assign({
+              inputValue: (_, evt) => evt.inputValue
+            })
+          }
+        },
+        after: {
+          3000: [
+            {
+              target: "notTyping.loading",
+              cond: ctx => {
+                return isQueryValid(ctx.inputValue);
+              }
+            },
             {
               target: "notTyping.bad.invalidQuery"
             }
@@ -63,7 +76,7 @@ const badStateDef = function() {
     states: {
       invalidQuery: {},
       requestError: {},
-      requestEmpty: {}
+      noItems: {}
     }
   };
 };
@@ -83,7 +96,7 @@ const loadingDef = function({ fetchItems }) {
           actions: assign({ items: (_ctx, evt) => evt.data.items })
         },
         {
-          target: "bad.requestEmpty",
+          target: "bad.noItems",
           actions: assign({ errorMsg: "No Suggestions" })
         }
       ],
@@ -135,7 +148,7 @@ const requestOkDef = function() {
             target: "cursor_off"
           },
           MOUSE_CLICKED_ITEM: {
-            target: "#idle",
+            //target: "#idle",
             actions: assign({
               cursorIndex: (_ctx, evt) => evt.itemIndex,
               inputValue: (ctx, evt) => ctx.items[evt.itemIndex]
