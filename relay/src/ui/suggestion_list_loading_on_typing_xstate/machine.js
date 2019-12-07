@@ -129,7 +129,10 @@ const loadingDef = function({ fetchItems }) {
 
 const requestOkDef = function() {
   return {
-    exit: assign({ cursorIndex: null }),
+    on: {
+      KEY_ENTER: "#notTyping"
+    },
+    entry: assign({ cursorIndex: null }),
     initial: "cursor_off",
     states: {
       cursor_off: {

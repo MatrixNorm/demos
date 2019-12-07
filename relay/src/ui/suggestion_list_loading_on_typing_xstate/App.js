@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useContext } from "react";
 
 import { Machine } from "xstate";
 import { useMachine } from "@xstate/react";
@@ -12,6 +12,21 @@ const KEY_CODE = {
   ENTER: 13
 };
 
+const keyCodeToEventTypeMap = {
+  [KEY_CODE.ARROW_DOWN]: "KEY_ARROW_DOWN",
+  [KEY_CODE.ARROW_UP]: "KEY_ARROW_UP",
+  [KEY_CODE.ENTER]: "KEY_ENTER"
+};
+
+const fetchItemsPromise = function(query) {
+  return new Promise(resolve => {
+    setTimeout(
+      () => resolve({ items: [...Array(5).keys()].map(i => `${query}${i}`) }),
+      1000
+    );
+  });
+};
+
 const SendContext = React.createContext();
 
 export default function App() {
@@ -19,32 +34,17 @@ export default function App() {
   const [current, send] = useMachine(
     Machine(
       createSuggestionMachine({
-        fetchItems: q =>
-          new Promise(resolve => {
-            setTimeout(
-              () =>
-                resolve({ items: [...Array(5).keys()].map(i => `${q}${i}`) }),
-              1000
-            );
-          }),
+        fetchItems: fetchItemsPromise,
         isQueryValid: q => q && q.trim().length > 0
       })
     )
   );
 
   function handleKeyDown(e) {
-    console.log(e.keyCode);
-    if (e.keyCode === KEY_CODE.ARROW_DOWN) {
-      send({ type: "KEY_ARROW_DOWN" });
-    }
-    if (e.keyCode === KEY_CODE.ARROW_UP) {
-      send({ type: "KEY_ARROW_UP" });
-    }
-    if (e.keyCode === KEY_CODE.ENTER) {
-      send({ type: "KEY_ENTER" });
-    }
+    let type = keyCodeToEventTypeMap[e.keyCode];
+    type && send({ type });
   }
-  console.log(current.value, current.event, current.context)
+  console.log(current.value, current.event, current.context);
   return (
     <div>
       <div>{JSON.stringify(current.value)}</div>
