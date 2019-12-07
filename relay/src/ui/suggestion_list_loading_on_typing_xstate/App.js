@@ -81,19 +81,13 @@ const RequestOk = () => {
 
   return (
     <div>
-      <ul
-        css={css`
-          padding: 0;
-          margin: 0;
-        `}
-        onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}
-      >
-        {items.map((item, j) => (
+      <ul onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}>
+        {state.context.items.map((item, j) => (
           <SuggestionListItem
             key={j}
             index={j}
             text={item}
-            isHovered={j === cursorIndex}
+            isHovered={j === state.context.cursorIndex}
           />
         ))}
       </ul>
