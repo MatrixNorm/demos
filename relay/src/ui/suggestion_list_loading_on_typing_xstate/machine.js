@@ -67,9 +67,7 @@ export const createSuggestionMachine = function({ fetchItems, isQueryValid }) {
           }
         },
         states: {
-          idle: {
-            id: "#idleId"
-          },
+          idle: {},
           bad: { ...badStateDef() },
           loading: {
             ...loadingDef({ fetchItems })
@@ -179,13 +177,23 @@ const requestOkDef = function() {
             })
           },
           KEY_ARROW_DOWN: {
-            actions: assign({
-              cursorIndex: ctx => (ctx.cursorIndex + 1) % ctx.items.length
+            actions: assign(ctx => {
+              let cursorIndex = (ctx.cursorIndex + 1) % ctx.items.length;
+              return {
+                ...ctx,
+                cursorIndex,
+                inputValue: ctx.items[cursorIndex]
+              };
             })
           },
           KEY_ARROW_UP: {
-            actions: assign({
-              cursorIndex: ctx => (ctx.cursorIndex - 1) % ctx.items.length
+            actions: assign(ctx => {
+              let cursorIndex = (ctx.cursorIndex - 1) % ctx.items.length;
+              return {
+                ...ctx,
+                cursorIndex,
+                inputValue: ctx.items[cursorIndex]
+              };
             })
           }
         }

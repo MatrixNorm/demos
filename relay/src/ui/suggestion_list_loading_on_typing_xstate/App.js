@@ -19,12 +19,12 @@ export default function App() {
   const [current, send] = useMachine(
     Machine(
       createSuggestionMachine({
-        fetchItems: query =>
+        fetchItems: q =>
           new Promise(resolve => {
             setTimeout(
               () =>
-                resolve({ items: ["Aa", "Bb", "Cc", "Dd", "Ee"] }),
-              1000000000000000000
+                resolve({ items: [...Array(5).keys()].map(i => `${q}${i}`) }),
+              1000
             );
           }),
         isQueryValid: q => q && q.trim().length > 0
