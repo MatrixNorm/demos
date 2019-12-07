@@ -17,12 +17,32 @@ export const createSuggestionMachine = function({ fetchItems, isQueryValid }) {
           TYPING: {
             target: "typing",
             actions: assign({
-              inputValue: (_, evt) => evt.inputValue
+              inputValue: (_, evt) => {
+                console.log(33333333);
+                return evt.inputValue;
+              }
             })
           }
         },
         after: {
-          3000: [
+          3000: "walk_around"
+          // TODO: report bug
+          // [
+          //   {
+          //     target: "notTyping.loading",
+          //     cond: ctx => {
+          //       return isQueryValid(ctx.inputValue);
+          //     }
+          //   },
+          //   {
+          //     target: "notTyping.bad.invalidQuery"
+          //   }
+          // ]
+        }
+      },
+      walk_around: {
+        on: {
+          "": [
             {
               target: "notTyping.loading",
               cond: ctx => {
@@ -36,6 +56,7 @@ export const createSuggestionMachine = function({ fetchItems, isQueryValid }) {
         }
       },
       notTyping: {
+        id: "notTyping",
         initial: "idle",
         on: {
           TYPING: {
@@ -47,7 +68,7 @@ export const createSuggestionMachine = function({ fetchItems, isQueryValid }) {
         },
         states: {
           idle: {
-            id: "#idle"
+            id: "#idleId"
           },
           bad: { ...badStateDef() },
           loading: {
@@ -110,7 +131,7 @@ const loadingDef = function({ fetchItems }) {
 
 const requestOkDef = function() {
   return {
-    exit: assign({ items: null, cursorIndex: null }),
+    exit: assign({ cursorIndex: null }),
     initial: "cursor_off",
     states: {
       cursor_off: {
@@ -148,10 +169,13 @@ const requestOkDef = function() {
             target: "cursor_off"
           },
           MOUSE_CLICKED_ITEM: {
-            //target: "#idle",
+            target: "#notTyping",
             actions: assign({
               cursorIndex: (_ctx, evt) => evt.itemIndex,
-              inputValue: (ctx, evt) => ctx.items[evt.itemIndex]
+              inputValue: (ctx, evt) => {
+                console.log(55555555);
+                return ctx.items[evt.itemIndex];
+              }
             })
           },
           KEY_ARROW_DOWN: {
@@ -160,12 +184,9 @@ const requestOkDef = function() {
             })
           },
           KEY_ARROW_UP: {
-            actions: [
-              assign({
-                cursorIndex: ctx => (ctx.cursorIndex - 1) % ctx.items.length
-              }),
-              "setTextInput"
-            ]
+            actions: assign({
+              cursorIndex: ctx => (ctx.cursorIndex - 1) % ctx.items.length
+            })
           }
         }
       }

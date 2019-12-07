@@ -44,6 +44,7 @@ export default function App() {
       send({ type: "KEY_ENTER" });
     }
   }
+  console.log(current.value, current.event, current.context)
   return (
     <div>
       <div>{JSON.stringify(current.value)}</div>
