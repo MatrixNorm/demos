@@ -1,90 +1,14 @@
 import { assign } from "xstate";
 
-const requestOkDef = {
-  exit: assign({ items: null, cursorIndex: null }),
-  initial: "cursor_off",
-  states: {
-    cursor_off: {
-      on: {
-        MOUSE_ENTERED_ITEM: {
-          target: "cursor_on",
-          actions: assign({
-            cursorIndex: (_ctx, evt) => evt.itemIndex
-          })
-        },
-        KEY_ARROW_DOWN: {
-          target: "cursor_on",
-          actions: [
-            assign({
-              cursorIndex: 0
-            }),
-            "setTextInput"
-          ]
-        },
-        KEY_ARROW_UP: {
-          target: "cursor_on",
-          actions: [
-            assign({
-              cursorIndex: ctx => ctx.items.length - 1
-            }),
-            "setTextInput"
-          ]
-        }
-      }
-    },
-    cursor_on: {
-      on: {
-        MOUSE_ENTERED_ITEM: {
-          actions: assign({
-            cursorIndex: (_ctx, evt) => evt.itemIndex
-          })
-        },
-        MOUSE_LEAVED_LIST: {
-          target: "cursor_off"
-        },
-        MOUSE_CLICKED_ITEM: {
-          target: "#idle",
-          actions: [
-            assign({
-              cursorIndex: (_ctx, evt) => evt.itemIndex
-            }),
-            "setTextInput"
-          ]
-        },
-        KEY_ARROW_DOWN: {
-          actions: [
-            assign({
-              cursorIndex: ctx => (ctx.cursorIndex + 1) % ctx.items.length
-            }),
-            "setTextInput"
-          ]
-        },
-        KEY_ARROW_UP: {
-          actions: [
-            assign({
-              cursorIndex: ctx => (ctx.cursorIndex - 1) % ctx.items.length
-            }),
-            "setTextInput"
-          ]
-        }
-      }
-    }
-  }
-};
-
-export const createSuggestionMachine = function({
-  fetchSuggestions,
-  isQueryValid
-}) {
+export const createSuggestionMachine = function({ fetchItems, isQueryValid }) {
   const initialContext = {
     inputValue: "",
     items: null,
     cursorIndex: null,
     errorMsg: null
   };
-
   return {
-    id: "suggestionMachine",
+    id: "suggestionsMachine",
     context: initialContext,
     initial: "notTyping",
     states: {
@@ -93,7 +17,7 @@ export const createSuggestionMachine = function({
           TYPING_STOP: [
             { target: "notTyping.loading", cond: isQueryValid },
             {
-              target: "invalidQuery"
+              target: "notTyping.bad.invalidQuery"
             }
           ]
         }
@@ -112,49 +36,124 @@ export const createSuggestionMachine = function({
           idle: {
             id: "#idle"
           },
-          bad: {
-            exit: {
-              actions: assign({ errorMsg: null })
-            },
-            on: {
-              INPUT_BLUR: {
-                target: "idle"
-              },
-              DISMISS: {
-                target: "idle"
-              }
-            },
-            states: {
-              invalidQuery: {},
-              requestError: {},
-              requestEmpty: {}
-            }
-          },
+          bad: { ...badStateDef() },
           loading: {
-            invoke: {
-              id: "getSuggestions",
-              src: ctx => fetchSuggestions(ctx.inputValue),
-              onDone: [
-                {
-                  target: "requestOk",
-                  cond: (_ctx, evt) => {
-                    let items = evt.data.items;
-                    return items && items.length > 0;
-                  },
-                  actions: assign({ items: (_ctx, evt) => evt.data.items })
-                },
-                {
-                  target: "bad.requestEmpty",
-                  actions: assign({ errorMsg: "No Suggestions" })
-                }
-              ],
-              onError: {
-                target: "bad.requestError",
-                actions: assign({ errorMsg: "Request Error" })
-              }
-            }
+            ...loadingDef({ fetchItems })
           },
-          requestOk: { ...requestOkDef }
+          requestOk: { ...requestOkDef() }
+        }
+      }
+    }
+  };
+};
+
+const badStateDef = function() {
+  return {
+    exit: {
+      actions: assign({ errorMsg: null })
+    },
+    on: {
+      INPUT_BLUR: {
+        target: "idle"
+      },
+      DISMISS: {
+        target: "idle"
+      }
+    },
+    states: {
+      invalidQuery: {},
+      requestError: {},
+      requestEmpty: {}
+    }
+  };
+};
+
+const loadingDef = function({ fetchItems }) {
+  return {
+    invoke: {
+      id: "getItems",
+      src: ctx => fetchItems(ctx.inputValue),
+      onDone: [
+        {
+          target: "requestOk",
+          cond: (_ctx, evt) => {
+            let items = evt.data.items;
+            return items && items.length > 0;
+          },
+          actions: assign({ items: (_ctx, evt) => evt.data.items })
+        },
+        {
+          target: "bad.requestEmpty",
+          actions: assign({ errorMsg: "No Suggestions" })
+        }
+      ],
+      onError: {
+        target: "bad.requestError",
+        actions: assign({ errorMsg: "Request Error" })
+      }
+    }
+  };
+};
+
+const requestOkDef = function() {
+  return {
+    exit: assign({ items: null, cursorIndex: null }),
+    initial: "cursor_off",
+    states: {
+      cursor_off: {
+        on: {
+          MOUSE_ENTERED_ITEM: {
+            target: "cursor_on",
+            actions: assign({
+              cursorIndex: (_ctx, evt) => evt.itemIndex
+            })
+          },
+          KEY_ARROW_DOWN: {
+            target: "cursor_on",
+            actions: assign({
+              cursorIndex: 0,
+              inputValue: ctx => ctx.items[0]
+            })
+          },
+          KEY_ARROW_UP: {
+            target: "cursor_on",
+            actions: assign({
+              cursorIndex: ctx => ctx.items.length - 1,
+              inputValue: ctx => ctx.items[ctx.items.length - 1]
+            })
+          }
+        }
+      },
+      cursor_on: {
+        on: {
+          MOUSE_ENTERED_ITEM: {
+            actions: assign({
+              cursorIndex: (_ctx, evt) => evt.itemIndex
+            })
+          },
+          MOUSE_LEAVED_LIST: {
+            target: "cursor_off"
+          },
+          MOUSE_CLICKED_ITEM: {
+            target: "#idle",
+            actions: assign({
+              cursorIndex: (_ctx, evt) => evt.itemIndex,
+              inputValue: (ctx, evt) => ctx.items[evt.itemIndex]
+            })
+          },
+          KEY_ARROW_DOWN: {
+            actions: assign({
+              cursorIndex: ctx => (ctx.cursorIndex + 1) % ctx.items.length
+            })
+          },
+          KEY_ARROW_UP: {
+            actions: [
+              assign({
+                cursorIndex: ctx => (ctx.cursorIndex - 1) % ctx.items.length
+              }),
+              "setTextInput"
+            ]
+          }
         }
       }
     }

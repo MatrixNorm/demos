@@ -4,8 +4,7 @@ import { Machine } from "xstate";
 import { useMachine } from "@xstate/react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
-import { suggestionMachineDef } from "./machine";
-import { createElement as createDebouncedInput } from "../../xstate/debounce3/debounce";
+import { createSuggestionMachine } from "./machine";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
@@ -13,44 +12,26 @@ const KEY_CODE = {
   ENTER: 13
 };
 
+const StateContext = React.createContext();
 const SendContext = React.createContext();
 
 export default function App() {
   console.log("render: App");
   const [current, send] = useMachine(
-    Machine(suggestionMachineDef, {
-      actions: {
-        setTextInput: ctx => resetInput(ctx.items["cursorIndex"])
-      },
-      guards: {
-        serchTermIsValid: (_, evt) => {
-          return evt.query && evt.query.trim().length > 0;
-        },
-        isLoadingError: (_, evt) => {
-          evt.isError || !Array.isArray(evt.payload);
-        },
-        isItemsListEmpty: (_, evt) => {
-          let p = evt.payload;
-          !evt.isError && Array.isArray(p) && p.length > 0;
-        }
-      }
-    })
+    Machine(
+      createSuggestionMachine({
+        fetchItems: query =>
+          new Promise(resolve => {
+            setTimeout(
+              () =>
+                resolve({ data: { items: ["Aa", "Bb", "Cc", "Dd", "Ee"] } }),
+              1000
+            );
+          }),
+        isQueryValid: q => q && q.trim().length > 0
+      })
+    )
   );
-
-  const [inputEl, resetInput] = useMemo(() => {
-    return createDebouncedInput({
-      debounceDuration: 2000,
-      initialInputValue: "",
-      onStartTyping: inputValue => {
-        console.log("StartTyping", inputValue);
-        send({ type: "USER_START_TYPING" });
-      },
-      onFinishTyping: inputValue => {
-        console.log("FinishTyping", inputValue);
-        send({ type: "USER_ASKED_FOR_SUGGESTIONS", query: inputValue });
-      }
-    });
-  }, []);
 
   function handleKeyDown(e) {
     console.log(e.keyCode);
@@ -66,36 +47,38 @@ export default function App() {
   }
   console.log(current, current.context);
   return (
-    <div onKeyDown={handleKeyDown}>
-      {inputEl}
-      <SendContext.Provider value={send}>
-        {(current.matches("loading_result") || current.matches("loading")) && (
-          <MockQueryRenderer cursorIndex={current.context.cursorIndex} />
-        )}
-      </SendContext.Provider>
+    <div>
+      <input
+        value={current.context.inputValue}
+        onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
+        onKeyDown={handleKeyDown}
+      />
+      <StateContext.Provider value={current}>
+        <SendContext.Provider value={send}>
+          {current.matches("notTyping.loading") && <Loading />}
+          {current.matches("notTyping.bad") && <Bad />}
+          {current.matches("notTyping.requestOk") && <RequestOk />}
+        </SendContext.Provider>
+      </StateContext.Provider>
     </div>
   );
 }
 
-const MockQueryRenderer = React.memo(function({ cursorIndex /* XXX */  }) {
-  console.log("render: MockQueryRenderer", cursorIndex);
+const Loading = () => {
+  console.log("render: Loading");
+  return <p>loading...</p>;
+};
+
+const Bad = () => {
+  console.log("render: Bad");
+  return <p>shit</p>;
+};
+
+const RequestOk = () => {
+  console.log("render: RequestOk");
   const send = useContext(SendContext);
-  const [items, setItems] = useState(null);
+  const state = useContext(StateContext);
 
-  useEffect(() => {
-    const timerId = setTimeout(() => {
-      let data = ["Aa", "Bb", "Cc", "Dd", "Ee"];
-      setItems(data);
-      send({ type: "REQUEST_DONE", payload: data });
-    }, 3000);
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, []);
-
-  if (items === null) {
-    return <div>loading...</div>;
-  }
   return (
     <div>
       <ul
@@ -116,7 +99,7 @@ const MockQueryRenderer = React.memo(function({ cursorIndex /* XXX */  }) {
       </ul>
     </div>
   );
-});
+};
 
 const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
   console.log("render: ListItem", text, isHovered);
