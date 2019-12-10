@@ -67,23 +67,26 @@ const fsmReducers = {
       case "INPUT_BLUR":
         return { ...state, fsmState: "idle" };
       case "INPUT_ARROW_DOWN": {
-        let pointedIndex = state.pointedIndex
-          ? (state.pointedIndex + 1) % state.suggestion.length
-          : 0;
+        let pointedIndex =
+          state.pointedIndex !== null
+            ? (state.pointedIndex + 1) % state.suggestions.length
+            : 0;
         return {
           ...state,
           pointedIndex,
-          inputValue: state.suggestion[pointedIndex]
+          inputValue: state.suggestions[pointedIndex]
         };
       }
       case "INPUT_ARROW_UP": {
-        let pointedIndex = state.pointedIndex
-          ? (state.pointedIndex - 1) % state.suggestion.length
-          : state.suggestion.length - 1;
+        let len = state.suggestions.length;
+        let pointedIndex =
+          state.pointedIndex !== null
+            ? (state.pointedIndex - 1 + len) % len
+            : len - 1;
         return {
           ...state,
           pointedIndex,
-          inputValue: state.suggestion[pointedIndex]
+          inputValue: state.suggestions[pointedIndex]
         };
       }
       case "MOUSE_ENTER_ITEM":

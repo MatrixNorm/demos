@@ -112,7 +112,7 @@ const Error = ({ error }) => {
 
 const Ok = function() {
   console.log("render: SuggestionList");
-  const { suggestions } = useContext(StateContext);
+  const { suggestions, pointedIndex } = useContext(StateContext);
   const dispatch = useContext(DispatchContext);
 
   return (
@@ -127,23 +127,26 @@ const Ok = function() {
         }
       >
         {suggestions.map((sugg, j) => (
-          <SuggestionListItem key={j} index={j} text={sugg} />
+          <SuggestionListItem
+            key={j}
+            index={j}
+            text={sugg}
+            isPointed={j === pointedIndex}
+          />
         ))}
       </ul>
     </div>
   );
 };
 
-const SuggestionListItem = React.memo(function({ text, index }) {
-  console.log("render: ListItem", text, index);
-  const { pointedIndex } = useContext(StateContext);
+const SuggestionListItem = React.memo(function({ text, index, isPointed }) {
+  console.log("render: ListItem", text, index, isPointed);
   const dispatch = useContext(DispatchContext);
-  const style =
-    index === pointedIndex
-      ? css`
-          background-color: #dedcdc;
-        `
-      : css``;
+  const style = isPointed
+    ? css`
+        background-color: #dedcdc;
+      `
+    : css``;
   return (
     <li
       css={style}
