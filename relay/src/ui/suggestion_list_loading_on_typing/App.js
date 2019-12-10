@@ -9,6 +9,7 @@ import React, {
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
 import { debounce } from "../../utils/fsm";
+import reducer from "./reducers";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
@@ -24,67 +25,6 @@ const initialState = {
   suggestions: null,
   showDropdown: false
 };
-
-function reducer(state, action) {
-  switch (action.type) {
-    case "SHOW_DROPDOWN":
-      return {
-        ...state,
-        showDropdown: true
-      };
-    case "USER_SELECTED_SUGGESTION":
-      return {
-        ...state,
-        inputValue: action.suggestion,
-        selectedIndex: null,
-        suggestions: null,
-        showDropdown: false
-      };
-    case "USER_CLOSED_SUGGESTION":
-      return {
-        ...state,
-        selectedIndex: null,
-        suggestions: null,
-        showDropdown: false
-      };
-    case "TEXT_INPUT_CHANGE":
-      return {
-        ...state,
-        inputValue: action.inputValue,
-        selectedIndex: null,
-        suggestions: null,
-        showDropdown: false
-      };
-    case "SET_SELECTED_INDEX":
-      return { ...state, selectedIndex: action.value };
-    case "INCREMENT_SELECTED_INDEX": {
-      if (!state.showDropdown) {
-        return state;
-      }
-      let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
-      return {
-        ...state,
-        selectedIndex,
-        inputValue: state.suggestions[selectedIndex]
-      };
-    }
-    case "DECREMENT_SELECTED_INDEX": {
-      if (!state.showDropdown) {
-        return state;
-      }
-      let selectedIndex = (state.selectedIndex + 1) % state.suggestions.length;
-      return {
-        ...state,
-        selectedIndex,
-        inputValue: state.suggestions[selectedIndex]
-      };
-    }
-    case "SUGGESTION_LIST_LOADED":
-      return { ...state, suggestions: action.value };
-    default:
-      return state;
-  }
-}
 
 export default function App() {
   console.log("render: App");
@@ -103,13 +43,15 @@ export default function App() {
     }
   }
 
-  function handleTextInputChange(e) {
-    dispatch({
-      type: "TEXT_INPUT_CHANGE",
-      inputValue: e.target.value
-    });
-    showDropdown();
-  }
+  const handleTextInputChange = useMemo(() => {
+    return e => {
+      dispatch({
+        type: "TEXT_INPUT_CHANGE",
+        inputValue: e.target.value
+      });
+      showDropdown();
+    };
+  }, []);
 
   const showDropdown = useMemo(() => {
     return debounce(() => {
