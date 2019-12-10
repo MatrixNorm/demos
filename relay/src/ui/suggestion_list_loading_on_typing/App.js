@@ -23,7 +23,26 @@ const keyCodeToEventTypeMap = {
   [KEY_CODE.ENTER]: "INPUT_ENTER"
 };
 
+const fetchSuggestions = async function({ query }) {
+  let suggestions = ["Aa", "Bb", "Cc", "Dd", "Ee"];
+};
+
+const commandInterpreter = function(command, dispatch) {
+  if (command) {
+    switch (command.type) {
+      case "LOAD_SUGGESTIONS": {
+        fetchSuggestions({ query: command.query })
+          .then(data =>
+            dispatch({ type: "LOAD_OK", suggestions: data.suggestions })
+          )
+          .catch(error => dispatch({ type: "LOAD_ERROR", error }));
+      }
+    }
+  }
+};
+
 const DispatchContext = React.createContext();
+const StateContext = React.createContext();
 
 const initialState = {
   fsmState: "idle",
@@ -34,21 +53,23 @@ const initialState = {
 
 export default function App() {
   console.log("render: App");
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [[state, command], dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    commandInterpreter(command, dispatch);
+  });
 
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];
     type && dispatch({ type });
   }
 
-  const handleTextInputChange = useMemo(() => {
-    return e => {
-      dispatch({
-        type: "TYPING",
-        inputValue: e.target.value
-      });
-      onStopTyping();
-    };
+  const handleTextInputChange = useCallback(e => {
+    dispatch({
+      type: "TYPING",
+      inputValue: e.target.value
+    });
+    onStopTyping();
   }, []);
 
   const onStopTyping = useMemo(() => {
@@ -64,27 +85,21 @@ export default function App() {
         value={state.inputValue}
         onChange={handleTextInputChange}
       />
-      <DispatchContext.Provider value={dispatch}>
-        {state.showDropdown && (
-          <SuggestionList selectedIndex={state.selectedIndex} />
-        )}
-      </DispatchContext.Provider>
+      <StateContext.Provider value={state}>
+        <DispatchContext.Provider value={dispatch}>
+          {state.fsmState === "loading" && <Loading />}
+          {state.fsmState === "ok" && <Ok />}
+          {state.fsmState === "error" && <Error />}
+        </DispatchContext.Provider>
+      </StateContext.Provider>
     </div>
   );
 }
 
-const SuggestionList = React.memo(function({ selectedIndex }) {
+const Ok = function() {
   console.log("render: SuggestionList");
+  const { suggestions } = useContext(StateContext);
   const dispatch = useContext(DispatchContext);
-  const [items] = useState(null);
-
-  useEffect(() => {
-    let suggestions = ["Aa", "Bb", "Cc", "Dd", "Ee"];
-    let timeoutId = setTimeout(() => {
-      dispatch({ type: "LOAD_OK", suggestions });
-    }, 1000);
-    return () => clearTimeout(timeoutId);
-  }, []);
 
   return (
     <div>
@@ -97,37 +112,34 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
           dispatch({ type: "MOUSE_LEAVE_ITEMS", value: null })
         }
       >
-        {items.map((item, j) => (
-          <SuggestionListItem
-            key={j}
-            index={j}
-            text={item}
-            isHovered={j === selectedIndex}
-          />
+        {suggestions.map((sugg, j) => (
+          <SuggestionListItem key={j} index={j} suggestion={sugg} />
         ))}
       </ul>
     </div>
   );
-});
+};
 
-const SuggestionListItem = React.memo(function({ text, index, isHovered }) {
-  console.log("render: ListItem", text, isHovered);
+const SuggestionListItem = React.memo(function({ text, index }) {
+  console.log("render: ListItem", text, index);
+  const { pointedIndex } = useContext(StateContext);
   const dispatch = useContext(DispatchContext);
-  const style = isHovered
-    ? css`
-        background-color: #dedcdc;
-      `
-    : css``;
+  const style =
+    index === pointedIndex
+      ? css`
+          background-color: #dedcdc;
+        `
+      : css``;
   return (
     <li
       css={style}
       onMouseEnter={() =>
-        dispatch({ type: "SET_SELECTED_INDEX", value: index })
+        dispatch({ type: "MOUSE_ENTER_ITEM", itemIndex: index })
       }
       onClick={() =>
         dispatch({
-          type: "USER_SELECTED_SUGGESTION",
-          suggestion: text
+          type: "MOUSE_CLICK_ITEM",
+          itemText: text
         })
       }
     >

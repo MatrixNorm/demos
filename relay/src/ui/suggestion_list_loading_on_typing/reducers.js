@@ -24,7 +24,7 @@ const fsmReducers = {
       if (isQueryValid(query)) {
         return [
           { ...state, fsmState: "loading" },
-          { cmd: "LOAD_SUGGESTIONS", query }
+          { type: "LOAD_SUGGESTIONS", query }
         ];
       } else {
         return { ...state, fsmState: "error", errorMsg: "Bad query" };
@@ -88,7 +88,7 @@ const fsmReducers = {
         return {
           ...state,
           fsmState: "idle",
-          inputValue: state.suggestion[action.itemIndex]
+          inputValue: action.itemText
         };
     }
   }
