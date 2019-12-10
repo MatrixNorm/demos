@@ -25,6 +25,7 @@ const keyCodeToEventTypeMap = {
 
 const fetchSuggestions = async function({ query }) {
   let suggestions = ["Aa", "Bb", "Cc", "Dd", "Ee"];
+  return { suggestions };
 };
 
 const commandInterpreter = function(command, dispatch) {
@@ -44,12 +45,15 @@ const commandInterpreter = function(command, dispatch) {
 const DispatchContext = React.createContext();
 const StateContext = React.createContext();
 
-const initialState = {
-  fsmState: "idle",
-  inputValue: "",
-  suggestions: null,
-  pointedIndex: null
-};
+const initialState = [
+  {
+    fsmState: "idle",
+    inputValue: "",
+    suggestions: null,
+    pointedIndex: null
+  },
+  null
+];
 
 export default function App() {
   console.log("render: App");
@@ -89,12 +93,22 @@ export default function App() {
         <DispatchContext.Provider value={dispatch}>
           {state.fsmState === "loading" && <Loading />}
           {state.fsmState === "ok" && <Ok />}
-          {state.fsmState === "error" && <Error />}
+          {state.fsmState === "error" && <Error error={state.errorMsg} />}
         </DispatchContext.Provider>
       </StateContext.Provider>
     </div>
   );
 }
+
+const Loading = () => {
+  console.log("render: Loading");
+  return <p>loading...</p>;
+};
+
+const Error = ({ error }) => {
+  console.log("render: Bad");
+  return <p>{error}</p>;
+};
 
 const Ok = function() {
   console.log("render: SuggestionList");
@@ -113,7 +127,7 @@ const Ok = function() {
         }
       >
         {suggestions.map((sugg, j) => (
-          <SuggestionListItem key={j} index={j} suggestion={sugg} />
+          <SuggestionListItem key={j} index={j} text={sugg} />
         ))}
       </ul>
     </div>

@@ -3,11 +3,19 @@ function isQueryValid(query) {
 }
 
 export default function reducer(state, action) {
+  let result = _reducer(state[0], action);
+  if (!Array.isArray(result)) {
+    result = [result, null];
+  }
+  return result;
+}
+
+function _reducer(state, action) {
   if (action.type === "TYPING") {
     return {
       ...state,
       fsmState: "idle",
-      inputValue: action.payload.inputValue
+      inputValue: action.inputValue
     };
   }
   let localReducer = fsmReducers[state.fsmState];
@@ -20,7 +28,7 @@ export default function reducer(state, action) {
 const fsmReducers = {
   idle: (state, action) => {
     if (action.type === "STOP_TYPING") {
-      let { query } = action.payload;
+      let query = state.inputValue;
       if (isQueryValid(query)) {
         return [
           { ...state, fsmState: "loading" },
@@ -34,7 +42,11 @@ const fsmReducers = {
   loading: (state, action) => {
     switch (action.type) {
       case "LOAD_ERROR":
-        return { ...state, fsmState: "error", errorMsg: "Loading query" };
+        return {
+          ...state,
+          fsmState: "error",
+          errorMsg: "Loading suggestions error"
+        };
       case "LOAD_OK":
         return {
           ...state,
