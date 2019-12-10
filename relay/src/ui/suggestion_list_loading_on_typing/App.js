@@ -17,13 +17,19 @@ const KEY_CODE = {
   ENTER: 13
 };
 
+const keyCodeToEventTypeMap = {
+  [KEY_CODE.ARROW_DOWN]: "INPUT_ARROW_DOWN",
+  [KEY_CODE.ARROW_UP]: "INPUT_ARROW_UP",
+  [KEY_CODE.ENTER]: "INPUT_ENTER"
+};
+
 const DispatchContext = React.createContext();
 
 const initialState = {
+  fsmState: "idle",
   inputValue: "",
-  selectedIndex: null,
   suggestions: null,
-  showDropdown: false
+  pointedIndex: null
 };
 
 export default function App() {
@@ -31,22 +37,14 @@ export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   function handleKeyDown(e) {
-    console.log(e.keyCode);
-    if (e.keyCode === KEY_CODE.ARROW_DOWN) {
-      dispatch({ type: "INCREMENT_SELECTED_INDEX", value: null });
-    }
-    if (e.keyCode === KEY_CODE.ARROW_UP) {
-      dispatch({ type: "DECREMENT_SELECTED_INDEX", value: null });
-    }
-    if (e.keyCode === KEY_CODE.ENTER) {
-      dispatch({ type: "USER_CLOSED_SUGGESTION" });
-    }
+    let type = keyCodeToEventTypeMap[e.keyCode];
+    type && dispatch({ type });
   }
 
   const handleTextInputChange = useMemo(() => {
     return e => {
       dispatch({
-        type: "TEXT_INPUT_CHANGE",
+        type: "TYPING",
         inputValue: e.target.value
       });
       showDropdown();
