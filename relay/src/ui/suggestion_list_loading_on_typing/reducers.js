@@ -39,7 +39,7 @@ const fsmReducers = {
         return {
           ...state,
           fsmState: "ok",
-          suggestions: action.payload.suggestions
+          suggestions: action.suggestions
         };
     }
   },

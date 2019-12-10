@@ -47,13 +47,13 @@ export default function App() {
         type: "TYPING",
         inputValue: e.target.value
       });
-      showDropdown();
+      onStopTyping();
     };
   }, []);
 
-  const showDropdown = useMemo(() => {
+  const onStopTyping = useMemo(() => {
     return debounce(() => {
-      dispatch({ type: "SHOW_DROPDOWN" });
+      dispatch({ type: "STOP_TYPING" });
     }, 500);
   }, []);
 
@@ -76,14 +76,14 @@ export default function App() {
 const SuggestionList = React.memo(function({ selectedIndex }) {
   console.log("render: SuggestionList");
   const dispatch = useContext(DispatchContext);
-  const [items] = useState(["Aa", "Bb", "Cc", "Dd", "Ee"]);
+  const [items] = useState(null);
 
   useEffect(() => {
-    dispatch({ type: "SUGGESTION_LIST_LOADED", value: items });
-  }, []);
-
-  const handleMouseLeaveList = useCallback(() => {
-    dispatch({ type: "SET_SELECTED_INDEX", value: null });
+    let suggestions = ["Aa", "Bb", "Cc", "Dd", "Ee"];
+    let timeoutId = setTimeout(() => {
+      dispatch({ type: "LOAD_OK", suggestions });
+    }, 1000);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   return (
@@ -93,7 +93,9 @@ const SuggestionList = React.memo(function({ selectedIndex }) {
           padding: 0;
           margin: 0;
         `}
-        onMouseLeave={handleMouseLeaveList}
+        onMouseLeave={() =>
+          dispatch({ type: "MOUSE_LEAVE_ITEMS", value: null })
+        }
       >
         {items.map((item, j) => (
           <SuggestionListItem
