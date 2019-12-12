@@ -8,13 +8,15 @@ import useMyReducer from "./hooks";
 const KEY_CODE = {
   ARROW_DOWN: 40,
   ARROW_UP: 38,
-  ENTER: 13
+  ENTER: 13,
+  ESCAPE: 27
 };
 
 const keyCodeToEventTypeMap = {
   [KEY_CODE.ARROW_DOWN]: "INPUT_ARROW_DOWN",
   [KEY_CODE.ARROW_UP]: "INPUT_ARROW_UP",
-  [KEY_CODE.ENTER]: "INPUT_ENTER"
+  [KEY_CODE.ENTER]: "INPUT_ENTER",
+  [KEY_CODE.ESCAPE]: "INPUT_ESCAPE"
 };
 
 const DispatchContext = React.createContext();

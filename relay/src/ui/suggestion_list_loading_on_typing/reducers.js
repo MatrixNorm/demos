@@ -38,10 +38,10 @@ function _reducer(state, action) {
       };
     }
   }
-  let localReducer = fsmReducers[state.fsm?.state];
-    if (localReducer) {
-      return localReducer(state, action) || state;
-    }
+  let localReducer = fsmReducers[(state.fsm?.state)];
+  if (localReducer) {
+    return localReducer(state, action) || state;
+  }
   return state;
 }
 
@@ -70,8 +70,9 @@ const fsmReducers = {
   },
   ok: (state, action) => {
     switch (action.type) {
-      case "INPUT_ENTER":
       case "INPUT_BLUR":
+      case "INPUT_ENTER":
+      case "INPUT_ESCAPE":
         return clearInteraction(state);
       case "INPUT_ARROW_DOWN": {
         let pointedIndex =
