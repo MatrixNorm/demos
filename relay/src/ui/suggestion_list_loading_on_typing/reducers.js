@@ -3,42 +3,37 @@ function isQueryValid(query) {
 }
 
 export default function reducer(state, action) {
-  let result = _reducer(state[0], action);
-  if (!Array.isArray(result)) {
-    result = [result, null];
-  }
-  return result;
-}
-
-function _reducer(state, action) {
   if (action.type === "TYPING") {
     return {
       ...state,
-      fsmState: "idle",
+      fsm: null,
       inputValue: action.inputValue
     };
   }
+  if (action.type === "STOP_TYPING") {
+    let query = state.inputValue;
+    let fsmId = 1 * new Date();
+    if (isQueryValid(query)) {
+      return [
+        { ...state, fsm: { id: fsmId, state: "loading" } },
+        { type: "LOAD_SUGGESTIONS", query, fsmId }
+      ];
+    } else {
+      return {
+        ...state,
+        fsm: { id: fsmId, state: "error" },
+        errorMsg: "Bad query"
+      };
+    }
+  }
   let localReducer = fsmReducers[state.fsmState];
-  if (localReducer) {
+  if (localReducer && action.fsmId === state.fsm.id) {
     return localReducer(state, action) || state;
   }
   return state;
 }
 
 const fsmReducers = {
-  idle: (state, action) => {
-    if (action.type === "STOP_TYPING") {
-      let query = state.inputValue;
-      if (isQueryValid(query)) {
-        return [
-          { ...state, fsmState: "loading" },
-          { type: "LOAD_SUGGESTIONS", query }
-        ];
-      } else {
-        return { ...state, fsmState: "error", errorMsg: "Bad query" };
-      }
-    }
-  },
   loading: (state, action) => {
     switch (action.type) {
       case "LOAD_ERROR":

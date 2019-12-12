@@ -3,8 +3,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
-  useReducer,
-  useState
+  useReducer
 } from "react";
 /** @jsx jsx */
 import { css, jsx } from "@emotion/core";
@@ -34,20 +33,25 @@ const commandInterpreter = function(command, dispatch) {
       case "LOAD_SUGGESTIONS": {
         fetchSuggestions({ query: command.query })
           .then(data =>
-            dispatch({ type: "LOAD_OK", suggestions: data.suggestions })
+            dispatch({
+              type: "LOAD_OK",
+              suggestions: data.suggestions,
+              fsmId: command.fsmId
+            })
           )
-          .catch(error => dispatch({ type: "LOAD_ERROR", error }));
+          .catch(error =>
+            dispatch({ type: "LOAD_ERROR", error, fsmId: command.fsmId })
+          );
       }
     }
   }
 };
 
 const DispatchContext = React.createContext();
-const StateContext = React.createContext();
 
 const initialState = [
   {
-    fsmState: "idle",
+    fsm: null,
     inputValue: "",
     suggestions: null,
     pointedIndex: null
@@ -55,9 +59,26 @@ const initialState = [
   null
 ];
 
+function useMyReducer(reducer, initialState) {
+  const [stateAndMaybeCommand, dispatch] = useReducer(reducer, initialState);
+
+  let state, command;
+  if (!Array.isArray(stateAndMaybeCommand)) {
+    [state, command] = [stateAndMaybeCommand, null];
+  } else {
+    [state, command] = stateAndMaybeCommand;
+  }
+
+  const myDispatch = useCallback(action =>
+    dispatch({ ...action, fsmId: state.fsm?.id })
+  );
+
+  return [[state, command], myDispatch];
+}
+
 export default function App() {
   console.log("render: App");
-  const [[state, command], dispatch] = useReducer(reducer, initialState);
+  const [[state, command], dispatch] = useMyReducer(reducer, initialState);
 
   useEffect(() => {
     commandInterpreter(command, dispatch);
@@ -89,13 +110,18 @@ export default function App() {
         value={state.inputValue}
         onChange={handleTextInputChange}
       />
-      <StateContext.Provider value={state}>
-        <DispatchContext.Provider value={dispatch}>
-          {state.fsmState === "loading" && <Loading />}
-          {state.fsmState === "ok" && <Ok />}
-          {state.fsmState === "error" && <Error error={state.errorMsg} />}
-        </DispatchContext.Provider>
-      </StateContext.Provider>
+      <DispatchContext.Provider value={dispatch}>
+        {state.fsm && state.fsm.state === "loading" && <Loading />}
+        {state.fsm && state.fsm.state === "ok" && (
+          <Ok
+            suggestions={state.suggestions}
+            pointedIndex={state.pointedIndex}
+          />
+        )}
+        {state.fsm && state.fsm.state === "error" && (
+          <Error error={state.errorMsg} />
+        )}
+      </DispatchContext.Provider>
     </div>
   );
 }
@@ -110,9 +136,9 @@ const Error = ({ error }) => {
   return <p>{error}</p>;
 };
 
-const Ok = function() {
+const Ok = function({ suggestions, pointedIndex }) {
   console.log("render: SuggestionList");
-  const { suggestions, pointedIndex } = useContext(StateContext);
+
   const dispatch = useContext(DispatchContext);
 
   return (
