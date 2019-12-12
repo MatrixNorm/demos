@@ -2,13 +2,25 @@ function isQueryValid(query) {
   return query && query.trim().length > 0;
 }
 
-export default function reducer(state, action) {
+function clearInteraction(state) {
+  return { ...state, fsm: null, suggestions: null, pointedIndex: null };
+}
+
+export default function reducer(stateAndCommand, action) {
+  let stateAndMaybeCommand = _reducer(stateAndCommand[0], action);
+  if (!Array.isArray(stateAndMaybeCommand)) {
+    stateAndMaybeCommand = [stateAndMaybeCommand, null];
+  }
+  return stateAndMaybeCommand;
+}
+
+function _reducer(state, action) {
+  console.log(state, action);
   if (action.type === "TYPING") {
-    return {
+    return clearInteraction({
       ...state,
-      fsm: null,
       inputValue: action.inputValue
-    };
+    });
   }
   if (action.type === "STOP_TYPING") {
     let query = state.inputValue;
@@ -16,7 +28,7 @@ export default function reducer(state, action) {
     if (isQueryValid(query)) {
       return [
         { ...state, fsm: { id: fsmId, state: "loading" } },
-        { type: "LOAD_SUGGESTIONS", query, fsmId }
+        { type: "LOAD_SUGGESTIONS", query }
       ];
     } else {
       return {
@@ -26,10 +38,10 @@ export default function reducer(state, action) {
       };
     }
   }
-  let localReducer = fsmReducers[state.fsmState];
-  if (localReducer && action.fsmId === state.fsm.id) {
-    return localReducer(state, action) || state;
-  }
+  let localReducer = fsmReducers[state.fsm?.state];
+    if (localReducer) {
+      return localReducer(state, action) || state;
+    }
   return state;
 }
 
@@ -39,13 +51,13 @@ const fsmReducers = {
       case "LOAD_ERROR":
         return {
           ...state,
-          fsmState: "error",
+          fsm: { ...state.fsm, state: "error" },
           errorMsg: "Loading suggestions error"
         };
       case "LOAD_OK":
         return {
           ...state,
-          fsmState: "ok",
+          fsm: { ...state.fsm, state: "ok" },
           suggestions: action.suggestions
         };
     }
@@ -53,14 +65,14 @@ const fsmReducers = {
   error: (state, action) => {
     switch (action.type) {
       case "DISMISS_ERROR_MESSAGE":
-        return { ...state, fsmState: "idle" };
+        return clearInteraction(state);
     }
   },
   ok: (state, action) => {
     switch (action.type) {
       case "INPUT_ENTER":
       case "INPUT_BLUR":
-        return { ...state, fsmState: "idle" };
+        return clearInteraction(state);
       case "INPUT_ARROW_DOWN": {
         let pointedIndex =
           state.pointedIndex !== null
@@ -95,11 +107,10 @@ const fsmReducers = {
           pointedIndex: null
         };
       case "MOUSE_CLICK_ITEM":
-        return {
+        return clearInteraction({
           ...state,
-          fsmState: "idle",
           inputValue: action.itemText
-        };
+        });
     }
   }
 };
