@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useReducer } from "react";
 
-export default function useMyReducer(reducer, initialState) {
+export default function useMyReducer(
+  reducer,
+  initialState,
+  { fetchSuggestions }
+) {
   const [[state, command], dispatch] = useReducer(reducer, [
     initialState,
     null
@@ -40,8 +44,3 @@ export default function useMyReducer(reducer, initialState) {
 
   return [state, dispatch];
 }
-
-const fetchSuggestions = async function({ query }) {
-  let suggestions = [...Array(5).keys()].map(i => `${query}${i}`);
-  return { suggestions };
-};

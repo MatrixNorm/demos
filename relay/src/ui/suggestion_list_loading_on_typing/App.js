@@ -28,9 +28,11 @@ const initialState = {
   pointedIndex: null
 };
 
-export default function App() {
+export default function App({ fetchSuggestions }) {
   console.log("render: App");
-  const [state, dispatch] = useMyReducer(reducer, initialState);
+  const [state, dispatch] = useMyReducer(reducer, initialState, {
+    fetchSuggestions
+  });
 
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];
