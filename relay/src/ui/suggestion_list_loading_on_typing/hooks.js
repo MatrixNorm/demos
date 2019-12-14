@@ -36,7 +36,7 @@ export default function useMyReducer(
         }
       }
     }
-  });
+  }, []);
 
   useEffect(() => {
     commandInterpreter(command, dispatch);

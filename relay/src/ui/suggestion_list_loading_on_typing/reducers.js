@@ -15,7 +15,6 @@ export default function reducer(stateAndCommand, action) {
 }
 
 function _reducer(state, action) {
-  console.log(state, action);
   if (action.type === "TYPING") {
     return clearInteraction({
       ...state,
@@ -70,7 +69,7 @@ const fsmReducers = {
   },
   ok: (state, action) => {
     switch (action.type) {
-      case "INPUT_BLUR":
+      //case "INPUT_BLUR":
       case "INPUT_ENTER":
       case "INPUT_ESCAPE":
         return clearInteraction(state);
