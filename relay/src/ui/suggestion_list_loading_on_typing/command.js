@@ -1,7 +1,8 @@
 export const createCommandInterpreter = commandConfig => dispatch => {
   return command => {
-    let taskRunner = commandConfig[command.type];
-    taskRunner && taskRunner.run(command, dispatch);
+    let commandRunner = commandConfig[command.type];
+    commandRunner &&
+      commandRunner.run(command).then(action => action && dispatch(action));
   };
 };
 
@@ -13,17 +14,17 @@ export class CommandRunnerTakeLatest {
     this.errorToAction = errorToAction;
   }
 
-  run(command, dispatch) {
+  run(command) {
     let commandNumber = this._commandCounter;
     this.promiseFromCommand(command)
       .then(result => {
         if (commandNumber === this._commandCounter) {
-          dispatch(this.resultToAction(result));
+          return this.resultToAction(result);
         }
       })
       .catch(error => {
         if (commandNumber === this._commandCounter) {
-          dispatch(this.errorToAction(error));
+          return this.errorToAction(error);
         }
       });
     this._commandCounter++;
