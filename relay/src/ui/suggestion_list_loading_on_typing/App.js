@@ -28,10 +28,10 @@ const initialState = {
   pointedIndex: null
 };
 
-export default function App({ fetchSuggestions }) {
+export default function App({ commandConfig }) {
   console.log("render: App");
   const [state, dispatch] = useMyReducer(reducer, initialState, {
-    fetchSuggestions
+    commandConfig
   });
 
   function handleKeyDown(e) {
@@ -62,16 +62,14 @@ export default function App({ fetchSuggestions }) {
         onBlur={() => dispatch({ type: "INPUT_BLUR" })}
       />
       <DispatchContext.Provider value={dispatch}>
-        {state.fsm && state.fsm.state === "loading" && <Loading />}
-        {state.fsm && state.fsm.state === "ok" && (
+        {state.fsmState === "loading" && <Loading />}
+        {state.fsmState === "ok" && (
           <Ok
             suggestions={state.suggestions}
             pointedIndex={state.pointedIndex}
           />
         )}
-        {state.fsm && state.fsm.state === "error" && (
-          <Error error={state.errorMsg} />
-        )}
+        {state.fsmState === "error" && <Error error={state.errorMsg} />}
       </DispatchContext.Provider>
     </div>
   );

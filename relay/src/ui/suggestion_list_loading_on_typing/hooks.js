@@ -1,45 +1,18 @@
-import { useCallback, useEffect, useReducer } from "react";
+import { useMemo, useEffect, useReducer } from "react";
+import { createCommandInterpreter } from "./command";
 
-export default function useMyReducer(
-  reducer,
-  initialState,
-  { fetchSuggestions }
-) {
+export default function useMyReducer(reducer, initialState, { commandConfig }) {
   const [[state, command], dispatch] = useReducer(reducer, [
     initialState,
     null
   ]);
 
-  const commandInterpreter = useCallback(function(command, dispatch) {
-    if (command) {
-      switch (command.type) {
-        case "LOAD_SUGGESTIONS": {
-          (function() {
-            let fsmId = state.fsm.id;
-            fetchSuggestions({ query: command.query })
-              .then(
-                data =>
-                  state.fsm &&
-                  fsmId === state.fsm.id &&
-                  dispatch({
-                    type: "LOAD_OK",
-                    suggestions: data.suggestions
-                  })
-              )
-              .catch(
-                error =>
-                  state.fsm &&
-                  fsmId === state.fsm.id &&
-                  dispatch({ type: "LOAD_ERROR", error })
-              );
-          })();
-        }
-      }
-    }
+  const commandInterpreter = useMemo(() => {
+    return createCommandInterpreter(commandConfig)(dispatch);
   }, []);
 
   useEffect(() => {
-    commandInterpreter(command, dispatch);
+    command && commandInterpreter(command);
   });
 
   return [state, dispatch];

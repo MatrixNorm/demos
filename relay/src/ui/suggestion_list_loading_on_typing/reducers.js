@@ -3,7 +3,7 @@ function isQueryValid(query) {
 }
 
 function clearInteraction(state) {
-  return { ...state, fsm: null, suggestions: null, pointedIndex: null };
+  return { ...state, fsmState: null, suggestions: null, pointedIndex: null };
 }
 
 export default function reducer(stateAndCommand, action) {
@@ -23,16 +23,15 @@ function _reducer(state, action) {
   }
   if (action.type === "STOP_TYPING") {
     let query = state.inputValue;
-    let fsmId = 1 * new Date();
     if (isQueryValid(query)) {
       return [
-        { ...state, fsm: { id: fsmId, state: "loading" } },
+        { ...state, fsmState: "loading" },
         { type: "LOAD_SUGGESTIONS", query }
       ];
     } else {
       return {
         ...state,
-        fsm: { id: fsmId, state: "error" },
+        fsmState: "error",
         errorMsg: "Bad query"
       };
     }
@@ -50,13 +49,13 @@ const fsmReducers = {
       case "LOAD_ERROR":
         return {
           ...state,
-          fsm: { ...state.fsm, state: "error" },
+          fsmState: "error",
           errorMsg: "Loading suggestions error"
         };
       case "LOAD_OK":
         return {
           ...state,
-          fsm: { ...state.fsm, state: "ok" },
+          fsmState: "ok",
           suggestions: action.suggestions
         };
     }
