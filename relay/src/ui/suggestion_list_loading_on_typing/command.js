@@ -7,16 +7,17 @@ export const createCommandInterpreter = commandConfig => dispatch => {
 };
 
 export class CommandRunnerTakeLatest {
-  constructor(promiseFromCommand, resultToAction, errorToAction) {
-    this._commandCounter = 0;
+  constructor({ promiseFromCommand, resultToAction, errorToAction }) {
+    this._commandCounter = -1;
     this.promiseFromCommand = promiseFromCommand;
     this.resultToAction = resultToAction;
     this.errorToAction = errorToAction;
   }
 
   run(command) {
+    this._commandCounter++;
     let commandNumber = this._commandCounter;
-    this.promiseFromCommand(command)
+    return this.promiseFromCommand(command)
       .then(result => {
         if (commandNumber === this._commandCounter) {
           return this.resultToAction(result);
@@ -27,6 +28,5 @@ export class CommandRunnerTakeLatest {
           return this.errorToAction(error);
         }
       });
-    this._commandCounter++;
   }
 }

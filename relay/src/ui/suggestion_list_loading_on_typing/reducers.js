@@ -36,7 +36,7 @@ function _reducer(state, action) {
       };
     }
   }
-  let localReducer = fsmReducers[(state.fsm?.state)];
+  let localReducer = fsmReducers[(state.fsmState)];
   if (localReducer) {
     return localReducer(state, action) || state;
   }
