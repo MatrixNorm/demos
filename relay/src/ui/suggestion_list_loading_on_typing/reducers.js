@@ -68,7 +68,7 @@ const fsmReducers = {
   },
   ok: (state, action) => {
     switch (action.type) {
-      //case "INPUT_BLUR":
+      case "INPUT_BLUR":
       case "INPUT_ENTER":
       case "INPUT_ESCAPE":
         return clearInteraction(state);

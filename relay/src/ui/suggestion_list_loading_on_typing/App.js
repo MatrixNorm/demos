@@ -1,6 +1,5 @@
 import React, { useCallback, useContext, useMemo } from "react";
-/** @jsx jsx */
-import { css, jsx } from "@emotion/core";
+import styled from "styled-components";
 import { debounce } from "../../utils/fsm";
 import reducer from "./reducers";
 import useMyReducer from "./hooks";
@@ -28,6 +27,17 @@ const initialState = {
   pointedIndex: null
 };
 
+const WithStyle = styled.div`
+  .suggestions-list {
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-is_pointed="true"] {
+    background-color: #7cbd67;
+  }
+`;
+
 export default function App({ commandConfig }) {
   console.log("render: App");
   const [state, dispatch] = useMyReducer(reducer, initialState, {
@@ -54,24 +64,26 @@ export default function App({ commandConfig }) {
   }, []);
 
   return (
-    <div onKeyDown={handleKeyDown}>
-      <input
-        type="text"
-        value={state.inputValue}
-        onChange={handleTextInputChange}
-        onBlur={() => dispatch({ type: "INPUT_BLUR" })}
-      />
-      <DispatchContext.Provider value={dispatch}>
-        {state.fsmState === "loading" && <Loading />}
-        {state.fsmState === "ok" && (
-          <Ok
-            suggestions={state.suggestions}
-            pointedIndex={state.pointedIndex}
-          />
-        )}
-        {state.fsmState === "error" && <Error error={state.errorMsg} />}
-      </DispatchContext.Provider>
-    </div>
+    <WithStyle>
+      <div onKeyDown={handleKeyDown}>
+        <input
+          type="text"
+          value={state.inputValue}
+          onChange={handleTextInputChange}
+          onBlur={() => dispatch({ type: "INPUT_BLUR" })}
+        />
+        <DispatchContext.Provider value={dispatch}>
+          {state.fsmState === "loading" && <Loading />}
+          {state.fsmState === "ok" && (
+            <Ok
+              suggestions={state.suggestions}
+              pointedIndex={state.pointedIndex}
+            />
+          )}
+          {state.fsmState === "error" && <Error error={state.errorMsg} />}
+        </DispatchContext.Provider>
+      </div>
+    </WithStyle>
   );
 }
 
@@ -93,10 +105,7 @@ const Ok = function({ suggestions, pointedIndex }) {
   return (
     <div>
       <ul
-        css={css`
-          padding: 0;
-          margin: 0;
-        `}
+        className="suggestions-list"
         onMouseLeave={() =>
           dispatch({ type: "MOUSE_LEAVE_ITEMS", value: null })
         }
@@ -114,21 +123,20 @@ const Ok = function({ suggestions, pointedIndex }) {
   );
 };
 
-const SuggestionListItem = React.memo(function({ text, index, isPointed }) {
+const SuggestionListItem = React.memo(function SuggestionListItem({
+  text,
+  index,
+  isPointed
+}) {
   console.log("render: ListItem", text, index, isPointed);
   const dispatch = useContext(DispatchContext);
-  const style = isPointed
-    ? css`
-        background-color: #dedcdc;
-      `
-    : css``;
   return (
     <li
-      css={style}
+      data-is_pointed={isPointed}
       onMouseEnter={() =>
         dispatch({ type: "MOUSE_ENTER_ITEM", itemIndex: index })
       }
-      onClick={() =>
+      onMouseDown={() =>
         dispatch({
           type: "MOUSE_CLICK_ITEM",
           itemText: text
