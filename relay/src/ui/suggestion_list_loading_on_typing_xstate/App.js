@@ -1,10 +1,6 @@
 import React, { useContext } from "react";
-
-import { Machine } from "xstate";
 import { useMachine } from "@xstate/react";
-/** @jsx jsx */
-import { css, jsx } from "@emotion/core";
-import { createSuggestionMachine } from "./machine";
+import styled from "styled-components";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
@@ -18,27 +14,22 @@ const keyCodeToEventTypeMap = {
   [KEY_CODE.ENTER]: "KEY_ENTER"
 };
 
-const fetchItemsPromise = function(query) {
-  return new Promise(resolve => {
-    setTimeout(
-      () => resolve({ items: [...Array(5).keys()].map(i => `${query}${i}`) }),
-      1000
-    );
-  });
-};
-
 const SendContext = React.createContext();
+
+const WithStyle = styled.div`
+  .suggestions-list {
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-is_pointed="true"] {
+    background-color: #7cbd67;
+  }
+`;
 
 export default function App() {
   console.log("render: App");
-  const [current, send] = useMachine(
-    Machine(
-      createSuggestionMachine({
-        fetchItems: fetchItemsPromise,
-        isQueryValid: q => q && q.trim().length > 0
-      })
-    )
-  );
+  const [current, send] = useMachine();
 
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];
@@ -46,21 +37,23 @@ export default function App() {
   }
   console.log(current.value, current.event, current.context);
   return (
-    <div>
-      <div>{JSON.stringify(current.value)}</div>
-      <input
-        value={current.context.inputValue}
-        onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
-        onKeyDown={handleKeyDown}
-      />
-      <SendContext.Provider value={send}>
-        {current.matches("notTyping.loading") && <Loading />}
-        {current.matches("notTyping.bad") && <Bad />}
-        {current.matches("notTyping.requestOk") && (
-          <RequestOk state={current.context} />
-        )}
-      </SendContext.Provider>
-    </div>
+    <WithStyle>
+      <div>
+        <div>{JSON.stringify(current.value)}</div>
+        <input
+          value={current.context.inputValue}
+          onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
+          onKeyDown={handleKeyDown}
+        />
+        <SendContext.Provider value={send}>
+          {current.matches("notTyping.loading") && <Loading />}
+          {current.matches("notTyping.bad") && <Bad />}
+          {current.matches("notTyping.requestOk") && (
+            <RequestOk state={current.context} />
+          )}
+        </SendContext.Provider>
+      </div>
+    </WithStyle>
   );
 }
 
@@ -80,7 +73,10 @@ const RequestOk = ({ state }) => {
 
   return (
     <div>
-      <ul onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}>
+      <ul
+        className="suggestions-list"
+        onMouseLeave={() => send({ type: "MOUSE_LEAVED_LIST" })}
+      >
         {state.items.map((item, j) => (
           <Item
             key={j}
@@ -94,17 +90,12 @@ const RequestOk = ({ state }) => {
   );
 };
 
-const Item = React.memo(function({ text, index, isHovered }) {
+const Item = React.memo(function Item({ text, index, isHovered }) {
   console.log("render: ListItem", text, isHovered);
   const send = useContext(SendContext);
-  const style = isHovered
-    ? css`
-        background-color: #dedcdc;
-      `
-    : css``;
   return (
     <li
-      css={style}
+      data-is_pointed={isHovered}
       onMouseEnter={() =>
         send({ type: "MOUSE_ENTERED_ITEM", itemIndex: index })
       }
