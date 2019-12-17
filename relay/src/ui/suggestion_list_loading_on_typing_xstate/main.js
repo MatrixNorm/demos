@@ -2,9 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { Machine } from "xstate";
 import App from "./App";
-import { createSuggestionMachine } from "./machine";
+import { machineDef } from "./machine";
 
-const fetchItemsPromise = function(query) {
+const fetchItems = function(query) {
   return new Promise(resolve => {
     setTimeout(
       () => resolve({ items: [...Array(5).keys()].map(i => `${query}${i}`) }),
@@ -13,11 +13,19 @@ const fetchItemsPromise = function(query) {
   });
 };
 
-const machine = Machine(
-  createSuggestionMachine({
-    fetchItems: fetchItemsPromise,
-    isQueryValid: q => q && q.trim().length > 0
-  })
-);
+const machine = Machine(Machine(machineDef), {
+  services: {
+    fetchService: fetchItems
+  },
+  guards: {
+    isQueryValid: ctx => {
+      let q = ctx.inputValue;
+      return q && q.trim().length > 0;
+    }
+  },
+  delays: {
+    TYPING_DEBOUNCE_DELAY: 500
+  }
+});
 
 ReactDOM.render(<App machine={machine} />, document.getElementById("app"));

@@ -39,18 +39,15 @@ export default function App() {
   return (
     <WithStyle>
       <div>
-        <div>{JSON.stringify(current.value)}</div>
         <input
           value={current.context.inputValue}
           onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
           onKeyDown={handleKeyDown}
         />
         <SendContext.Provider value={send}>
-          {current.matches("notTyping.loading") && <Loading />}
-          {current.matches("notTyping.bad") && <Bad />}
-          {current.matches("notTyping.requestOk") && (
-            <RequestOk state={current.context} />
-          )}
+          {current.matches("working.loading") && <Loading />}
+          {current.matches("working.error") && <Error />}
+          {current.matches("working.ok") && <Ok state={current.context} />}
         </SendContext.Provider>
       </div>
     </WithStyle>
@@ -62,12 +59,12 @@ const Loading = () => {
   return <p>loading...</p>;
 };
 
-const Bad = () => {
+const Error = () => {
   console.log("render: Bad");
   return <p>shit</p>;
 };
 
-const RequestOk = ({ state }) => {
+const Ok = ({ state }) => {
   console.log("render: RequestOk");
   const send = useContext(SendContext);
 
@@ -82,7 +79,7 @@ const RequestOk = ({ state }) => {
             key={j}
             index={j}
             text={item}
-            isHovered={j === state.cursorIndex}
+            isPointed={j === state.pointedIndex}
           />
         ))}
       </ul>
@@ -90,12 +87,12 @@ const RequestOk = ({ state }) => {
   );
 };
 
-const Item = React.memo(function Item({ text, index, isHovered }) {
-  console.log("render: ListItem", text, isHovered);
+const Item = React.memo(function Item({ text, index, isPointed }) {
+  console.log("render: ListItem", text, isPointed);
   const send = useContext(SendContext);
   return (
     <li
-      data-is_pointed={isHovered}
+      data-is_pointed={isPointed}
       onMouseEnter={() =>
         send({ type: "MOUSE_ENTERED_ITEM", itemIndex: index })
       }

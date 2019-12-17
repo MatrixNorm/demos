@@ -1,154 +1,139 @@
 import { assign } from "xstate";
 
-export function createMachine({ isQueryValid, fetchItems }) {
-  let workingSubmachineDef = workingSubmachineDefFactory({
-    isQueryValid,
-    fetchItems
-  });
-  return machineDefFactory(workingSubmachineDef);
-}
-
-export const machineDefFactory = function(workingSubmachineDef) {
-  const initialContext = {
+export const machineDef = {
+  id: "suggestionMachine",
+  context: {
     inputValue: "",
     items: null,
-    cursorIndex: null,
+    pointedIndex: null,
     errorMsg: null
-  };
-
-  return {
-    id: "suggestionsMachine",
-    context: initialContext,
-    initial: "idle",
-    states: {
-      idle: {
-        id: "idle",
-        on: {
-          TYPING: "typing"
-        }
-      },
-      typing: {
-        entry: assign({
-          inputValue: (_, evt) => {
-            return evt.inputValue;
-          }
-        }),
-        on: {
-          TYPING: "typing"
-        },
-        after: {
-          3000: "working"
-        }
-      },
-      working: {
-        on: {
-          TYPING: "typing"
-        },
-        ...workingSubmachineDef
+  },
+  initial: "idle",
+  states: {
+    idle: {
+      id: "idle",
+      on: {
+        TYPING: "typing"
       }
+    },
+    typing: {
+      entry: assign({
+        inputValue: (_, evt) => {
+          return evt.inputValue;
+        }
+      }),
+      on: {
+        TYPING: "typing"
+      },
+      after: {
+        TYPING_DEBOUNCE_DELAY: "working"
+      }
+    },
+    working: {
+      on: {
+        TYPING: "typing"
+      },
+      ...workingSubmachineDef
     }
-  };
+  }
 };
 
-const workingSubmachineDefFactory = function({ isQueryValid, fetchItems }) {
-  return {
-    initial: "entry",
-    states: {
-      entry: {
-        on: {
-          "": [
-            {
-              target: "loading",
-              cond: ctx => {
-                return isQueryValid(ctx.inputValue);
-              }
-            },
-            {
-              target: "error"
-            }
-          ]
-        }
-      },
-      error: {
-        on: {
-          DISMISS: {
-            target: "#idle"
-          }
-        }
-      },
-      loading: {
-        ...loadingDef(fetchItems)
-      },
-      ok: { ...okDef() }
-    }
-  };
-};
-
-const loadingDef = function(fetchItems) {
-  return {
-    invoke: {
-      src: ctx => fetchItems(ctx.inputValue),
-      onDone: [
-        {
-          target: "ok",
-          cond: (_ctx, evt) => {
-            let items = evt.data.items;
-            return items && items.length > 0;
+const workingSubmachineDef = {
+  initial: "entry",
+  states: {
+    entry: {
+      on: {
+        "": [
+          {
+            target: "loading",
+            cond: "isQueryValid"
           },
-          actions: assign({ items: (_ctx, evt) => evt.data.items })
-        },
-        {
-          target: "error",
-          actions: assign({ errorMsg: "No Suggestions" })
-        }
-      ],
-      onError: {
-        target: "error",
-        actions: assign({ errorMsg: "Request Error" })
+          {
+            target: "error"
+          }
+        ]
       }
+    },
+    error: {
+      on: {
+        DISMISS_MESSAGE: {
+          target: "#idle"
+        }
+      },
+      exit: assign({ errorMsg: null })
+    },
+    loading: { ...loadingDef },
+    ok: { ...okDef }
+  }
+};
+
+const loadingDef = {
+  invoke: {
+    src: "fetchService",
+    onDone: [
+      {
+        target: "ok",
+        cond: (_ctx, evt) => {
+          let items = evt.data.items;
+          return items && items.length > 0;
+        },
+        actions: assign({ items: (_ctx, evt) => evt.data.items })
+      },
+      {
+        target: "error",
+        actions: assign({ errorMsg: "No Suggestions" })
+      }
+    ],
+    onError: {
+      target: "error",
+      actions: assign({ errorMsg: "Request Error" })
     }
-  };
+  }
 };
 
 const okDef = function() {
   return {
-    entry: assign({ cursorIndex: null }),
+    entry: assign({ pointedIndex: null }),
     on: {
       KEY_ENTER: "#idle",
       MOUSE_ENTERED_ITEM: {
         actions: assign({
-          cursorIndex: (_ctx, evt) => evt.itemIndex
+          pointedIndex: (_ctx, evt) => evt.itemIndex
         })
       },
       MOUSE_LEAVED_LIST: {
-        target: "cursor_off"
+        actions: assign({ pointedIndex: null })
       },
       MOUSE_CLICKED_ITEM: {
-        target: "#notTyping",
+        target: "#idle",
         actions: assign({
-          cursorIndex: (_ctx, evt) => evt.itemIndex,
-          inputValue: (ctx, evt) => {
-            return ctx.items[evt.itemIndex];
-          }
+          inputValue: (_, evt) => evt.itemText
         })
       },
-      KEY_ARROW_DOWN: {
+      INPUT_ARROW_DOWN: {
         actions: assign(ctx => {
-          let cursorIndex = (ctx.cursorIndex + 1) % ctx.items.length;
+          let pointedIndex =
+            ctx.pointedIndex !== null
+              ? (ctx.pointedIndex + 1) % ctx.items.length
+              : 0;
           return {
             ...ctx,
-            cursorIndex,
-            inputValue: ctx.items[cursorIndex]
+            pointedIndex,
+            inputValue: ctx.items[pointedIndex]
           };
         })
       },
-      KEY_ARROW_UP: {
+      INPUT_ARROW_UP: {
         actions: assign(ctx => {
-          let cursorIndex = (ctx.cursorIndex - 1) % ctx.items.length;
+          let len = ctx.items.length;
+          let pointedIndex =
+            ctx.pointedIndex !== null
+              ? (ctx.pointedIndex - 1 + len) % len
+              : len - 1;
           return {
             ...ctx,
-            cursorIndex,
-            inputValue: ctx.items[cursorIndex]
+            pointedIndex,
+            inputValue: ctx.items[pointedIndex]
           };
         })
       }
