@@ -27,9 +27,9 @@ const WithStyle = styled.div`
   }
 `;
 
-export default function App() {
+export default function App({ machine }) {
   console.log("render: App");
-  const [current, send] = useMachine();
+  const [current, send] = useMachine(machine);
 
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];

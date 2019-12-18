@@ -13,9 +13,9 @@ const fetchItems = function(query) {
   });
 };
 
-const machine = Machine(Machine(machineDef), {
+const machine = Machine(machineDef(), {
   services: {
-    fetchService: fetchItems
+    fetchService: ctx => fetchItems(ctx.inputValue)
   },
   guards: {
     isQueryValid: ctx => {
