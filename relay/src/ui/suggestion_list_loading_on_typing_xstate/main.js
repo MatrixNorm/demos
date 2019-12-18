@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { Machine } from "xstate";
+import { Machine, interpret } from "xstate";
 import App from "./App";
 import { machineDef } from "./machine";
 
@@ -28,4 +28,10 @@ const machine = Machine(machineDef(), {
   }
 });
 
-ReactDOM.render(<App machine={machine} />, document.getElementById("app"));
+const service = interpret(machine).onTransition(state => {
+  console.log(state.value);
+});
+service.start();
+//window.service = service;
+
+ReactDOM.render(<App service={service} />, document.getElementById("app"));

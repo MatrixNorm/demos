@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { useMachine } from "@xstate/react";
+import { useService } from "@xstate/react";
 import styled from "styled-components";
 
 const KEY_CODE = {
@@ -12,8 +12,8 @@ const KEY_CODE = {
 const keyCodeToEventTypeMap = {
   [KEY_CODE.ARROW_DOWN]: "INPUT_ARROW_DOWN",
   [KEY_CODE.ARROW_UP]: "INPUT_ARROW_UP",
-  [KEY_CODE.ENTER]: "CLOSE_LIST",
-  [KEY_CODE.ESCAPE]: "CLOSE_LIST"
+  [KEY_CODE.ENTER]: "INPUT_ENTER",
+  [KEY_CODE.ESCAPE]: "INPUT_ESCAPE"
 };
 
 const SendContext = React.createContext();
@@ -29,15 +29,15 @@ const WithStyle = styled.div`
   }
 `;
 
-export default function App({ machine }) {
+export default function App({ service }) {
   console.log("render: App");
-  const [current, send] = useMachine(machine);
+  const [current, send] = useService(service);
 
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];
     type && send({ type });
   }
-  console.log(current.value, current.event, current.context);
+
   return (
     <WithStyle>
       <div>
@@ -49,7 +49,9 @@ export default function App({ machine }) {
         />
         <SendContext.Provider value={send}>
           {current.matches("working.loading") && <Loading />}
-          {current.matches("working.error") && <Error />}
+          {current.matches("working.error") && (
+            <Error errorMsg={current.context.errorMsg} />
+          )}
           {current.matches("working.ok") && <Ok state={current.context} />}
         </SendContext.Provider>
       </div>
@@ -58,19 +60,22 @@ export default function App({ machine }) {
 }
 
 const Loading = () => {
-  console.log("render: Loading");
   return <p>loading...</p>;
 };
 
-const Error = () => {
-  console.log("render: Bad");
-  return <p>shit</p>;
+const Error = ({ errorMsg }) => {
+  const send = useContext(SendContext);
+  return (
+    <div>
+      <span>{errorMsg}</span>
+      <button onClick={() => send({ type: "DISMISS_MESSAGE" })}>close</button>
+    </div>
+  );
 };
 
 const Ok = ({ state }) => {
   console.log("render: RequestOk");
   const send = useContext(SendContext);
-
   return (
     <div>
       <ul

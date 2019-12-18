@@ -49,16 +49,16 @@ const workingSubmachineDef = () => ({
             cond: "isQueryValid"
           },
           {
-            target: "error"
+            target: "error",
+            actions: assign({ errorMsg: "Invalid query" })
           }
         ]
       }
     },
     error: {
       on: {
-        DISMISS_MESSAGE: {
-          target: "#idle"
-        }
+        DISMISS_MESSAGE: "#idle",
+        INPUT_ESCAPE: "#idle"
       },
       exit: assign({ errorMsg: null })
     },
@@ -94,7 +94,8 @@ const loadingDef = () => ({
 const okDef = () => ({
   entry: assign({ pointedIndex: null }),
   on: {
-    CLOSE_LIST: "#idle",
+    INPUT_ENTER: "#idle",
+    INPUT_ESCAPE: "#idle",
     MOUSE_ENTERED_ITEM: {
       actions: assign({
         pointedIndex: (_ctx, evt) => evt.itemIndex
