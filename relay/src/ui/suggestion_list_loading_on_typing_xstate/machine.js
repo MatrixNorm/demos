@@ -94,7 +94,7 @@ const loadingDef = () => ({
 const okDef = () => ({
   entry: assign({ pointedIndex: null }),
   on: {
-    KEY_ENTER: "#idle",
+    CLOSE_LIST: "#idle",
     MOUSE_ENTERED_ITEM: {
       actions: assign({
         pointedIndex: (_ctx, evt) => evt.itemIndex

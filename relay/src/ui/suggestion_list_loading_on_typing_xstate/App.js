@@ -5,13 +5,15 @@ import styled from "styled-components";
 const KEY_CODE = {
   ARROW_DOWN: 40,
   ARROW_UP: 38,
-  ENTER: 13
+  ENTER: 13,
+  ESCAPE: 27
 };
 
 const keyCodeToEventTypeMap = {
-  [KEY_CODE.ARROW_DOWN]: "KEY_ARROW_DOWN",
-  [KEY_CODE.ARROW_UP]: "KEY_ARROW_UP",
-  [KEY_CODE.ENTER]: "KEY_ENTER"
+  [KEY_CODE.ARROW_DOWN]: "INPUT_ARROW_DOWN",
+  [KEY_CODE.ARROW_UP]: "INPUT_ARROW_UP",
+  [KEY_CODE.ENTER]: "CLOSE_LIST",
+  [KEY_CODE.ESCAPE]: "CLOSE_LIST"
 };
 
 const SendContext = React.createContext();
@@ -43,6 +45,7 @@ export default function App({ machine }) {
           value={current.context.inputValue}
           onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
           onKeyDown={handleKeyDown}
+          onBlur={() => send({ type: "CLOSE_LIST" })}
         />
         <SendContext.Provider value={send}>
           {current.matches("working.loading") && <Loading />}
@@ -96,10 +99,10 @@ const Item = React.memo(function Item({ text, index, isPointed }) {
       onMouseEnter={() =>
         send({ type: "MOUSE_ENTERED_ITEM", itemIndex: index })
       }
-      onClick={() =>
+      onMouseDown={() =>
         send({
           type: "MOUSE_CLICKED_ITEM",
-          itemIndex: index
+          itemText: text
         })
       }
     >
