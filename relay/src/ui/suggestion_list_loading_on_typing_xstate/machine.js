@@ -26,8 +26,15 @@ export const machineDef = () => ({
         TYPING: "typing"
       },
       after: {
-        TYPING_DEBOUNCE_DELAY: "working"
+        TYPING_DEBOUNCE_DELAY: [
+          {
+            target: "working"
+            //cond: ctx => ctx.inputValue && ctx.inputValue.trim().length !== 0
+          }
+          //{ target: "idle" }
+        ]
       }
+      // XXX report bug
     },
     working: {
       on: {
