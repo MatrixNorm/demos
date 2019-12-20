@@ -26,15 +26,27 @@ export const machineDef = () => ({
         TYPING: "typing"
       },
       after: {
-        TYPING_DEBOUNCE_DELAY: [
+        TYPING_DEBOUNCE_DELAY: { target: "uglyfix" }
+        // https://github.com/davidkpiano/xstate/issues/886
+        // [
+        //   {
+        //     target: "working",
+        //     cond: ctx => ctx.inputValue && ctx.inputValue.trim().length !== 0
+        //   },
+        //   { target: "idle" }
+        // ]
+      }
+    },
+    uglyfix: {
+      on: {
+        "": [
           {
-            target: "working"
-            //cond: ctx => ctx.inputValue && ctx.inputValue.trim().length !== 0
-          }
-          //{ target: "idle" }
+            target: "idle",
+            cond: ctx => ctx.inputValue.trim().length === 0
+          },
+          { target: "working" }
         ]
       }
-      // XXX report bug
     },
     working: {
       on: {

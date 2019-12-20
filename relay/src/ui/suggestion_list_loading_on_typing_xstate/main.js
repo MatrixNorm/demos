@@ -20,7 +20,7 @@ const machine = Machine(machineDef(), {
   guards: {
     isQueryValid: ctx => {
       let q = ctx.inputValue;
-      return q && q.trim().length > 0;
+      return q.trim().length > 0 && /^[a-zA-Z]+$/.test(q);
     }
   },
   delays: {
