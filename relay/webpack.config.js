@@ -37,7 +37,11 @@ const baseBuild = ({ buildId }) => env => {
       })
     ],
     resolve: {
-      extensions: [".mjs", ".js", ".jsx"]
+      extensions: [".mjs", ".js", ".jsx"],
+      alias: {
+        theapp: path.resolve(__dirname, `src/${buildId}/`),
+        theproject: path.resolve(__dirname, `src/`)
+     }
     },
     module: {
       rules: [
@@ -87,53 +91,54 @@ function registerBuild(buildId) {
   builds[buildId] = baseBuild({ buildId });
 }
 
-registerBuild("cities_app");
-registerBuild("connection_and_store/demo1");
-registerBuild("connection_and_store/demo2");
-registerBuild("connection_and_store/normalization_without_ids");
-registerBuild("flow_fragmentrefs");
-registerBuild("graphiql_demo");
-registerBuild("indexeddb/demo1");
-registerBuild("indexeddb/uploading_json");
-registerBuild("js_lang/async_iter");
-registerBuild("js_lang/callback_to_async_generator");
-registerBuild("js_lang/generators_and_stuff");
-registerBuild("js_lang/observable");
-registerBuild("js_lang/slow_callback");
-registerBuild("local_state/demo1");
-registerBuild("local_state/demo2");
-registerBuild("local_state/demo3");
-registerBuild("local_state/schema_stitching");
-registerBuild("local_state/two_environments");
-registerBuild("pagination_demo_0/demo1");
-registerBuild("pagination_demo_0/demo2");
-registerBuild("problem_numero_one");
-registerBuild("problem_connection_fragment");
-registerBuild("problem_connection_fragment2");
-registerBuild("react/hooks_vs_render_props");
-registerBuild("react/setstate_and_props");
-registerBuild("react_router/demo1");
-registerBuild("relay_hello");
-registerBuild("ui/autosuggest");
-registerBuild("ui/suggestion_list");
-registerBuild("ui/suggestion_list_loading_on_typing");
-registerBuild("ui/suggestion_list_loading_on_typing_xstate");
-registerBuild("ui/uncontrolled_input");
-registerBuild("xstate/bug1");
-registerBuild("xstate/debounce");
-registerBuild("xstate/debounce2");
-registerBuild("xstate/debounce3");
+// registerBuild("cities_app");
+// registerBuild("cities_app/pages");
+// registerBuild("connection_and_store/demo1");
+// registerBuild("connection_and_store/demo2");
+// registerBuild("connection_and_store/normalization_without_ids");
+// registerBuild("flow_fragmentrefs");
+// registerBuild("graphiql_demo");
+// registerBuild("indexeddb/demo1");
+// registerBuild("indexeddb/uploading_json");
+// registerBuild("js_lang/async_iter");
+// registerBuild("js_lang/callback_to_async_generator");
+// registerBuild("js_lang/generators_and_stuff");
+// registerBuild("js_lang/observable");
+// registerBuild("js_lang/slow_callback");
+// registerBuild("local_state/demo1");
+// registerBuild("local_state/demo2");
+// registerBuild("local_state/demo3");
+// registerBuild("local_state/schema_stitching");
+// registerBuild("local_state/two_environments");
+// registerBuild("pagination_demo_0/demo1");
+// registerBuild("pagination_demo_0/demo2");
+// registerBuild("problem_numero_one");
+// registerBuild("problem_connection_fragment");
+// registerBuild("problem_connection_fragment2");
+// registerBuild("react/hooks_vs_render_props");
+// registerBuild("react/setstate_and_props");
+// registerBuild("react_router/demo1");
+// registerBuild("relay_hello");
+// registerBuild("ui/autosuggest");
+// registerBuild("ui/suggestion_list");
+// registerBuild("ui/suggestion_list_loading_on_typing");
+// registerBuild("ui/suggestion_list_loading_on_typing_xstate");
+// registerBuild("ui/uncontrolled_input");
+// registerBuild("xstate/bug1");
+// registerBuild("xstate/debounce");
+// registerBuild("xstate/debounce2");
+// registerBuild("xstate/debounce3");
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
+  // const onBuildNotFound = function() {
+  //   console.log(`No build with id ${buildId}\n env: ${env}`);
+  // };
 
-  const onBuildNotFound = function() {
-    console.log(`No build with id ${buildId}\n env: ${env}`);
-  };
-
-  const build = builds[buildId];
-  if (!build) {
-    return onBuildNotFound(env);
-  }
+  // const build = builds[buildId];
+  // if (!build) {
+  //   return onBuildNotFound(env);
+  // }
+  const build = baseBuild({ buildId })
   return build(env);
 };
