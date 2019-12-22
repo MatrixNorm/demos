@@ -1,4 +1,4 @@
-import citiesTxt from "raw-loader!theapp/resources/cities.json";
+import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
 
 const cities = JSON.parse(citiesTxt)
 
