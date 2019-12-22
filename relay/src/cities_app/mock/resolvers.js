@@ -1,7 +1,8 @@
 import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
+import { hello } from "theapp/__cljs__/foo";
 
-const cities = JSON.parse(citiesTxt)
-
+const cities = JSON.parse(citiesTxt);
+console.log(hello("123"));
 export const serverResolvers = {
   Query: {
     viewer: () => {
@@ -12,8 +13,9 @@ export const serverResolvers = {
       return { id };
     },
     citiesPagination: (_, args) => {
-      const pageSize = 5;
-      const nodes = []
+      let pageSize = 5;
+      let j = Math.floor(Math.random() * cities.length);
+      let nodes = cities.slice(j, j + pageSize);
       return {
         nodes,
         pageNo: 1,
@@ -22,7 +24,7 @@ export const serverResolvers = {
       };
     },
     citiesMetadata: () => {
-       return {
+      return {
         population_lower_bound: 400000,
         population_upper_bound: 9000000,
         lat_lower_bound: 11.97,

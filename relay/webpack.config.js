@@ -47,7 +47,7 @@ const baseBuild = ({ buildId }) => env => {
       rules: [
         {
           test: /\.m?js$/,
-          exclude: /node_modules/,
+          exclude: /(node_modules|__cljs__)/,
           use: {
             loader: "babel-loader",
             options: {

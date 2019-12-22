@@ -1,4 +1,5 @@
 /docs/**/manifest.edn
+**/__cljs__
 /jsdev
 /cljsdev
 /target

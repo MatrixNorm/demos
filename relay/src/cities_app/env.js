@@ -1,7 +1,7 @@
 import { Environment, Network, RecordSource, Store } from "relay-runtime";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
-import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
+import serverSchemaTxt from "raw-loader!theapp/resources/serverSchema.graphql";
 import { serverResolvers } from "theapp/mock/resolvers";
 
 const serverSchema = makeExecutableSchema({

@@ -1,0 +1,10 @@
+;; shadow-cljs configuration
+{:source-paths
+ ["src/cities_app/cljs"]
+
+ :dependencies
+ []
+
+ :builds
+ {:abc {:target :npm-module
+        :output-dir "src/cities_app/__cljs__"}}}
