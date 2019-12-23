@@ -1,9 +1,7 @@
-// @flow
-
 import { QueryRenderer, graphql } from "react-relay";
 import React from "react";
-import environment from "../env";
-import CitiesPagination from "./CitiesPagination";
+import environment from "theapp/env";
+import CitiesPagination from "theapp/components/CitiesPagination";
 
 function CitiesPaginationListPanel() {
   return (

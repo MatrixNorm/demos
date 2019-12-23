@@ -1,14 +1,7 @@
-// @flow
-
 import React from "react";
 import { createFragmentContainer, graphql } from "react-relay";
-import type { CitiesPaginationParametersPanel_params } from "../__generated__/CitiesPaginationParametersPanel_params.graphql";
 
-type Props = {
-  params: CitiesPaginationParametersPanel_params
-};
-
-function CitiesPaginationParametersPanel({ params }: Props) {
+function CitiesPaginationParametersPanel({ params }) {
   return (
     <div>
       <CountryFilter />

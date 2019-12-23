@@ -1,0 +1,6 @@
+{:deps
+ {org.clojure/clojurescript  {:mvn/version "1.10.516"}
+  org.clojure/core.async     {:mvn/version "0.4.474"}
+  org.clojure/test.check     {:mvn/version "0.10.0-alpha4"} 
+  com.paren/serene           {:mvn/version "0.0.2"}
+  com.walmartlabs/lacinia    {:mvn/version "0.33.0"}}}

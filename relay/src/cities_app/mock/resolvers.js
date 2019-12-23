@@ -1,8 +1,9 @@
 import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
-import { hello } from "theapp/__cljs__/foo";
+// import { a2 } from "shadow-cljs/theapp.foo";
+// window.a2 = a2
 
 const cities = JSON.parse(citiesTxt);
-console.log(hello("123"));
+
 export const serverResolvers = {
   Query: {
     viewer: () => {

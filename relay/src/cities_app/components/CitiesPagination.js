@@ -1,19 +1,8 @@
-// @flow
-
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  createRefetchContainer,
-  graphql,
-  type RelayRefetchProp
-} from "react-relay";
+import { createRefetchContainer, graphql } from "react-relay";
 
-type Props = {
-  relay: RelayRefetchProp,
-  cities: any
-};
-
-const CitiesPagination = ({ relay, cities }: Props) => {
+const CitiesPagination = ({ relay, cities }) => {
   const nodes = cities?.citiesPagination?.nodes || [];
 
   const hasPrev = cities?.citiesPagination?.hasPrevPage;
@@ -40,9 +29,7 @@ const CitiesPagination = ({ relay, cities }: Props) => {
       <div>
         {nodes.map(node => (
           <div key={node.id}>
-            <h4>
-              {/*<Link to={`/city/${node.id}`}>{node.name}</Link>*/}
-            </h4>
+            <h4>{/*<Link to={`/city/${node.id}`}>{node.name}</Link>*/}</h4>
             <div>{node.country}</div>
             <div>{node.population}</div>
           </div>
