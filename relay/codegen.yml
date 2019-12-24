@@ -1,5 +1,0 @@
-schema: ./src/posts_server/schema.graphql
-generates:
-  ./src/posts_server/graphql.types.js:
-    plugins:
-      - flow

@@ -10,7 +10,9 @@ type Query {
   node(id: ID!): Node
   viewer: User
   citiesPagination(
+    pageSize: Int!
     pageNo: Int!
+    searchParams: CitySearchParamsInput
   ): CitiesPagination
   citiesMetadata: CitiesMetadata
 }
@@ -19,6 +21,10 @@ type User implements Node {
   id: ID!
   cityFilters: [CityFilter!]
   pinnedCityFilter: CityFilter
+  """
+  uses pinnedCityFilter if any
+  """
+  citiesDefaultPagination(pageNo: Int): CitiesPagination
 }
 
 type CitiesPagination {
@@ -38,28 +44,45 @@ type City implements Node {
 }
 
 type CitiesMetadata {
-  population_lower_bound: Int!
-  population_upper_bound: Int!
-  lat_lower_bound: Float!
-  lat_upper_bound: Float!
-  lng_lower_bound: Float!
-  lng_upper_bound: Float!
+  populationLowerBound: Int!
+  populationUpperBound: Int!
+  latLowerBound: Float!
+  latUpperBound: Float!
+  lngLowerBound: Float!
+  lngUpperBound: Float!
+}
+
+enum CitiesOrderAttr {
+  nameASC
+  nameDESC
+  populationASC
+  populationDESC
+  latASC
+  latDESC
+  lngASC
+  lngDESC
+  countryASC
+  countryDESC
+}
+
+input CitySearchParamsInput {
+  cityNameStartsWith: String
+  countryName: String
+  populationGte: Int
+  populationLte: Int
+  ordering: CitiesOrderAttr
+}
+
+type CitySearchParams {
+  cityNameStartsWith: String
+  countryName: String
+  populationGte: Int
+  populationLte: Int
+  ordering: CitiesOrderAttr
 }
 
 type CityFilter implements Node {
   id: ID!
-  name: String!
-  country: String
-  population_gte: Float
-  population_lse: Float
-  orderBy: CitiesOrderAttr!
-  orderByDesc: Boolean
-}
-
-enum CitiesOrderAttr {
-  name
-  population
-  lat
-  lng
-  country
+  filterName: String!
+  searchParams: CitySearchParams!
 }
