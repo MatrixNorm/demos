@@ -21,10 +21,7 @@ type User implements Node {
   id: ID!
   cityFilters: [CityFilter!]
   pinnedCityFilter: CityFilter
-  """
-  uses pinnedCityFilter if any
-  """
-  citiesDefaultPagination(pageNo: Int): CitiesPagination
+  citiesPaginationWithPinnedFilter(pageNo: Int!, pageSize: Int!): CitiesPagination
 }
 
 type CitiesPagination {

@@ -19,19 +19,19 @@ export const serverResolvers = {
       let nodes = cities.slice(j, j + pageSize);
       return {
         nodes,
-        pageNo: 1,
+        pageNo: 0,
         hasNextPage: true,
         hasPrevPage: false
       };
     },
     citiesMetadata: () => {
       return {
-        population_lower_bound: 400000,
-        population_upper_bound: 9000000,
-        lat_lower_bound: 11.97,
-        lat_upper_bound: 67.53,
-        lng_lower_bound: 9.47,
-        lng_upper_bound: 78.25
+        populationLowerBound: 400000,
+        populationUpperBound: 9000000,
+        latLowerBound: 11.97,
+        latUpperBound: 67.53,
+        lngLowerBound: 9.47,
+        lngUpperBound: 78.25
       };
     }
   },
@@ -42,6 +42,17 @@ export const serverResolvers = {
     }
   },
   User: {
+    citiesPaginationWithPinnedFilter: () => {
+      let pageSize = 5;
+      let j = Math.floor(Math.random() * cities.length);
+      let nodes = cities.slice(j, j + pageSize);
+      return {
+        nodes,
+        pageNo: 0,
+        hasNextPage: true,
+        hasPrevPage: false
+      };
+    },
     cityFilters: () => {
       return [];
     }

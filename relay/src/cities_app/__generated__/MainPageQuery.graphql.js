@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 51ef405b624831b58fe81f2ce0cafd0a
+ * @relayHash 811ac91869d76e7fea3b4e8138207db5
  */
 
 /* eslint-disable */
@@ -9,21 +9,20 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-import type { CitiesPaginationParametersPanel_params$ref } from "./CitiesPaginationParametersPanel_params.graphql";
-export type MainPageQueryVariables = {||};
+import type { CitiesPaginationListingPanel_cities$ref } from "./CitiesPaginationListingPanel_cities.graphql";
+import type { CitiesPaginationParametersPanel_metadata$ref } from "./CitiesPaginationParametersPanel_metadata.graphql";
+export type MainPageQueryVariables = {|
+  pageSize: number,
+  pageNo: number,
+|};
 export type MainPageQueryResponse = {|
   +citiesMetadata: ?{|
-    +$fragmentRefs: CitiesPaginationParametersPanel_params$ref
+    +$fragmentRefs: CitiesPaginationParametersPanel_metadata$ref
   |},
   +viewer: ?{|
-    +cityFilters: ?$ReadOnlyArray<{|
-      +id: string,
-      +name: string,
-    |}>,
-    +pinnedCityFilter: ?{|
-      +id: string,
-      +name: string,
-    |},
+    +citiesPaginationWithPinnedFilter: ?{|
+      +$fragmentRefs: CitiesPaginationListingPanel_cities$ref
+    |}
   |},
 |};
 export type MainPageQuery = {|
@@ -34,70 +33,78 @@ export type MainPageQuery = {|
 
 
 /*
-query MainPageQuery {
+query MainPageQuery(
+  $pageSize: Int!
+  $pageNo: Int!
+) {
   citiesMetadata {
-    ...CitiesPaginationParametersPanel_params
+    ...CitiesPaginationParametersPanel_metadata
   }
   viewer {
-    cityFilters {
-      id
-      name
-    }
-    pinnedCityFilter {
-      id
-      name
+    citiesPaginationWithPinnedFilter(pageNo: $pageNo, pageSize: $pageSize) {
+      ...CitiesPaginationListingPanel_cities_1eNWgj
     }
     id
   }
 }
 
-fragment CitiesPaginationParametersPanel_params on CitiesMetadata {
-  population_lower_bound
-  population_upper_bound
-  lat_lower_bound
-  lat_upper_bound
-  lng_lower_bound
-  lng_upper_bound
+fragment CitiesPaginationListingPanel_cities_1eNWgj on CitiesPagination {
+  nodes {
+    name
+    country
+    population
+    lat
+    lng
+    id
+  }
+  pageNo
+  hasNextPage
+  hasPrevPage
+}
+
+fragment CitiesPaginationParametersPanel_metadata on CitiesMetadata {
+  populationLowerBound
+  populationUpperBound
+  latLowerBound
+  latUpperBound
+  lngLowerBound
+  lngUpperBound
 }
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = {
+var v0 = [
+  {
+    "kind": "LocalArgument",
+    "name": "pageSize",
+    "type": "Int!",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "pageNo",
+    "type": "Int!",
+    "defaultValue": null
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "pageNo",
+    "variableName": "pageNo"
+  },
+  {
+    "kind": "Variable",
+    "name": "pageSize",
+    "variableName": "pageSize"
+  }
+],
+v2 = {
   "kind": "ScalarField",
   "alias": null,
   "name": "id",
   "args": null,
   "storageKey": null
-},
-v1 = [
-  (v0/*: any*/),
-  {
-    "kind": "ScalarField",
-    "alias": null,
-    "name": "name",
-    "args": null,
-    "storageKey": null
-  }
-],
-v2 = {
-  "kind": "LinkedField",
-  "alias": null,
-  "name": "cityFilters",
-  "storageKey": null,
-  "args": null,
-  "concreteType": "CityFilter",
-  "plural": true,
-  "selections": (v1/*: any*/)
-},
-v3 = {
-  "kind": "LinkedField",
-  "alias": null,
-  "name": "pinnedCityFilter",
-  "storageKey": null,
-  "args": null,
-  "concreteType": "CityFilter",
-  "plural": false,
-  "selections": (v1/*: any*/)
 };
 return {
   "kind": "Request",
@@ -106,7 +113,7 @@ return {
     "name": "MainPageQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
@@ -119,7 +126,7 @@ return {
         "selections": [
           {
             "kind": "FragmentSpread",
-            "name": "CitiesPaginationParametersPanel_params",
+            "name": "CitiesPaginationParametersPanel_metadata",
             "args": null
           }
         ]
@@ -133,8 +140,22 @@ return {
         "concreteType": "User",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
-          (v3/*: any*/)
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "citiesPaginationWithPinnedFilter",
+            "storageKey": null,
+            "args": (v1/*: any*/),
+            "concreteType": "CitiesPagination",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "FragmentSpread",
+                "name": "CitiesPaginationListingPanel_cities",
+                "args": (v1/*: any*/)
+              }
+            ]
+          }
         ]
       }
     ]
@@ -142,7 +163,7 @@ return {
   "operation": {
     "kind": "Operation",
     "name": "MainPageQuery",
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
@@ -156,42 +177,42 @@ return {
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "population_lower_bound",
+            "name": "populationLowerBound",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "population_upper_bound",
+            "name": "populationUpperBound",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "lat_lower_bound",
+            "name": "latLowerBound",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "lat_upper_bound",
+            "name": "latUpperBound",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "lng_lower_bound",
+            "name": "lngLowerBound",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "lng_upper_bound",
+            "name": "lngUpperBound",
             "args": null,
             "storageKey": null
           }
@@ -206,9 +227,86 @@ return {
         "concreteType": "User",
         "plural": false,
         "selections": [
-          (v2/*: any*/),
-          (v3/*: any*/),
-          (v0/*: any*/)
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "citiesPaginationWithPinnedFilter",
+            "storageKey": null,
+            "args": (v1/*: any*/),
+            "concreteType": "CitiesPagination",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "nodes",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "City",
+                "plural": true,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "name",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "country",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "population",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "lat",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "lng",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  (v2/*: any*/)
+                ]
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "pageNo",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "hasNextPage",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "hasPrevPage",
+                "args": null,
+                "storageKey": null
+              }
+            ]
+          },
+          (v2/*: any*/)
         ]
       }
     ]
@@ -217,11 +315,11 @@ return {
     "operationKind": "query",
     "name": "MainPageQuery",
     "id": null,
-    "text": "query MainPageQuery {\n  citiesMetadata {\n    ...CitiesPaginationParametersPanel_params\n  }\n  viewer {\n    cityFilters {\n      id\n      name\n    }\n    pinnedCityFilter {\n      id\n      name\n    }\n    id\n  }\n}\n\nfragment CitiesPaginationParametersPanel_params on CitiesMetadata {\n  population_lower_bound\n  population_upper_bound\n  lat_lower_bound\n  lat_upper_bound\n  lng_lower_bound\n  lng_upper_bound\n}\n",
+    "text": "query MainPageQuery(\n  $pageSize: Int!\n  $pageNo: Int!\n) {\n  citiesMetadata {\n    ...CitiesPaginationParametersPanel_metadata\n  }\n  viewer {\n    citiesPaginationWithPinnedFilter(pageNo: $pageNo, pageSize: $pageSize) {\n      ...CitiesPaginationListingPanel_cities_1eNWgj\n    }\n    id\n  }\n}\n\nfragment CitiesPaginationListingPanel_cities_1eNWgj on CitiesPagination {\n  nodes {\n    name\n    country\n    population\n    lat\n    lng\n    id\n  }\n  pageNo\n  hasNextPage\n  hasPrevPage\n}\n\nfragment CitiesPaginationParametersPanel_metadata on CitiesMetadata {\n  populationLowerBound\n  populationUpperBound\n  latLowerBound\n  latUpperBound\n  lngLowerBound\n  lngUpperBound\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '461e4c0d53c8b41f9ab1e8fab2127114';
+(node/*: any*/).hash = 'b0582c260f5d074e77e954cd9c58a006';
 module.exports = node;

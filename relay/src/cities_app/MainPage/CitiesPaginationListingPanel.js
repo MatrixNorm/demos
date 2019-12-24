@@ -9,7 +9,12 @@ export default createRefetchContainer(
   CitiesPaginationListingPanel,
   {
     cities: graphql`
-      fragment CitiesPaginationListingPanel_cities on CitiesPagination {
+      fragment CitiesPaginationListingPanel_cities on CitiesPagination
+        @argumentDefinitions(
+          pageNo: { type: "Int!" }
+          pageSize: { type: "Int!" }
+          searchParams: { type: "CitySearchParamsInput" }
+        ) {
         nodes {
           name
           country
@@ -29,7 +34,11 @@ export default createRefetchContainer(
       $pageSize: Int!
       $searchParams: CitySearchParamsInput
     ) {
-      citiesPagination {
+      citiesPagination(
+        pageNo: $pageNo
+        pageSize: $pageSize
+        searchParams: $searchParams
+      ) {
         ...CitiesPaginationListingPanel_cities
           @arguments(
             pageNo: $pageNo
