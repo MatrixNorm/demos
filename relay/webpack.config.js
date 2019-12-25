@@ -6,8 +6,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const builds = {};
-
 const baseBuild = ({ buildId }) => env => {
   const outputPath = env.development
     ? `jsdev/${buildId}`
@@ -41,13 +39,13 @@ const baseBuild = ({ buildId }) => env => {
       alias: {
         theapp: path.resolve(__dirname, `src/${buildId}/`),
         theproject: path.resolve(__dirname, `src/`)
-     }
+      }
     },
     module: {
       rules: [
         {
           test: /\.m?js$/,
-          exclude: /(node_modules|__cljs__)/,
+          exclude: /node_modules/,
           use: {
             loader: "babel-loader",
             options: {
@@ -89,6 +87,6 @@ const baseBuild = ({ buildId }) => env => {
 
 module.exports = env => {
   const buildId = process.env.JS_BUILD_ID;
-  const build = baseBuild({ buildId })
+  const build = baseBuild({ buildId });
   return build(env);
 };

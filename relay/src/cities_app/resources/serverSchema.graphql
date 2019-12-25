@@ -15,13 +15,17 @@ type Query {
     searchParams: CitySearchParamsInput
   ): CitiesPagination
   citiesMetadata: CitiesMetadata
+  countries(searchString: String): [String!]
 }
 
 type User implements Node {
   id: ID!
   cityFilters: [CityFilter!]
   pinnedCityFilter: CityFilter
-  citiesPaginationWithPinnedFilter(pageNo: Int!, pageSize: Int!): CitiesPagination
+  citiesPaginationWithPinnedFilter(
+    pageNo: Int!
+    pageSize: Int!
+  ): CitiesPagination
 }
 
 type CitiesPagination {

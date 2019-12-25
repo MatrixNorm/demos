@@ -1,8 +1,15 @@
 import { createFragmentContainer, graphql } from "react-relay";
 import React from "react";
 
-function CitiesPaginationParametersPanel({ metadata }) {
-  return <div>{JSON.stringify(metadata)}</div>;
+import Main from "./SelectCountryWidget";
+
+function CitiesPaginationParametersPanel({ metadata, relay }) {
+  console.log(relay);
+  return (
+    <div>
+      <Main relayEnvironment={relay.environment} />
+    </div>
+  );
 }
 
 export default createFragmentContainer(CitiesPaginationParametersPanel, {

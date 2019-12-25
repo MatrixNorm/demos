@@ -3,6 +3,7 @@ import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
 // window.a2 = a2
 
 const cities = JSON.parse(citiesTxt);
+const countries = [...new Set(cities.map(i => i.country))];
 
 export const serverResolvers = {
   Query: {
@@ -33,6 +34,11 @@ export const serverResolvers = {
         lngLowerBound: 9.47,
         lngUpperBound: 78.25
       };
+    },
+    countries: (_, { searchString }) => {
+      return countries
+        .filter(c => c.toLowerCase().includes(searchString))
+        .slice(0, 5);
     }
   },
   Node: {
