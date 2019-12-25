@@ -1,7 +1,7 @@
 import { assign } from "xstate";
 
-export const machineDef = () => ({
-  id: "suggestionMachine",
+export const machineDef = ({ machineId }) => ({
+  id: machineId,
   context: {
     inputValue: "",
     items: null,

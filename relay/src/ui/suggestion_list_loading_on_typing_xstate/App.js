@@ -17,9 +17,8 @@ const keyCodeToEventTypeMap = {
 
 const SendContext = React.createContext();
 
-export default function App({ service }) {
-  console.log("render: App");
-  const [current, send] = useService(service);
+export default function App({ current, send }) {
+  //const [current, send] = useService(service);
 
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];
@@ -60,7 +59,6 @@ const Error = ({ errorMsg }) => {
 };
 
 const Ok = ({ state }) => {
-  console.log("render: RequestOk");
   const send = useContext(SendContext);
   return (
     <div>
@@ -82,7 +80,6 @@ const Ok = ({ state }) => {
 };
 
 const Item = React.memo(function Item({ text, index, isPointed }) {
-  console.log("render: ListItem", text, isPointed);
   const send = useContext(SendContext);
   return (
     <li

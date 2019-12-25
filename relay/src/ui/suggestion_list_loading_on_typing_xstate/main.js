@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useMemo } from "react";
 import ReactDOM from "react-dom";
 import { Machine, interpret } from "xstate";
+import { useService } from "@xstate/react";
 import styled from "styled-components";
 import App from "./App";
 import { machineDef } from "./machine";
@@ -25,7 +26,7 @@ const fetchItems = function(query) {
   });
 };
 
-const machine = Machine(machineDef(), {
+const machine = Machine(machineDef({ machineId: "suggestionMachine" }), {
   services: {
     fetchService: ctx => fetchItems(ctx.inputValue)
   },
@@ -40,15 +41,22 @@ const machine = Machine(machineDef(), {
   }
 });
 
-const service = interpret(machine).onTransition(state => {
-  console.log(state.value);
-});
-service.start();
-//window.service = service;
+function Main() {
+  const service = useMemo(() => {
+    const service = interpret(machine).onTransition(state => {
+      console.log(state);
+    });
+    service.start();
+    return service;
+  }, []);
 
-ReactDOM.render(
-  <WithStyle>
-    <App service={service} />
-  </WithStyle>,
-  document.getElementById("app")
-);
+  const [current, send] = useService(service);
+
+  return (
+    <WithStyle>
+      <App current={current} send={send} />
+    </WithStyle>
+  );
+}
+
+ReactDOM.render(<Main />, document.getElementById("app"));
