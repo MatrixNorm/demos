@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { useService } from "@xstate/react";
-import styled from "styled-components";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
@@ -18,17 +17,6 @@ const keyCodeToEventTypeMap = {
 
 const SendContext = React.createContext();
 
-const WithStyle = styled.div`
-  .suggestions-list {
-    padding: 0;
-    margin: 0;
-  }
-
-  [data-is_pointed="true"] {
-    background-color: #7cbd67;
-  }
-`;
-
 export default function App({ service }) {
   console.log("render: App");
   const [current, send] = useService(service);
@@ -39,23 +27,21 @@ export default function App({ service }) {
   }
 
   return (
-    <WithStyle>
-      <div>
-        <input
-          value={current.context.inputValue}
-          onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
-          onKeyDown={handleKeyDown}
-          onBlur={() => send({ type: "CLOSE_LIST" })}
-        />
-        <SendContext.Provider value={send}>
-          {current.matches("working.loading") && <Loading />}
-          {current.matches("working.error") && (
-            <Error errorMsg={current.context.errorMsg} />
-          )}
-          {current.matches("working.ok") && <Ok state={current.context} />}
-        </SendContext.Provider>
-      </div>
-    </WithStyle>
+    <div>
+      <input
+        value={current.context.inputValue}
+        onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
+        onKeyDown={handleKeyDown}
+        onBlur={() => send({ type: "CLOSE_LIST" })}
+      />
+      <SendContext.Provider value={send}>
+        {current.matches("working.loading") && <Loading />}
+        {current.matches("working.error") && (
+          <Error errorMsg={current.context.errorMsg} />
+        )}
+        {current.matches("working.ok") && <Ok state={current.context} />}
+      </SendContext.Provider>
+    </div>
   );
 }
 

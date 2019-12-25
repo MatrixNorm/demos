@@ -30,11 +30,11 @@ export default function MainPage() {
             <div>
               <CitiesPaginationParametersPanel metadata={props.citiesMetadata} />
             </div>
-            <div>
+            {/*<div>
               <CitiesPaginationListingPanel
                 cities={props.viewer.citiesPaginationWithPinnedFilter}
               />
-            </div>
+            </div>*/}
           </div>
         );
       }}

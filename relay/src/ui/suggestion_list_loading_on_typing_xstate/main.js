@@ -1,8 +1,20 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Machine, interpret } from "xstate";
+import styled from "styled-components";
 import App from "./App";
 import { machineDef } from "./machine";
+
+const WithStyle = styled.div`
+  .suggestions-list {
+    padding: 0;
+    margin: 0;
+  }
+
+  [data-is_pointed="true"] {
+    background-color: #7cbd67;
+  }
+`;
 
 const fetchItems = function(query) {
   return new Promise(resolve => {
@@ -34,4 +46,9 @@ const service = interpret(machine).onTransition(state => {
 service.start();
 //window.service = service;
 
-ReactDOM.render(<App service={service} />, document.getElementById("app"));
+ReactDOM.render(
+  <WithStyle>
+    <App service={service} />
+  </WithStyle>,
+  document.getElementById("app")
+);
