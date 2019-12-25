@@ -18,18 +18,9 @@ const WithStyle = styled.div`
   }
 `;
 
-const fetchItems = function(query) {
-  return new Promise(resolve => {
-    setTimeout(
-      () => resolve({ items: [...Array(5).keys()].map(i => `${query}${i}`) }),
-      1000
-    );
-  });
-};
-
 const machine = Machine(machineDef({ machineId: "suggestionMachine" }), {
   services: {
-    fetchService: ctx => fetchItems(ctx.inputValue)
+    fetchService: () => new Promise(r => r)
   },
   guards: {
     isQueryValid: ctx => {
@@ -42,11 +33,16 @@ const machine = Machine(machineDef({ machineId: "suggestionMachine" }), {
   }
 });
 
-export const a1 = () => {
+function createService() {
   const service = interpret(machine, {
     clock: new SimulatedClock()
   });
   service.start();
+  return service;
+}
+
+export const idle = () => {
+  const service = createService();
   service.send({ type: "TYPING", inputValue: "abc" });
   return (
     <WithStyle>
@@ -55,11 +51,8 @@ export const a1 = () => {
   );
 };
 
-export const a2 = () => {
-  const service = interpret(machine, {
-    clock: new SimulatedClock()
-  });
-  service.start();
+export const loading = () => {
+  const service = createService();
   service.send({ type: "TYPING", inputValue: "abc" });
   service.send({
     type: "xstate.after(TYPING_DEBOUNCE_DELAY)#suggestionMachine.typing"
@@ -71,15 +64,64 @@ export const a2 = () => {
   );
 };
 
-export const a3 = () => {
-  const service = interpret(machine, {
-    clock: new SimulatedClock()
-  });
-  service.start();
+export const invalidQuery = () => {
+  const service = createService();
   service.send({ type: "TYPING", inputValue: "123" });
   service.send({
     type: "xstate.after(TYPING_DEBOUNCE_DELAY)#suggestionMachine.typing"
   });
+  return (
+    <WithStyle>
+      <App current={service.state} send={() => {}} />
+    </WithStyle>
+  );
+};
+
+export const fetchOk = () => {
+  const service = createService();
+  service.send({ type: "TYPING", inputValue: "abc" });
+  service.send({
+    type: "xstate.after(TYPING_DEBOUNCE_DELAY)#suggestionMachine.typing"
+  });
+  service.send({
+    type: "done.invoke.fetchService",
+    data: { items: ["aaa", "bbb", "ccc", "ddd", "eee"] }
+  });
+  return (
+    <WithStyle>
+      <App current={service.state} send={() => {}} />
+    </WithStyle>
+  );
+};
+
+export const fetchError = () => {
+  const service = createService();
+  service.send({ type: "TYPING", inputValue: "abc" });
+  service.send({
+    type: "xstate.after(TYPING_DEBOUNCE_DELAY)#suggestionMachine.typing"
+  });
+  service.send({
+    type: "error.platform.fetchService",
+    data: { errorMsg: "Network Error" }
+  });
+  return (
+    <WithStyle>
+      <App current={service.state} send={() => {}} />
+    </WithStyle>
+  );
+};
+
+export const selectedItem = () => {
+  const service = createService();
+  service.send({ type: "TYPING", inputValue: "abc" });
+  service.send({
+    type: "xstate.after(TYPING_DEBOUNCE_DELAY)#suggestionMachine.typing"
+  });
+  service.send({
+    type: "done.invoke.fetchService",
+    data: { items: ["aaa", "bbb", "ccc", "ddd", "eee"] }
+  });
+  service.send({ type: "MOUSE_ENTERED_ITEM", itemIndex: 3 });
   return (
     <WithStyle>
       <App current={service.state} send={() => {}} />
