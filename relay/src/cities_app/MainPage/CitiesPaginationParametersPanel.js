@@ -1,13 +1,22 @@
 import { createFragmentContainer, graphql } from "react-relay";
 import React from "react";
 
-import Main from "./SelectCountryWidget";
+import SelectCountryWidget from "./SelectCountryWidget";
+import SelectPopulationWidget from "./SelectPopulationWidget";
 
-function CitiesPaginationParametersPanel({ metadata, relay }) {
-  console.log(relay);
+function CitiesPaginationParametersPanel({ metadata, relay, dispatch }) {
   return (
     <div>
-      <Main relayEnvironment={relay.environment} />
+      <SelectCountryWidget
+        relayEnv={relay.environment}
+        onNewValue={value => dispatch({ field: "country", value })}
+      />
+      <SelectPopulationWidget
+        relayEnv={relay.environment}
+        onNewValue={value => dispatch({ field: "pupulation", value })}
+        minRange={metadata.populationLowerBound}
+        maxRange={metadata.populationUpperBound}
+      />
     </div>
   );
 }

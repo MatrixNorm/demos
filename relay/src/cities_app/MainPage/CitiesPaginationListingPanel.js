@@ -1,7 +1,7 @@
 import { createRefetchContainer, graphql } from "react-relay";
 import React from "react";
 
-function CitiesPaginationListingPanel({ cities }) {
+function CitiesPaginationListingPanel({ cities, relay }) {
   return <div>{JSON.stringify(cities)}</div>;
 }
 
