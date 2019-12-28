@@ -1,8 +1,9 @@
-import React, { useReducer } from "react";
+import React, { useEffect, useReducer, useRef } from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import environment from "theapp/env";
 import CitiesPaginationParametersPanel from "./CitiesPaginationParametersPanel";
 import CitiesPaginationListingPanel from "./CitiesPaginationListingPanel";
+import CitiesPaginationListingPanelWithQR from "./CitiesPaginationListingPanelWithQR";
 
 export default function MainPage() {
   return (
@@ -12,14 +13,9 @@ export default function MainPage() {
           citiesMetadata {
             ...CitiesPaginationParametersPanel_metadata
           }
-          viewer {
-            citiesPaginationWithPinnedFilter(
-              pageNo: $pageNo
-              pageSize: $pageSize
-            ) {
-              ...CitiesPaginationListingPanel_cities
-                @arguments(pageNo: $pageNo, pageSize: $pageSize)
-            }
+          citiesPagination(pageNo: $pageNo, pageSize: $pageSize) {
+            ...CitiesPaginationListingPanel_cities
+              @arguments(pageNo: $pageNo, pageSize: $pageSize)
           }
         }
       `}
@@ -35,17 +31,26 @@ export default function MainPage() {
 }
 
 function Inner({ props }) {
-  const [uiState, dispatch] = useReducer({ filters: null });
+  const isInitialRender = useRef(true);
+  const [uiState, dispatch] = useReducer({ searchParams: null });
+
+  useEffect(() => {
+    isInitialRender.current = false;
+  }, []);
+
   return (
     <div>
       <CitiesPaginationParametersPanel
         metadata={props.citiesMetadata}
         dispatch={dispatch}
       />
-      <CitiesPaginationListingPanel
-        cities={props.viewer.citiesPaginationWithPinnedFilter}
-        filters={uiState.filters}
-      />
+      {isInitialRender ? (
+        <CitiesPaginationListingPanel cities={props.citiesPagination} />
+      ) : (
+        <CitiesPaginationListingPanelWithQR
+          searchParams={uiState.searchParams}
+        />
+      )}
     </div>
   );
 }

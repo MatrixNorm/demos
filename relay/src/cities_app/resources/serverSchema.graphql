@@ -20,12 +20,6 @@ type Query {
 
 type User implements Node {
   id: ID!
-  cityFilters: [CityFilter!]
-  pinnedCityFilter: CityFilter
-  citiesPaginationWithPinnedFilter(
-    pageNo: Int!
-    pageSize: Int!
-  ): CitiesPagination
 }
 
 type CitiesPagination {
