@@ -1,9 +1,16 @@
 import React, { useEffect, useReducer, useRef } from "react";
 import { QueryRenderer, graphql } from "react-relay";
+import styled from "styled-components";
 import environment from "theapp/env";
 import CitiesPaginationParametersPanel from "./CitiesPaginationParametersPanel";
 import CitiesPaginationListingPanel from "./CitiesPaginationListingPanel";
 import CitiesPaginationListingPanelWithQR from "./CitiesPaginationListingPanelWithQR";
+
+const WithStyle = styled.div`
+  .main-page {
+    display: flex;
+  }
+`;
 
 export default function MainPage() {
   return (
@@ -39,18 +46,21 @@ function Inner({ props }) {
   }, []);
 
   return (
-    <div>
-      <CitiesPaginationParametersPanel
-        metadata={props.citiesMetadata}
-        dispatch={dispatch}
-      />
-      {isInitialRender ? (
-        <CitiesPaginationListingPanel cities={props.citiesPagination} />
-      ) : (
-        <CitiesPaginationListingPanelWithQR
-          searchParams={uiState.searchParams}
+    <WithStyle>
+      <div className="main-page">
+        <CitiesPaginationParametersPanel
+          metadata={props.citiesMetadata}
+          dispatch={dispatch}
         />
-      )}
-    </div>
+        {isInitialRender ? (
+          <CitiesPaginationListingPanel cities={props.citiesPagination} />
+        ) : (
+          <CitiesPaginationListingPanelWithQR
+            searchParams={uiState.searchParams}
+            relayEnv={environment}
+          />
+        )}
+      </div>
+    </WithStyle>
   );
 }

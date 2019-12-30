@@ -1,0 +1,24 @@
+interface Node {
+  id: ID!
+}
+
+type Person implements Node {
+  id: ID!
+  name: String!
+  address: Address!
+}
+
+type Address implements Node {
+  id: ID!
+  city: City!
+  state: String!
+}
+
+type City implements Node {
+  id: ID!
+  name: String! 
+}
+
+type Query {
+  persons: [Person!]
+}

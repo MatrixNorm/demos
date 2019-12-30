@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 258c2fc42dc6afa1536a351cd80202f7
+ * @relayHash 9c223b56abcc9364f98490a1ec552caa
  */
 
 /* eslint-disable */
@@ -18,25 +18,25 @@ export type CitySearchParamsInput = {|
   populationLte?: ?number,
   ordering?: ?CitiesOrderAttr,
 |};
-export type CitiesPaginationListingPanelRefetchQueryVariables = {|
+export type CitiesPaginationListingPanelWithQRQueryVariables = {|
   pageNo: number,
   pageSize: number,
   searchParams?: ?CitySearchParamsInput,
 |};
-export type CitiesPaginationListingPanelRefetchQueryResponse = {|
+export type CitiesPaginationListingPanelWithQRQueryResponse = {|
   +citiesPagination: ?{|
     +$fragmentRefs: CitiesPaginationListingPanel_cities$ref
   |}
 |};
-export type CitiesPaginationListingPanelRefetchQuery = {|
-  variables: CitiesPaginationListingPanelRefetchQueryVariables,
-  response: CitiesPaginationListingPanelRefetchQueryResponse,
+export type CitiesPaginationListingPanelWithQRQuery = {|
+  variables: CitiesPaginationListingPanelWithQRQueryVariables,
+  response: CitiesPaginationListingPanelWithQRQueryResponse,
 |};
 */
 
 
 /*
-query CitiesPaginationListingPanelRefetchQuery(
+query CitiesPaginationListingPanelWithQRQuery(
   $pageNo: Int!
   $pageSize: Int!
   $searchParams: CitySearchParamsInput
@@ -48,12 +48,12 @@ query CitiesPaginationListingPanelRefetchQuery(
 
 fragment CitiesPaginationListingPanel_cities_2NHXxp on CitiesPagination {
   nodes {
+    id
     name
     country
     population
     lat
     lng
-    id
   }
   pageNo
   hasNextPage
@@ -103,7 +103,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "CitiesPaginationListingPanelRefetchQuery",
+    "name": "CitiesPaginationListingPanelWithQRQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
@@ -128,7 +128,7 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "CitiesPaginationListingPanelRefetchQuery",
+    "name": "CitiesPaginationListingPanelWithQRQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
@@ -149,6 +149,13 @@ return {
             "concreteType": "City",
             "plural": true,
             "selections": [
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "id",
+                "args": null,
+                "storageKey": null
+              },
               {
                 "kind": "ScalarField",
                 "alias": null,
@@ -183,13 +190,6 @@ return {
                 "name": "lng",
                 "args": null,
                 "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "id",
-                "args": null,
-                "storageKey": null
               }
             ]
           },
@@ -220,13 +220,13 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "CitiesPaginationListingPanelRefetchQuery",
+    "name": "CitiesPaginationListingPanelWithQRQuery",
     "id": null,
-    "text": "query CitiesPaginationListingPanelRefetchQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    ...CitiesPaginationListingPanel_cities_2NHXxp\n  }\n}\n\nfragment CitiesPaginationListingPanel_cities_2NHXxp on CitiesPagination {\n  nodes {\n    name\n    country\n    population\n    lat\n    lng\n    id\n  }\n  pageNo\n  hasNextPage\n  hasPrevPage\n}\n",
+    "text": "query CitiesPaginationListingPanelWithQRQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    ...CitiesPaginationListingPanel_cities_2NHXxp\n  }\n}\n\nfragment CitiesPaginationListingPanel_cities_2NHXxp on CitiesPagination {\n  nodes {\n    id\n    name\n    country\n    population\n    lat\n    lng\n  }\n  pageNo\n  hasNextPage\n  hasPrevPage\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '1790ff84cb633c2a45fb743f98738ace';
+(node/*: any*/).hash = '8863e2260e5039b7ca93c115245a00c5';
 module.exports = node;

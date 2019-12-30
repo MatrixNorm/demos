@@ -47,20 +47,5 @@ export const serverResolvers = {
       return node;
     }
   },
-  User: {
-    citiesPaginationWithPinnedFilter: () => {
-      let pageSize = 5;
-      let j = Math.floor(Math.random() * cities.length);
-      let nodes = cities.slice(j, j + pageSize);
-      return {
-        nodes,
-        pageNo: 0,
-        hasNextPage: true,
-        hasPrevPage: false
-      };
-    },
-    cityFilters: () => {
-      return [];
-    }
-  }
+  User: {}
 };

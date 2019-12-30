@@ -9,7 +9,7 @@ export default function CitiesPaginationListingPanelWithQR({
   return (
     <QueryRenderer
       query={graphql`
-        query CitiesPaginationListingPanelWithQR(
+        query CitiesPaginationListingPanelWithQRQuery(
           $pageNo: Int!
           $pageSize: Int!
           $searchParams: CitySearchParamsInput
@@ -25,16 +25,6 @@ export default function CitiesPaginationListingPanelWithQR({
                 pageSize: $pageSize
                 searchParams: $searchParams
               )
-            nodes {
-              name
-              country
-              population
-              lat
-              lng
-            }
-            pageNo
-            hasNextPage
-            hasPrevPage
           }
         }
       `}

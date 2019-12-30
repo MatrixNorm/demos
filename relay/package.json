@@ -22,9 +22,9 @@
     "preact-render-to-string": "^3.6.3",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-relay": "^7.0.0",
+    "react-relay": "^7.1.0",
     "react-router-dom": "^5.1.2",
-    "relay-compiler": "^7.0.0",
+    "relay-compiler": "^7.1.0",
     "styled-components": "^4.4.1",
     "xstate": "^4.7.3"
   },

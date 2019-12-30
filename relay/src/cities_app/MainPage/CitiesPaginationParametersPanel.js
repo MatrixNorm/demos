@@ -6,7 +6,7 @@ import SelectPopulationWidget from "./SelectPopulationWidget";
 
 function CitiesPaginationParametersPanel({ metadata, relay, dispatch }) {
   return (
-    <div>
+    <div className="cities-pagination-parameters-panel">
       <SelectCountryWidget
         relayEnv={relay.environment}
         onNewValue={value => dispatch({ field: "country", value })}

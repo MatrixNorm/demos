@@ -13,6 +13,7 @@ declare export opaque type CitiesPaginationListingPanel_cities$ref: FragmentRefe
 declare export opaque type CitiesPaginationListingPanel_cities$fragmentType: CitiesPaginationListingPanel_cities$ref;
 export type CitiesPaginationListingPanel_cities = {|
   +nodes: ?$ReadOnlyArray<{|
+    +id: string,
     +name: string,
     +country: string,
     +population: number,
@@ -67,6 +68,13 @@ const node/*: ReaderFragment*/ = {
       "concreteType": "City",
       "plural": true,
       "selections": [
+        {
+          "kind": "ScalarField",
+          "alias": null,
+          "name": "id",
+          "args": null,
+          "storageKey": null
+        },
         {
           "kind": "ScalarField",
           "alias": null,
@@ -128,5 +136,5 @@ const node/*: ReaderFragment*/ = {
   ]
 };
 // prettier-ignore
-(node/*: any*/).hash = '05ccb092a9bf1bbe7db6a4b60186692a';
+(node/*: any*/).hash = 'd721d4c8bbb7998f0a7dd7461445c912';
 module.exports = node;
