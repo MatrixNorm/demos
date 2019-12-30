@@ -1,4 +1,10 @@
-import { Environment, Network, RecordSource, Store } from "relay-runtime";
+import {
+  commitLocalUpdate,
+  Environment,
+  Network,
+  RecordSource,
+  Store
+} from "relay-runtime";
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import serverSchemaTxt from "raw-loader!theapp/resources/serverSchema.graphql";
@@ -24,6 +30,24 @@ const network = Network.create(async (operation, variables) => {
 
 const store = new Store(new RecordSource());
 const environment = new Environment({ network, store });
+
+commitLocalUpdate(environment, store => {
+  const uiStateId = "client:UIState";
+  const uiState = store.create(uiStateId, "UIState");
+
+  const citySearchParams = store.create(
+    "client:CitySearchParams",
+    "CitySearchParams"
+  );
+  uiState.setLinkedRecord(citySearchParams, "citySearchParams");
+
+  environment.retain({
+    uiStateId,
+    variables: {},
+    node: { selections: [] }
+  });
+  store.getRoot().setLinkedRecord(uiState, "uiState");
+});
 
 window.relayEnv = environment;
 export default environment;

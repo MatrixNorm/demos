@@ -1,7 +1,7 @@
 // @flow
 
 import React from "react";
-import { QueryRenderer, graphql } from "react-relay";
+import { LocalQueryRenderer, graphql } from "react-relay";
 import environment from "./env";
 
 const openStyles = {
@@ -14,7 +14,7 @@ const closedStyles = {
 
 function Drawer() {
   return (
-    <QueryRenderer
+    <LocalQueryRenderer
       environment={environment}
       query={graphql`
         query DrawerQuery {

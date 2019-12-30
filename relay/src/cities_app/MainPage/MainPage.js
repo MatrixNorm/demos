@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import styled from "styled-components";
 import environment from "theapp/env";
@@ -39,7 +39,6 @@ export default function MainPage() {
 
 function Inner({ props }) {
   const isInitialRender = useRef(true);
-  const [uiState, dispatch] = useReducer({ searchParams: null });
 
   useEffect(() => {
     isInitialRender.current = false;
@@ -48,10 +47,7 @@ function Inner({ props }) {
   return (
     <WithStyle>
       <div className="main-page">
-        <CitiesPaginationParametersPanel
-          metadata={props.citiesMetadata}
-          dispatch={dispatch}
-        />
+        <CitiesPaginationParametersPanel metadata={props.citiesMetadata} />
         {isInitialRender ? (
           <CitiesPaginationListingPanel cities={props.citiesPagination} />
         ) : (

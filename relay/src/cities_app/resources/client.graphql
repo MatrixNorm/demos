@@ -1,0 +1,13 @@
+extend type Query {
+  uiState: UIState!
+}
+
+type UIState {
+  citySearchParams: CitySearchParams
+}
+
+type CitySearchParams {
+  country: String
+  populationUpperBound: Int
+  populationLowerBound: Int
+}

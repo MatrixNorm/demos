@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash ef25ce3b4b2033932982287f8d2dfa1f
+ * @relayHash 0692cf18600db1363b324ee3490d46a0
  */
 
 /* eslint-disable */
@@ -9,22 +9,22 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type MainyQueryVariables = {||};
-export type MainyQueryResponse = {|
+export type MainSectionQueryVariables = {||};
+export type MainSectionQueryResponse = {|
   +__typename: string,
   +settings: {|
     +isDrawerOpen: boolean
   |},
 |};
-export type MainyQuery = {|
-  variables: MainyQueryVariables,
-  response: MainyQueryResponse,
+export type MainSectionQuery = {|
+  variables: MainSectionQueryVariables,
+  response: MainSectionQueryResponse,
 |};
 */
 
 
 /*
-query MainyQuery {
+query MainSectionQuery {
   __typename
 }
 */
@@ -66,7 +66,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "MainyQuery",
+    "name": "MainSectionQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": [],
@@ -74,19 +74,19 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "MainyQuery",
+    "name": "MainSectionQuery",
     "argumentDefinitions": [],
     "selections": (v0/*: any*/)
   },
   "params": {
     "operationKind": "query",
-    "name": "MainyQuery",
+    "name": "MainSectionQuery",
     "id": null,
-    "text": "query MainyQuery {\n  __typename\n}\n",
+    "text": "query MainSectionQuery {\n  __typename\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '032c64924fd490e733ef74a04e348736';
+(node/*: any*/).hash = 'adb81f9a1b8a071ec657f4b632556d0f';
 module.exports = node;

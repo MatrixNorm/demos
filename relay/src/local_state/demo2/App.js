@@ -3,14 +3,14 @@
 import React from "react";
 import Header from "./Header";
 import Drawer from "./Drawer";
-import Mainy from "./Mainy";
+import MainSection from "./MainSection";
 
 function App() {
   return (
     <>
       <Header />
       <Drawer />
-      <Mainy />
+      <MainSection />
     </>
   );
 }
