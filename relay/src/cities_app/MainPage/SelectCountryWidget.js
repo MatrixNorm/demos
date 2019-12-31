@@ -1,4 +1,5 @@
-import { fetchQuery, graphql } from "relay-runtime";
+import { fetchQuery } from "relay-runtime";
+import { createFragmentContainer, graphql } from "react-relay";
 import React, { useMemo } from "react";
 import { Machine, interpret } from "xstate";
 import { useService } from "@xstate/react";
@@ -17,16 +18,16 @@ const WithStyle = styled.div`
   }
 `;
 
-const query = graphql`
-  query SelectCountryWidgetQuery($searchString: String) {
-    countries(searchString: $searchString)
-  }
-`;
-
-export default function Main({ relayEnvironment }) {
+function SelectCountryWidget({ value, relay }) {
   const service = useMemo(() => {
+    const query = graphql`
+      query SelectCountryWidgetQuery($searchString: String) {
+        countries(searchString: $searchString)
+      }
+    `;
+
     const fetchItems = function(searchString) {
-      return fetchQuery(relayEnvironment, query, { searchString }).then(
+      return fetchQuery(relay.environment, query, { searchString }).then(
         data => {
           return { items: data.countries };
         }
@@ -58,3 +59,11 @@ export default function Main({ relayEnvironment }) {
     </WithStyle>
   );
 }
+
+export default createFragmentContainer(SelectCountryWidget, {
+  value: graphql`
+    fragment SelectCountryWidget_value on CitySearchParams {
+      country
+    }
+  `
+});

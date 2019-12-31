@@ -8,6 +8,6 @@ type UIState {
 
 type CitySearchParams {
   country: String
-  populationUpperBound: Int
-  populationLowerBound: Int
+  populationUpper: Int
+  populationLower: Int
 }

@@ -1,84 +1,75 @@
 import React from "react";
-import {
-  createFragmentContainer,
-  graphql,
-  LocalQueryRenderer
-} from "react-relay";
+import { graphql, QueryRenderer } from "react-relay";
 import { commitLocalUpdate } from "relay-runtime";
+import environment from "theapp/env";
 import SelectCountryWidget from "./SelectCountryWidget";
 import SelectPopulationWidget from "./SelectPopulationWidget";
 
-function CitiesPaginationParametersPanel({ metadata, relay }) {
-  function onCountryUpdate(country) {
-    commitLocalUpdate(relay.environment, store => {
-      const citySearchParams = store.get('client:CitySearchParams');
-      citySearchParams.setValue(country, "country");
-    });
-  }
-
-  function onPopulationUpdate([lower, upper]) {
-    commitLocalUpdate(relay.environment, store => {
-      const citySearchParams = store.get('client:CitySearchParams');
-      citySearchParams.setValue(lower, "populationLowerBound");
-      citySearchParams.setValue(upper, "populationUpperBound");
-    });
-  }
-
+export default function CitiesPaginationParametersPanel() {
   return (
-    <LocalQueryRenderer
-      environment={relay.environment}
+    <QueryRenderer
       query={graphql`
         query CitiesPaginationParametersPanelQuery {
-          __typename
+          citiesMetadata {
+            ...SelectPopulationWidget_meta
+          }
           uiState {
             citySearchParams {
-              country
-              populationUpperBound
-              populationLowerBound
+              ...SelectCountryWidget_value
+              ...SelectPopulationWidget_value
             }
           }
         }
       `}
+      environment={environment}
       variables={{}}
       render={({ error, props }) => {
-        if (error) {
-          return <p>oops..</p>;
-        }
-        if (!props) return null;
-
+        if (error) throw error;
+        if (!props) return <h3>loading...</h3>;
         return (
-          <div className="cities-pagination-parameters-panel">
-            <SelectCountryWidget
-              initialValue={props.uiState.citySearchParams.country}
-              relayEnv={relay.environment}
-              onNewValue={onCountryUpdate}
-            />
-            <SelectPopulationWidget
-              initialValue={[
-                props.uiState.citySearchParams.populationUpperBound,
-                props.uiState.citySearchParams.populationLowerBound
-              ]}
-              relayEnv={relay.environment}
-              onNewValue={onPopulationUpdate}
-              minRange={metadata.populationLowerBound}
-              maxRange={metadata.populationUpperBound}
-            />
-          </div>
+          <Inner
+            metadata={props.citiesMetadata}
+            searchParams={props.uiState.citySearchParams}
+          />
         );
       }}
     />
   );
 }
 
-export default createFragmentContainer(CitiesPaginationParametersPanel, {
-  metadata: graphql`
-    fragment CitiesPaginationParametersPanel_metadata on CitiesMetadata {
-      populationLowerBound
-      populationUpperBound
-      latLowerBound
-      latUpperBound
-      lngLowerBound
-      lngUpperBound
-    }
-  `
-});
+function Inner({ metadata, searchParams, relay }) {
+  function onCountryUpdate(country) {
+    commitLocalUpdate(relay.environment, store => {
+      const citySearchParams = store.get("client:CitySearchParams");
+      citySearchParams.setValue(country, "country");
+    });
+  }
+
+  function onPopulationUpdate([lower, upper]) {
+    commitLocalUpdate(relay.environment, store => {
+      const citySearchParams = store.get("client:CitySearchParams");
+      citySearchParams.setValue(lower, "populationLowerBound");
+      citySearchParams.setValue(upper, "populationUpperBound");
+    });
+  }
+
+  return (
+    <div>
+      <SelectCountryWidget
+        initialValue={searchParams.country}
+        relayEnv={relay.environment}
+        onNewValue={onCountryUpdate}
+      />
+      <SelectPopulationWidget
+        initialValue={[
+          searchParams.populationUpperBound,
+          searchParams.populationLowerBound
+        ]}
+        relayEnv={relay.environment}
+        onNewValue={onPopulationUpdate}
+        minRange={metadata.populationLowerBound}
+        maxRange={metadata.populationUpperBound}
+      />
+    </div>
+  );
+}
