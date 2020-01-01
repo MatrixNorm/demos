@@ -15,9 +15,19 @@ export const serverResolvers = {
       return { id };
     },
     citiesPagination: (_, args) => {
+      console.log("citiesPagination: ", args);
+      let nodes;
       let pageSize = 5;
-      let j = Math.floor(Math.random() * cities.length);
-      let nodes = cities.slice(j, j + pageSize);
+      let { country } = args.searchParams;
+      if (country) {
+        nodes = cities
+          .filter(city => city.country === country)
+          .slice(0, pageSize);
+      } else {
+        let j = Math.floor(Math.random() * cities.length);
+        nodes = cities.slice(j, j + pageSize);
+      }
+
       return {
         nodes,
         pageNo: 0,

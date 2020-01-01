@@ -1,7 +1,7 @@
 import React from "react";
 import { LocalQueryRenderer, graphql } from "react-relay";
 import environment from "theapp/env";
-//import CitiesPaginationListingPanelInner from "./CitiesPaginationListingPanelInner";
+import CitiesPaginationListingPanelInner from "./CitiesPaginationListingPanelInner";
 
 export default function CitiesPaginationListingPanel() {
   console.log("CitiesPaginationListingPanel");
@@ -22,7 +22,12 @@ export default function CitiesPaginationListingPanel() {
       render={({ error, props }) => {
         if (error) <h3>{error}</h3>;
         if (!props) return null;
-        return <div>{props.uiState.citySearchParams.country}</div>;
+        return (
+          <CitiesPaginationListingPanelInner
+            searchParams={props.uiState.citySearchParams}
+            relayEnv={environment}
+          />
+        );
       }}
     />
   );

@@ -20,12 +20,7 @@ export default function CitiesPaginationListingPanelInner({
             pageSize: $pageSize
             searchParams: $searchParams
           ) {
-            ...CitiesPaginationListingPanel_cities
-              @arguments(
-                pageNo: $pageNo
-                pageSize: $pageSize
-                searchParams: $searchParams
-              )
+            ...CitiesPagination_cities
           }
         }
       `}

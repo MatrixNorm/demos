@@ -49,12 +49,7 @@ export default createRefetchContainer(
   CitiesPagination,
   {
     cities: graphql`
-      fragment CitiesPagination_cities on CitiesPagination
-        @argumentDefinitions(
-          pageNo: { type: "Int!" }
-          pageSize: { type: "Int!" }
-          searchParams: { type: "CitySearchParamsInput" }
-        ) {
+      fragment CitiesPagination_cities on CitiesPagination {
         nodes {
           id
           name
@@ -70,8 +65,24 @@ export default createRefetchContainer(
     `
   },
   graphql`
-    query CitiesPaginationRefetchQuery($pageNo: Int!) {
-      ...CitiesPagination_cities @arguments(pageNo: $pageNo)
+    query CitiesPaginationRefetchQuery(
+      $pageNo: Int!
+      $pageSize: Int!
+      $searchParams: CitySearchParamsInput
+    ) {
+      citiesPagination(
+        pageNo: $pageNo
+        pageSize: $pageSize
+        searchParams: $searchParams
+      ) {
+        ...CitiesPagination_cities
+      }
     }
   `
 );
+
+// @argumentDefinitions(
+//           pageNo: { type: "Int!" }
+//           pageSize: { type: "Int!" }
+//           searchParams: { type: "CitySearchParamsInput" }
+//         )
