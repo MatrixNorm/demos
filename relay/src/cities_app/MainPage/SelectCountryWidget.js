@@ -1,6 +1,6 @@
-import { fetchQuery } from "relay-runtime";
+import React, { useCallback, useMemo, useRef } from "react";
+import { commitLocalUpdate, fetchQuery } from "relay-runtime";
 import { createFragmentContainer, graphql } from "react-relay";
-import React, { useMemo } from "react";
 import { Machine, interpret } from "xstate";
 import { useService } from "@xstate/react";
 import styled from "styled-components";
@@ -19,7 +19,16 @@ const WithStyle = styled.div`
 `;
 
 function SelectCountryWidget({ value, relay }) {
-  console.log(value);
+  console.log("SelectCountryWidget", value);
+  const currentValue = useRef(value.country);
+
+  const onCountryUpdate = useCallback(country => {
+    commitLocalUpdate(relay.environment, store => {
+      const citySearchParams = store.get("client:UICitySearchParams");
+      citySearchParams.setValue(country, "country");
+    });
+  });
+
   const service = useMemo(() => {
     const query = graphql`
       query SelectCountryWidgetQuery($searchString: String) {
@@ -35,19 +44,33 @@ function SelectCountryWidget({ value, relay }) {
       );
     };
 
-    const machine = Machine(machineDef({ machineId: "suggestionMachine" }), {
-      services: {
-        fetchService: ctx => fetchItems(ctx.inputValue)
-      },
-      guards: {
-        isQueryValid: () => true
-      },
-      delays: {
-        TYPING_DEBOUNCE_DELAY: 500
+    const machine = Machine(
+      machineDef({
+        machineId: "suggestionMachine",
+        initialInputValue: value.country || ""
+      }),
+      {
+        services: {
+          fetchService: ctx => fetchItems(ctx.inputValue)
+        },
+        guards: {
+          isQueryValid: () => true
+        },
+        delays: {
+          TYPING_DEBOUNCE_DELAY: 500
+        }
+      }
+    );
+
+    const service = interpret(machine).onTransition(state => {
+      if (state.changed && state.value === "idle") {
+        let { inputValue } = state.context;
+        if (inputValue !== currentValue.current) {
+          currentValue.current = inputValue;
+          onCountryUpdate(inputValue);
+        }
       }
     });
-
-    const service = interpret(machine);
     service.start();
     return service;
   }, []);

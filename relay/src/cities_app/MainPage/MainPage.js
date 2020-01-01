@@ -3,7 +3,7 @@ import React from "react";
 //import styled from "styled-components";
 //import environment from "theapp/env";
 import CitiesPaginationParametersPanel from "./CitiesPaginationParametersPanel";
-//import CitiesPaginationListingPanel from "./CitiesPaginationListingPanel";
+import CitiesPaginationListingPanel from "./CitiesPaginationListingPanel";
 
 // const WithStyle = styled.div`
 //   .main-page {
@@ -12,5 +12,11 @@ import CitiesPaginationParametersPanel from "./CitiesPaginationParametersPanel";
 // `;
 
 export default function MainPage() {
-  return <CitiesPaginationParametersPanel />;
+  console.log("MainPage");
+  return (
+    <div>
+      <CitiesPaginationParametersPanel />
+      <CitiesPaginationListingPanel />
+    </div>
+  );
 }

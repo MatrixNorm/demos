@@ -62,7 +62,7 @@ enum CitiesOrderAttr {
 
 input CitySearchParamsInput {
   cityNameStartsWith: String
-  countryName: String
+  country: String
   populationGte: Int
   populationLte: Int
   ordering: CitiesOrderAttr
