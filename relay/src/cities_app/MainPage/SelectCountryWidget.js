@@ -19,6 +19,7 @@ const WithStyle = styled.div`
 `;
 
 function SelectCountryWidget({ value, relay }) {
+  console.log(value);
   const service = useMemo(() => {
     const query = graphql`
       query SelectCountryWidgetQuery($searchString: String) {
@@ -62,7 +63,7 @@ function SelectCountryWidget({ value, relay }) {
 
 export default createFragmentContainer(SelectCountryWidget, {
   value: graphql`
-    fragment SelectCountryWidget_value on CitySearchParams {
+    fragment SelectCountryWidget_value on UICitySearchParams {
       country
     }
   `

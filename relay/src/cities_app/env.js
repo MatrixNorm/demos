@@ -36,9 +36,10 @@ commitLocalUpdate(environment, store => {
   const uiState = store.create(uiStateId, "UIState");
 
   const citySearchParams = store.create(
-    "client:CitySearchParams",
-    "CitySearchParams"
+    "client:UICitySearchParams",
+    "UICitySearchParams"
   );
+  citySearchParams.setValue("US", "country");
   uiState.setLinkedRecord(citySearchParams, "citySearchParams");
 
   environment.retain({

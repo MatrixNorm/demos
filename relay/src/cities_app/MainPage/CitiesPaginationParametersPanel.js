@@ -37,17 +37,17 @@ export default function CitiesPaginationParametersPanel() {
   );
 }
 
-function Inner({ metadata, searchParams, relay }) {
+function Inner({ metadata, searchParams }) {
   function onCountryUpdate(country) {
-    commitLocalUpdate(relay.environment, store => {
-      const citySearchParams = store.get("client:CitySearchParams");
+    commitLocalUpdate(environment, store => {
+      const citySearchParams = store.get("client:UICitySearchParams");
       citySearchParams.setValue(country, "country");
     });
   }
 
   function onPopulationUpdate([lower, upper]) {
-    commitLocalUpdate(relay.environment, store => {
-      const citySearchParams = store.get("client:CitySearchParams");
+    commitLocalUpdate(environment, store => {
+      const citySearchParams = store.get("client:UICitySearchParams");
       citySearchParams.setValue(lower, "populationLowerBound");
       citySearchParams.setValue(upper, "populationUpperBound");
     });
@@ -55,21 +55,8 @@ function Inner({ metadata, searchParams, relay }) {
 
   return (
     <div>
-      <SelectCountryWidget
-        initialValue={searchParams.country}
-        relayEnv={relay.environment}
-        onNewValue={onCountryUpdate}
-      />
-      <SelectPopulationWidget
-        initialValue={[
-          searchParams.populationUpperBound,
-          searchParams.populationLowerBound
-        ]}
-        relayEnv={relay.environment}
-        onNewValue={onPopulationUpdate}
-        minRange={metadata.populationLowerBound}
-        maxRange={metadata.populationUpperBound}
-      />
+      <SelectCountryWidget value={searchParams} />
+      <SelectPopulationWidget value={searchParams} meta={metadata} />
     </div>
   );
 }
