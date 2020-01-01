@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useRef } from "react";
 import ReactDOM from "react-dom";
 import { Machine, interpret } from "xstate";
 import { useService } from "@xstate/react";
@@ -26,25 +26,38 @@ const fetchItems = function(query) {
   });
 };
 
-const machine = Machine(machineDef({ machineId: "suggestionMachine" }), {
-  services: {
-    fetchService: ctx => fetchItems(ctx.inputValue)
-  },
-  guards: {
-    isQueryValid: ctx => {
-      let q = ctx.inputValue;
-      return q.trim().length > 0 && /^[a-zA-Z]+$/.test(q);
-    }
-  },
-  delays: {
-    TYPING_DEBOUNCE_DELAY: 500
-  }
-});
+function Main({ inputValue, onUpdate }) {
+  const currentValue = useRef(inputValue);
 
-function Main() {
   const service = useMemo(() => {
+    const machine = Machine(
+      machineDef({
+        machineId: "suggestionMachine",
+        initialInputValue: inputValue
+      }),
+      {
+        services: {
+          fetchService: ctx => fetchItems(ctx.inputValue)
+        },
+        guards: {
+          isQueryValid: ctx => {
+            let q = ctx.inputValue;
+            return q.trim().length > 0 && /^[a-zA-Z]+$/.test(q);
+          }
+        },
+        delays: {
+          TYPING_DEBOUNCE_DELAY: 500
+        }
+      }
+    );
     const service = interpret(machine).onTransition(state => {
-      console.log(state);
+      if (state.changed && state.value === "idle") {
+        let { inputValue } = state.context;
+        if (inputValue !== currentValue.current) {
+          currentValue.current = inputValue;
+          onUpdate(inputValue);
+        }
+      }
     });
     service.start();
     return service;
@@ -59,4 +72,7 @@ function Main() {
   );
 }
 
-ReactDOM.render(<Main />, document.getElementById("app"));
+ReactDOM.render(
+  <Main inputValue="foo" onUpdate={console.log} />,
+  document.getElementById("app")
+);

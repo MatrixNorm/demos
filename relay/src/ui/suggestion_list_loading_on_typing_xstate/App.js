@@ -1,5 +1,4 @@
 import React, { useContext } from "react";
-//import { useService } from "@xstate/react";
 
 const KEY_CODE = {
   ARROW_DOWN: 40,
@@ -18,8 +17,6 @@ const keyCodeToEventTypeMap = {
 const SendContext = React.createContext();
 
 export default function App({ current, send }) {
-  //const [current, send] = useService(service);
-
   function handleKeyDown(e) {
     let type = keyCodeToEventTypeMap[e.keyCode];
     type && send({ type });
@@ -31,7 +28,7 @@ export default function App({ current, send }) {
         value={current.context.inputValue}
         onChange={e => send({ type: "TYPING", inputValue: e.target.value })}
         onKeyDown={handleKeyDown}
-        onBlur={() => send({ type: "CLOSE_LIST" })}
+        onBlur={() => send({ type: "INPUT_BLUR" })}
       />
       <SendContext.Provider value={send}>
         {current.matches("working.loading") && <Loading />}

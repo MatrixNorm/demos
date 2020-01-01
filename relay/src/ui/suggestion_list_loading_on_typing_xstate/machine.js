@@ -1,9 +1,9 @@
 import { assign } from "xstate";
 
-export const machineDef = ({ machineId }) => ({
+export const machineDef = ({ machineId, initialInputValue = "" }) => ({
   id: machineId,
   context: {
-    inputValue: "",
+    inputValue: initialInputValue,
     items: null,
     pointedIndex: null,
     errorMsg: null
@@ -26,25 +26,12 @@ export const machineDef = ({ machineId }) => ({
         TYPING: "typing"
       },
       after: {
-        TYPING_DEBOUNCE_DELAY: { target: "uglyfix" }
-        // https://github.com/davidkpiano/xstate/issues/886
-        // [
-        //   {
-        //     target: "working",
-        //     cond: ctx => ctx.inputValue && ctx.inputValue.trim().length !== 0
-        //   },
-        //   { target: "idle" }
-        // ]
-      }
-    },
-    uglyfix: {
-      on: {
-        "": [
+        TYPING_DEBOUNCE_DELAY: [
           {
-            target: "idle",
-            cond: ctx => ctx.inputValue.trim().length === 0
+            target: "working",
+            cond: ctx => ctx.inputValue && ctx.inputValue.trim().length !== 0
           },
-          { target: "working" }
+          { target: "idle" }
         ]
       }
     },
@@ -115,6 +102,7 @@ const okDef = () => ({
   on: {
     INPUT_ENTER: "#idle",
     INPUT_ESCAPE: "#idle",
+    INPUT_BLUR: "#idle",
     MOUSE_ENTERED_ITEM: {
       actions: assign({
         pointedIndex: (_ctx, evt) => evt.itemIndex
