@@ -1,8 +1,9 @@
+import _ from "lodash";
 import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
 // import { a2 } from "shadow-cljs/theapp.foo";
 // window.a2 = a2
 
-const cities = JSON.parse(citiesTxt);
+const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);
 const countries = [...new Set(cities.map(i => i.country))];
 
 export const serverResolvers = {
@@ -24,10 +25,8 @@ export const serverResolvers = {
           .filter(city => city.country === country)
           .slice(0, pageSize);
       } else {
-        let j = Math.floor(Math.random() * cities.length);
-        nodes = cities.slice(j, j + pageSize);
+        nodes = cities.slice(0, pageSize);
       }
-
       return {
         nodes,
         pageNo: 0,

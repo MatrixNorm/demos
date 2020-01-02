@@ -16,7 +16,7 @@ const serverSchema = makeExecutableSchema({
 });
 
 const network = Network.create(async (operation, variables) => {
-  await new Promise(resolve => setTimeout(resolve, 100));
+  await new Promise(resolve => setTimeout(resolve, 500));
   const resp = await graphql(
     serverSchema,
     operation.text,
@@ -39,7 +39,7 @@ commitLocalUpdate(environment, store => {
     "client:UICitySearchParams",
     "UICitySearchParams"
   );
-  citySearchParams.setValue("US", "country");
+  //citySearchParams.setValue("France", "country");
   uiState.setLinkedRecord(citySearchParams, "citySearchParams");
 
   environment.retain({
