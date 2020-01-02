@@ -18,18 +18,18 @@ export const serverResolvers = {
     citiesPagination: (_, args) => {
       console.log("citiesPagination: ", args);
       let nodes;
-      let pageSize = 5;
+      let { pageSize, pageNo } = args;
       let { country } = args.searchParams;
       if (country) {
         nodes = cities
           .filter(city => city.country === country)
-          .slice(0, pageSize);
+          .slice(pageNo * pageSize, pageNo * pageSize + pageSize);
       } else {
-        nodes = cities.slice(0, pageSize);
+        nodes = cities.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
       }
       return {
         nodes,
-        pageNo: 0,
+        pageNo,
         hasNextPage: true,
         hasPrevPage: false
       };

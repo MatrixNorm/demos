@@ -1,4 +1,4 @@
-import { createRefetchContainer, graphql } from "react-relay";
+import { createFragmentContainer, graphql } from "react-relay";
 import React from "react";
 
 function City({ city }) {
@@ -10,7 +10,8 @@ function City({ city }) {
   );
 }
 
-function CitiesPagination({ relay, cities }) {
+function CitiesPagination({ cities, loadNextPage }) {
+  console.log("CitiesPagination", cities);
   const hasPrev = cities?.hasPrevPage;
   const hasNext = cities?.hasNextPage;
   const pageNo = cities?.pageNo;
@@ -23,10 +24,7 @@ function CitiesPagination({ relay, cities }) {
   }
 
   function nextPage() {
-    hasNext &&
-      relay.refetch(prevVars => {
-        return { ...prevVars, pageNo: pageNo + 1 };
-      });
+    hasNext && loadNextPage();
   }
 
   return (
@@ -45,7 +43,7 @@ function CitiesPagination({ relay, cities }) {
   );
 }
 
-export default createRefetchContainer(
+export default createFragmentContainer(
   CitiesPagination,
   {
     cities: graphql`
@@ -63,26 +61,21 @@ export default createRefetchContainer(
         hasPrevPage
       }
     `
-  },
-  graphql`
-    query CitiesPaginationRefetchQuery(
-      $pageNo: Int!
-      $pageSize: Int!
-      $searchParams: CitySearchParamsInput
-    ) {
-      citiesPagination(
-        pageNo: $pageNo
-        pageSize: $pageSize
-        searchParams: $searchParams
-      ) {
-        ...CitiesPagination_cities
-      }
-    }
-  `
+  }
+  // ,
+  // graphql`
+  //   query CitiesPaginationRefetchQuery(
+  //     $pageNo: Int!
+  //     $pageSize: Int!
+  //     $searchParams: CitySearchParamsInput
+  //   ) {
+  //     cities: citiesPagination(
+  //       pageNo: $pageNo
+  //       pageSize: $pageSize
+  //       searchParams: $searchParams
+  //     ) {
+  //       ...CitiesPagination_cities
+  //     }
+  //   }
+  // `
 );
-
-// @argumentDefinitions(
-//           pageNo: { type: "Int!" }
-//           pageSize: { type: "Int!" }
-//           searchParams: { type: "CitySearchParamsInput" }
-//         )

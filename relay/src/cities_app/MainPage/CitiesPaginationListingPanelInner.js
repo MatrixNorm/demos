@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import CitiesPagination from "./CitiesPagination";
 
@@ -7,6 +7,12 @@ export default function CitiesPaginationListingPanelInner({
   relayEnv
 }) {
   console.log("CitiesPaginationListingPanelInner");
+  const [pageNo, setPageNo] = useState(0);
+
+  const loadNextPage = () => {
+    setPageNo(pageNo + 1);
+  };
+
   return (
     <QueryRenderer
       query={graphql`
@@ -25,11 +31,16 @@ export default function CitiesPaginationListingPanelInner({
         }
       `}
       environment={relayEnv}
-      variables={{ pageSize: 10, pageNo: 0, searchParams }}
+      variables={{ pageSize: 7, pageNo, searchParams }}
       render={({ error, props }) => {
         if (error) throw error;
         if (!props) return <h3>loading...</h3>;
-        return <CitiesPagination cities={props.citiesPagination} />;
+        return (
+          <CitiesPagination
+            cities={props.citiesPagination}
+            loadNextPage={loadNextPage}
+          />
+        );
       }}
     />
   );
