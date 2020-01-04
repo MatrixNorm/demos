@@ -24,7 +24,7 @@ export const App = () => {
     <QueryRenderer
       query={AppQuery}
       environment={environment}
-      variables={{ userId1: "user#111", userId2: "user#222" }}
+      variables={{ }}
       render={render}
     />
   );
