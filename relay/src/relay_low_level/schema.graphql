@@ -1,0 +1,20 @@
+interface Node {
+  id: ID!
+}
+
+type Query {
+  cities(pageNo: Int!): CityPagination
+}
+
+type CityPagination {
+  nodes: [City!]
+  pageNo: Int!
+  hasNextPage: Boolean!
+  hasPrevPage: Boolean!
+}
+
+type City implements Node {
+  id: ID!
+  name: String!
+  population: Int!
+}

@@ -1,5 +1,5 @@
 import { QueryRenderer, graphql } from "react-relay";
-import React from "react";
+import React, { useState } from "react";
 import environment from "./env";
 
 const AppQuery = graphql`
@@ -20,13 +20,19 @@ const AppQuery = graphql`
 `;
 
 export const App = () => {
+  const [show, setShow] = useState(true);
   return (
-    <QueryRenderer
-      query={AppQuery}
-      environment={environment}
-      variables={{ }}
-      render={render}
-    />
+    <div>
+      {show && (
+        <QueryRenderer
+          query={AppQuery}
+          environment={environment}
+          variables={{}}
+          render={render}
+        />
+      )}
+      <button onClick={() => setShow(false)}>Unmount</button>
+    </div>
   );
 };
 
