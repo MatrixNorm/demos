@@ -8,7 +8,6 @@ import cities from "./cities";
 const resolvers = {
   Query: {
     cities: (_, { pageNo }) => {
-      console.log("resolvers", pageNo);
       let pageSize = 5;
       let nodes = cities.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
       return {
