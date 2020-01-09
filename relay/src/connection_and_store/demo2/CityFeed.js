@@ -58,7 +58,7 @@ export default createPaginationContainer(
           cursor: { type: "String" }
         ) {
         allCities(first: $count, after: $cursor)
-          @connection(key: "CityFeed_allCities") {
+          @connection(key: "CityFeed_allCities", filters: []) {
           edges {
             node {
               id
@@ -86,7 +86,7 @@ export default createPaginationContainer(
       };
     },
     getVariables(props, { count, cursor }, fragmentVariables) {
-      console.log(props, { count, cursor }, fragmentVariables)
+      console.log(props, { count, cursor }, fragmentVariables);
       return {
         count,
         cursor

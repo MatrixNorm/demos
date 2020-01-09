@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash d97e6910d4c68dd10be97d16b89a3983
+ * @relayHash 4e234fbec54342138ee24f113f0af688
  */
 
 /* eslint-disable */
@@ -42,6 +42,7 @@ fragment CityList_cities_pbnwq on Query {
       node {
         id
         ...City_city
+        __typename
       }
       cursor
     }
@@ -185,6 +186,13 @@ return {
                     "name": "lng",
                     "args": null,
                     "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "__typename",
+                    "args": null,
+                    "storageKey": null
                   }
                 ]
               },
@@ -237,6 +245,15 @@ return {
             ]
           }
         ]
+      },
+      {
+        "kind": "LinkedHandle",
+        "alias": null,
+        "name": "allCities",
+        "args": (v1/*: any*/),
+        "handle": "connection",
+        "key": "CityList_allCities",
+        "filters": []
       }
     ]
   },
@@ -244,7 +261,7 @@ return {
     "operationKind": "query",
     "name": "AppQuery",
     "id": null,
-    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...CityList_cities_pbnwq\n}\n\nfragment CityList_cities_pbnwq on Query {\n  allCities(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        ...City_city\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
+    "text": "query AppQuery(\n  $first: Int\n  $after: String\n  $last: Int\n  $before: String\n) {\n  ...CityList_cities_pbnwq\n}\n\nfragment CityList_cities_pbnwq on Query {\n  allCities(first: $first, after: $after, last: $last, before: $before) {\n    edges {\n      node {\n        id\n        ...City_city\n        __typename\n      }\n      cursor\n    }\n    pageInfo {\n      hasNextPage\n      endCursor\n      hasPreviousPage\n      startCursor\n    }\n  }\n}\n\nfragment City_city on City {\n  name\n  lat\n  lng\n}\n",
     "metadata": {}
   }
 };

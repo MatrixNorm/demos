@@ -62,7 +62,7 @@ export default createRefetchContainer(
           after: $after
           last: $last
           before: $before
-        ) #@connection(key: "CityList_allCities")
+        ) @connection(key: "CityList_allCities", filters: [])
         {
           edges {
             node {

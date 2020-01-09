@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash bd831049da73c6f8b7158b8ce92b8a60
+ * @relayHash 2401857d675fc8453fa7a02df6735df1
  */
 
 /* eslint-disable */
@@ -222,7 +222,7 @@ return {
         "args": (v1/*: any*/),
         "handle": "connection",
         "key": "CityFeed_allCities",
-        "filters": null
+        "filters": []
       }
     ]
   },
