@@ -1,7 +1,5 @@
 import _ from "lodash";
 import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
-// import { a2 } from "shadow-cljs/theapp.foo";
-// window.a2 = a2
 
 const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);
 const countries = [...new Set(cities.map(i => i.country))];

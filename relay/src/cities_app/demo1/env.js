@@ -31,24 +31,24 @@ const network = Network.create(async (operation, variables) => {
 const store = new Store(new RecordSource());
 const environment = new Environment({ network, store });
 
-commitLocalUpdate(environment, store => {
-  const uiStateId = "client:UIState";
-  const uiState = store.create(uiStateId, "UIState");
+// commitLocalUpdate(environment, store => {
+//   const uiStateId = "client:UIState";
+//   const uiState = store.create(uiStateId, "UIState");
 
-  const citySearchParams = store.create(
-    "client:UICitySearchParams",
-    "UICitySearchParams"
-  );
-  //citySearchParams.setValue("France", "country");
-  uiState.setLinkedRecord(citySearchParams, "citySearchParams");
+//   const citySearchParams = store.create(
+//     "client:UICitySearchParams",
+//     "UICitySearchParams"
+//   );
+//   //citySearchParams.setValue("France", "country");
+//   uiState.setLinkedRecord(citySearchParams, "citySearchParams");
 
-  environment.retain({
-    uiStateId,
-    variables: {},
-    node: { selections: [] }
-  });
-  store.getRoot().setLinkedRecord(uiState, "uiState");
-});
+//   environment.retain({
+//     uiStateId,
+//     variables: {},
+//     node: { selections: [] }
+//   });
+//   store.getRoot().setLinkedRecord(uiState, "uiState");
+// });
 
 window.relayEnv = environment;
 export default environment;
