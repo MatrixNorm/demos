@@ -1,13 +1,13 @@
+extend type Query {
+  uiState: UIState!
+}
+
 type UIState {
   citySearchParams: UICitySearchParams
 }
 
 type UICitySearchParams {
-  country: String
+  countryNameContains: String
   populationGte: Int
   populationLte: Int
-}
-
-extend type Query {
-  uiState: UIState!
 }

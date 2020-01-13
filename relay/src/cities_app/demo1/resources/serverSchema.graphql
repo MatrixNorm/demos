@@ -61,23 +61,8 @@ enum CitiesOrderAttr {
 }
 
 input CitySearchParamsInput {
-  cityNameStartsWith: String
-  country: String
+  countryNameContains: String
   populationGte: Int
   populationLte: Int
   ordering: CitiesOrderAttr
-}
-
-type CitySearchParams {
-  cityNameStartsWith: String
-  countryName: String
-  populationGte: Int
-  populationLte: Int
-  ordering: CitiesOrderAttr
-}
-
-type CityFilter implements Node {
-  id: ID!
-  filterName: String!
-  searchParams: CitySearchParams!
 }

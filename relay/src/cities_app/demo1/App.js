@@ -26,7 +26,7 @@ export default function App() {
         query AppQuery {
           uiState {
             citySearchParams {
-              country
+              countryNameContains
               populationGte
               populationLte
             }
