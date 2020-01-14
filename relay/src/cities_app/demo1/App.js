@@ -1,5 +1,5 @@
 import React from "react";
-import { graphql, QueryRenderer } from "react-relay";
+import { graphql, LocalQueryRenderer } from "react-relay";
 import styled from "styled-components";
 import environment from "theapp/env";
 import CitiesBrowserPanel from "theapp/components/CitiesBrowserPanel";
@@ -19,11 +19,12 @@ const WithStyle = styled.div`
 `;
 
 export default function App() {
-  //console.log("App");
+  console.log("App");
   return (
-    <QueryRenderer
+    <LocalQueryRenderer
       query={graphql`
         query AppQuery {
+          __typename
           uiState {
             citySearchParams {
               countryNameContains
@@ -40,7 +41,7 @@ export default function App() {
         if (!props) return <h3>loading...</h3>;
         return (
           <div>
-            <CitiesBrowserPanel searchParams={props.uiState.citySearchParams} />
+            <CitiesBrowserPanel searchParams={props.uiState.citySearchParams} environment={environment} />
           </div>
         );
       }}

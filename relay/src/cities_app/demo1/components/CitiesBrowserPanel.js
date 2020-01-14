@@ -1,7 +1,7 @@
 import React from "react";
 import { createRefetchContainer, QueryRenderer, graphql } from "react-relay";
 import SearchParameters from "./SearchParameters";
-import Pagination from "./Pagination";
+import CitiesPagination from "./CitiesPagination";
 
 const CitiesBrowserPanel = createRefetchContainer(
   ({ cities, metadata, initialSearchParams, relay }) => {
@@ -12,7 +12,7 @@ const CitiesBrowserPanel = createRefetchContainer(
           initialSearchParams={initialSearchParams}
           refetch={relay.refetch}
         />
-        <Pagination cities={cities} refetch={relay.refetch} />
+        <CitiesPagination cities={cities.citiesPagination} refetch={relay.refetch} />
       </>
     );
   },
@@ -59,12 +59,17 @@ const CitiesBrowserPanel = createRefetchContainer(
       $searchParams: CitySearchParamsInput
     ) {
       ...CitiesBrowserPanel_cities
+        @arguments(
+          pageNo: $pageNo
+          pageSize: $pageSize
+          searchParams: $searchParams
+        )
     }
   `
 );
 
-export default function CitiesBrowserPanelQR({ searchParams, relay }) {
-  console.log("CitiesBrowserPanelQR");
+export default function CitiesBrowserPanelQR({ searchParams, environment }) {
+  console.log("CitiesBrowserPanelQR", searchParams, environment);
   return (
     <QueryRenderer
       query={graphql`
@@ -74,10 +79,15 @@ export default function CitiesBrowserPanelQR({ searchParams, relay }) {
           $searchParams: CitySearchParamsInput
         ) {
           ...CitiesBrowserPanel_cities
+            @arguments(
+              pageNo: $pageNo
+              pageSize: $pageSize
+              searchParams: $searchParams
+            )
           ...CitiesBrowserPanel_metadata
         }
       `}
-      environment={relay.environment}
+      environment={environment}
       variables={{ pageSize: 7, pageNo: 0, searchParams }}
       render={({ error, props }) => {
         if (error) return <h3>error</h3>;

@@ -13,7 +13,7 @@ export default function SearchParameters({
 
   return (
     <div>
-      <input type="text" value={initialSearchParams.countryNameContains} />
+      <input type="text" value={initialSearchParams?.countryNameContains} />
       <button onClick={onButtonClick}>Apply</button>
     </div>
   );

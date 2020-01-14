@@ -16,14 +16,16 @@ export const serverResolvers = {
     citiesPagination: (_, args) => {
       console.log("citiesPagination: ", args);
       let nodes;
-      let { pageSize, pageNo } = args;
-      let { country } = args.searchParams;
-      if (country) {
-        nodes = cities
-          .filter(city => city.country === country)
-          .slice(pageNo * pageSize, pageNo * pageSize + pageSize);
-      } else {
+      let { pageSize, pageNo, searchParams } = args;
+      if (!searchParams) {
         nodes = cities.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
+      } else {
+        let { countryNameContains } = searchParams;
+        if (countryNameContains) {
+          nodes = cities
+            .filter(city => city.country.includes(countryNameContains))
+            .slice(pageNo * pageSize, pageNo * pageSize + pageSize);
+        }
       }
       return {
         nodes,
