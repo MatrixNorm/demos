@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 8e34ccef7dde63a2b674a6e9d0f8b0f2
+ * @relayHash bfee22664779537c05cba4f35c81ee7a
  */
 
 /* eslint-disable */
@@ -9,19 +9,16 @@
 
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
-export type mainQueryVariables = {|
-  pageNo: number
-|};
+export type mainQueryVariables = {||};
 export type mainQueryResponse = {|
-  +cities: ?{|
-    +nodes: ?$ReadOnlyArray<{|
-      +id: string,
-      +name: string,
-      +population: number,
-    |}>,
-    +pageNo: number,
-    +hasNextPage: boolean,
-  |}
+  +__typename: string,
+  +uiState: {|
+    +id: string,
+    +citySearchParams: ?{|
+      +countryNameContains: ?string,
+      +populationGte: ?number,
+    |},
+  |},
 |};
 export type mainQuery = {|
   variables: mainQueryVariables,
@@ -31,54 +28,31 @@ export type mainQuery = {|
 
 
 /*
-query mainQuery(
-  $pageNo: Int!
-) {
-  cities(pageNo: $pageNo) {
-    nodes {
-      id
-      name
-      population
-    }
-    pageNo
-    hasNextPage
-  }
+query mainQuery {
+  __typename
 }
 */
 
 const node/*: ConcreteRequest*/ = (function(){
 var v0 = [
   {
-    "kind": "LocalArgument",
-    "name": "pageNo",
-    "type": "Int!",
-    "defaultValue": null
-  }
-],
-v1 = [
-  {
-    "kind": "LinkedField",
+    "kind": "ScalarField",
     "alias": null,
-    "name": "cities",
-    "storageKey": null,
-    "args": [
-      {
-        "kind": "Variable",
-        "name": "pageNo",
-        "variableName": "pageNo"
-      }
-    ],
-    "concreteType": "CityPagination",
-    "plural": false,
+    "name": "__typename",
+    "args": null,
+    "storageKey": null
+  },
+  {
+    "kind": "ClientExtension",
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "nodes",
+        "name": "uiState",
         "storageKey": null,
         "args": null,
-        "concreteType": "City",
-        "plural": true,
+        "concreteType": "UIState",
+        "plural": false,
         "selections": [
           {
             "kind": "ScalarField",
@@ -88,34 +62,31 @@ v1 = [
             "storageKey": null
           },
           {
-            "kind": "ScalarField",
+            "kind": "LinkedField",
             "alias": null,
-            "name": "name",
+            "name": "citySearchParams",
+            "storageKey": null,
             "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "population",
-            "args": null,
-            "storageKey": null
+            "concreteType": "UICitySearchParams",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "countryNameContains",
+                "args": null,
+                "storageKey": null
+              },
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "populationGte",
+                "args": null,
+                "storageKey": null
+              }
+            ]
           }
         ]
-      },
-      {
-        "kind": "ScalarField",
-        "alias": null,
-        "name": "pageNo",
-        "args": null,
-        "storageKey": null
-      },
-      {
-        "kind": "ScalarField",
-        "alias": null,
-        "name": "hasNextPage",
-        "args": null,
-        "storageKey": null
       }
     ]
   }
@@ -127,24 +98,24 @@ return {
     "name": "mainQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": (v0/*: any*/),
-    "selections": (v1/*: any*/)
+    "argumentDefinitions": [],
+    "selections": (v0/*: any*/)
   },
   "operation": {
     "kind": "Operation",
     "name": "mainQuery",
-    "argumentDefinitions": (v0/*: any*/),
-    "selections": (v1/*: any*/)
+    "argumentDefinitions": [],
+    "selections": (v0/*: any*/)
   },
   "params": {
     "operationKind": "query",
     "name": "mainQuery",
     "id": null,
-    "text": "query mainQuery(\n  $pageNo: Int!\n) {\n  cities(pageNo: $pageNo) {\n    nodes {\n      id\n      name\n      population\n    }\n    pageNo\n    hasNextPage\n  }\n}\n",
+    "text": "query mainQuery {\n  __typename\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = 'a5deb53d137603e2ff17cd7705137e32';
+(node/*: any*/).hash = '1a6316675a400aa2be354d86b1df6f63';
 module.exports = node;

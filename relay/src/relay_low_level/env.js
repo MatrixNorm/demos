@@ -38,8 +38,7 @@ const network = Network.create(async (operation, variables) => {
 });
 
 const env = new Environment({ network, store });
-window.relayStore = env.getStore().getSource();
-window.commitLocalUpdate = function(callback) {
-  commitLocalUpdate(env, callback);
+window.printStore = () => {
+  console.log(env.getStore().getSource()._records);
 };
 export default env;

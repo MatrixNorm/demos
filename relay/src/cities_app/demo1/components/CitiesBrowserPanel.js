@@ -10,7 +10,7 @@ const CitiesBrowserPanel = createRefetchContainer(
         <SearchParameters
           metadata={metadata}
           initialSearchParams={initialSearchParams}
-          refetch={relay.refetch}
+          relay={relay}
         />
         <CitiesPagination cities={cities.citiesPagination} refetch={relay.refetch} />
       </>
@@ -88,7 +88,7 @@ export default function CitiesBrowserPanelQR({ searchParams, environment }) {
         }
       `}
       environment={environment}
-      variables={{ pageSize: 7, pageNo: 0, searchParams }}
+      variables={{ pageSize: 5, pageNo: 0, searchParams }}
       render={({ error, props }) => {
         if (error) return <h3>error</h3>;
         if (!props) return <h3>loading...</h3>;

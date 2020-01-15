@@ -1,0 +1,14 @@
+extend type Query {
+  uiState: UIState!
+}
+
+type UIState {
+  id: ID!
+  citySearchParams: UICitySearchParams
+}
+
+type UICitySearchParams {
+  countryNameContains: String
+  populationGte: Int
+  populationLte: Int
+}

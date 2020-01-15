@@ -12,16 +12,29 @@ function ps(x) {
   console.log(x, env.getStore().getSource()._records);
 }
 
+// const query = graphql`
+//   query mainQuery($pageNo: Int!) {
+//     cities(pageNo: $pageNo) {
+//       nodes {
+//         id
+//         name
+//         population
+//       }
+//       pageNo
+//       hasNextPage
+//     }
+//   }
+// `;
+
 const query = graphql`
-  query mainQuery($pageNo: Int!) {
-    cities(pageNo: $pageNo) {
-      nodes {
-        id
-        name
-        population
+  query mainQuery {
+    __typename
+    uiState {
+      id
+      citySearchParams {
+        countryNameContains
+        populationGte
       }
-      pageNo
-      hasNextPage
     }
   }
 `;
@@ -32,28 +45,48 @@ async function job() {
   //console.log(query());
   const request = getRequest(query);
   log("request", request);
-  const operation = createOperationDescriptor(request, variables);
-  log("operation", operation);
-  const reference = env.retain(operation);
-  log("reference", reference);
-  // env.execute({ operation }).subscribe({
-  //   next: response => {
-  //     console.log(response);
-  //     ps("222");
-  //     console.log(env.lookup(operation.fragment));
+  const operationDescriptor = createOperationDescriptor(request, {});
+  log("operation", operationDescriptor);
+  // let data = {
+  //   cities: {
+  //     nodes: [
+  //       {
+  //         id: "8101",
+  //         name: "Seattle",
+  //         population: 3643765.0
+  //       }
+  //     ],
+  //     pageNo: 1,
+  //     hasNextPage: true,
+  //     hasPrevPage: true
   //   }
-  // });
-  ps("111");
-  const response = await env.execute({ operation }).toPromise();
-  log(response);
-  ps("222");
-  const snapshot = env.lookup(operation.fragment);
-  log(snapshot);
-  const unsub = env.subscribe(snapshot, x => log(x));
+  // };
+  let data = {
+    __typename: "__Root",
+    uiState: {
+      id: "local:UIState",
+      citySearchParams: {
+        countryNameContains: "abc",
+        populationGte: 2000
+      }
+    }
+  };
+  env.commitPayload(operationDescriptor, data);
+  env.retain(operationDescriptor.root);
+  // const reference = env.retain(operation);
+  // log("reference", reference);
 
-  commitLocalUpdate(env, store => {
-    store.get("8521").setValue("Orlandos", "name");
-  });
+  // ps("111");
+  // const response = await env.execute({ operation }).toPromise();
+  // log(response);
+  // ps("222");
+  // const snapshot = env.lookup(operation.fragment);
+  // log(snapshot);
+  // const unsub = env.subscribe(snapshot, x => log(x));
+
+  // commitLocalUpdate(env, store => {
+  //   store.get("8521").setValue("Orlandos", "name");
+  // });
 }
 
 job();
