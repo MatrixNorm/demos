@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 4f6ddf73ca5f215ee2fa6e555103bf0b
+ * @relayHash 21ae3d3e3211fa6b0ceb4c65d7e9a6ad
  */
 
 /* eslint-disable */
@@ -34,63 +34,45 @@ query AppQuery {
 */
 
 const node/*: ConcreteRequest*/ = (function(){
-var v0 = [
-  {
-    "kind": "ScalarField",
-    "alias": null,
-    "name": "__typename",
-    "args": null,
-    "storageKey": null
-  },
-  {
-    "kind": "ClientExtension",
-    "selections": [
-      {
-        "kind": "LinkedField",
-        "alias": null,
-        "name": "uiState",
-        "storageKey": null,
-        "args": null,
-        "concreteType": "UIState",
-        "plural": false,
-        "selections": [
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "citySearchParams",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "UICitySearchParams",
-            "plural": false,
-            "selections": [
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "countryNameContains",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "populationGte",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "populationLte",
-                "args": null,
-                "storageKey": null
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
-];
+var v0 = {
+  "kind": "ScalarField",
+  "alias": null,
+  "name": "__typename",
+  "args": null,
+  "storageKey": null
+},
+v1 = {
+  "kind": "LinkedField",
+  "alias": null,
+  "name": "citySearchParams",
+  "storageKey": null,
+  "args": null,
+  "concreteType": "UICitySearchParams",
+  "plural": false,
+  "selections": [
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "countryNameContains",
+      "args": null,
+      "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "populationGte",
+      "args": null,
+      "storageKey": null
+    },
+    {
+      "kind": "ScalarField",
+      "alias": null,
+      "name": "populationLte",
+      "args": null,
+      "storageKey": null
+    }
+  ]
+};
 return {
   "kind": "Request",
   "fragment": {
@@ -99,13 +81,58 @@ return {
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": [],
-    "selections": (v0/*: any*/)
+    "selections": [
+      (v0/*: any*/),
+      {
+        "kind": "ClientExtension",
+        "selections": [
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "uiState",
+            "storageKey": null,
+            "args": null,
+            "concreteType": "UIState",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/)
+            ]
+          }
+        ]
+      }
+    ]
   },
   "operation": {
     "kind": "Operation",
     "name": "AppQuery",
     "argumentDefinitions": [],
-    "selections": (v0/*: any*/)
+    "selections": [
+      (v0/*: any*/),
+      {
+        "kind": "ClientExtension",
+        "selections": [
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "uiState",
+            "storageKey": null,
+            "args": null,
+            "concreteType": "UIState",
+            "plural": false,
+            "selections": [
+              (v1/*: any*/),
+              {
+                "kind": "ScalarField",
+                "alias": null,
+                "name": "id",
+                "args": null,
+                "storageKey": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
   },
   "params": {
     "operationKind": "query",

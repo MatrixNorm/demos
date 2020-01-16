@@ -34,16 +34,8 @@ const environment = new Environment({ network, store });
 commitLocalUpdate(environment, store => {
   const uiStateId = "client:UIState";
   const uiState = store.create(uiStateId, "UIState");
-
-  // const citySearchParams = store.create(
-  //   "client:UICitySearchParams",
-  //   "UICitySearchParams"
-  // );
-  //citySearchParams.setValue("France", "country");
-  // uiState.setLinkedRecord(citySearchParams, "citySearchParams");
-
   environment.retain({
-    uiStateId,
+    dataID: uiStateId,
     variables: {},
     node: { selections: [] }
   });

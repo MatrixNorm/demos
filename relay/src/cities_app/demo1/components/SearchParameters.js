@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { commitLocalUpdate } from "relay-runtime";
+import { graphql } from "react-relay";
+import { createOperationDescriptor, getRequest } from "relay-runtime";
+
+const defaultInput = { countryNameContains: "", populationGte: 0 };
 
 export default function SearchParameters({
   metadata,
@@ -8,35 +11,57 @@ export default function SearchParameters({
 }) {
   console.log("SearchParameters");
   const [searchParams, setSearchParams] = useState({
-    ...{ countryNameContains: "" },
+    ...defaultInput,
     ...(initialSearchParams || {})
   });
 
   function onButtonClick() {
-    commitLocalUpdate(relay.environment, store => {
-      console.log(store);
-      // const uiStateId = "client:UIState";
-      // const uiState = store.create(uiStateId, "UIState");
-
-      // const citySearchParams = store.create(
-      //   "client:UICitySearchParams",
-      //   "UICitySearchParams"
-      // );
-      // citySearchParams.setValue("France", "country");
-      // uiState.setLinkedRecord(citySearchParams, "citySearchParams");
-    });
+    const query = graphql`
+      query SearchParametersQuery {
+        __typename
+        uiState {
+          id
+          citySearchParams {
+            countryNameContains
+            populationGte
+          }
+        }
+      }
+    `;
+    const request = getRequest(query);
+    const operationDescriptor = createOperationDescriptor(request, {});
+    let data = {
+      __typename: "__Root",
+      uiState: {
+        id: "client:UIState",
+        citySearchParams: { ...searchParams }
+      }
+    };
+    relay.environment.commitPayload(operationDescriptor, data);
+    relay.environment.retain(operationDescriptor.root);
   }
 
   return (
     <div>
-      <div>Country: </div>
+      <div>Country:</div>
       <input
         type="text"
         value={searchParams.countryNameContains}
         onChange={e =>
           setSearchParams({
-            ...setSearchParams,
+            ...searchParams,
             countryNameContains: e.target.value
+          })
+        }
+      />
+      <div>Population greater than:</div>
+      <input
+        type="text"
+        value={searchParams.populationGte}
+        onChange={e =>
+          setSearchParams({
+            ...searchParams,
+            populationGte: e.target.value
           })
         }
       />

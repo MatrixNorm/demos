@@ -3,8 +3,8 @@ import React from "react";
 function City({ city }) {
   return (
     <div>
-      <h4>{city.name}</h4>
-      <div>{city.country}</div>
+      <div>{city.name}<i>({city.country})</i></div>
+      <div>{city.population}</div>
     </div>
   );
 }
