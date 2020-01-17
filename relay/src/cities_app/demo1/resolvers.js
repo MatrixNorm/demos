@@ -4,6 +4,10 @@ import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
 const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);
 const countries = [...new Set(cities.map(i => i.country))];
 
+function isMissing(obj) {
+  return obj === null || obj === undefined || Object.entries(obj).length === 0;
+}
+
 export const serverResolvers = {
   Query: {
     viewer: () => {
@@ -14,18 +18,29 @@ export const serverResolvers = {
       return { id };
     },
     citiesPagination: (_, args) => {
-      console.log("citiesPagination: ", args);
-      let nodes;
+      console.log(JSON.stringify(args, 2));
       let { pageSize, pageNo, searchParams } = args;
-      if (!searchParams) {
-        nodes = cities.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
+      let nodes = cities;
+      if (isMissing(searchParams)) {
+        nodes = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
       } else {
-        let { countryNameContains } = searchParams;
-        if (countryNameContains) {
-          nodes = cities
-            .filter(city => city.country.includes(countryNameContains))
-            .slice(pageNo * pageSize, pageNo * pageSize + pageSize);
+        let {
+          countryNameContains,
+          populationGte,
+          populationLte
+        } = searchParams;
+        if (countryNameContains && countryNameContains.length > 0) {
+          nodes = cities.filter(city =>
+            city.country.toLowerCase().includes(countryNameContains.toLowerCase())
+          );
         }
+        if (populationGte) {
+          nodes = nodes.filter(city => city.population >= populationGte);
+        }
+        if (populationLte) {
+          nodes = nodes.filter(city => city.population <= populationLte);
+        }
+        nodes = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
       }
       return {
         nodes,

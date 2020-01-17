@@ -3,13 +3,16 @@ import React from "react";
 function City({ city }) {
   return (
     <div>
-      <div>{city.name}<i>({city.country})</i></div>
+      <div>
+        {city.name}
+        <i>({city.country})</i>
+      </div>
       <div>{city.population}</div>
     </div>
   );
 }
 
-export default function CitiesPagination({ cities, refetch }) {
+export default function CitiesPagination({ cities, relay }) {
   console.log("CitiesPagination", cities);
   const hasPrev = cities?.hasPrevPage;
   const hasNext = cities?.hasNextPage;
@@ -24,6 +27,10 @@ export default function CitiesPagination({ cities, refetch }) {
 
   function nextPage() {
     hasNext && loadNextPage();
+  }
+
+  if (!cities) {
+    return <p>something wrong</p>;
   }
 
   return (

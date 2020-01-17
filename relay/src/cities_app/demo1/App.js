@@ -21,7 +21,7 @@ const WithStyle = styled.div`
 
 export default function App() {
   console.log("App");
-  const [state, setState] = useState({ready: false});
+  const [state, setState] = useState({ ready: false });
   useEffect(() => {
     const query = graphql`
       query AppQuery {
@@ -37,9 +37,8 @@ export default function App() {
     `;
     const request = getRequest(query);
     const operation = createOperationDescriptor(request, {});
-    const res = environment.lookup(operation.fragment, operation)
-    console.log(res)
-    setState({ready: true, searchParams: res.data.uiState.citySearchParams});
+    const res = environment.lookup(operation.fragment, operation);
+    setState({ ready: true, searchParams: res.data.uiState.citySearchParams });
   }, []);
 
   return (

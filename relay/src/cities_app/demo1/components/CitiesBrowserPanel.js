@@ -12,7 +12,10 @@ const CitiesBrowserPanel = createRefetchContainer(
           initialSearchParams={initialSearchParams}
           relay={relay}
         />
-        <CitiesPagination cities={cities.citiesPagination} refetch={relay.refetch} />
+        <CitiesPagination
+          cities={cities.citiesPagination}
+          relay={relay}
+        />
       </>
     );
   },

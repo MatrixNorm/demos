@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { graphql } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
 
-const defaultInput = { countryNameContains: "", populationGte: 0 };
+const defaultInput = {
+  countryNameContains: "",
+  populationGte: 0,
+  populationLte: 99999999
+};
 
 export default function SearchParameters({
   metadata,
@@ -39,6 +43,8 @@ export default function SearchParameters({
     };
     relay.environment.commitPayload(operationDescriptor, data);
     relay.environment.retain(operationDescriptor.root);
+    console.log(searchParams);
+    relay.refetch({ searchParams });
   }
 
   return (
@@ -56,12 +62,23 @@ export default function SearchParameters({
       />
       <div>Population greater than:</div>
       <input
-        type="text"
+        type="number"
         value={searchParams.populationGte}
         onChange={e =>
           setSearchParams({
             ...searchParams,
-            populationGte: e.target.value
+            populationGte: parseInt(e.target.value)
+          })
+        }
+      />
+      <div>Population less than:</div>
+      <input
+        type="number"
+        value={searchParams.populationLte}
+        onChange={e =>
+          setSearchParams({
+            ...searchParams,
+            populationLte: parseInt(e.target.value)
           })
         }
       />
