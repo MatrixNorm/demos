@@ -5,7 +5,7 @@ import { createOperationDescriptor, getRequest } from "relay-runtime";
 const defaultInput = {
   countryNameContains: "",
   populationGte: 0,
-  populationLte: 99999999
+  populationLte: 100000000
 };
 
 export default function SearchParameters({
@@ -63,6 +63,7 @@ export default function SearchParameters({
       <div>Population greater than:</div>
       <input
         type="number"
+        step="100000"
         value={searchParams.populationGte}
         onChange={e =>
           setSearchParams({
@@ -74,6 +75,7 @@ export default function SearchParameters({
       <div>Population less than:</div>
       <input
         type="number"
+        step="100000"
         value={searchParams.populationLte}
         onChange={e =>
           setSearchParams({
