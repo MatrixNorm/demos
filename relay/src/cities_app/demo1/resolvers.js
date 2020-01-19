@@ -8,18 +8,29 @@ function isMissing(obj) {
   return obj === null || obj === undefined || Object.entries(obj).length === 0;
 }
 
+const users = {
+  user_anon: { id: "user_anon", name: "Anon", settings: { pageSize: 5 } },
+  user1: { id: "user1", name: "Bob", settings: { pageSize: 7 } }
+};
+
 export const serverResolvers = {
   Query: {
     viewer: () => {
-      return { id: 1 };
+      // logged-in user
+      return users["user1"];
     },
     node: (_, { id }) => {
-      console.log({ id });
       return { id };
     },
-    citiesPagination: (_, args) => {
-      console.log(JSON.stringify(args, 2));
-      let { pageSize, pageNo, searchParams } = args;
+    citiesPagination: (_, args, context) => {
+      //console.log(JSON.stringify(args, 2));
+      let { user } = context;
+      let { pageSize } = {
+        ...{ pageSize: 5 },
+        ...user.settings,
+        args
+      };
+      let { pageNo, searchParams } = args;
       let nodes = cities;
       if (isMissing(searchParams)) {
         nodes = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
@@ -31,7 +42,9 @@ export const serverResolvers = {
         } = searchParams;
         if (countryNameContains && countryNameContains.length > 0) {
           nodes = cities.filter(city =>
-            city.country.toLowerCase().includes(countryNameContains.toLowerCase())
+            city.country
+              .toLowerCase()
+              .includes(countryNameContains.toLowerCase())
           );
         }
         if (populationGte) {
@@ -70,6 +83,5 @@ export const serverResolvers = {
       console.log({ node });
       return node;
     }
-  },
-  User: {}
+  }
 };

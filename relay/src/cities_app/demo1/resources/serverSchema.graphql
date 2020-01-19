@@ -10,8 +10,8 @@ type Query {
   node(id: ID!): Node
   viewer: User
   citiesPagination(
-    pageSize: Int!
     pageNo: Int!
+    pageSize: Int
     searchParams: CitySearchParamsInput
   ): CitiesPagination
   citiesMetadata: CitiesMetadata
@@ -20,6 +20,12 @@ type Query {
 
 type User implements Node {
   id: ID!
+  name: String!
+  settings: UserSettings
+}
+
+type UserSettings {
+  pageSize: Int
 }
 
 type CitiesPagination {
