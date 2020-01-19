@@ -16,7 +16,8 @@ console.log(
 [:find ?name ?population :where 
   [?e "country" "China"]
   [?e "name" ?name]
-  [?e "population" ?population]]`,
+  [?e "population" ?population]
+  [(>= ?population 5000000)]]`,
     db
   )
 );
