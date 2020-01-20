@@ -15,9 +15,26 @@ export function City({ city }) {
         <span className="country">{city.country}</span>
       </div>
       <div>
-        <label className="name">pop.</label>
-        <span className="name">{city.population}</span>
+        <label className="population-label">pop.</label>
+        <span className="population">{city.population}</span>
       </div>
     </CityStyle>
+  );
+}
+
+export function CitiesPage({ cities, pageNo, hasPrev, hasNext, onPrev, onNext }) {
+  return (
+    <div>
+      <ol>
+        {cities.map(city => (
+          <City city={city} key={city.id} />
+        ))}
+      </ol>
+      <div>
+        {hasPrev && <button onClick={onPrev}>PREV</button>}
+        <span>{pageNo}</span>
+        {hasNext && <button onClick={onNext}>NEXT</button>}
+      </div>
+    </div>
   );
 }
