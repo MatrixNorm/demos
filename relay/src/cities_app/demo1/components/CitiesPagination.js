@@ -1,13 +1,19 @@
-import React from "react";
+import React, { useCallback } from "react";
+import { City } from "./City";
 
-function City({ city }) {
+function CitiesPage({ cities, pageNo, hasPrev, hasNext, onPrev, onNext }) {
   return (
     <div>
+      <ol>
+        {cities.map(city => (
+          <City city={city} key={city.id} />
+        ))}
+      </ol>
       <div>
-        {city.name}
-        <i>({city.country})</i>
+        {hasPrev && <button onClick={onPrev}>PREV</button>}
+        <span>{pageNo}</span>
+        {hasNext && <button onClick={onNext}>NEXT</button>}
       </div>
-      <div>{city.population}</div>
     </div>
   );
 }
@@ -18,33 +24,31 @@ export default function CitiesPagination({ cities, relay }) {
   const hasNext = cities?.hasNextPage;
   const pageNo = cities?.pageNo;
 
-  function prevPage() {
+  const onPrev = useCallback(() => {
     hasPrev &&
       relay.refetch(prevVars => {
         return { ...prevVars, pageNo: pageNo - 1 };
       });
-  }
-
-  function nextPage() {
-    hasNext && loadNextPage();
-  }
+  });
+  const onNext = useCallback(() => {
+    hasNext &&
+      relay.refetch(nextVars => {
+        return { ...nextVars, pageNo: pageNo + 1 };
+      });
+  });
 
   if (!cities) {
     return <p>something wrong</p>;
   }
 
   return (
-    <div>
-      <ol>
-        {cities.nodes.map(city => (
-          <City city={city} key={city.id} />
-        ))}
-      </ol>
-      <div>
-        <button onClick={prevPage}>PREV</button>
-        <span>{pageNo}</span>
-        <button onClick={nextPage}>NEXT</button>
-      </div>
-    </div>
+    <CitiesPage
+      cities={cities.nodes}
+      pageNo={pageNo}
+      hasPrev={hasPrev}
+      hasNext={hasNext}
+      onPrev={onPrev}
+      onNext={onNext}
+    />
   );
 }

@@ -8,7 +8,7 @@ function isMissing(obj) {
   return obj === null || obj === undefined || Object.entries(obj).length === 0;
 }
 
-const users = {
+export const users = {
   user_anon: { id: "user_anon", name: "Anon", settings: { pageSize: 5 } },
   user1: { id: "user1", name: "Bob", settings: { pageSize: 7 } }
 };

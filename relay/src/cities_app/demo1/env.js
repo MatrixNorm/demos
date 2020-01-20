@@ -8,7 +8,7 @@ import {
 import { graphql } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 import serverSchemaTxt from "raw-loader!theapp/resources/serverSchema.graphql";
-import { serverResolvers } from "theapp/resolvers";
+import { serverResolvers, users } from "theapp/resolvers";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
@@ -21,7 +21,7 @@ const network = Network.create(async (operation, variables) => {
     serverSchema,
     operation.text,
     {},
-    undefined,
+    { user: users["user1"] },
     variables
   );
   console.log(resp);
