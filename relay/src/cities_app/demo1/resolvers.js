@@ -3,6 +3,14 @@ import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
 
 const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);
 const countries = [...new Set(cities.map(i => i.country))];
+const citiesMetadata = {
+  populationLowerBound: cities
+    .map(c => c.population)
+    .reduce((a, b) => Math.min(a, b)),
+  populationUpperBound: cities
+    .map(c => c.population)
+    .reduce((a, b) => Math.max(a, b))
+};
 
 function isMissing(obj) {
   return obj === null || obj === undefined || Object.entries(obj).length === 0;
@@ -64,8 +72,7 @@ export const serverResolvers = {
     },
     citiesMetadata: () => {
       return {
-        populationLowerBound: 400000,
-        populationUpperBound: 9000000,
+        ...citiesMetadata,
         latLowerBound: 11.97,
         latUpperBound: 67.53,
         lngLowerBound: 9.47,

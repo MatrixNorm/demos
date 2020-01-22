@@ -1,6 +1,16 @@
 import React, { useState } from "react";
-import { graphql } from "react-relay";
+import { graphql, createFragmentContainer } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
+import styled from "styled-components";
+
+const Input = styled.input`
+  width: calc(100% - 4px);
+  padding: 0;
+`;
+
+const Section = styled.section`
+  margin-bottom: 20px;
+`;
 
 const defaultInput = {
   countryNameContains: "",
@@ -8,14 +18,19 @@ const defaultInput = {
   populationLte: 100000000
 };
 
-export default function SearchParameters({
+function SearchParameters({
   metadata,
   initialSearchParams,
-  relay
+  environment,
+  refetch
 }) {
-  console.log("SearchParameters");
+  //console.log("SearchParameters", metadata);
   const [searchParams, setSearchParams] = useState({
     ...defaultInput,
+    ...{
+      populationGte: metadata.populationLowerBound,
+      populationLte: metadata.populationUpperBound
+    },
     ...(initialSearchParams || {})
   });
 
@@ -41,52 +56,67 @@ export default function SearchParameters({
         citySearchParams: { ...searchParams }
       }
     };
-    relay.environment.commitPayload(operationDescriptor, data);
-    relay.environment.retain(operationDescriptor.root);
-    console.log(searchParams);
-    relay.refetch({ searchParams });
+    environment.commitPayload(operationDescriptor, data);
+    environment.retain(operationDescriptor.root);
+    //console.log(searchParams);
+    refetch({ searchParams });
   }
 
   return (
     <div>
-      <div>Country:</div>
-      <input
-        type="text"
-        value={searchParams.countryNameContains}
-        onChange={e =>
-          setSearchParams({
-            ...searchParams,
-            countryNameContains: e.target.value
-          })
-        }
-      />
-      <div>Population greater than:</div>
-      <input
-        type="number"
-        step="100000"
-        value={searchParams.populationGte}
-        onChange={e =>
-          setSearchParams({
-            ...searchParams,
-            populationGte: parseInt(e.target.value)
-          })
-        }
-      />
-      <div>Population less than:</div>
-      <input
-        type="number"
-        step="100000"
-        value={searchParams.populationLte}
-        onChange={e =>
-          setSearchParams({
-            ...searchParams,
-            populationLte: parseInt(e.target.value)
-          })
-        }
-      />
+      <Section>
+        <div>Country:</div>
+        <Input
+          type="text"
+          value={searchParams.countryNameContains}
+          onChange={e =>
+            setSearchParams({
+              ...searchParams,
+              countryNameContains: e.target.value
+            })
+          }
+        />
+      </Section>
+      <Section>
+        <div>Population more than:</div>
+        <Input
+          type="number"
+          step="100000"
+          value={searchParams.populationGte}
+          onChange={e =>
+            setSearchParams({
+              ...searchParams,
+              populationGte: parseInt(e.target.value)
+            })
+          }
+        />
+      </Section>
+      <Section>
+        <div>Population less than:</div>
+        <Input
+          type="number"
+          step="100000"
+          value={searchParams.populationLte}
+          onChange={e =>
+            setSearchParams({
+              ...searchParams,
+              populationLte: parseInt(e.target.value)
+            })
+          }
+        />
+      </Section>
       <div>
         <button onClick={onButtonClick}>Apply</button>
       </div>
     </div>
   );
 }
+
+export default createFragmentContainer(SearchParameters, {
+  metadata: graphql`
+    fragment SearchParameters_metadata on CitiesMetadata {
+      populationLowerBound
+      populationUpperBound
+    }
+  `
+});

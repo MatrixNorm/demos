@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash 0e62e786ac65f94858427c8d6f72f58c
+ * @relayHash 3bd532802e372316733f921104a832cf
  */
 
 /* eslint-disable */
@@ -10,7 +10,7 @@
 /*::
 import type { ConcreteRequest } from 'relay-runtime';
 import type { CitiesBrowserPanel_cities$ref } from "./CitiesBrowserPanel_cities.graphql";
-import type { CitiesBrowserPanel_metadata$ref } from "./CitiesBrowserPanel_metadata.graphql";
+import type { CitiesBrowserPanel_searchMetadata$ref } from "./CitiesBrowserPanel_searchMetadata.graphql";
 export type CitiesOrderAttr = "countryASC" | "countryDESC" | "latASC" | "latDESC" | "lngASC" | "lngDESC" | "nameASC" | "nameDESC" | "populationASC" | "populationDESC";
 export type CitySearchParamsInput = {|
   countryNameContains?: ?string,
@@ -24,7 +24,7 @@ export type CitiesBrowserPanelQueryVariables = {|
   searchParams?: ?CitySearchParamsInput,
 |};
 export type CitiesBrowserPanelQueryResponse = {|
-  +$fragmentRefs: CitiesBrowserPanel_cities$ref & CitiesBrowserPanel_metadata$ref
+  +$fragmentRefs: CitiesBrowserPanel_cities$ref & CitiesBrowserPanel_searchMetadata$ref
 |};
 export type CitiesBrowserPanelQuery = {|
   variables: CitiesBrowserPanelQueryVariables,
@@ -40,7 +40,7 @@ query CitiesBrowserPanelQuery(
   $searchParams: CitySearchParamsInput
 ) {
   ...CitiesBrowserPanel_cities_2NHXxp
-  ...CitiesBrowserPanel_metadata
+  ...CitiesBrowserPanel_searchMetadata
 }
 
 fragment CitiesBrowserPanel_cities_2NHXxp on Query {
@@ -59,11 +59,15 @@ fragment CitiesBrowserPanel_cities_2NHXxp on Query {
   }
 }
 
-fragment CitiesBrowserPanel_metadata on Query {
+fragment CitiesBrowserPanel_searchMetadata on Query {
   citiesMetadata {
-    populationLowerBound
-    populationUpperBound
+    ...SearchParameters_metadata
   }
+}
+
+fragment SearchParameters_metadata on CitiesMetadata {
+  populationLowerBound
+  populationUpperBound
 }
 */
 
@@ -121,7 +125,7 @@ return {
       },
       {
         "kind": "FragmentSpread",
-        "name": "CitiesBrowserPanel_metadata",
+        "name": "CitiesBrowserPanel_searchMetadata",
         "args": null
       }
     ]
@@ -247,11 +251,11 @@ return {
     "operationKind": "query",
     "name": "CitiesBrowserPanelQuery",
     "id": null,
-    "text": "query CitiesBrowserPanelQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n  ...CitiesBrowserPanel_metadata\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    nodes {\n      id\n      name\n      country\n      population\n      lat\n      lng\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n\nfragment CitiesBrowserPanel_metadata on Query {\n  citiesMetadata {\n    populationLowerBound\n    populationUpperBound\n  }\n}\n",
+    "text": "query CitiesBrowserPanelQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n  ...CitiesBrowserPanel_searchMetadata\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    nodes {\n      id\n      name\n      country\n      population\n      lat\n      lng\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n\nfragment CitiesBrowserPanel_searchMetadata on Query {\n  citiesMetadata {\n    ...SearchParameters_metadata\n  }\n}\n\nfragment SearchParameters_metadata on CitiesMetadata {\n  populationLowerBound\n  populationUpperBound\n}\n",
     "metadata": {}
   }
 };
 })();
 // prettier-ignore
-(node/*: any*/).hash = '6f617bc51bfbbd03b9dcdf0e89b5130e';
+(node/*: any*/).hash = 'ee98e646b8bf69b2ca5d132c92bdc9a0';
 module.exports = node;

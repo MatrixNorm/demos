@@ -1,24 +1,50 @@
 import React from "react";
 import { createRefetchContainer, QueryRenderer, graphql } from "react-relay";
+import styled from "styled-components";
 import SearchParameters from "./SearchParameters";
 import CitiesPagination from "./CitiesPagination";
 
-const CitiesBrowserPanel = createRefetchContainer(
-  ({ cities, metadata, initialSearchParams, relay }) => {
-    return (
-      <>
-        <SearchParameters
-          metadata={metadata}
-          initialSearchParams={initialSearchParams}
-          relay={relay}
-        />
-        <CitiesPagination
-          cities={cities.citiesPagination}
-          relay={relay}
-        />
-      </>
-    );
-  },
+const WithStyle = styled.div`
+  .outer-panel {
+    display: flex;
+  }
+
+  .search-params {
+    width: 150px;
+  }
+
+  .pagination-panel {
+    width: 350px;
+  }
+`;
+
+const CitiesBrowserPanel = ({
+  cities,
+  searchMetadata,
+  initialSearchParams,
+  relay
+}) => {
+  return (
+    <WithStyle>
+      <div className="outer-panel">
+        <div className="search-params">
+          <SearchParameters
+            metadata={searchMetadata.citiesMetadata}
+            initialSearchParams={initialSearchParams}
+            environment={relay.environment}
+            refetch={relay.refetch}
+          />
+        </div>
+        <div className="pagination-panel">
+          <CitiesPagination cities={cities.citiesPagination} relay={relay} />
+        </div>
+      </div>
+    </WithStyle>
+  );
+};
+
+const CitiesBrowserPanelRC = createRefetchContainer(
+  CitiesBrowserPanel,
   {
     cities: graphql`
       fragment CitiesBrowserPanel_cities on Query
@@ -46,11 +72,10 @@ const CitiesBrowserPanel = createRefetchContainer(
         }
       }
     `,
-    metadata: graphql`
-      fragment CitiesBrowserPanel_metadata on Query {
+    searchMetadata: graphql`
+      fragment CitiesBrowserPanel_searchMetadata on Query {
         citiesMetadata {
-          populationLowerBound
-          populationUpperBound
+          ...SearchParameters_metadata
         }
       }
     `
@@ -87,7 +112,7 @@ export default function CitiesBrowserPanelQR({ searchParams, environment }) {
               pageSize: $pageSize
               searchParams: $searchParams
             )
-          ...CitiesBrowserPanel_metadata
+          ...CitiesBrowserPanel_searchMetadata
         }
       `}
       environment={environment}
@@ -96,9 +121,9 @@ export default function CitiesBrowserPanelQR({ searchParams, environment }) {
         if (error) return <h3>error</h3>;
         if (!props) return <h3>loading...</h3>;
         return (
-          <CitiesBrowserPanel
+          <CitiesBrowserPanelRC
             cities={props}
-            metadata={props}
+            searchMetadata={props}
             initialSearchParams={searchParams}
           />
         );
