@@ -3,6 +3,8 @@ import { createRefetchContainer, QueryRenderer, graphql } from "react-relay";
 import styled from "styled-components";
 import SearchParameters from "./SearchParameters";
 import CitiesPagination from "./CitiesPagination";
+import LoadingIndicator from "theapp/elements/LoadingIndicator";
+import LoadingError from "theapp/elements/LoadingError";
 
 const WithStyle = styled.div`
   .outer-panel {
@@ -118,14 +120,20 @@ export default function CitiesBrowserPanelQR({ searchParams, environment }) {
       environment={environment}
       variables={{ pageSize: 5, pageNo: 0, searchParams }}
       render={({ error, props }) => {
-        if (error) return <h3>error</h3>;
-        if (!props) return <h3>loading...</h3>;
         return (
-          <CitiesBrowserPanelRC
-            cities={props}
-            searchMetadata={props}
-            initialSearchParams={searchParams}
-          />
+          <div className="cities-browser-panel">
+            {error ? (
+              <LoadingError />
+            ) : props ? (
+              <CitiesBrowserPanelRC
+                cities={props}
+                searchMetadata={props}
+                initialSearchParams={searchParams}
+              />
+            ) : (
+              <LoadingIndicator />
+            )}
+          </div>
         );
       }}
     />
