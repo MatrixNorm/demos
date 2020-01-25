@@ -5,14 +5,8 @@ import React from "react";
 
 import environment from "./env";
 import CityFeed from "./CityFeed";
-import type { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 
-type Props = {
-  error: ?Error,
-  props: ?AppQueryResponse
-};
-
-const render = ({ error, props }: Props) => {
+const render = ({ error, props }) => {
   if (error) {
     return <h1>fook: {error.toString()}</h1>;
   }
@@ -23,8 +17,7 @@ const render = ({ error, props }: Props) => {
 
 const AppQuery = graphql`
   query AppQuery($count: Int, $cursor: String) {
-    ...CityFeed_cities
-      @arguments(count: $count, cursor: $cursor)
+    ...CityFeed_cities @arguments(count: $count, cursor: $cursor)
   }
 `;
 

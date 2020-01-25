@@ -1,20 +1,10 @@
 // @flow
 
-import {
-  createPaginationContainer,
-  graphql,
-  type RelayPaginationProp
-} from "react-relay";
+import { createPaginationContainer, graphql } from "react-relay";
 import React, { useState } from "react";
 import City from "../demo1/City";
-import type { CityFeed_cities } from "./__generated__/CityFeed_cities.graphql";
 
-type Props = {|
-  relay: RelayPaginationProp,
-  cities: CityFeed_cities
-|};
-
-const CityFeed = ({ relay, cities }: Props) => {
+const CityFeed = ({ relay, cities }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { allCities } = cities;

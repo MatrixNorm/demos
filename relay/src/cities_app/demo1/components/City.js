@@ -1,4 +1,5 @@
 import React from "react";
+import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 
 const CityStyle = styled.div`
@@ -7,7 +8,7 @@ const CityStyle = styled.div`
   }
 `;
 
-export function City({ city }) {
+export function City_({ city }) {
   return (
     <CityStyle>
       <div>
@@ -22,19 +23,13 @@ export function City({ city }) {
   );
 }
 
-export function CitiesPage({ cities, pageNo, hasPrev, hasNext, onPrev, onNext }) {
-  return (
-    <div>
-      <ol>
-        {cities.map(city => (
-          <City city={city} key={city.id} />
-        ))}
-      </ol>
-      <div>
-        {hasPrev && <button onClick={onPrev}>PREV</button>}
-        <span>{pageNo}</span>
-        {hasNext && <button onClick={onNext}>NEXT</button>}
-      </div>
-    </div>
-  );
-}
+export default createFragmentContainer(City_, {
+  city: graphql`
+    fragment City_city on City {
+      id
+      name
+      country
+      population
+    }
+  `
+});

@@ -60,17 +60,7 @@ const CitiesBrowserPanelRC = createRefetchContainer(
           pageSize: $pageSize
           searchParams: $searchParams
         ) {
-          nodes {
-            id
-            name
-            country
-            population
-            lat
-            lng
-          }
-          hasNextPage
-          hasPrevPage
-          pageNo
+          ...CitiesPage_page
         }
       }
     `,
