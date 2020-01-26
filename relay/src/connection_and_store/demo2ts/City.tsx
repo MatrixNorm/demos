@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from 'react';
 import { createFragmentContainer, graphql } from "react-relay";
 import { City_city } from "./__generated__/City_city.graphql";
 

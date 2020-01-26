@@ -28,7 +28,7 @@ type PageInfo {
 
 type CityConnection {
   pageInfo: PageInfo!
-  edges: [CityEdge]!
+  edges: [CityEdge]
 }
 
 type CityEdge {

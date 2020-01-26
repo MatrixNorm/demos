@@ -1,6 +1,5 @@
 import { QueryRenderer, graphql } from "react-relay";
-import React from "react";
-
+import * as React from "react";
 import environment from "./env";
 import CityFeed from "./CityFeed";
 

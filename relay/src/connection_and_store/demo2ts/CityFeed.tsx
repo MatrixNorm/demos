@@ -1,18 +1,24 @@
 import { createPaginationContainer, graphql } from "react-relay";
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import City from "./City";
+import { CityFeed_cities } from "./__generated__/CityFeed_cities.graphql";
 
-const CityFeed = ({ relay, cities }) => {
+interface Props {
+  cities: CityFeed_cities;
+  relay: any;
+}
+
+const CityFeed = ({ relay, cities }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { allCities } = cities;
 
+  // TS: https://github.com/microsoft/TypeScript/pull/29955
+  // .filter(Boolean) does not work like in flow
   const nodes =
     allCities && allCities.edges
-      ? allCities.edges
-          .filter(Boolean)
-          .map(edge => edge.node)
-          .filter(Boolean)
+      ? allCities.edges.map(edge => (edge ? edge.node : null))//.filter(Boolean)
       : [];
 
   function loadMode() {

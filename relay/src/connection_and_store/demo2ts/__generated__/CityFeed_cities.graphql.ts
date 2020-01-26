@@ -11,7 +11,7 @@ export type CityFeed_cities = {
                 readonly " $fragmentRefs": FragmentRefs<"City_city">;
             } | null;
             readonly cursor: string;
-        } | null>;
+        } | null> | null;
         readonly pageInfo: {
             readonly hasNextPage: boolean;
             readonly endCursor: string | null;
