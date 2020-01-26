@@ -1,7 +1,12 @@
 import React from "react";
 import { createFragmentContainer, graphql } from "react-relay";
+import { City_city } from "./__generated__/City_city.graphql";
 
-function City({ city }) {
+interface Props {
+  city: City_city;
+}
+
+function City({ city }: Props) {
   const { name, lat, lng } = city;
   return (
     <div>
