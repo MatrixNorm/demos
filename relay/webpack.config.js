@@ -12,10 +12,11 @@ const baseBuild = ({ buildId }) => env => {
     : `docs/js/${buildId}`;
 
   const mode = env.development ? "development" : "production";
+  const lang = process.env.LANG;
 
   return {
     entry: {
-      main: `./src/${buildId}/main.tsx`
+      main: `./src/${buildId}/main.${lang === "ts" ? "tsx" : "js"}`
     },
     output: {
       path: path.resolve(__dirname, outputPath),
@@ -24,7 +25,6 @@ const baseBuild = ({ buildId }) => env => {
     },
     mode: mode,
     devServer: {
-      //contentBase: `jsdev/${buildId}`,
       publicPath: "/",
       historyApiFallback: true
     },
@@ -49,11 +49,16 @@ const baseBuild = ({ buildId }) => env => {
           use: {
             loader: "babel-loader",
             options: {
-              presets: [
-                "@babel/preset-react",
-                ["@babel/preset-env", { targets: { chrome: "76" } }],
-                "@babel/typescript"
-              ],
+              presets: (function() {
+                let base = [
+                  "@babel/preset-react",
+                  ["@babel/preset-env", { targets: { chrome: "76" } }]
+                ];
+                if (lang === "ts") {
+                  return [...base, "@babel/typescript"];
+                }
+                return base;
+              })(),
               plugins: [
                 [
                   "relay",

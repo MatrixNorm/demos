@@ -18,7 +18,7 @@ const CityFeed = ({ relay, cities }: Props) => {
   // .filter(Boolean) does not work like in flow
   const nodes =
     allCities && allCities.edges
-      ? allCities.edges.map(edge => (edge ? edge.node : null))//.filter(Boolean)
+      ? allCities.edges.map(edge => (edge ? edge.node : null)) //.filter(Boolean)
       : [];
 
   function loadMode() {
@@ -32,9 +32,11 @@ const CityFeed = ({ relay, cities }: Props) => {
   return (
     <div>
       <div>
-        {nodes.map(node => (
-          <City city={node} key={node.id} />
-        ))}
+        {nodes.map(node => {
+          if (node) {
+            return <City city={node} key={node.id} />;
+          }
+        })}
       </div>
       {relay.hasMore() && <button onClick={loadMode}>NEXT</button>}
       {isLoading && <span>loading ...</span>}

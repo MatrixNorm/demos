@@ -3,7 +3,7 @@ import * as React from "react";
 import environment from "./env";
 import CityFeed from "./CityFeed";
 
-const render = ({ error, props }) => {
+const render = ({ error, props }: any) => {
   if (error) {
     return <h1>fook: {error.toString()}</h1>;
   }
