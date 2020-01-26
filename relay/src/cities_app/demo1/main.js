@@ -1,5 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import App from "./App";
+import { createRelayEnvironment } from "theapp/env";
+import App from "theapp/App";
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(
+  <App environment={createRelayEnvironment()} />,
+  document.getElementById("app")
+);

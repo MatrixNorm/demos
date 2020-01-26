@@ -1,11 +1,12 @@
 import React, { useCallback } from "react";
-import { CitiesPage } from "./City";
+import { graphql, createFragmentContainer } from "react-relay";
+import { CitySummary } from "./CitySummary";
 
-export default function CitiesPagination({ cities, relay }) {
-  console.log("CitiesPagination", cities);
-  const hasPrev = cities?.hasPrevPage;
-  const hasNext = cities?.hasNextPage;
-  const pageNo = cities?.pageNo;
+export function CitiesPagination__({ page, relay }) {
+  console.log("CitiesPagination", page);
+  const hasPrev = page?.hasPrevPage;
+  const hasNext = page?.hasNextPage;
+  const pageNo = page?.pageNo;
 
   const onPrev = useCallback(() => {
     hasPrev &&
@@ -20,18 +21,35 @@ export default function CitiesPagination({ cities, relay }) {
       });
   });
 
-  if (!cities) {
+  if (!page) {
     return <p>something wrong</p>;
   }
 
   return (
-    <CitiesPage
-      cities={cities.nodes}
-      pageNo={pageNo}
-      hasPrev={hasPrev}
-      hasNext={hasNext}
-      onPrev={onPrev}
-      onNext={onNext}
-    />
+    <div>
+      <ol>
+        {page.nodes.map(city => (
+          <CitySummary city={city} key={city.id} />
+        ))}
+      </ol>
+      <div>
+        {page.hasPrev && <button onClick={onPrev}>PREV</button>}
+        <span>{page.pageNo}</span>
+        {page.hasNext && <button onClick={onNext}>NEXT</button>}
+      </div>
+    </div>
   );
 }
+
+export default createFragmentContainer(CitiesPagination__, {
+  page: graphql`
+    fragment CitiesPagination_page on CitiesPagination {
+      pageNo
+      hasNextPage
+      hasPrevPage
+      nodes {
+        ...CitySummary_city
+      }
+    }
+  `
+});

@@ -1,6 +1,6 @@
 /**
  * @flow
- * @relayHash cef84be1fa136f4a7a61fd0be9be35a8
+ * @relayHash d47b00db36b5b5e33b286e1b14bc5693
  */
 
 /* eslint-disable */
@@ -43,18 +43,25 @@ query CitiesBrowserPanelRefetchQuery(
 
 fragment CitiesBrowserPanel_cities_2NHXxp on Query {
   citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {
-    nodes {
-      id
-      name
-      country
-      population
-      lat
-      lng
-    }
-    hasNextPage
-    hasPrevPage
-    pageNo
+    ...CitiesPagination_page
   }
+}
+
+fragment CitiesPagination_page on CitiesPagination {
+  pageNo
+  hasNextPage
+  hasPrevPage
+  nodes {
+    ...CitySummary_city
+    id
+  }
+}
+
+fragment CitySummary_city on City {
+  id
+  name
+  country
+  population
 }
 */
 
@@ -127,6 +134,27 @@ return {
         "plural": false,
         "selections": [
           {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "pageNo",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "hasNextPage",
+            "args": null,
+            "storageKey": null
+          },
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "hasPrevPage",
+            "args": null,
+            "storageKey": null
+          },
+          {
             "kind": "LinkedField",
             "alias": null,
             "name": "nodes",
@@ -162,43 +190,8 @@ return {
                 "name": "population",
                 "args": null,
                 "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "lat",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "lng",
-                "args": null,
-                "storageKey": null
               }
             ]
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "hasNextPage",
-            "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "hasPrevPage",
-            "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "pageNo",
-            "args": null,
-            "storageKey": null
           }
         ]
       }
@@ -208,7 +201,7 @@ return {
     "operationKind": "query",
     "name": "CitiesBrowserPanelRefetchQuery",
     "id": null,
-    "text": "query CitiesBrowserPanelRefetchQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    nodes {\n      id\n      name\n      country\n      population\n      lat\n      lng\n    }\n    hasNextPage\n    hasPrevPage\n    pageNo\n  }\n}\n",
+    "text": "query CitiesBrowserPanelRefetchQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  pageNo\n  hasNextPage\n  hasPrevPage\n  nodes {\n    ...CitySummary_city\n    id\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
     "metadata": {}
   }
 };

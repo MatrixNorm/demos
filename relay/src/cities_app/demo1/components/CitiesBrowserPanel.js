@@ -60,7 +60,7 @@ const CitiesBrowserPanelRC = createRefetchContainer(
           pageSize: $pageSize
           searchParams: $searchParams
         ) {
-          ...CitiesPage_page
+          ...CitiesPagination_page
         }
       }
     `,

@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { graphql } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
-import environment from "theapp/env";
 import CitiesBrowserPanel from "theapp/components/CitiesBrowserPanel";
 
-export default function App() {
+export default function App({ environment }) {
   console.log("App");
   const [state, setState] = useState({ ready: false });
   useEffect(() => {

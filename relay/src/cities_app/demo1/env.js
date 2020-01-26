@@ -15,34 +15,37 @@ const serverSchema = makeExecutableSchema({
   resolvers: serverResolvers
 });
 
-const network = Network.create(async (operation, variables) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
-  const resp = await graphql(
-    serverSchema,
-    operation.text,
-    {},
-    { user: users["user1"] },
-    variables
-  );
-  console.log(resp);
-  return resp;
-});
-
-const store = new Store(new RecordSource());
-const environment = new Environment({ network, store });
-
-commitLocalUpdate(environment, store => {
-  const uiStateId = "client:UIState";
-  const uiState = store.create(uiStateId, "UIState");
-  environment.retain({
-    dataID: uiStateId,
-    variables: {},
-    node: { selections: [] }
+export const createRelayEnvironment = () => {
+  const network = Network.create(async (operation, variables) => {
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const resp = await graphql(
+      serverSchema,
+      operation.text,
+      {},
+      { user: users["user1"] },
+      variables
+    );
+    console.log(resp);
+    return resp;
   });
-  store.getRoot().setLinkedRecord(uiState, "uiState");
-});
 
-window.printStore = () => {
-  console.log(environment.getStore().getSource()._records);
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+
+  commitLocalUpdate(environment, store => {
+    const uiStateId = "client:UIState";
+    const uiState = store.create(uiStateId, "UIState");
+    environment.retain({
+      dataID: uiStateId,
+      variables: {},
+      node: { selections: [] }
+    });
+    store.getRoot().setLinkedRecord(uiState, "uiState");
+  });
+
+  window.printStore = () => {
+    console.log(environment.getStore().getSource()._records);
+  };
+
+  return environment;
 };
-export default environment;

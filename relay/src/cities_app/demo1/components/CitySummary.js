@@ -1,6 +1,13 @@
+// @flow
+
 import React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
+import type { CitySummary_city } from "theapp/__generated__/CitySummary_city.graphql";
+
+type Props = {|
+  +city: CitySummary_city
+|};
 
 const CityStyle = styled.div`
   .country {
@@ -8,7 +15,7 @@ const CityStyle = styled.div`
   }
 `;
 
-export function City_({ city }) {
+export function CitySummary__({ city }: Props) {
   return (
     <CityStyle>
       <div>
@@ -23,9 +30,9 @@ export function City_({ city }) {
   );
 }
 
-export default createFragmentContainer(City_, {
+export default createFragmentContainer(CitySummary__, {
   city: graphql`
-    fragment City_city on City {
+    fragment CitySummary_city on City {
       id
       name
       country

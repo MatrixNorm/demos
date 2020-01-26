@@ -15,7 +15,7 @@ const baseBuild = ({ buildId }) => env => {
 
   return {
     entry: {
-      main: `./src/${buildId}/main.js`
+      main: `./src/${buildId}/main.tsx`
     },
     output: {
       path: path.resolve(__dirname, outputPath),
@@ -35,7 +35,7 @@ const baseBuild = ({ buildId }) => env => {
       })
     ],
     resolve: {
-      extensions: [".mjs", ".js", ".jsx"],
+      extensions: [".mjs", ".js", ".jsx", ".ts", ".tsx"],
       alias: {
         theapp: path.resolve(__dirname, `src/${buildId}/`),
         theproject: path.resolve(__dirname, `src/`)
@@ -44,7 +44,7 @@ const baseBuild = ({ buildId }) => env => {
     module: {
       rules: [
         {
-          test: /\.m?js$/,
+          test: /\.(ts|tsx|js|jsx|mjs)$/,
           exclude: /node_modules/,
           use: {
             loader: "babel-loader",
@@ -52,7 +52,7 @@ const baseBuild = ({ buildId }) => env => {
               presets: [
                 "@babel/preset-react",
                 ["@babel/preset-env", { targets: { chrome: "76" } }],
-                "@babel/preset-flow"
+                "@babel/typescript"
               ],
               plugins: [
                 [

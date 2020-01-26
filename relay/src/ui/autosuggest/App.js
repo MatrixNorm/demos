@@ -1,5 +1,3 @@
-// @flow
-
 import React, { useMemo, useRef, useReducer } from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import { createDebounceStateMachine } from "../../utils/fsm";
