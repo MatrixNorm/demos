@@ -1,4 +1,4 @@
-import { createPaginationContainer, graphql } from "react-relay";
+import { createPaginationContainer, graphql, RelayPaginationProp } from "react-relay";
 import * as React from "react";
 import { useState } from "react";
 import City from "./City";
@@ -6,7 +6,7 @@ import { CityFeed_cities } from "./__generated__/CityFeed_cities.graphql";
 
 interface Props {
   cities: CityFeed_cities;
-  relay: any;
+  relay: RelayPaginationProp;
 }
 
 const CityFeed = ({ relay, cities }: Props) => {
