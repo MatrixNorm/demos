@@ -7,10 +7,7 @@ import {
   IEnvironment
 } from "relay-runtime";
 import CitiesBrowserPanel from "./components/CitiesBrowserPanel";
-import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
-
-type UIStateType = AppQueryResponse["uiState"];
-type SearchParams = UIStateType["citySearchParams"];
+import { UIState, SearchParams } from "./types";
 
 interface AppProps {
   environment: IEnvironment;
@@ -42,7 +39,7 @@ export default function App({ environment }: AppProps) {
     const request = getRequest(query);
     const operation = createOperationDescriptor(request, {});
     const res = environment.lookup(operation.fragment);
-    const uiState: UIStateType = res.data.uiState;
+    const uiState: UIState = res.data.uiState;
     setState({ ready: true, searchParams: uiState.citySearchParams });
   }, []);
 
