@@ -1,7 +1,26 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
-import { createOperationDescriptor, getRequest } from "relay-runtime";
+import {
+  createOperationDescriptor,
+  getRequest,
+  IEnvironment
+} from "relay-runtime";
 import styled from "styled-components";
+import { SearchParameters_metadata } from "../__generated__/SearchParameters_metadata.graphql";
+
+interface Props {
+  metadata: SearchParameters_metadata;
+  initialSearchParams: SearchParams;
+  environment: IEnvironment;
+  refetch: any;
+}
+
+interface SearchParams {
+  countryNameContains: string | null;
+  populationGte: number | null;
+  populationLte: number | null;
+}
 
 const Input = styled.input`
   width: calc(100% - 4px);
@@ -12,7 +31,7 @@ const Section = styled.section`
   margin-bottom: 20px;
 `;
 
-const defaultInput = {
+const defaultInput: SearchParams = {
   countryNameContains: "",
   populationGte: 0,
   populationLte: 100000000
@@ -23,8 +42,7 @@ function SearchParameters({
   initialSearchParams,
   environment,
   refetch
-}) {
-  //console.log("SearchParameters", metadata);
+}: Props) {
   const [searchParams, setSearchParams] = useState({
     ...defaultInput,
     ...{
@@ -57,7 +75,7 @@ function SearchParameters({
       }
     };
     environment.commitPayload(operationDescriptor, data);
-    environment.retain(operationDescriptor.root);
+    environment.retain(operationDescriptor);
     //console.log(searchParams);
     refetch({ searchParams });
   }
@@ -68,7 +86,7 @@ function SearchParameters({
         <div>Country:</div>
         <Input
           type="text"
-          value={searchParams.countryNameContains}
+          value={searchParams.countryNameContains || ""}
           onChange={e =>
             setSearchParams({
               ...searchParams,
@@ -82,11 +100,11 @@ function SearchParameters({
         <Input
           type="number"
           step="100000"
-          value={searchParams.populationGte}
+          value={searchParams.populationGte || ""}
           onChange={e =>
             setSearchParams({
               ...searchParams,
-              populationGte: parseInt(e.target.value)
+              populationGte: parseInt(e.target.value) || null
             })
           }
         />
@@ -96,11 +114,11 @@ function SearchParameters({
         <Input
           type="number"
           step="100000"
-          value={searchParams.populationLte}
+          value={searchParams.populationLte || ""}
           onChange={e =>
             setSearchParams({
               ...searchParams,
-              populationLte: parseInt(e.target.value)
+              populationLte: parseInt(e.target.value) || null
             })
           }
         />

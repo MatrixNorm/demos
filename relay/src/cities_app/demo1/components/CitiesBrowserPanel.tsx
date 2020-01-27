@@ -1,11 +1,17 @@
 import * as React from "react";
-import { createRefetchContainer, QueryRenderer, graphql } from "react-relay";
+import {
+  createRefetchContainer,
+  QueryRenderer,
+  graphql,
+  RelayRefetchProp
+} from "react-relay";
 import styled from "styled-components";
 import SearchParameters from "./SearchParameters";
 import CitiesPagination from "./CitiesPagination";
 import LoadingIndicator from "../elements/LoadingIndicator";
 import LoadingError from "../elements/LoadingError";
 import { CitiesPagination_page } from "../__generated__/CitiesPagination_page.graphql";
+import { CitiesBrowserPanel_cities } from "../__generated__/CitiesBrowserPanel_cities.graphql";
 
 const WithStyle = styled.div`
   .outer-panel {
@@ -21,12 +27,19 @@ const WithStyle = styled.div`
   }
 `;
 
+interface Props {
+  cities: CitiesBrowserPanel_cities;
+  searchMetadata: any;
+  initialSearchParams: any;
+  relay: RelayRefetchProp;
+}
+
 const CitiesBrowserPanel = ({
   cities,
   searchMetadata,
   initialSearchParams,
   relay
-}) => {
+}: Props) => {
   const loadPrevPage = (currentPage: CitiesPagination_page) => {
     currentPage.hasPrevPage &&
       relay.refetch(prevVars => {
@@ -53,11 +66,13 @@ const CitiesBrowserPanel = ({
           />
         </div>
         <div className="pagination-panel">
-          <CitiesPagination
-            cities={cities.citiesPagination}
-            loadPrevPage={loadPrevPage}
-            loadNextPage={loadNextPage}
-          />
+          {cities.citiesPagination && (
+            <CitiesPagination
+              page={cities.citiesPagination}
+              loadPrevPage={loadPrevPage}
+              loadNextPage={loadNextPage}
+            />
+          )}
         </div>
       </div>
     </WithStyle>
@@ -108,7 +123,6 @@ const CitiesBrowserPanelRC = createRefetchContainer(
 );
 
 export default function CitiesBrowserPanelQR({ searchParams, environment }) {
-  console.log("CitiesBrowserPanelQR", searchParams, environment);
   return (
     <QueryRenderer
       query={graphql`

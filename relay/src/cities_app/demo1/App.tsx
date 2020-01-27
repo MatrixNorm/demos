@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import { graphql } from "react-relay";
-import { createOperationDescriptor, getRequest } from "relay-runtime";
-import CitiesBrowserPanel from "theapp/components/CitiesBrowserPanel";
+import {
+  createOperationDescriptor,
+  getRequest,
+  IEnvironment
+} from "relay-runtime";
+import CitiesBrowserPanel from "./components/CitiesBrowserPanel";
+import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 
-export default function App({ environment }) {
-  console.log("App");
-  const [state, setState] = useState({ ready: false });
+interface Props {
+  environment: IEnvironment;
+}
+
+export default function App({ environment }: Props) {
+  const [state, setState] = useState({ ready: false, searchParams: null });
   useEffect(() => {
     const query = graphql`
       query AppQuery {
@@ -21,7 +30,8 @@ export default function App({ environment }) {
     `;
     const request = getRequest(query);
     const operation = createOperationDescriptor(request, {});
-    const res = environment.lookup(operation.fragment, operation);
+    const res = environment.lookup(operation.fragment);
+    // @ts-ignore
     setState({ ready: true, searchParams: res.data.uiState.citySearchParams });
   }, []);
 
