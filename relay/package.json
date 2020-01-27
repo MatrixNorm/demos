@@ -28,7 +28,7 @@
     "react-relay": "^7.1.0",
     "react-router-dom": "^5.1.2",
     "relay-compiler": "^7.1.0",
-    "styled-components": "^4.4.1",
+    "styled-components": "^5.0.0",
     "xstate": "^4.7.5"
   },
   "devDependencies": {
@@ -47,9 +47,11 @@
     "@storybook/addon-links": "^5.3.9",
     "@storybook/addons": "^5.3.9",
     "@storybook/react": "^5.3.9",
+    "@types/lodash": "^4.14.149",
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
     "@types/react-relay": "^7.0.3",
+    "@types/styled-components": "^4.4.2",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "babel-plugin-relay": "^6.0.0",

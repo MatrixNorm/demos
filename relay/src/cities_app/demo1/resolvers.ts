@@ -1,4 +1,5 @@
-import _ from "lodash";
+import * as _ from "lodash";
+// @ts-ignore
 import citiesTxt from "raw-loader!theapp/resources/cities.json.txt";
 
 const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);

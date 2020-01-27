@@ -1,13 +1,11 @@
-// @flow
-
-import React from "react";
+import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
-import type { CitySummary_city } from "theapp/__generated__/CitySummary_city.graphql";
+import { CitySummary_city } from "../__generated__/CitySummary_city.graphql";
 
-type Props = {|
-  +city: CitySummary_city
-|};
+interface Props {
+  city: CitySummary_city;
+}
 
 const CityStyle = styled.div`
   .country {

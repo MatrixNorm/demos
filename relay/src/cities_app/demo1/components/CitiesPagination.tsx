@@ -1,41 +1,49 @@
-import React, { useCallback } from "react";
+import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
-import { CitySummary } from "./CitySummary";
+import CitySummary from "./CitySummary";
+import { CitiesPagination_page } from "../__generated__/CitiesPagination_page.graphql";
 
-export function CitiesPagination__({ page, relay }) {
-  console.log("CitiesPagination", page);
-  const hasPrev = page?.hasPrevPage;
-  const hasNext = page?.hasNextPage;
-  const pageNo = page?.pageNo;
+interface Props {
+  page: CitiesPagination_page;
+  loadPrevPage: any;
+  loadNextPage: any;
+}
 
-  const onPrev = useCallback(() => {
-    hasPrev &&
+export function CitiesPagination__({
+  page,
+  loadPrevPage,
+  loadNextPage
+}: Props) {
+  const onPrev = (currentPage: CitiesPagination_page) => {
+    currentPage.hasPrevPage &&
       relay.refetch(prevVars => {
-        return { ...prevVars, pageNo: pageNo - 1 };
+        return { ...prevVars, pageNo: currentPage.pageNo - 1 };
       });
-  });
-  const onNext = useCallback(() => {
-    hasNext &&
+  };
+  const onNext = (currentPage: CitiesPagination_page) => {
+    currentPage.hasNextPage &&
       relay.refetch(nextVars => {
-        return { ...nextVars, pageNo: pageNo + 1 };
+        return { ...nextVars, pageNo: currentPage.pageNo + 1 };
       });
-  });
-
-  if (!page) {
-    return <p>something wrong</p>;
-  }
-
+  };
+  const { nodes, hasPrevPage, hasNextPage, pageNo } = page;
   return (
     <div>
       <ol>
-        {page.nodes.map(city => (
-          <CitySummary city={city} key={city.id} />
-        ))}
+        {nodes && nodes.map(city => <CitySummary city={city} key={city.id} />)}
       </ol>
       <div>
-        {page.hasPrev && <button onClick={onPrev}>PREV</button>}
-        <span>{page.pageNo}</span>
-        {page.hasNext && <button onClick={onNext}>NEXT</button>}
+        {hasPrevPage && (
+          <button onClick={() => loadPrevPage(page)}>
+            PREV
+          </button>
+        )}
+        <span>{pageNo}</span>
+        {hasNextPage && (
+          <button onClick={() => loadNextPage(page)}>
+            NEXT
+          </button>
+        )}
       </div>
     </div>
   );
@@ -48,6 +56,7 @@ export default createFragmentContainer(CitiesPagination__, {
       hasNextPage
       hasPrevPage
       nodes {
+        id
         ...CitySummary_city
       }
     }

@@ -1,10 +1,11 @@
-import React from "react";
+import * as React from "react";
 import { createRefetchContainer, QueryRenderer, graphql } from "react-relay";
 import styled from "styled-components";
 import SearchParameters from "./SearchParameters";
 import CitiesPagination from "./CitiesPagination";
-import LoadingIndicator from "theapp/elements/LoadingIndicator";
-import LoadingError from "theapp/elements/LoadingError";
+import LoadingIndicator from "../elements/LoadingIndicator";
+import LoadingError from "../elements/LoadingError";
+import { CitiesPagination_page } from "../__generated__/CitiesPagination_page.graphql";
 
 const WithStyle = styled.div`
   .outer-panel {
@@ -26,6 +27,20 @@ const CitiesBrowserPanel = ({
   initialSearchParams,
   relay
 }) => {
+  const loadPrevPage = (currentPage: CitiesPagination_page) => {
+    currentPage.hasPrevPage &&
+      relay.refetch(prevVars => {
+        return { ...prevVars, pageNo: currentPage.pageNo - 1 };
+      });
+  };
+
+  const loadNextPage = (currentPage: CitiesPagination_page) => {
+    currentPage.hasNextPage &&
+      relay.refetch(nextVars => {
+        return { ...nextVars, pageNo: currentPage.pageNo + 1 };
+      });
+  };
+
   return (
     <WithStyle>
       <div className="outer-panel">
@@ -38,7 +53,11 @@ const CitiesBrowserPanel = ({
           />
         </div>
         <div className="pagination-panel">
-          <CitiesPagination cities={cities.citiesPagination} relay={relay} />
+          <CitiesPagination
+            cities={cities.citiesPagination}
+            loadPrevPage={loadPrevPage}
+            loadNextPage={loadNextPage}
+          />
         </div>
       </div>
     </WithStyle>

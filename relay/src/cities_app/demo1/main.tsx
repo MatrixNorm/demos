@@ -1,7 +1,7 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { createRelayEnvironment } from "theapp/env";
-import App from "theapp/App";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { createRelayEnvironment } from "./env";
+import App from "./App";
 
 ReactDOM.render(
   <App environment={createRelayEnvironment()} />,
