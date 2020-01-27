@@ -9,12 +9,23 @@ import {
 import CitiesBrowserPanel from "./components/CitiesBrowserPanel";
 import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
 
-interface Props {
+type UIStateType = AppQueryResponse["uiState"];
+type SearchParams = UIStateType["citySearchParams"];
+
+interface AppProps {
   environment: IEnvironment;
 }
 
-export default function App({ environment }: Props) {
-  const [state, setState] = useState({ ready: false, searchParams: null });
+interface State {
+  ready: boolean;
+  searchParams: SearchParams;
+}
+
+export default function App({ environment }: AppProps) {
+  const [state, setState] = useState<State>({
+    ready: false,
+    searchParams: null
+  });
   useEffect(() => {
     const query = graphql`
       query AppQuery {
@@ -31,8 +42,8 @@ export default function App({ environment }: Props) {
     const request = getRequest(query);
     const operation = createOperationDescriptor(request, {});
     const res = environment.lookup(operation.fragment);
-    // @ts-ignore
-    setState({ ready: true, searchParams: res.data.uiState.citySearchParams });
+    const uiState: UIStateType = res.data.uiState;
+    setState({ ready: true, searchParams: uiState.citySearchParams });
   }, []);
 
   if (state.ready) {
