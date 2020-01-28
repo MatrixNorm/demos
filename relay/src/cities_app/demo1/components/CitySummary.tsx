@@ -9,7 +9,7 @@ interface Props {
 
 const CityStyle = styled.div`
   .country {
-    color: blue;
+    color: red;
   }
 `;
 
