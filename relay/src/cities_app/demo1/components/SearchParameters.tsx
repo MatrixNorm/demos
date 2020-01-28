@@ -7,7 +7,7 @@ import {
   IEnvironment
 } from "relay-runtime";
 import styled from "styled-components";
-import { SearchParameters_metadata } from "../__generated__/SearchParameters_metadata.graphql";
+import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 
 interface Props {
   metadata: SearchParameters_metadata;

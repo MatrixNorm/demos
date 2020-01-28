@@ -1,7 +1,7 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
-import { CitySummary_city } from "../__generated__/CitySummary_city.graphql";
+import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
 interface Props {
   city: CitySummary_city;

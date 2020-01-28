@@ -11,9 +11,9 @@ import SearchParameters from "./SearchParameters";
 import CitiesPagination from "./CitiesPagination";
 import LoadingIndicator from "../elements/LoadingIndicator";
 import LoadingError from "../elements/LoadingError";
-import { CitiesPagination_page } from "../__generated__/CitiesPagination_page.graphql";
-import { CitiesBrowserPanel_cities } from "../__generated__/CitiesBrowserPanel_cities.graphql";
-import { CitiesBrowserPanelQuery } from "../__generated__/CitiesBrowserPanelQuery.graphql";
+import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
+import { CitiesBrowserPanel_cities } from "__relay__/CitiesBrowserPanel_cities.graphql";
+import { CitiesBrowserPanelQuery } from "__relay__/CitiesBrowserPanelQuery.graphql";
 import { SearchParams } from "../types";
 
 const WithStyle = styled.div`

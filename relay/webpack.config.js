@@ -63,7 +63,7 @@ const baseBuild = ({ buildId }) => env => {
                 [
                   "relay",
                   {
-                    artifactDirectory: `./src/${buildId}/__generated__`
+                    artifactDirectory: `./src/__relay__`
                   }
                 ],
                 "@babel/proposal-class-properties",

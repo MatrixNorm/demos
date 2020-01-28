@@ -1,7 +1,7 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import CitySummary from "./CitySummary";
-import { CitiesPagination_page } from "../__generated__/CitiesPagination_page.graphql";
+import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 
 interface Props {
   page: CitiesPagination_page;
