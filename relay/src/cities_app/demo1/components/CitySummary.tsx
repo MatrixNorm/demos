@@ -7,24 +7,35 @@ interface Props {
   city: CitySummary_city;
 }
 
-const CityStyle = styled.div`
+const City = styled.div`
+  .row {
+    margin: 0 0 10px 0;
+  }
+  .name {
+    margin-right: 14px;
+    font-weight: bold;
+  }
   .country {
     color: red;
+  }
+  .population-label {
+    font-size: 0.9em;
+    margin-right: 5px;
   }
 `;
 
 export function CitySummary__({ city }: Props) {
   return (
-    <CityStyle>
-      <div>
+    <City>
+      <div className="row">
         <span className="name">{city.name}</span>
         <span className="country">{city.country}</span>
       </div>
-      <div>
-        <label className="population-label">pop.</label>
+      <div className="row">
+        <label className="population-label">population</label>
         <span className="population">{city.population}</span>
       </div>
-    </CityStyle>
+    </City>
   );
 }
 
