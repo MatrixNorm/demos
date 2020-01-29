@@ -5,10 +5,11 @@ import {
   RecordSource,
   Store
 } from "relay-runtime";
-import { graphql } from "graphql";
+import { graphql, graphqlSync } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
-import serverSchemaTxt from "raw-loader!theapp/resources/serverSchema.graphql";
-import { serverResolvers, users } from "theapp/resolvers";
+// @ts-ignore
+import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
+import { serverResolvers, users } from "./resolvers";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
@@ -47,5 +48,27 @@ export const createRelayEnvironment = () => {
     console.log(environment.getStore().getSource()._records);
   };
 
+  return environment;
+};
+
+export const createTestingEnv = (resolvers) => {
+  const executableSchema = makeExecutableSchema({
+    typeDefs: serverSchemaTxt,
+    resolvers: resolvers
+  });
+
+  const network = Network.create((operation, variables) => {
+    const resp = graphqlSync(
+      executableSchema,
+      operation.text,
+      {},
+      { user: users["user1"] },
+      variables
+    );
+    return resp;
+  });
+
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
   return environment;
 };
