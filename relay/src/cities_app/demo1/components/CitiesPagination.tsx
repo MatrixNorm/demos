@@ -11,7 +11,12 @@ const CitiesList = styled.ol`
   margin: 0;
 `;
 
-const PaginationControls = styled.section``;
+const Page = styled.div`
+  display: inline-block;
+  .controls-container {
+    text-align: center;
+  }
+`;
 
 interface Props {
   page: CitiesPagination_page;
@@ -22,7 +27,7 @@ interface Props {
 function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
   const { nodes, hasPrevPage, hasNextPage, pageNo } = page;
   return (
-    <div>
+    <Page>
       <CitiesList>
         {nodes &&
           nodes.map(city => (
@@ -31,12 +36,14 @@ function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
             </li>
           ))}
       </CitiesList>
-      <PaginationControls>
-        {hasPrevPage && <PrevButton onClick={() => loadNextPage(page)} />}
-        <span>{pageNo}</span>
-        {hasNextPage && <NextButton onClick={() => loadNextPage(page)} />}
-      </PaginationControls>
-    </div>
+      <div className="controls-container">
+        <div className="controls">
+          {hasPrevPage && <PrevButton onClick={() => loadPrevPage(page)} />}
+          <span>{pageNo}</span>
+          {hasNextPage && <NextButton onClick={() => loadNextPage(page)} />}
+        </div>
+      </div>
+    </Page>
   );
 }
 
