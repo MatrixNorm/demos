@@ -5,7 +5,7 @@ import CitiesPagination from "../components/CitiesPagination";
 
 export default { title: "cities_app-demo1/CityPagination" };
 
-export const aaa = () => {
+export const innerPage = () => {
   const environment = createTestingEnv({
     Query: {
       node(_, { id }) {
@@ -61,8 +61,8 @@ export const aaa = () => {
         return (
           <CitiesPagination
             page={props.citiesPagination}
-            loadPrevPage={() => console.log('prev')}
-            loadNextPage={() => console.log('next')}
+            loadPrevPage={() => console.log("prev")}
+            loadNextPage={() => console.log("next")}
           />
         );
       }}
