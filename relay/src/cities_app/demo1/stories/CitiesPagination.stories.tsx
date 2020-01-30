@@ -25,11 +25,18 @@ export const aaa = () => {
               name: "Rome",
               country: "Italy",
               population: 4600000
+            },
+            ,
+            {
+              id: "city#3",
+              name: "Turin",
+              country: "Italy",
+              population: 2300000
             }
           ],
-          pageNo: 1,
+          pageNo: 2,
           hasNextPage: true,
-          hasPrevPage: false
+          hasPrevPage: true
         };
       }
     },
@@ -54,8 +61,8 @@ export const aaa = () => {
         return (
           <CitiesPagination
             page={props.citiesPagination}
-            loadPrevPage={() => {}}
-            loadNextPage={() => {}}
+            loadPrevPage={() => console.log('prev')}
+            loadNextPage={() => console.log('next')}
           />
         );
       }}

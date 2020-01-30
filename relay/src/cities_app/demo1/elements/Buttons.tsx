@@ -1,0 +1,50 @@
+import * as React from "react";
+import styled from "styled-components";
+
+export const NextButton = styled.button`
+  background: transparent;
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  border: 0px solid #333;
+  border-radius: 50%;
+  padding: 0;
+
+  &:after {
+    content: "";
+    display: inline-block;
+    margin-top: 0.3em;
+    margin-left: -0.2em;
+    width: 0.7em;
+    height: 0.7em;
+    border-top: 0.3em solid #333;
+    border-right: 0.3em solid #333;
+    -moz-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+`;
+
+export const PrevButton = styled.button`
+  background: transparent;
+  display: inline-block;
+  width: 2em;
+  height: 2em;
+  border: 0px solid #333;
+  border-radius: 50%;
+  padding: 0;
+
+  &:after {
+    content: "";
+    display: inline-block;
+    margin-top: 0.3em;
+    margin-left: -0.2em;
+    width: 0.7em;
+    height: 0.7em;
+    border-top: 0.3em solid #333;
+    border-right: 0.3em solid #333;
+    -moz-transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    transform: rotate(-135deg);
+  }
+`;

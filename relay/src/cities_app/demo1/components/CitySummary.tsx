@@ -9,7 +9,6 @@ interface Props {
 
 const City = styled.section`
   display: inline-block;
-  //border: 1px solid grey;
   padding: 0 1em 0 1em;
   position: relative;
   .row {
@@ -23,7 +22,7 @@ const City = styled.section`
     font-weight: bold;
   }
   .country {
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #00BCD4;
     position: absolute;
     top: 0.4em;
