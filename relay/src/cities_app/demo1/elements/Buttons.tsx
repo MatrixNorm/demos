@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-const BaseButton = styled.button`
+const BasePaginationButton = styled.button`
   background: transparent;
   display: inline-block;
   width: 2em;
@@ -20,7 +20,7 @@ const BaseButton = styled.button`
   }
 `;
 
-export const NextButton = styled(BaseButton)`
+export const NextButton = styled(BasePaginationButton)`
   &:after {
     -moz-transform: rotate(45deg);
     -webkit-transform: rotate(45deg);
@@ -28,7 +28,7 @@ export const NextButton = styled(BaseButton)`
   }
 `;
 
-export const PrevButton = styled(BaseButton)`
+export const PrevButton = styled(BasePaginationButton)`
   &:after {
     -moz-transform: rotate(-135deg);
     -webkit-transform: rotate(-135deg);
@@ -36,3 +36,4 @@ export const PrevButton = styled(BaseButton)`
   }
 `;
 
+export const SubmitButton = styled.button``;
