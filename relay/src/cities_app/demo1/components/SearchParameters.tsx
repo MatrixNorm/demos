@@ -7,6 +7,7 @@ import {
   IEnvironment
 } from "relay-runtime";
 import styled from "styled-components";
+import { TextInput, NumberInput } from "../elements/Inputs";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 
 interface Props {
@@ -22,14 +23,44 @@ interface SearchParams {
   populationLte: number | null;
 }
 
-const Input = styled.input`
-  width: calc(100% - 4px);
-  padding: 0;
-`;
+// const Input = styled.input`
+//   width: calc(100% - 4px);
+//   padding: 0;
+// `;
 
 const Section = styled.section`
   margin-bottom: 20px;
 `;
+
+export function SearchParametersPure({ val, on }) {
+  return (
+    <div>
+      <Section>
+        <div>Country:</div>
+        <TextInput
+          value={val.countryNameContains || ""}
+          onChange={e => on.countryNameContains(e.target.value)}
+        />
+      </Section>
+      <Section>
+        <div>Population more than:</div>
+        <NumberInput
+          step="100000"
+          value={val.populationGte || ""}
+          onChange={e => on.populationGte(parseInt(e.target.value) || null)}
+        />
+      </Section>
+      <Section>
+        <div>Population less than:</div>
+        <NumberInput
+          step="100000"
+          value={val.populationLte || ""}
+          onChange={e => on.populationLte(parseInt(e.target.value) || null)}
+        />
+      </Section>
+    </div>
+  );
+}
 
 const defaultInput: SearchParams = {
   countryNameContains: "",
@@ -82,47 +113,30 @@ function SearchParameters({
 
   return (
     <div>
-      <Section>
-        <div>Country:</div>
-        <Input
-          type="text"
-          value={searchParams.countryNameContains || ""}
-          onChange={e =>
+      <SearchParametersPure
+        val={{
+          countryNameContains: searchParams.countryNameContains,
+          populationGte: searchParams.populationGte,
+          populationLte: searchParams.populationLte
+        }}
+        on={{
+          countryNameContains: val =>
             setSearchParams({
               ...searchParams,
-              countryNameContains: e.target.value
-            })
-          }
-        />
-      </Section>
-      <Section>
-        <div>Population more than:</div>
-        <Input
-          type="number"
-          step="100000"
-          value={searchParams.populationGte || ""}
-          onChange={e =>
+              countryNameContains: val
+            }),
+          populationGte: val =>
             setSearchParams({
               ...searchParams,
-              populationGte: parseInt(e.target.value) || null
-            })
-          }
-        />
-      </Section>
-      <Section>
-        <div>Population less than:</div>
-        <Input
-          type="number"
-          step="100000"
-          value={searchParams.populationLte || ""}
-          onChange={e =>
+              populationGte: val
+            }),
+          populationLte: val =>
             setSearchParams({
               ...searchParams,
-              populationLte: parseInt(e.target.value) || null
+              populationGte: val
             })
-          }
-        />
-      </Section>
+        }}
+      />
       <div>
         <button onClick={onButtonClick}>Apply</button>
       </div>

@@ -24,6 +24,7 @@ interface Props {
   loadNextPage: any;
 }
 
+// XXX generic pagination over cities, countries, goods, etc.
 function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
   const { nodes, hasPrevPage, hasNextPage, pageNo } = page;
   return (
