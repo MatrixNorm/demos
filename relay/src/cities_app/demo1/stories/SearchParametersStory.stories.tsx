@@ -25,42 +25,83 @@ export const aaa1 = () => {
   );
 };
 
-export const bbb2 = () => {
-  const environment = createTestingEnv({
+const query = graphql`
+  query SearchParametersStoryQuery {
+    citiesMetadata {
+      ...SearchParameters_metadata
+    }
+  }
+`;
+
+const uiQuery = graphql`
+  query SearchParametersStoryUIQuery {
+    __typename
+    uiState {
+      id
+      citySearchParams {
+        countryNameContains
+        populationGte
+        populationLte
+      }
+    }
+  }
+`;
+
+const makeEnv = (metadata: any) => {
+  return createTestingEnv({
     Query: {
       citiesMetadata: () => {
-        return {
-          populationLowerBound: 2,
-          populationUpperBound: 8
-        };
+        return metadata;
+      }
+    },
+    Node: {
+      __resolveType() {
+        return "City";
       }
     }
   });
+};
+
+export const bbb2 = () => {
+  const environment = makeEnv({
+    populationLowerBound: 2,
+    populationUpperBound: 8
+  });
   return (
-    <QueryRenderer
-      query={graphql`
-        query SearchParametersStoryQuery {
-          citiesMetadata {
-            ...SearchParameters_metadata
-          }
-        }
-      `}
-      environment={environment}
-      variables={{}}
-      render={({ error, props }) => {
-        return (
-          <SearchParameters
-            metadata={props.citiesMetadata}
-            initialSearchParams={{
-              countryNameContains: "q",
-              populationGte: null,
-              populationLte: null
-            }}
-            environment={environment}
-            refetch={() => {}}
-          />
-        );
-      }}
-    />
+    <>
+      <QueryRenderer
+        query={query}
+        environment={environment}
+        variables={{}}
+        render={({ error, props }) => {
+          return (
+            <SearchParameters
+              metadata={props.citiesMetadata}
+              initialSearchParams={{
+                countryNameContains: null,
+                populationGte: null,
+                populationLte: null
+              }}
+              environment={environment}
+              refetch={x => console.log(x)}
+            />
+          );
+        }}
+      />
+      <QueryRenderer
+        query={uiQuery}
+        environment={environment}
+        variables={{}}
+        render={({ error, props }) => {
+          return (
+            <div>
+              {props.uiState
+                ? JSON.stringify(props.uiState)
+                : String(props.uiState)}
+            </div>
+          );
+        }}
+      />
+    </>
   );
 };

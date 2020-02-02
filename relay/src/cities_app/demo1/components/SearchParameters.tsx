@@ -40,6 +40,7 @@ function commitSearchParamsInRelaystore(
         citySearchParams {
           countryNameContains
           populationGte
+          populationLte
         }
       }
     }

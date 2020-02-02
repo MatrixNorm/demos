@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 76f0a6eea6e85c9da4ca6459eacdea1a */
+/* @relayHash e9a4813729d239dfe987ed1e2fdbb565 */
 
 import { ConcreteRequest } from "relay-runtime";
 export type AppQueryVariables = {};
@@ -12,7 +12,7 @@ export type AppQueryResponse = {
             readonly populationGte: number | null;
             readonly populationLte: number | null;
         } | null;
-    };
+    } | null;
 };
 export type AppQuery = {
     readonly response: AppQueryResponse;

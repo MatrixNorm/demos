@@ -1,10 +1,10 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 3fd08c9c7879d10e61b72750392c5545 */
+/* @relayHash 06d1189892379b16bcf373ad9f5e592a */
 
 import { ConcreteRequest } from "relay-runtime";
-export type SearchParametersQueryVariables = {};
-export type SearchParametersQueryResponse = {
+export type SearchParametersStoryUIQueryVariables = {};
+export type SearchParametersStoryUIQueryResponse = {
     readonly __typename: string;
     readonly uiState: {
         readonly id: string;
@@ -15,15 +15,15 @@ export type SearchParametersQueryResponse = {
         } | null;
     } | null;
 };
-export type SearchParametersQuery = {
-    readonly response: SearchParametersQueryResponse;
-    readonly variables: SearchParametersQueryVariables;
+export type SearchParametersStoryUIQuery = {
+    readonly response: SearchParametersStoryUIQueryResponse;
+    readonly variables: SearchParametersStoryUIQueryVariables;
 };
 
 
 
 /*
-query SearchParametersQuery {
+query SearchParametersStoryUIQuery {
   __typename
 }
 */
@@ -97,7 +97,7 @@ return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "SearchParametersQuery",
+    "name": "SearchParametersStoryUIQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": [],
@@ -105,18 +105,18 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "SearchParametersQuery",
+    "name": "SearchParametersStoryUIQuery",
     "argumentDefinitions": [],
     "selections": (v0/*: any*/)
   },
   "params": {
     "operationKind": "query",
-    "name": "SearchParametersQuery",
+    "name": "SearchParametersStoryUIQuery",
     "id": null,
-    "text": "query SearchParametersQuery {\n  __typename\n}\n",
+    "text": "query SearchParametersStoryUIQuery {\n  __typename\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = 'f89105c0e6abfb9189eea630631b40ca';
+(node as any).hash = 'ed25173f39312f6c40cbc859db784ad3';
 export default node;

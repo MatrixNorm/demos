@@ -7,7 +7,7 @@ interface Props {
   city: CitySummary_city;
 }
 
-const City = styled.section`
+const CitySummary = styled.section`
   display: inline-block;
   padding: 0 1em 0 1em;
   position: relative;
@@ -23,7 +23,7 @@ const City = styled.section`
   }
   .country {
     font-size: 0.85em;
-    color: #00BCD4;
+    color: #00bcd4;
     position: absolute;
     top: 0.4em;
     right: 0.4em;
@@ -34,28 +34,29 @@ const City = styled.section`
   }
 `;
 
-export function CitySummary__({ city }: Props) {
-  return (
-    <City>
-      <div className="row row-1">
-        <span className="name">{city.name}</span>
-        <span className="country">{city.country}</span>
-      </div>
-      <div className="row">
-        <label className="population-label">population</label>
-        <span className="population">{city.population}</span>
-      </div>
-    </City>
-  );
-}
-
-export default createFragmentContainer(CitySummary__, {
-  city: graphql`
-    fragment CitySummary_city on City {
-      id
-      name
-      country
-      population
-    }
-  `
-});
+export default createFragmentContainer(
+  ({ city }: Props) => {
+    return (
+      <CitySummary>
+        <div className="row row-1">
+          <span className="name">{city.name}</span>
+          <span className="country">{city.country}</span>
+        </div>
+        <div className="row">
+          <label className="population-label">population</label>
+          <span className="population">{city.population}</span>
+        </div>
+      </CitySummary>
+    );
+  },
+  {
+    city: graphql`
+      fragment CitySummary_city on City {
+        id
+        name
+        country
+        population
+      }
+    `
+  }
+);

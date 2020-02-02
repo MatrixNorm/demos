@@ -51,7 +51,7 @@ export const createRelayEnvironment = () => {
   return environment;
 };
 
-export const createTestingEnv = (resolvers) => {
+export const createTestingEnv = (resolvers: any) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
     resolvers: resolvers
