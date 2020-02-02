@@ -41,7 +41,7 @@ export const innerPage = () => {
       }
     },
     Node: {
-      __resolveType(node) {
+      __resolveType() {
         return "City";
       }
     }

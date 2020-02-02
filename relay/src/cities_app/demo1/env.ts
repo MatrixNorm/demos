@@ -65,7 +65,20 @@ export const createTestingEnv = (resolvers: any) => {
       { user: users["user1"] },
       variables
     );
+    console.log(resp);
     return resp;
+  });
+
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};
+
+export const loadingForeverEnvironment = () => {
+  const network = Network.create(async () => {
+    while (true) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
   });
 
   const store = new Store(new RecordSource());

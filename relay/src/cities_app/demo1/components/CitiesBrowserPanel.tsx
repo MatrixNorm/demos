@@ -16,17 +16,17 @@ import { CitiesBrowserPanel_cities } from "__relay__/CitiesBrowserPanel_cities.g
 import { CitiesBrowserPanelQuery } from "__relay__/CitiesBrowserPanelQuery.graphql";
 import { SearchParams } from "../types";
 
-const WithStyle = styled.div`
+const Panel = styled.div`
+  display: flex;
   .outer-panel {
-    display: flex;
   }
 
-  .search-params {
-    width: 150px;
+  .search-params-wrapper {
+    width: 200px;
   }
 
-  .pagination-panel {
-    width: 350px;
+  .pagination-panel-wrapper {
+    width: 400px;
   }
 `;
 
@@ -58,27 +58,25 @@ const CitiesBrowserPanel = ({
   };
 
   return (
-    <WithStyle>
-      <div className="outer-panel">
-        <div className="search-params">
-          <SearchParameters
-            metadata={searchMetadata.citiesMetadata}
-            initialSearchParams={initialSearchParams}
-            environment={relay.environment}
-            refetch={relay.refetch}
-          />
-        </div>
-        <div className="pagination-panel">
-          {cities.citiesPagination && (
-            <CitiesPagination
-              page={cities.citiesPagination}
-              loadPrevPage={loadPrevPage}
-              loadNextPage={loadNextPage}
-            />
-          )}
-        </div>
+    <Panel>
+      <div className="search-params-wrapper">
+        <SearchParameters
+          metadata={searchMetadata.citiesMetadata}
+          initialSearchParams={initialSearchParams}
+          environment={relay.environment}
+          refetch={relay.refetch}
+        />
       </div>
-    </WithStyle>
+      <div className="pagination-panel-wrapper">
+        {cities.citiesPagination && (
+          <CitiesPagination
+            page={cities.citiesPagination}
+            loadPrevPage={loadPrevPage}
+            loadNextPage={loadNextPage}
+          />
+        )}
+      </div>
+    </Panel>
   );
 };
 
@@ -154,22 +152,28 @@ export default function CitiesBrowserPanelQR({
       environment={environment}
       variables={{ pageSize: 5, pageNo: 0, searchParams }}
       render={({ error, props }) => {
-        return (
-          <div className="cities-browser-panel">
-            {error ? (
-              <LoadingError />
-            ) : props ? (
-              <CitiesBrowserPanelRC
-                cities={props}
-                searchMetadata={props}
-                initialSearchParams={searchParams}
-              />
-            ) : (
-              <LoadingIndicator />
-            )}
-          </div>
-        );
+        if (error) {
+          return <CitiesBrowserPanelError />;
+        }
+        if (props) {
+          return (
+            <CitiesBrowserPanelRC
+              cities={props}
+              searchMetadata={props}
+              initialSearchParams={searchParams}
+            />
+          );
+        }
+        return <CitiesBrowserPanelLoading />;
       }}
     />
   );
+}
+
+function CitiesBrowserPanelLoading() {
+  return <LoadingIndicator />;
+}
+
+function CitiesBrowserPanelError() {
+  return <LoadingError />;
 }
