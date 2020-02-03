@@ -3,6 +3,7 @@ import { QueryRenderer, graphql } from "react-relay";
 import { createTestingEnv } from "../env";
 import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
 import SearchParameters, { EventT } from "../components/SearchParameters";
+import { SearchParametersStoryQuery } from "__relay__/SearchParametersStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/SearchParameters" };
 
@@ -68,28 +69,31 @@ export const bbb2 = () => {
   });
   return (
     <>
-      <QueryRenderer
+      <QueryRenderer<SearchParametersStoryQuery>
         query={query}
         environment={environment}
         variables={{}}
         render={({ error, props }) => {
           return (
-            <SearchParameters
-              metadata={props.citiesMetadata}
-              initialSearchParams={{
-                countryNameContains: null,
-                populationGte: null,
-                populationLte: null
-              }}
-              environment={environment}
-              refetch={x => console.log(x)}
-              render={({ searchParams, dispatch }) => (
-                <SearchParametersPresentational
-                  searchParams={searchParams}
-                  dispatch={dispatch}
-                />
-              )}
-            />
+            props &&
+            props.citiesMetadata && (
+              <SearchParameters
+                metadata={props.citiesMetadata}
+                initialSearchParams={{
+                  countryNameContains: null,
+                  populationGte: null,
+                  populationLte: null
+                }}
+                environment={environment}
+                refetch={x => console.log(x)}
+                render={({ searchParams, dispatch }) => (
+                  <SearchParametersPresentational
+                    searchParams={searchParams}
+                    dispatch={dispatch}
+                  />
+                )}
+              />
+            )
           );
         }}
       />
