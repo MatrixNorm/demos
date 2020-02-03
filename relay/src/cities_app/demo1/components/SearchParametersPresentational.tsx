@@ -31,15 +31,20 @@ function Field({
     if (child.type === TextInput) {
       return React.cloneElement(child, {
         value: fieldValues[fieldName] || "",
-        onChange: e => {
-          let target: HTMLTextAreaElement = e.target
-          dispatch(["fieldChange", [fieldName, target.value]])}
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          dispatch(["fieldChange", [fieldName, e.target.value]]);
+        }
       });
     }
     if (child.type === NumberInput) {
       return React.cloneElement(child, {
         value: fieldValues[fieldName] || "",
-        onChange: e => dispatch(["applyChange"])
+        onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+          dispatch([
+            "fieldChange",
+            [fieldName, parseInt(e.target.value) || null]
+          ]);
+        }
       });
     }
     return child;
@@ -69,7 +74,7 @@ export function SearchParametersPresentational() {
         </Field>
       </ParameterSection>
       <div>
-        <SubmitButton onClick={() => dispatch(["applyChange", null])}>
+        <SubmitButton onClick={() => dispatch(["applyChange"])}>
           Apply
         </SubmitButton>
       </div>

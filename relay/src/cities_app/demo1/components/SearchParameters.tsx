@@ -68,8 +68,8 @@ export const EventDispatchContext = React.createContext<DispatchFunction>(
   ([x, y]) => {}
 );
 
-type Event = ["fieldChange", [string, any]] | ["applyChange"];
-type DispatchFunction = (event: Event) => void;
+export type Event = ["fieldChange", [string, any]] | ["applyChange"];
+export type DispatchFunction = (event: Event) => void;
 
 function SearchParameters({
   metadata,
