@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import {
   createOperationDescriptor,
@@ -9,7 +9,7 @@ import {
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 
-interface SearchParams {
+export interface SearchParams {
   countryNameContains: string | null;
   populationGte: number | null;
   populationLte: number | null;
@@ -26,6 +26,7 @@ interface Props {
   initialSearchParams: SearchParams;
   environment: IEnvironment;
   refetch: any;
+  children: any;
 }
 
 function commitSearchParamsInRelaystore(
@@ -58,11 +59,24 @@ function commitSearchParamsInRelaystore(
   relayEnv.retain(operationDescriptor);
 }
 
+export const SearchParametersContext = React.createContext<SearchParams>({
+  countryNameContains: null,
+  populationGte: null,
+  populationLte: null
+});
+export const EventDispatchContext = React.createContext<DispatchFunction>(
+  ([x, y]) => {}
+);
+
+type Event = ["fieldChange", [string, any]] | ["applyChange"];
+type DispatchFunction = (event: Event) => void;
+
 function SearchParameters({
   metadata,
   initialSearchParams,
   environment,
-  refetch
+  refetch,
+  children
 }: Props) {
   const [searchParams, setSearchParams] = useState({
     ...defaultInput,
@@ -73,23 +87,28 @@ function SearchParameters({
     ...(initialSearchParams || {})
   });
 
-  function applySearchParams() {
-    commitSearchParamsInRelaystore(searchParams, environment);
-    refetch({ searchParams });
-  }
-
-  let onFieldChange = (fieldName: string, fieldValue: any) =>
-    setSearchParams({
-      ...searchParams,
-      [fieldName]: fieldValue
-    });
+  let dispatch = useCallback((event: Event) => {
+    if (event[0] === "fieldChange") {
+      let [fieldName, fieldValue] = event[1];
+      setSearchParams({
+        ...searchParams,
+        [fieldName]: fieldValue
+      });
+      return;
+    }
+    if (event[0] === "applyChange") {
+      commitSearchParamsInRelaystore(searchParams, environment);
+      refetch({ searchParams });
+      return;
+    }
+  }, []);
 
   return (
-    <SearchParametersPresentational
-      fieldValues={searchParams}
-      onFieldChange={onFieldChange}
-      onButtonClick={applySearchParams}
-    />
+    <SearchParametersContext.Provider value={searchParams}>
+      <EventDispatchContext.Provider value={dispatch}>
+        {children}
+      </EventDispatchContext.Provider>
+    </SearchParametersContext.Provider>
   );
 }
 

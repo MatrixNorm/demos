@@ -1,5 +1,11 @@
 import * as React from "react";
+import { useContext } from "react";
 import styled from "styled-components";
+import {
+  SearchParametersContext,
+  EventDispatchContext,
+  SearchParams
+} from "./SearchParameters";
 import { SubmitButton } from "../elements/Buttons";
 import { TextInput, NumberInput } from "../elements/Inputs";
 
@@ -12,42 +18,60 @@ const ParameterSection = styled.section`
   margin-bottom: 20px;
 `;
 
-export function SearchParametersPresentational({
-  fieldValues,
-  onFieldChange,
-  onButtonClick
+function Field({
+  fieldName,
+  children
+}: {
+  fieldName: keyof SearchParams;
+  children: any;
 }) {
+  const fieldValues = useContext(SearchParametersContext);
+  const dispatch = useContext(EventDispatchContext);
+  return React.Children.map(children, child => {
+    if (child.type === TextInput) {
+      return React.cloneElement(child, {
+        value: fieldValues[fieldName] || "",
+        onChange: e => {
+          let target: HTMLTextAreaElement = e.target
+          dispatch(["fieldChange", [fieldName, target.value]])}
+      });
+    }
+    if (child.type === NumberInput) {
+      return React.cloneElement(child, {
+        value: fieldValues[fieldName] || "",
+        onChange: e => dispatch(["applyChange"])
+      });
+    }
+    return child;
+  });
+}
+
+export function SearchParametersPresentational() {
+  const dispatch = useContext(EventDispatchContext);
   return (
     <div>
       <ParameterSection>
         <div>Country:</div>
-        <TextInput
-          value={fieldValues.countryNameContains || ""}
-          onChange={e => onFieldChange("countryNameContains", e.target.value)}
-        />
+        <Field fieldName="countryNameContains">
+          <TextInput />
+        </Field>
       </ParameterSection>
       <ParameterSection>
         <div>Population more than:</div>
-        <NumberInput
-          step="100000"
-          value={fieldValues.populationGte || ""}
-          onChange={e =>
-            onFieldChange("populationGte", parseInt(e.target.value) || null)
-          }
-        />
+        <Field fieldName="populationGte">
+          <NumberInput step="100000" />
+        </Field>
       </ParameterSection>
       <ParameterSection>
         <div>Population less than:</div>
-        <NumberInput
-          step="100000"
-          value={fieldValues.populationLte || ""}
-          onChange={e =>
-            onFieldChange("populationLte", parseInt(e.target.value) || null)
-          }
-        />
+        <Field fieldName="populationLte">
+          <NumberInput step="100000" />
+        </Field>
       </ParameterSection>
       <div>
-        <SubmitButton onClick={onButtonClick}>Apply</SubmitButton>
+        <SubmitButton onClick={() => dispatch(["applyChange", null])}>
+          Apply
+        </SubmitButton>
       </div>
     </div>
   );
