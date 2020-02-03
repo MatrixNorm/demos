@@ -1,36 +1,32 @@
-import * as React from "react";
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import {
   createOperationDescriptor,
   getRequest,
   IEnvironment
 } from "relay-runtime";
-import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
+import { SearchParamsT } from "../types";
 
-export interface SearchParams {
-  countryNameContains: string | null;
-  populationGte: number | null;
-  populationLte: number | null;
+interface Props {
+  metadata: SearchParameters_metadata;
+  initialSearchParams: SearchParamsT;
+  environment: IEnvironment;
+  refetch: any;
+  render: any;
 }
 
-const defaultInput: SearchParams = {
+export type EventT = ["fieldChange", [string, any]] | ["applyChange"];
+export type DispatchT = (event: EventT) => void;
+
+const defaultInput: SearchParamsT = {
   countryNameContains: "",
   populationGte: 0,
   populationLte: 999999999
 };
 
-interface Props {
-  metadata: SearchParameters_metadata;
-  initialSearchParams: SearchParams;
-  environment: IEnvironment;
-  refetch: any;
-  children: any;
-}
-
 function commitSearchParamsInRelaystore(
-  searchParams: SearchParams,
+  searchParams: SearchParamsT,
   relayEnv: IEnvironment
 ) {
   const query = graphql`
@@ -59,24 +55,12 @@ function commitSearchParamsInRelaystore(
   relayEnv.retain(operationDescriptor);
 }
 
-export const SearchParametersContext = React.createContext<SearchParams>({
-  countryNameContains: null,
-  populationGte: null,
-  populationLte: null
-});
-export const EventDispatchContext = React.createContext<DispatchFunction>(
-  ([x, y]) => {}
-);
-
-export type Event = ["fieldChange", [string, any]] | ["applyChange"];
-export type DispatchFunction = (event: Event) => void;
-
 function SearchParameters({
   metadata,
   initialSearchParams,
   environment,
   refetch,
-  children
+  render
 }: Props) {
   const [searchParams, setSearchParams] = useState({
     ...defaultInput,
@@ -87,9 +71,10 @@ function SearchParameters({
     ...(initialSearchParams || {})
   });
 
-  let dispatch = useCallback((event: Event) => {
+  let dispatch = (event: EventT) => {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
+      console.log(1, searchParams);
       setSearchParams({
         ...searchParams,
         [fieldName]: fieldValue
@@ -101,15 +86,8 @@ function SearchParameters({
       refetch({ searchParams });
       return;
     }
-  }, []);
-
-  return (
-    <SearchParametersContext.Provider value={searchParams}>
-      <EventDispatchContext.Provider value={dispatch}>
-        {children}
-      </EventDispatchContext.Provider>
-    </SearchParametersContext.Provider>
-  );
+  };
+  return render({ dispatch, searchParams });
 }
 
 export default createFragmentContainer(SearchParameters, {

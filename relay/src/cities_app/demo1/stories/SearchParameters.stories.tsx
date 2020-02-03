@@ -2,11 +2,7 @@ import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import { createTestingEnv } from "../env";
 import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
-import SearchParameters, {
-  SearchParametersContext,
-  EventDispatchContext,
-  Event
-} from "../components/SearchParameters";
+import SearchParameters, { EventT } from "../components/SearchParameters";
 
 export default { title: "cities_app-demo1/SearchParameters" };
 
@@ -16,16 +12,15 @@ export const aaa1 = () => {
     populationGte: 1000,
     populationLte: 30000
   };
-  const dispatch = ([eventType, payload]: Event) => {
+  const dispatch = ([eventType, payload]: EventT) => {
     console.log(eventType, payload);
   };
 
   return (
-    <SearchParametersContext.Provider value={searchParams}>
-      <EventDispatchContext.Provider value={dispatch}>
-        <SearchParametersPresentational />
-      </EventDispatchContext.Provider>
-    </SearchParametersContext.Provider>
+    <SearchParametersPresentational
+      searchParams={searchParams}
+      dispatch={dispatch}
+    />
   );
 };
 
@@ -88,9 +83,13 @@ export const bbb2 = () => {
               }}
               environment={environment}
               refetch={x => console.log(x)}
-            >
-              <SearchParametersPresentational />
-            </SearchParameters>
+              render={({ searchParams, dispatch }) => (
+                <SearchParametersPresentational
+                  searchParams={searchParams}
+                  dispatch={dispatch}
+                />
+              )}
+            />
           );
         }}
       />

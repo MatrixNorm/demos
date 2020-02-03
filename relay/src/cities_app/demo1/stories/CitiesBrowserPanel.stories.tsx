@@ -60,7 +60,11 @@ export const ok = () => {
 
 export const loading = () => {
   const environment = loadingForeverEnvironment()
-  const searchParams = null;
+  const searchParams =  {
+    countryNameContains: null,
+    populationGte: null,
+    populationLte: null
+  };;
   return (
     <CitiesBrowserPanel environment={environment} searchParams={searchParams} />
   );

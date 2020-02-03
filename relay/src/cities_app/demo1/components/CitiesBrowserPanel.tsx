@@ -7,28 +7,15 @@ import {
 } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
-import SearchParameters from "./SearchParameters";
+import SearchParameters, { DispatchT } from "./SearchParameters";
+import { SearchParamsT } from "../types";
+import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import CitiesPagination from "./CitiesPagination";
 import LoadingIndicator from "../elements/LoadingIndicator";
 import LoadingError from "../elements/LoadingError";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesBrowserPanel_cities } from "__relay__/CitiesBrowserPanel_cities.graphql";
 import { CitiesBrowserPanelQuery } from "__relay__/CitiesBrowserPanelQuery.graphql";
-import { SearchParams } from "../types";
-
-const Panel = styled.div`
-  display: flex;
-  .outer-panel {
-  }
-
-  .search-params-wrapper {
-    width: 200px;
-  }
-
-  .pagination-panel-wrapper {
-    width: 400px;
-  }
-`;
 
 interface Props {
   cities: CitiesBrowserPanel_cities;
@@ -36,6 +23,17 @@ interface Props {
   initialSearchParams: any;
   relay: RelayRefetchProp;
 }
+
+const PanelBlock = styled.div`
+  display: flex;
+  .search-params-wrapper {
+    width: 200px;
+  }
+  .pagination-panel-wrapper {
+    width: 400px;
+    margin-left: 30px;
+  }
+`;
 
 const CitiesBrowserPanel = ({
   cities,
@@ -58,13 +56,25 @@ const CitiesBrowserPanel = ({
   };
 
   return (
-    <Panel>
+    <PanelBlock>
       <div className="search-params-wrapper">
         <SearchParameters
           metadata={searchMetadata.citiesMetadata}
           initialSearchParams={initialSearchParams}
           environment={relay.environment}
           refetch={relay.refetch}
+          render={({
+            searchParams,
+            dispatch
+          }: {
+            searchParams: SearchParamsT;
+            dispatch: DispatchT;
+          }) => (
+            <SearchParametersPresentational
+              searchParams={searchParams}
+              dispatch={dispatch}
+            />
+          )}
         />
       </div>
       <div className="pagination-panel-wrapper">
@@ -76,7 +86,7 @@ const CitiesBrowserPanel = ({
           />
         )}
       </div>
-    </Panel>
+    </PanelBlock>
   );
 };
 
@@ -124,7 +134,7 @@ const CitiesBrowserPanelRC = createRefetchContainer(
 );
 
 interface CitiesBrowserPanelQRProps {
-  searchParams: SearchParams;
+  searchParams: SearchParamsT;
   environment: IEnvironment;
 }
 

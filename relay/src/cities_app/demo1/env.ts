@@ -65,7 +65,6 @@ export const createTestingEnv = (resolvers: any) => {
       { user: users["user1"] },
       variables
     );
-    console.log(resp);
     return resp;
   });
 

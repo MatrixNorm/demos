@@ -1,4 +1,6 @@
-import { AppQueryResponse } from "./__generated__/AppQuery.graphql";
+import { AppQueryResponse } from "__relay__/AppQuery.graphql";
 
-export type UIState = AppQueryResponse["uiState"];
-export type SearchParams = UIState["citySearchParams"];
+export type UIStateT = AppQueryResponse["uiState"];
+export type SearchParamsT = NonNullable<
+  NonNullable<UIStateT>["citySearchParams"]
+>;
