@@ -8,14 +8,16 @@ interface Props {
 }
 
 const CitySummary = styled.section`
+  width: 9em;
+  height: 5em;
   display: inline-block;
   padding: 0 1em 0 1em;
-  position: relative;
   .row {
-    margin: 0 0 10px 0;
+    text-align: right;
   }
-  .row-1 {
-    padding-top: 1.1em;
+  .row-name {
+    text-align: left;
+    margin: 0.2em 0 0.2em 0;
   }
   .name {
     margin-right: 2px;
@@ -24,26 +26,33 @@ const CitySummary = styled.section`
   .country {
     font-size: 0.85em;
     color: #00bcd4;
-    position: absolute;
-    top: 0.4em;
-    right: 0.4em;
   }
   .population-label {
     font-size: 0.9em;
-    margin-right: 5px;
+    margin-right: 15px;
   }
+`;
+
+export const CitySummarySkeleton = styled.section`
+  width: 9em;
+  height: 5em;
+  display: inline-block;
+  padding: 0 1em 0 1em;
+  background: silver;
 `;
 
 export default createFragmentContainer(
   ({ city }: Props) => {
     return (
       <CitySummary>
-        <div className="row row-1">
-          <span className="name">{city.name}</span>
+        <div className="row">
           <span className="country">{city.country}</span>
         </div>
+        <div className="row row-name">
+          <span className="name">{city.name}</span>
+        </div>
         <div className="row">
-          <label className="population-label">population</label>
+          <label className="population-label">pop.</label>
           <span className="population">{city.population}</span>
         </div>
       </CitySummary>

@@ -1,40 +1,32 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash e96d0c44ed4100935e464179c61a08a7 */
+/* @relayHash 19bb90e9c969c16b39ad7f86aa44b8a7 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
-export type CitiesPaginationQueryVariables = {
-    pageNo: number;
+export type CitySummaryStoryQueryVariables = {
+    cityId: string;
 };
-export type CitiesPaginationQueryResponse = {
-    readonly citiesPagination: {
-        readonly " $fragmentRefs": FragmentRefs<"CitiesPagination_page">;
+export type CitySummaryStoryQueryResponse = {
+    readonly city: {
+        readonly " $fragmentRefs": FragmentRefs<"CitySummary_city">;
     } | null;
 };
-export type CitiesPaginationQuery = {
-    readonly response: CitiesPaginationQueryResponse;
-    readonly variables: CitiesPaginationQueryVariables;
+export type CitySummaryStoryQuery = {
+    readonly response: CitySummaryStoryQueryResponse;
+    readonly variables: CitySummaryStoryQueryVariables;
 };
 
 
 
 /*
-query CitiesPaginationQuery(
-  $pageNo: Int!
+query CitySummaryStoryQuery(
+  $cityId: ID!
 ) {
-  citiesPagination(pageNo: $pageNo) {
-    ...CitiesPagination_page
-  }
-}
-
-fragment CitiesPagination_page on CitiesPagination {
-  pageNo
-  hasNextPage
-  hasPrevPage
-  nodes {
-    id
+  city: node(id: $cityId) {
+    __typename
     ...CitySummary_city
+    id
   }
 }
 
@@ -50,39 +42,39 @@ const node: ConcreteRequest = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "pageNo",
-    "type": "Int!",
+    "name": "cityId",
+    "type": "ID!",
     "defaultValue": null
   }
 ],
 v1 = [
   {
     "kind": "Variable",
-    "name": "pageNo",
-    "variableName": "pageNo"
+    "name": "id",
+    "variableName": "cityId"
   }
 ];
 return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
-    "name": "CitiesPaginationQuery",
+    "name": "CitySummaryStoryQuery",
     "type": "Query",
     "metadata": null,
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": null,
-        "name": "citiesPagination",
+        "alias": "city",
+        "name": "node",
         "storageKey": null,
         "args": (v1/*: any*/),
-        "concreteType": "CitiesPagination",
+        "concreteType": null,
         "plural": false,
         "selections": [
           {
             "kind": "FragmentSpread",
-            "name": "CitiesPagination_page",
+            "name": "CitySummary_city",
             "args": null
           }
         ]
@@ -91,55 +83,36 @@ return {
   },
   "operation": {
     "kind": "Operation",
-    "name": "CitiesPaginationQuery",
+    "name": "CitySummaryStoryQuery",
     "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
-        "alias": null,
-        "name": "citiesPagination",
+        "alias": "city",
+        "name": "node",
         "storageKey": null,
         "args": (v1/*: any*/),
-        "concreteType": "CitiesPagination",
+        "concreteType": null,
         "plural": false,
         "selections": [
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "pageNo",
+            "name": "__typename",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "hasNextPage",
+            "name": "id",
             "args": null,
             "storageKey": null
           },
           {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "hasPrevPage",
-            "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "nodes",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "City",
-            "plural": true,
+            "kind": "InlineFragment",
+            "type": "City",
             "selections": [
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "id",
-                "args": null,
-                "storageKey": null
-              },
               {
                 "kind": "ScalarField",
                 "alias": null,
@@ -169,12 +142,12 @@ return {
   },
   "params": {
     "operationKind": "query",
-    "name": "CitiesPaginationQuery",
+    "name": "CitySummaryStoryQuery",
     "id": null,
-    "text": "query CitiesPaginationQuery(\n  $pageNo: Int!\n) {\n  citiesPagination(pageNo: $pageNo) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  pageNo\n  hasNextPage\n  hasPrevPage\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
+    "text": "query CitySummaryStoryQuery(\n  $cityId: ID!\n) {\n  city: node(id: $cityId) {\n    __typename\n    ...CitySummary_city\n    id\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '37fc45417b7a8ce42f96251b8c10eaaa';
+(node as any).hash = 'be7fc3132e74a2caa17dbff135e21613';
 export default node;

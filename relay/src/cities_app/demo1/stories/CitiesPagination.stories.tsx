@@ -1,17 +1,28 @@
 import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
-import { createTestingEnv } from "../env";
-import CitiesPagination from "../components/CitiesPagination";
+import { createTestingEnv, loadingForeverEnvironment } from "../env";
+import CitiesPagination, {
+  CitiesPaginationSkeleton
+} from "../components/CitiesPagination";
+import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CityPagination" };
 
-export const innerPage = () => {
+const query = graphql`
+  query CitiesPaginationStoryQuery($pageNo: Int!) {
+    citiesPagination(pageNo: $pageNo) {
+      ...CitiesPagination_page
+    }
+  }
+`;
+
+export const okState = () => {
   const environment = createTestingEnv({
     Query: {
-      node(_, { id }) {
-        return { id };
+      node() {
+        return;
       },
-      citiesPagination(_, args) {
+      citiesPagination() {
         return {
           nodes: [
             {
@@ -47,24 +58,36 @@ export const innerPage = () => {
     }
   });
   return (
-    <QueryRenderer
-      query={graphql`
-        query CitiesPaginationQuery($pageNo: Int!) {
-          citiesPagination(pageNo: $pageNo) {
-            ...CitiesPagination_page
-          }
-        }
-      `}
+    <QueryRenderer<CitiesPaginationStoryQuery>
+      query={query}
       environment={environment}
       variables={{ pageNo: 1 }}
       render={({ error, props }) => {
         return (
-          <CitiesPagination
-            page={props.citiesPagination}
-            loadPrevPage={() => console.log("prev")}
-            loadNextPage={() => console.log("next")}
-          />
+          props &&
+          props.citiesPagination && (
+            <CitiesPagination
+              page={props.citiesPagination}
+              loadPrevPage={() => console.log("prev")}
+              loadNextPage={() => console.log("next")}
+            />
+          )
         );
+      }}
+    />
+  );
+};
+
+export const loadingState = () => {
+  return (
+    <QueryRenderer<CitiesPaginationStoryQuery>
+      query={query}
+      environment={loadingForeverEnvironment()}
+      variables={{ pageNo: 1 }}
+      render={({ error, props }) => {
+        if (!props) {
+          return <CitiesPaginationSkeleton />;
+        }
       }}
     />
   );
