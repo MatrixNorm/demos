@@ -2,8 +2,22 @@ interface Node {
   id: ID!
 }
 
+input ChangeCitiesPaginationPageSizeInput {
+  pageSize: Int!
+  userId: ID!
+}
+
+type ChangeCitiesPaginationPageSizePayload {
+  user {
+    id
+    settings {
+      citiesPaginationPageSize
+    }
+  }
+}
+
 type Mutation {
-  dummy(x: Int!): Int!
+  changeCitiesPaginationPageSize(input: ChangeCitiesPaginationPageSizeInput): ChangeCitiesPaginationPageSizePayload!
 }
 
 type Query {
@@ -25,7 +39,7 @@ type User implements Node {
 }
 
 type UserSettings {
-  pageSize: Int
+  citiesPaginationPageSize: Int
 }
 
 type CitiesPagination {
