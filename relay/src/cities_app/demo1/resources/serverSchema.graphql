@@ -8,12 +8,7 @@ input ChangeCitiesPaginationPageSizeInput {
 }
 
 type ChangeCitiesPaginationPageSizePayload {
-  user {
-    id
-    settings {
-      citiesPaginationPageSize
-    }
-  }
+  user: User
 }
 
 type Mutation {

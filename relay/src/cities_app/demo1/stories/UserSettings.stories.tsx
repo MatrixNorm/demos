@@ -4,7 +4,7 @@ import { createTestingEnv } from "../env";
 import UserSettings from "../components/UserSettings";
 import { UserSettingsStoryQuery } from "__relay__/UserSettingsStoryQuery.graphql";
 
-export default { title: "cities_app-demo1/CitySummary" };
+export default { title: "cities_app-demo1/UserSettings" };
 
 export const citySummary = () => {
   const environment = createTestingEnv({
@@ -27,8 +27,9 @@ export const citySummary = () => {
   return (
     <QueryRenderer<UserSettingsStoryQuery>
       query={graphql`
-        query UserSettingsStoryQuery() {
+        query UserSettingsStoryQuery {
           viewer {
+            ...UserSettings_viewer
             settings {
               ...UserSettings_settings
             }
@@ -42,7 +43,10 @@ export const citySummary = () => {
           props &&
           props.viewer &&
           props.viewer.settings && (
-            <UserSettings settings={props.viewer.settings} />
+            <UserSettings
+              settings={props.viewer.settings}
+              viewer={props.viewer}
+            />
           )
         );
       }}

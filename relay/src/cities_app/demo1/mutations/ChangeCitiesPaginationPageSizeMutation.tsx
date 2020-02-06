@@ -15,7 +15,7 @@ const mutation = graphql`
   }
 `;
 
-function getOptimisticResponse(pageSize, userId) {
+function getOptimisticResponse({ pageSize, userId }) {
   return {
     changeCitiesPaginationPageSize: {
       user: {
@@ -28,7 +28,7 @@ function getOptimisticResponse(pageSize, userId) {
   };
 }
 
-function commit(environment, pageSize, userId) {
+function commit({ environment, pageSize, userId }) {
   const input = {
     pageSize,
     userId
@@ -39,7 +39,7 @@ function commit(environment, pageSize, userId) {
     variables: {
       input
     },
-    optimisticResponse: getOptimisticResponse(pageSize, userId)
+    optimisticResponse: getOptimisticResponse({ pageSize, userId })
   });
 }
 
