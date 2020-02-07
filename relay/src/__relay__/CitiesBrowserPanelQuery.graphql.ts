@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 85d7f4af9499cb6ac6eecbb9bc1cd0e4 */
+/* @relayHash 083e710345fa89dfd94ea45b39cab1cf */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -13,7 +13,7 @@ export type CitySearchParamsInput = {
 };
 export type CitiesBrowserPanelQueryVariables = {
     pageNo: number;
-    pageSize: number;
+    pageSize?: number | null;
     searchParams?: CitySearchParamsInput | null;
 };
 export type CitiesBrowserPanelQueryResponse = {
@@ -29,7 +29,7 @@ export type CitiesBrowserPanelQuery = {
 /*
 query CitiesBrowserPanelQuery(
   $pageNo: Int!
-  $pageSize: Int!
+  $pageSize: Int
   $searchParams: CitySearchParamsInput
 ) {
   ...CitiesBrowserPanel_cities_2NHXxp
@@ -82,7 +82,7 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "pageSize",
-    "type": "Int!",
+    "type": "Int",
     "defaultValue": null
   },
   {
@@ -237,10 +237,10 @@ return {
     "operationKind": "query",
     "name": "CitiesBrowserPanelQuery",
     "id": null,
-    "text": "query CitiesBrowserPanelQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n  ...CitiesBrowserPanel_searchMetadata\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesBrowserPanel_searchMetadata on Query {\n  citiesMetadata {\n    ...SearchParameters_metadata\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  pageNo\n  hasNextPage\n  hasPrevPage\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n\nfragment SearchParameters_metadata on CitiesMetadata {\n  populationLowerBound\n  populationUpperBound\n}\n",
+    "text": "query CitiesBrowserPanelQuery(\n  $pageNo: Int!\n  $pageSize: Int\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n  ...CitiesBrowserPanel_searchMetadata\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesBrowserPanel_searchMetadata on Query {\n  citiesMetadata {\n    ...SearchParameters_metadata\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  pageNo\n  hasNextPage\n  hasPrevPage\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n\nfragment SearchParameters_metadata on CitiesMetadata {\n  populationLowerBound\n  populationUpperBound\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = 'ee98e646b8bf69b2ca5d132c92bdc9a0';
+(node as any).hash = 'e855fb69e617eafb3ee73ce629d7c556';
 export default node;

@@ -5,7 +5,9 @@ import {
   RecordSource,
   Store
 } from "relay-runtime";
+// @ts-ignore
 import { graphql, graphqlSync } from "graphql";
+// @ts-ignore
 import { makeExecutableSchema } from "graphql-tools";
 // @ts-ignore
 import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
@@ -33,17 +35,18 @@ export const createRelayEnvironment = () => {
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
 
-  commitLocalUpdate(environment, store => {
-    const uiStateId = "client:UIState";
-    const uiState = store.create(uiStateId, "UIState");
-    environment.retain({
-      dataID: uiStateId,
-      variables: {},
-      node: { selections: [] }
-    });
-    store.getRoot().setLinkedRecord(uiState, "uiState");
-  });
+  // commitLocalUpdate(environment, store => {
+  //   const uiStateId = "client:UIState";
+  //   const uiState = store.create(uiStateId, "UIState");
+  //   environment.retain({
+  //     dataID: uiStateId,
+  //     variables: {},
+  //     node: { selections: [] }
+  //   });
+  //   store.getRoot().setLinkedRecord(uiState, "uiState");
+  // });
 
+  // @ts-ignore
   window.printStore = () => {
     console.log(environment.getStore().getSource()._records);
   };

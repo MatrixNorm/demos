@@ -1,6 +1,7 @@
 import * as _ from "lodash";
 // @ts-ignore
 import citiesTxt from "raw-loader!./resources/cities.json.txt";
+import * as t from './types.codegen'
 
 const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);
 const countries = [...new Set(cities.map(i => i.country))];
@@ -28,10 +29,10 @@ export const serverResolvers = {
       // logged-in user
       return users["user1"];
     },
-    node: (_, { id }) => {
+    node: (_: any, { id }: t.Node) => {
       return { id };
     },
-    citiesPagination: (_, args, context) => {
+    citiesPagination: (_: any, args: t.QueryCitiesPaginationArgs, context: any) => {
       //console.log(JSON.stringify(args, 2));
       let { user } = context;
       let { pageSize } = {
@@ -80,14 +81,14 @@ export const serverResolvers = {
         lngUpperBound: 78.25
       };
     },
-    countries: (_, { searchString }) => {
+    countries: (_: any, { searchString }: t.QueryCountriesArgs) => {
       return countries
         .filter(c => c.toLowerCase().includes(searchString))
         .slice(0, 5);
     }
   },
   Node: {
-    __resolveType(node) {
+    __resolveType(node: any) {
       console.log({ node });
       return node;
     }

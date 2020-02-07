@@ -1,5 +1,9 @@
 import * as React from "react";
-import { createTestingEnv, loadingForeverEnvironment } from "../env";
+import {
+  createRelayEnvironment,
+  createTestingEnv,
+  loadingForeverEnvironment
+} from "../env";
 import CitiesBrowserPanel from "../components/CitiesBrowserPanel";
 
 export default { title: "cities_app-demo1/CitiesBrowserPanel" };
@@ -13,7 +17,7 @@ const makeEnv = () => {
           populationUpperBound: 9999999
         };
       },
-      citiesPagination(_, args) {
+      citiesPagination(_: any, args: any) {
         return {
           nodes: [
             {
@@ -52,20 +56,36 @@ const makeEnv = () => {
 
 export const ok = () => {
   const environment = makeEnv();
-  const searchParams = null;
+  const searchParams = {
+    countryNameContains: null,
+    populationGte: null,
+    populationLte: null
+  };
   return (
     <CitiesBrowserPanel environment={environment} searchParams={searchParams} />
   );
 };
 
 export const loading = () => {
-  const environment = loadingForeverEnvironment()
-  const searchParams =  {
+  const environment = loadingForeverEnvironment();
+  const searchParams = {
     countryNameContains: null,
     populationGte: null,
     populationLte: null
-  };;
+  };
   return (
     <CitiesBrowserPanel environment={environment} searchParams={searchParams} />
   );
-}
+};
+
+export const full = () => {
+  const environment = createRelayEnvironment();
+  const searchParams = {
+    countryNameContains: null,
+    populationGte: null,
+    populationLte: null
+  };
+  return (
+    <CitiesBrowserPanel environment={environment} searchParams={searchParams} />
+  );
+};

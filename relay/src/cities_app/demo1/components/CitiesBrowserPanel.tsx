@@ -8,7 +8,6 @@ import {
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
 import SearchParameters, { DispatchT } from "./SearchParameters";
-import { SearchParamsT } from "../types";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import CitiesPagination from "./CitiesPagination";
 import LoadingIndicator from "../elements/LoadingIndicator";
@@ -16,6 +15,7 @@ import LoadingError from "../elements/LoadingError";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesBrowserPanel_cities } from "__relay__/CitiesBrowserPanel_cities.graphql";
 import { CitiesBrowserPanelQuery } from "__relay__/CitiesBrowserPanelQuery.graphql";
+import * as t from "../types.codegen";
 
 interface Props {
   cities: CitiesBrowserPanel_cities;
@@ -67,7 +67,7 @@ const CitiesBrowserPanel = ({
             searchParams,
             dispatch
           }: {
-            searchParams: SearchParamsT;
+            searchParams: t.UiCitySearchParams;
             dispatch: DispatchT;
           }) => (
             <SearchParametersPresentational
@@ -97,7 +97,7 @@ const CitiesBrowserPanelRC = createRefetchContainer(
       fragment CitiesBrowserPanel_cities on Query
         @argumentDefinitions(
           pageNo: { type: "Int!" }
-          pageSize: { type: "Int!" }
+          pageSize: { type: "Int" }
           searchParams: { type: "CitySearchParamsInput" }
         ) {
         citiesPagination(
@@ -134,7 +134,7 @@ const CitiesBrowserPanelRC = createRefetchContainer(
 );
 
 interface CitiesBrowserPanelQRProps {
-  searchParams: SearchParamsT;
+  searchParams: t.UiCitySearchParams;
   environment: IEnvironment;
 }
 
@@ -147,7 +147,7 @@ export default function CitiesBrowserPanelQR({
       query={graphql`
         query CitiesBrowserPanelQuery(
           $pageNo: Int!
-          $pageSize: Int!
+          $pageSize: Int
           $searchParams: CitySearchParamsInput
         ) {
           ...CitiesBrowserPanel_cities
@@ -160,7 +160,7 @@ export default function CitiesBrowserPanelQR({
         }
       `}
       environment={environment}
-      variables={{ pageSize: 5, pageNo: 0, searchParams }}
+      variables={{ pageNo: 0, searchParams }}
       render={({ error, props }) => {
         if (error) {
           return <CitiesBrowserPanelError />;

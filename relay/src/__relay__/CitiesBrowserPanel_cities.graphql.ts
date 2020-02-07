@@ -32,7 +32,7 @@ const node: ReaderFragment = {
     {
       "kind": "LocalArgument",
       "name": "pageSize",
-      "type": "Int!",
+      "type": "Int",
       "defaultValue": null
     },
     {
@@ -77,5 +77,5 @@ const node: ReaderFragment = {
     }
   ]
 };
-(node as any).hash = '4425a9e4a5212f8cf67ca817b3e31c42';
+(node as any).hash = '90f33b4ab1b8e6cfdbc2484eec073849';
 export default node;

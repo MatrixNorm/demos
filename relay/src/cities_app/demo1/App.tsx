@@ -7,7 +7,7 @@ import {
   IEnvironment
 } from "relay-runtime";
 import CitiesBrowserPanel from "./components/CitiesBrowserPanel";
-import { UIState, SearchParams } from "./types";
+import { UIStateType, SearchParamsType } from "./types";
 
 interface AppProps {
   environment: IEnvironment;
@@ -15,7 +15,7 @@ interface AppProps {
 
 interface State {
   ready: boolean;
-  searchParams: SearchParams;
+  searchParams: SearchParamsType;
 }
 
 export default function App({ environment }: AppProps) {
@@ -39,7 +39,7 @@ export default function App({ environment }: AppProps) {
     const request = getRequest(query);
     const operation = createOperationDescriptor(request, {});
     const res = environment.lookup(operation.fragment);
-    const uiState: UIState = res.data.uiState;
+    const uiState: UIStateType = res.data.uiState;
     setState({ ready: true, searchParams: uiState.citySearchParams });
   }, []);
 
