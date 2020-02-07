@@ -5,23 +5,21 @@ import ChangeCitiesPaginationPageSizeMutation from "../mutations/ChangeCitiesPag
 import { NumberInput } from "../elements/Inputs";
 
 type Props = {
-  settings: any;
-  viewer: any;
+  user: any;
   relay: any;
 };
 
 export const UserSettings = styled.section``;
 
 export default createFragmentContainer(
-  ({ settings, viewer, relay }: Props) => {
+  ({ user, relay }: Props) => {
     const handlePaginationPageSizeChange = (
       e: React.ChangeEvent<HTMLInputElement>
     ) => {
-      console.log(e);
       ChangeCitiesPaginationPageSizeMutation.commit({
         environment: relay.environment,
-        pageSize: e.target.value,
-        userId: viewer.id
+        pageSize: Number(e.target.value),
+        userId: user.id
       });
     };
     return (
@@ -29,21 +27,19 @@ export default createFragmentContainer(
         <span>Pagination Page Size: </span>
         <NumberInput
           step="1"
-          value={settings.citiesPaginationPageSize}
+          value={user.settings.citiesPaginationPageSize}
           onChange={handlePaginationPageSizeChange}
         />
       </UserSettings>
     );
   },
   {
-    settings: graphql`
-      fragment UserSettings_settings on UserSettings {
-        citiesPaginationPageSize
-      }
-    `,
-    viewer: graphql`
-      fragment UserSettings_viewer on User {
+    user: graphql`
+      fragment UserSettings_user on User {
         id
+        settings {
+          citiesPaginationPageSize
+        }
       }
     `
   }

@@ -1,16 +1,15 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 150a4b5d9fa4e3c0b512f2caf2236353 */
+/* @relayHash 7737ba16118f2bbf281055c883cb63f3 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
-export type UserSettingsStoryQueryVariables = {};
+export type UserSettingsStoryQueryVariables = {
+    userId: string;
+};
 export type UserSettingsStoryQueryResponse = {
-    readonly viewer: {
-        readonly settings: {
-            readonly " $fragmentRefs": FragmentRefs<"UserSettings_settings">;
-        } | null;
-        readonly " $fragmentRefs": FragmentRefs<"UserSettings_viewer">;
+    readonly node: {
+        readonly " $fragmentRefs": FragmentRefs<"UserSettings_user">;
     } | null;
 };
 export type UserSettingsStoryQuery = {
@@ -21,63 +20,70 @@ export type UserSettingsStoryQuery = {
 
 
 /*
-query UserSettingsStoryQuery {
-  viewer {
-    ...UserSettings_viewer
-    settings {
-      ...UserSettings_settings
+query UserSettingsStoryQuery(
+  $userId: ID!
+) {
+  node(id: $userId) {
+    __typename
+    ... on User {
+      ...UserSettings_user
     }
     id
   }
 }
 
-fragment UserSettings_settings on UserSettings {
-  citiesPaginationPageSize
-}
-
-fragment UserSettings_viewer on User {
+fragment UserSettings_user on User {
   id
+  settings {
+    citiesPaginationPageSize
+  }
 }
 */
 
-const node: ConcreteRequest = {
+const node: ConcreteRequest = (function(){
+var v0 = [
+  {
+    "kind": "LocalArgument",
+    "name": "userId",
+    "type": "ID!",
+    "defaultValue": null
+  }
+],
+v1 = [
+  {
+    "kind": "Variable",
+    "name": "id",
+    "variableName": "userId"
+  }
+];
+return {
   "kind": "Request",
   "fragment": {
     "kind": "Fragment",
     "name": "UserSettingsStoryQuery",
     "type": "Query",
     "metadata": null,
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "viewer",
+        "name": "node",
         "storageKey": null,
-        "args": null,
-        "concreteType": "User",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "plural": false,
         "selections": [
           {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "settings",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "UserSettings",
-            "plural": false,
+            "kind": "InlineFragment",
+            "type": "User",
             "selections": [
               {
                 "kind": "FragmentSpread",
-                "name": "UserSettings_settings",
+                "name": "UserSettings_user",
                 "args": null
               }
             ]
-          },
-          {
-            "kind": "FragmentSpread",
-            "name": "UserSettings_viewer",
-            "args": null
           }
         ]
       }
@@ -86,17 +92,24 @@ const node: ConcreteRequest = {
   "operation": {
     "kind": "Operation",
     "name": "UserSettingsStoryQuery",
-    "argumentDefinitions": [],
+    "argumentDefinitions": (v0/*: any*/),
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "viewer",
+        "name": "node",
         "storageKey": null,
-        "args": null,
-        "concreteType": "User",
+        "args": (v1/*: any*/),
+        "concreteType": null,
         "plural": false,
         "selections": [
+          {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "__typename",
+            "args": null,
+            "storageKey": null
+          },
           {
             "kind": "ScalarField",
             "alias": null,
@@ -105,20 +118,26 @@ const node: ConcreteRequest = {
             "storageKey": null
           },
           {
-            "kind": "LinkedField",
-            "alias": null,
-            "name": "settings",
-            "storageKey": null,
-            "args": null,
-            "concreteType": "UserSettings",
-            "plural": false,
+            "kind": "InlineFragment",
+            "type": "User",
             "selections": [
               {
-                "kind": "ScalarField",
+                "kind": "LinkedField",
                 "alias": null,
-                "name": "citiesPaginationPageSize",
+                "name": "settings",
+                "storageKey": null,
                 "args": null,
-                "storageKey": null
+                "concreteType": "UserSettings",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "citiesPaginationPageSize",
+                    "args": null,
+                    "storageKey": null
+                  }
+                ]
               }
             ]
           }
@@ -130,9 +149,10 @@ const node: ConcreteRequest = {
     "operationKind": "query",
     "name": "UserSettingsStoryQuery",
     "id": null,
-    "text": "query UserSettingsStoryQuery {\n  viewer {\n    ...UserSettings_viewer\n    settings {\n      ...UserSettings_settings\n    }\n    id\n  }\n}\n\nfragment UserSettings_settings on UserSettings {\n  citiesPaginationPageSize\n}\n\nfragment UserSettings_viewer on User {\n  id\n}\n",
+    "text": "query UserSettingsStoryQuery(\n  $userId: ID!\n) {\n  node(id: $userId) {\n    __typename\n    ... on User {\n      ...UserSettings_user\n    }\n    id\n  }\n}\n\nfragment UserSettings_user on User {\n  id\n  settings {\n    citiesPaginationPageSize\n  }\n}\n",
     "metadata": {}
   }
 };
-(node as any).hash = '526eb10a5f1716f1fc7522ce1e3f486e';
+})();
+(node as any).hash = '6867f973da9d4a740de46452a807b000';
 export default node;
