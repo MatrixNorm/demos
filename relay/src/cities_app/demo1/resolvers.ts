@@ -77,6 +77,8 @@ export const serverResolvers = {
           return true;
         });
       }
+      // one extra node
+      //let sliceWithTail = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize)
       return {
         nodes: nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize),
         pageNo,
@@ -96,7 +98,7 @@ export const serverResolvers = {
     countries: (_: any, { searchString }: t.QueryCountriesArgs) => {
       return countries
         .filter(c => c.toLowerCase().includes(searchString))
-        .slice(0, 5);
+        .slice(0, 8);
     }
   },
   Node: {

@@ -99,7 +99,7 @@ export type QueryCitiesPaginationArgs = {
 
 
 export type QueryCountriesArgs = {
-  searchString?: Maybe<Scalars['String']>
+  searchString: Scalars['String']
 };
 
 

@@ -24,7 +24,7 @@ type Query {
     searchParams: CitySearchParamsInput
   ): CitiesPagination
   citiesMetadata: CitiesMetadata
-  countries(searchString: String): [String!]
+  countries(searchString: String!): [String!]
 }
 
 type User implements Node {
