@@ -1,9 +1,13 @@
 import * as _ from "lodash";
 // @ts-ignore
 import citiesTxt from "raw-loader!./resources/cities.json.txt";
-import * as t from './types.codegen'
+import * as t from "./types.codegen";
 
-const cities = _.orderBy(JSON.parse(citiesTxt), ["population"], ["desc"]);
+const cities: t.City[] = _.orderBy(
+  JSON.parse(citiesTxt),
+  ["population"],
+  ["desc"]
+);
 const countries = [...new Set(cities.map(i => i.country))];
 const citiesMetadata = {
   populationLowerBound: cities
@@ -14,59 +18,67 @@ const citiesMetadata = {
     .reduce((a, b) => Math.max(a, b))
 };
 
-function isMissing(obj) {
-  return obj === null || obj === undefined || Object.entries(obj).length === 0;
-}
-
-export const users = {
-  user_anon: { id: "user_anon", name: "Anon", settings: { pageSize: 5 } },
-  user1: { id: "user1", name: "Bob", settings: { pageSize: 7 } }
+export const dbUsers: { [key: string]: t.User } = {
+  "user#anon": {
+    id: "user#anon",
+    name: "anon",
+    settings: { citiesPaginationPageSize: 5 }
+  },
+  "user#1": {
+    id: "user#1",
+    name: "Bob",
+    settings: { citiesPaginationPageSize: 7 }
+  }
 };
 
 export const serverResolvers = {
   Query: {
     viewer: () => {
       // logged-in user
-      return users["user1"];
+      return dbUsers["user#1"];
     },
     node: (_: any, { id }: t.Node) => {
       return { id };
     },
-    citiesPagination: (_: any, args: t.QueryCitiesPaginationArgs, context: any) => {
-      //console.log(JSON.stringify(args, 2));
-      let { user } = context;
-      let { pageSize } = {
-        ...{ pageSize: 5 },
-        ...user.settings,
-        args
-      };
+    citiesPagination: (
+      _: any,
+      args: t.QueryCitiesPaginationArgs,
+      context: { user: t.User }
+    ): t.CitiesPagination => {
+      let pageSize =
+        args.pageSize || context.user.settings?.citiesPaginationPageSize || 3;
       let { pageNo, searchParams } = args;
       let nodes = cities;
-      if (isMissing(searchParams)) {
-        nodes = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
-      } else {
-        let {
-          countryNameContains,
-          populationGte,
-          populationLte
-        } = searchParams;
-        if (countryNameContains && countryNameContains.length > 0) {
-          nodes = cities.filter(city =>
+      if (searchParams) {
+        let predicates: ((city: t.City) => boolean)[] = [];
+
+        if (searchParams.countryNameContains) {
+          let { countryNameContains } = searchParams;
+          predicates.push((city: t.City) =>
             city.country
               .toLowerCase()
               .includes(countryNameContains.toLowerCase())
           );
         }
-        if (populationGte) {
-          nodes = nodes.filter(city => city.population >= populationGte);
+        if (searchParams.populationGte) {
+          let { populationGte } = searchParams;
+          predicates.push((city: t.City) => city.population >= populationGte);
         }
-        if (populationLte) {
-          nodes = nodes.filter(city => city.population <= populationLte);
+        if (searchParams.populationLte) {
+          let { populationLte } = searchParams;
+          predicates.push((city: t.City) => city.population <= populationLte);
         }
-        nodes = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize);
+        nodes = nodes.filter(city => {
+          for (let pred of predicates) {
+            if (!pred(city)) {
+              return false;
+            }
+          }
+          return true;
+        });
       }
       return {
-        nodes,
+        nodes: nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize),
         pageNo,
         hasNextPage: true,
         hasPrevPage: false
