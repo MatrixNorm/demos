@@ -11,7 +11,7 @@ import { graphql, graphqlSync } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 // @ts-ignore
 import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
-import { serverResolvers, users } from "./resolvers";
+import { serverResolvers, dbUsers } from "./resolvers/index";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
@@ -25,27 +25,14 @@ export const createRelayEnvironment = () => {
       serverSchema,
       operation.text,
       {},
-      { user: users["user1"] },
+      { user: dbUsers["user#1"] },
       variables
     );
     console.log(resp);
     return resp;
   });
-
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
-
-  // commitLocalUpdate(environment, store => {
-  //   const uiStateId = "client:UIState";
-  //   const uiState = store.create(uiStateId, "UIState");
-  //   environment.retain({
-  //     dataID: uiStateId,
-  //     variables: {},
-  //     node: { selections: [] }
-  //   });
-  //   store.getRoot().setLinkedRecord(uiState, "uiState");
-  // });
-
   // @ts-ignore
   window.printStore = () => {
     console.log(environment.getStore().getSource()._records);
@@ -65,7 +52,7 @@ export const createTestingEnv = (resolvers: any) => {
       executableSchema,
       operation.text,
       {},
-      { user: users["user1"] },
+      {},
       variables
     );
     return resp;
