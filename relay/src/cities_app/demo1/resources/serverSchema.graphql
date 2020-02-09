@@ -12,15 +12,18 @@ type ChangeCitiesPaginationPageSizePayload {
 }
 
 type Mutation {
-  changeCitiesPaginationPageSize(input: ChangeCitiesPaginationPageSizeInput): ChangeCitiesPaginationPageSizePayload!
+  changeCitiesPaginationPageSize(
+    input: ChangeCitiesPaginationPageSizeInput
+  ): ChangeCitiesPaginationPageSizePayload!
 }
 
 type Query {
   node(id: ID!): Node
   viewer: User
   citiesPagination(
-    pageNo: Int!
     pageSize: Int
+    after: String
+    before: String
     searchParams: CitySearchParamsInput
   ): CitiesPagination
   citiesMetadata: CitiesMetadata
@@ -39,9 +42,8 @@ type UserSettings {
 
 type CitiesPagination {
   nodes: [City!]
-  pageNo: Int!
-  hasNextPage: Boolean!
-  hasPrevPage: Boolean!
+  hasNext: Boolean!
+  hasPrev: Boolean!
 }
 
 type City implements Node {
@@ -79,5 +81,4 @@ input CitySearchParamsInput {
   countryNameContains: String
   populationGte: Int
   populationLte: Int
-  ordering: CitiesOrderAttr
 }

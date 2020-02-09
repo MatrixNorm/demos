@@ -47,11 +47,9 @@ export const serverResolvers = {
     ): t.CitiesPagination => {
       let pageSize =
         args.pageSize || context.user.settings?.citiesPaginationPageSize || 3;
-      let { pageNo, searchParams } = args;
-      let nodes = cities;
+      let { after, before, searchParams } = args;
+      let predicates: ((city: t.City) => boolean)[] = [];
       if (searchParams) {
-        let predicates: ((city: t.City) => boolean)[] = [];
-
         if (searchParams.countryNameContains) {
           let { countryNameContains } = searchParams;
           predicates.push((city: t.City) =>
@@ -68,22 +66,57 @@ export const serverResolvers = {
           let { populationLte } = searchParams;
           predicates.push((city: t.City) => city.population <= populationLte);
         }
-        nodes = nodes.filter(city => {
-          for (let pred of predicates) {
-            if (!pred(city)) {
-              return false;
-            }
-          }
-          return true;
-        });
       }
-      // one extra node
-      //let sliceWithTail = nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize)
+      let result = [];
+      let hasNext = null;
+      let hasPrev = null;
+      if (before) {
+        // getting prev page
+        let endIndex = cities.findIndex(city => city.id === before);
+        if (endIndex < 0) {
+          throw new Error("Bad cursor");
+        }
+        for (let i = endIndex - 1; i >= 0; i--) {
+          let city = cities[i];
+          if (predicates.map(p => p(city)).every(Boolean)) {
+            result.push(city);
+          }
+          // adding extra one node to calculate hasPrev
+          if (result.length > pageSize) {
+            break;
+          }
+        }
+        hasNext = true;
+        hasPrev = result.length > pageSize;
+        // remove extra node frmo the front
+        result = result.slice(-pageSize);
+      } else {
+        // getting next page
+        let startIndex = after
+          ? cities.findIndex(city => city.id === after)
+          : 0;
+        if (startIndex < 0) {
+          throw new Error("Bad cursor");
+        }
+        for (let i = startIndex + 1; i < cities.length; i++) {
+          let city = cities[i];
+          if (predicates.map(p => p(city)).every(Boolean)) {
+            result.push(city);
+          }
+          // adding extra one node to calculate hasNext
+          if (result.length > pageSize) {
+            break;
+          }
+        }
+        hasNext = result.length > pageSize;
+        hasPrev = after !== null;
+        // remove extra node frmo the end
+        result = result.slice(pageSize);
+      }
       return {
-        nodes: nodes.slice(pageNo * pageSize, pageNo * pageSize + pageSize),
-        pageNo,
-        hasNextPage: true,
-        hasPrevPage: false
+        nodes: result,
+        hasNext,
+        hasPrev
       };
     },
     citiesMetadata: () => {

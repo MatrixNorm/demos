@@ -44,9 +44,8 @@ export enum CitiesOrderAttr {
 export type CitiesPagination = {
    __typename?: 'CitiesPagination',
   nodes?: Maybe<Array<City>>,
-  pageNo: Scalars['Int'],
-  hasNextPage: Scalars['Boolean'],
-  hasPrevPage: Scalars['Boolean'],
+  hasNext: Scalars['Boolean'],
+  hasPrev: Scalars['Boolean'],
 };
 
 export type City = Node & {
@@ -63,7 +62,6 @@ export type CitySearchParamsInput = {
   countryNameContains?: Maybe<Scalars['String']>,
   populationGte?: Maybe<Scalars['Int']>,
   populationLte?: Maybe<Scalars['Int']>,
-  ordering?: Maybe<CitiesOrderAttr>,
 };
 
 export type Mutation = {
@@ -92,8 +90,9 @@ export type Query = {
 
 
 export type QueryCitiesPaginationArgs = {
-  pageNo: Scalars['Int'],
   pageSize?: Maybe<Scalars['Int']>,
+  after?: Maybe<Scalars['String']>,
+  before?: Maybe<Scalars['String']>,
   searchParams?: Maybe<CitySearchParamsInput>
 };
 
