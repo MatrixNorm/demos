@@ -28,7 +28,7 @@ interface Props {
 }
 
 function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
-  const { nodes, hasPrevPage, hasNextPage, pageNo } = page;
+  const { nodes, hasNext, hasPrev } = page;
   return (
     <Page>
       <CitiesList>
@@ -41,9 +41,8 @@ function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
       </CitiesList>
       <div className="controls-container">
         <div className="controls">
-          {hasPrevPage && <PrevButton onClick={() => loadPrevPage(page)} />}
-          <span>{pageNo}</span>
-          {hasNextPage && <NextButton onClick={() => loadNextPage(page)} />}
+          {hasPrev && <PrevButton onClick={() => loadPrevPage(page)} />}
+          {hasNext && <NextButton onClick={() => loadNextPage(page)} />}
         </div>
       </div>
     </Page>
@@ -53,9 +52,8 @@ function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
 export default createFragmentContainer(CitiesPagination, {
   page: graphql`
     fragment CitiesPagination_page on CitiesPagination {
-      pageNo
-      hasNextPage
-      hasPrevPage
+      hasNext
+      hasPrev
       nodes {
         id
         ...CitySummary_city
@@ -81,7 +79,6 @@ export function CitiesPaginationSkeleton() {
       <div className="controls-container">
         <div className="controls">
           <PrevButton onClick={() => {}} />
-          <span></span>
           <NextButton onClick={() => {}} />
         </div>
       </div>

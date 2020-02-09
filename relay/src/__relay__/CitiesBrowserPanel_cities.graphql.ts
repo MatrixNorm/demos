@@ -25,14 +25,20 @@ const node: ReaderFragment = {
   "argumentDefinitions": [
     {
       "kind": "LocalArgument",
-      "name": "pageNo",
-      "type": "Int!",
+      "name": "pageSize",
+      "type": "Int",
       "defaultValue": null
     },
     {
       "kind": "LocalArgument",
-      "name": "pageSize",
-      "type": "Int",
+      "name": "after",
+      "type": "String",
+      "defaultValue": null
+    },
+    {
+      "kind": "LocalArgument",
+      "name": "before",
+      "type": "String",
       "defaultValue": null
     },
     {
@@ -51,8 +57,13 @@ const node: ReaderFragment = {
       "args": [
         {
           "kind": "Variable",
-          "name": "pageNo",
-          "variableName": "pageNo"
+          "name": "after",
+          "variableName": "after"
+        },
+        {
+          "kind": "Variable",
+          "name": "before",
+          "variableName": "before"
         },
         {
           "kind": "Variable",
@@ -77,5 +88,5 @@ const node: ReaderFragment = {
     }
   ]
 };
-(node as any).hash = '90f33b4ab1b8e6cfdbc2484eec073849';
+(node as any).hash = 'b48eba6ba896791514a1b88f39a272ee';
 export default node;

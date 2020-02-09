@@ -9,8 +9,8 @@ import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery
 export default { title: "cities_app-demo1/CityPagination" };
 
 const query = graphql`
-  query CitiesPaginationStoryQuery($pageNo: Int!) {
-    citiesPagination(pageNo: $pageNo) {
+  query CitiesPaginationStoryQuery {
+    citiesPagination {
       ...CitiesPagination_page
     }
   }

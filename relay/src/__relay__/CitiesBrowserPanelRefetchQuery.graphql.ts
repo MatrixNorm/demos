@@ -1,19 +1,18 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 75b2827bb2eac8e64b75dc71033677a9 */
+/* @relayHash 31458a32909263976f39724fb841f78c */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
-export type CitiesOrderAttr = "countryASC" | "countryDESC" | "latASC" | "latDESC" | "lngASC" | "lngDESC" | "nameASC" | "nameDESC" | "populationASC" | "populationDESC" | "%future added value";
 export type CitySearchParamsInput = {
     countryNameContains?: string | null;
     populationGte?: number | null;
     populationLte?: number | null;
-    ordering?: CitiesOrderAttr | null;
 };
 export type CitiesBrowserPanelRefetchQueryVariables = {
-    pageNo: number;
     pageSize: number;
+    after?: string | null;
+    before?: string | null;
     searchParams?: CitySearchParamsInput | null;
 };
 export type CitiesBrowserPanelRefetchQueryResponse = {
@@ -28,23 +27,23 @@ export type CitiesBrowserPanelRefetchQuery = {
 
 /*
 query CitiesBrowserPanelRefetchQuery(
-  $pageNo: Int!
   $pageSize: Int!
+  $after: String
+  $before: String
   $searchParams: CitySearchParamsInput
 ) {
-  ...CitiesBrowserPanel_cities_2NHXxp
+  ...CitiesBrowserPanel_cities_mwT4m
 }
 
-fragment CitiesBrowserPanel_cities_2NHXxp on Query {
-  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {
+fragment CitiesBrowserPanel_cities_mwT4m on Query {
+  citiesPagination(pageSize: $pageSize, after: $after, before: $before, searchParams: $searchParams) {
     ...CitiesPagination_page
   }
 }
 
 fragment CitiesPagination_page on CitiesPagination {
-  pageNo
-  hasNextPage
-  hasPrevPage
+  hasNext
+  hasPrev
   nodes {
     id
     ...CitySummary_city
@@ -63,14 +62,20 @@ const node: ConcreteRequest = (function(){
 var v0 = [
   {
     "kind": "LocalArgument",
-    "name": "pageNo",
+    "name": "pageSize",
     "type": "Int!",
     "defaultValue": null
   },
   {
     "kind": "LocalArgument",
-    "name": "pageSize",
-    "type": "Int!",
+    "name": "after",
+    "type": "String",
+    "defaultValue": null
+  },
+  {
+    "kind": "LocalArgument",
+    "name": "before",
+    "type": "String",
     "defaultValue": null
   },
   {
@@ -83,8 +88,13 @@ var v0 = [
 v1 = [
   {
     "kind": "Variable",
-    "name": "pageNo",
-    "variableName": "pageNo"
+    "name": "after",
+    "variableName": "after"
+  },
+  {
+    "kind": "Variable",
+    "name": "before",
+    "variableName": "before"
   },
   {
     "kind": "Variable",
@@ -130,21 +140,14 @@ return {
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "pageNo",
+            "name": "hasNext",
             "args": null,
             "storageKey": null
           },
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "hasNextPage",
-            "args": null,
-            "storageKey": null
-          },
-          {
-            "kind": "ScalarField",
-            "alias": null,
-            "name": "hasPrevPage",
+            "name": "hasPrev",
             "args": null,
             "storageKey": null
           },
@@ -195,10 +198,10 @@ return {
     "operationKind": "query",
     "name": "CitiesBrowserPanelRefetchQuery",
     "id": null,
-    "text": "query CitiesBrowserPanelRefetchQuery(\n  $pageNo: Int!\n  $pageSize: Int!\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_2NHXxp\n}\n\nfragment CitiesBrowserPanel_cities_2NHXxp on Query {\n  citiesPagination(pageNo: $pageNo, pageSize: $pageSize, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  pageNo\n  hasNextPage\n  hasPrevPage\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
+    "text": "query CitiesBrowserPanelRefetchQuery(\n  $pageSize: Int!\n  $after: String\n  $before: String\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_mwT4m\n}\n\nfragment CitiesBrowserPanel_cities_mwT4m on Query {\n  citiesPagination(pageSize: $pageSize, after: $after, before: $before, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  hasNext\n  hasPrev\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '980f640bbf11cb6a8a9eaca3bedc80b9';
+(node as any).hash = '364b88959706e62514d9ee8b9fe12921';
 export default node;

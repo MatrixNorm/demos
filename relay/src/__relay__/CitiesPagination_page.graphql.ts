@@ -4,9 +4,8 @@
 import { ReaderFragment } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
 export type CitiesPagination_page = {
-    readonly pageNo: number;
-    readonly hasNextPage: boolean;
-    readonly hasPrevPage: boolean;
+    readonly hasNext: boolean;
+    readonly hasPrev: boolean;
     readonly nodes: ReadonlyArray<{
         readonly id: string;
         readonly " $fragmentRefs": FragmentRefs<"CitySummary_city">;
@@ -31,21 +30,14 @@ const node: ReaderFragment = {
     {
       "kind": "ScalarField",
       "alias": null,
-      "name": "pageNo",
+      "name": "hasNext",
       "args": null,
       "storageKey": null
     },
     {
       "kind": "ScalarField",
       "alias": null,
-      "name": "hasNextPage",
-      "args": null,
-      "storageKey": null
-    },
-    {
-      "kind": "ScalarField",
-      "alias": null,
-      "name": "hasPrevPage",
+      "name": "hasPrev",
       "args": null,
       "storageKey": null
     },
@@ -74,5 +66,5 @@ const node: ReaderFragment = {
     }
   ]
 };
-(node as any).hash = '5b5892f51a999fcab437edfd29dc9f51';
+(node as any).hash = '953b2e461d6767b780fc9a76c6d99545';
 export default node;

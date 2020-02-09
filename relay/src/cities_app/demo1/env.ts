@@ -1,10 +1,4 @@
-import {
-  commitLocalUpdate,
-  Environment,
-  Network,
-  RecordSource,
-  Store
-} from "relay-runtime";
+import { Environment, Network, RecordSource, Store } from "relay-runtime";
 // @ts-ignore
 import { graphql, graphqlSync } from "graphql";
 // @ts-ignore
@@ -35,6 +29,7 @@ export const createRelayEnvironment = () => {
   const environment = new Environment({ network, store });
   // @ts-ignore
   window.printStore = () => {
+    // @ts-ignore
     console.log(environment.getStore().getSource()._records);
   };
 

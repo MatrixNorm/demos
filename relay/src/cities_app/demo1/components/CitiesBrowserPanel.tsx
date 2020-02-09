@@ -41,20 +41,27 @@ const CitiesBrowserPanel = ({
   initialSearchParams,
   relay
 }: Props) => {
-  const loadPrevPage = (currentPage: CitiesPagination_page) => {
-    currentPage.hasPrevPage &&
-      relay.refetch(prevVars => {
-        return { ...prevVars, pageNo: currentPage.pageNo - 1 };
-      });
-  };
-
   const loadNextPage = (currentPage: CitiesPagination_page) => {
-    currentPage.hasNextPage &&
-      relay.refetch(nextVars => {
-        return { ...nextVars, pageNo: currentPage.pageNo + 1 };
-      });
+    let { nodes } = currentPage;
+    if (nodes && nodes.length > 0) {
+      let after = nodes[nodes.length - 1].id;
+      currentPage.hasNext &&
+        relay.refetch(nextVars => {
+          return { ...nextVars, after };
+        });
+    }
   };
 
+  const loadPrevPage = (currentPage: CitiesPagination_page) => {
+    let { nodes } = currentPage;
+    if (nodes && nodes.length > 0) {
+      let before = nodes[0].id;
+      currentPage.hasPrev &&
+        relay.refetch(prevVars => {
+          return { ...prevVars, before };
+        });
+    }
+  };
   return (
     <PanelBlock>
       <div className="search-params-wrapper">
@@ -96,13 +103,15 @@ const CitiesBrowserPanelRC = createRefetchContainer(
     cities: graphql`
       fragment CitiesBrowserPanel_cities on Query
         @argumentDefinitions(
-          pageNo: { type: "Int!" }
           pageSize: { type: "Int" }
+          after: { type: "String" }
+          before: { type: "String" }
           searchParams: { type: "CitySearchParamsInput" }
         ) {
         citiesPagination(
-          pageNo: $pageNo
           pageSize: $pageSize
+          after: $after
+          before: $before
           searchParams: $searchParams
         ) {
           ...CitiesPagination_page
@@ -119,14 +128,16 @@ const CitiesBrowserPanelRC = createRefetchContainer(
   },
   graphql`
     query CitiesBrowserPanelRefetchQuery(
-      $pageNo: Int!
       $pageSize: Int!
+      $after: String
+      $before: String
       $searchParams: CitySearchParamsInput
     ) {
       ...CitiesBrowserPanel_cities
         @arguments(
-          pageNo: $pageNo
           pageSize: $pageSize
+          after: $after
+          before: $before
           searchParams: $searchParams
         )
     }
@@ -146,21 +157,23 @@ export default function CitiesBrowserPanelQR({
     <QueryRenderer<CitiesBrowserPanelQuery>
       query={graphql`
         query CitiesBrowserPanelQuery(
-          $pageNo: Int!
           $pageSize: Int
+          $after: String
+          $before: String
           $searchParams: CitySearchParamsInput
         ) {
           ...CitiesBrowserPanel_cities
             @arguments(
-              pageNo: $pageNo
               pageSize: $pageSize
+              after: $after
+              before: $before
               searchParams: $searchParams
             )
           ...CitiesBrowserPanel_searchMetadata
         }
       `}
       environment={environment}
-      variables={{ pageNo: 0, searchParams }}
+      variables={{ searchParams, after: null, before: null }}
       render={({ error, props }) => {
         if (error) {
           return <CitiesBrowserPanelError />;

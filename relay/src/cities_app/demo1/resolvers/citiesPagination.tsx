@@ -6,9 +6,7 @@ export default (
   fallbackPageSize: number
 ): t.CitiesPagination => {
   let pageSize = args.pageSize || fallbackPageSize;
-
   let { after, before, searchParams } = args;
-
   let predicates: ((city: t.City) => boolean)[] = [];
 
   if (searchParams) {
@@ -31,6 +29,7 @@ export default (
   let result = [];
   let hasNext = null;
   let hasPrev = null;
+
   if (before) {
     // getting prev page
     let endIndex = cities.findIndex(city => city.id === before);
