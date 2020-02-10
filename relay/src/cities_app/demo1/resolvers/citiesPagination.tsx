@@ -46,6 +46,7 @@ export default (
         break;
       }
     }
+    result.reverse();
     hasNext = true;
     hasPrev = result.length > pageSize;
     // remove extra node frmo the front
@@ -73,7 +74,7 @@ export default (
     hasNext = result.length > pageSize;
     hasPrev = after !== null;
     // remove extra node frmo the end
-    result = result.slice(pageSize);
+    result = result.slice(0, pageSize);
   }
   return {
     nodes: result,

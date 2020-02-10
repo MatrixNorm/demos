@@ -9,7 +9,10 @@ import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
 import SearchParameters, { DispatchT } from "./SearchParameters";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
-import CitiesPagination from "./CitiesPagination";
+import CitiesPagination, {
+  loadNextPage,
+  loadPrevPage
+} from "./CitiesPagination";
 import LoadingIndicator from "../elements/LoadingIndicator";
 import LoadingError from "../elements/LoadingError";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
@@ -41,27 +44,6 @@ const CitiesBrowserPanel = ({
   initialSearchParams,
   relay
 }: Props) => {
-  const loadNextPage = (currentPage: CitiesPagination_page) => {
-    let { nodes } = currentPage;
-    if (nodes && nodes.length > 0) {
-      let after = nodes[nodes.length - 1].id;
-      currentPage.hasNext &&
-        relay.refetch(nextVars => {
-          return { ...nextVars, after };
-        });
-    }
-  };
-
-  const loadPrevPage = (currentPage: CitiesPagination_page) => {
-    let { nodes } = currentPage;
-    if (nodes && nodes.length > 0) {
-      let before = nodes[0].id;
-      currentPage.hasPrev &&
-        relay.refetch(prevVars => {
-          return { ...prevVars, before };
-        });
-    }
-  };
   return (
     <PanelBlock>
       <div className="search-params-wrapper">
@@ -88,8 +70,8 @@ const CitiesBrowserPanel = ({
         {cities.citiesPagination && (
           <CitiesPagination
             page={cities.citiesPagination}
-            loadPrevPage={loadPrevPage}
-            loadNextPage={loadNextPage}
+            loadPrevPage={loadPrevPage(relay)}
+            loadNextPage={loadNextPage(relay)}
           />
         )}
       </div>

@@ -1,7 +1,16 @@
 import * as React from "react";
-import { QueryRenderer, graphql, createRefetchContainer } from "react-relay";
+import {
+  QueryRenderer,
+  graphql,
+  createRefetchContainer,
+  RelayRefetchProp
+} from "react-relay";
+
 import { createRelayEnvironment } from "../env";
-import CitiesPagination from "../components/CitiesPagination";
+import CitiesPagination, {
+  loadNextPage,
+  loadPrevPage
+} from "../components/CitiesPagination";
 
 import { CitiesPaginationRefetchStory_cities } from "__relay__/CitiesPaginationRefetchStory_cities.graphql";
 import { CitiesPaginationRefetchStoryQuery } from "__relay__/CitiesPaginationRefetchStoryQuery.graphql";
@@ -11,21 +20,22 @@ export default { title: "cities_app-demo1/CitiesPaginationRefetch" };
 
 type Props = {
   cities: CitiesPaginationRefetchStory_cities;
-  relay: any;
+  relay: RelayRefetchProp;
 };
 
 export const fullCase = () => {
   const environment = createRelayEnvironment();
   const RefetchContainer = createRefetchContainer(
     ({ cities, relay }: Props) => {
-      return (
-        cities.citiesPagination && (
-          <CitiesPagination
-            page={cities.citiesPagination}
-            loadNextPage={() => {}}
-            loadPrevPage={() => {}}
-          />
-        )
+      console.log(cities);
+      return cities.citiesPagination ? (
+        <CitiesPagination
+          page={cities.citiesPagination}
+          loadNextPage={loadNextPage(relay)}
+          loadPrevPage={loadPrevPage(relay)}
+        />
+      ) : (
+        <div>ERROR</div>
       );
     },
     {

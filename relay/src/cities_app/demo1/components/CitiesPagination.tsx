@@ -1,5 +1,9 @@
 import * as React from "react";
-import { graphql, createFragmentContainer } from "react-relay";
+import {
+  graphql,
+  createFragmentContainer,
+  RelayRefetchProp
+} from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
 import CitySummary, { CitySummarySkeleton } from "./CitySummary";
@@ -21,6 +25,33 @@ const Page = styled.div`
   }
 `;
 
+export const loadNextPage = (relay: RelayRefetchProp) => (
+  currentPage: CitiesPagination_page
+) => {
+  let { nodes } = currentPage;
+  if (nodes && nodes.length > 0) {
+    let after = nodes[nodes.length - 1].id;
+    console.log({ after });
+    currentPage.hasNext &&
+      relay.refetch(nextVars => {
+        return { ...nextVars, after };
+      });
+  }
+};
+
+export const loadPrevPage = (relay: RelayRefetchProp) => (
+  currentPage: CitiesPagination_page
+) => {
+  let { nodes } = currentPage;
+  if (nodes && nodes.length > 0) {
+    let before = nodes[0].id;
+    currentPage.hasPrev &&
+      relay.refetch(prevVars => {
+        return { ...prevVars, before };
+      });
+  }
+};
+
 interface Props {
   page: CitiesPagination_page;
   loadPrevPage: any;
@@ -29,7 +60,6 @@ interface Props {
 
 /**
  * Single page of pagination.
- * Doesn't know how to load prev and next page - needs callbacks for that.
  */
 function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
   const { nodes, hasNext, hasPrev } = page;

@@ -5,7 +5,10 @@ import citiesTxt from "raw-loader!../resources/cities.json.txt";
 import * as t from "../types.codegen";
 
 const cities: t.City[] = _.orderBy(
-  JSON.parse(citiesTxt),
+  JSON.parse(citiesTxt).map((city: t.City) => ({
+    ...city,
+    id: city.id.toString()
+  })),
   ["population"],
   ["desc"]
 );
@@ -23,12 +26,12 @@ export const dbUsers: { [key: string]: t.User } = {
   "user#anon": {
     id: "user#anon",
     name: "anon",
-    settings: { citiesPaginationPageSize: 5 }
+    settings: { citiesPaginationPageSize: 4 }
   },
   "user#1": {
     id: "user#1",
     name: "Bob",
-    settings: { citiesPaginationPageSize: 7 }
+    settings: { citiesPaginationPageSize: 5 }
   }
 };
 
