@@ -5,6 +5,7 @@ import CitiesPagination, {
   CitiesPaginationSkeleton
 } from "../components/CitiesPagination";
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
+import * as t from "../types.codegen";
 
 export default { title: "cities_app-demo1/CityPagination" };
 
@@ -19,50 +20,51 @@ const query = graphql`
 export const okState = () => {
   const environment = createTestingEnv({
     Query: {
-      node() {
-        return;
-      },
-      citiesPagination() {
+      node() {},
+      citiesPagination(): t.CitiesPagination {
+        let nodes: t.City[] = [
+          {
+            id: "city#1",
+            name: "Madrid",
+            country: "Spain",
+            population: 3600000,
+            lat: 0,
+            lng: 0
+          },
+          {
+            id: "city#2",
+            name: "Rome",
+            country: "Italy",
+            population: 4600000,
+            lat: 0,
+            lng: 0
+          },
+          {
+            id: "city#3",
+            name: "Turin",
+            country: "Italy",
+            population: 2300000,
+            lat: 0,
+            lng: 0
+          }
+        ];
         return {
-          nodes: [
-            {
-              id: "city#1",
-              name: "Madrid",
-              country: "Spain",
-              population: 3600000
-            },
-            {
-              id: "city#2",
-              name: "Rome",
-              country: "Italy",
-              population: 4600000
-            },
-            ,
-            {
-              id: "city#3",
-              name: "Turin",
-              country: "Italy",
-              population: 2300000
-            }
-          ],
-          pageNo: 2,
-          hasNextPage: true,
-          hasPrevPage: true
+          nodes,
+          hasNext: true,
+          hasPrev: true
         };
       }
     },
     Node: {
-      __resolveType() {
-        return "City";
-      }
+      __resolveType() {}
     }
   });
   return (
     <QueryRenderer<CitiesPaginationStoryQuery>
       query={query}
       environment={environment}
-      variables={{ pageNo: 1 }}
-      render={({ error, props }) => {
+      variables={{}}
+      render={({ props }) => {
         return (
           props &&
           props.citiesPagination && (
@@ -84,7 +86,7 @@ export const loadingState = () => {
       query={query}
       environment={loadingForeverEnvironment()}
       variables={{ pageNo: 1 }}
-      render={({ error, props }) => {
+      render={({ props }) => {
         if (!props) {
           return <CitiesPaginationSkeleton />;
         }

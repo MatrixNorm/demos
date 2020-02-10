@@ -27,6 +27,10 @@ interface Props {
   loadNextPage: any;
 }
 
+/**
+ * Single page of pagination.
+ * Doesn't know how to load prev and next page - needs callbacks for that.
+ */
 function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
   const { nodes, hasNext, hasPrev } = page;
   return (

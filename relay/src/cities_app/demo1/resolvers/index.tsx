@@ -1,7 +1,7 @@
 import * as _ from "lodash";
 import citiesPagination from "./citiesPagination";
 // @ts-ignore
-import citiesTxt from "raw-loader!./resources/cities.json.txt";
+import citiesTxt from "raw-loader!../resources/cities.json.txt";
 import * as t from "../types.codegen";
 
 const cities: t.City[] = _.orderBy(
