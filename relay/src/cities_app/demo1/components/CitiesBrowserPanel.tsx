@@ -128,7 +128,7 @@ const CitiesBrowserPanelRC = createRefetchContainer(
   },
   graphql`
     query CitiesBrowserPanelRefetchQuery(
-      $pageSize: Int!
+      $pageSize: Int
       $after: String
       $before: String
       $searchParams: CitySearchParamsInput

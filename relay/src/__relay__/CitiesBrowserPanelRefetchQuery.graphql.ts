@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 31458a32909263976f39724fb841f78c */
+/* @relayHash 89880a48672ec2859c1a5d78345b6079 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -10,7 +10,7 @@ export type CitySearchParamsInput = {
     populationLte?: number | null;
 };
 export type CitiesBrowserPanelRefetchQueryVariables = {
-    pageSize: number;
+    pageSize?: number | null;
     after?: string | null;
     before?: string | null;
     searchParams?: CitySearchParamsInput | null;
@@ -27,7 +27,7 @@ export type CitiesBrowserPanelRefetchQuery = {
 
 /*
 query CitiesBrowserPanelRefetchQuery(
-  $pageSize: Int!
+  $pageSize: Int
   $after: String
   $before: String
   $searchParams: CitySearchParamsInput
@@ -63,7 +63,7 @@ var v0 = [
   {
     "kind": "LocalArgument",
     "name": "pageSize",
-    "type": "Int!",
+    "type": "Int",
     "defaultValue": null
   },
   {
@@ -198,10 +198,10 @@ return {
     "operationKind": "query",
     "name": "CitiesBrowserPanelRefetchQuery",
     "id": null,
-    "text": "query CitiesBrowserPanelRefetchQuery(\n  $pageSize: Int!\n  $after: String\n  $before: String\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_mwT4m\n}\n\nfragment CitiesBrowserPanel_cities_mwT4m on Query {\n  citiesPagination(pageSize: $pageSize, after: $after, before: $before, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  hasNext\n  hasPrev\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
+    "text": "query CitiesBrowserPanelRefetchQuery(\n  $pageSize: Int\n  $after: String\n  $before: String\n  $searchParams: CitySearchParamsInput\n) {\n  ...CitiesBrowserPanel_cities_mwT4m\n}\n\nfragment CitiesBrowserPanel_cities_mwT4m on Query {\n  citiesPagination(pageSize: $pageSize, after: $after, before: $before, searchParams: $searchParams) {\n    ...CitiesPagination_page\n  }\n}\n\nfragment CitiesPagination_page on CitiesPagination {\n  hasNext\n  hasPrev\n  nodes {\n    id\n    ...CitySummary_city\n  }\n}\n\nfragment CitySummary_city on City {\n  id\n  name\n  country\n  population\n}\n",
     "metadata": {}
   }
 };
 })();
-(node as any).hash = '364b88959706e62514d9ee8b9fe12921';
+(node as any).hash = '2496e5dc67ab0e4d6f964d69c2c30b54';
 export default node;

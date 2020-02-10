@@ -56,7 +56,11 @@ export default (
     if (startIndex < 0) {
       throw new Error("Bad cursor");
     }
-    for (let i = startIndex + 1; i < cities.length; i++) {
+    for (
+      let i = startIndex === 0 ? 0 : startIndex + 1;
+      i < cities.length;
+      i++
+    ) {
       let city = cities[i];
       if (predicates.map(p => p(city)).every(Boolean)) {
         result.push(city);

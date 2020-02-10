@@ -1,13 +1,15 @@
 import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import { createTestingEnv, loadingForeverEnvironment } from "../env";
+
 import CitiesPagination, {
   CitiesPaginationSkeleton
 } from "../components/CitiesPagination";
+
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 import * as t from "../types.codegen";
 
-export default { title: "cities_app-demo1/CityPagination" };
+export default { title: "cities_app-demo1/CitiesPagination" };
 
 const query = graphql`
   query CitiesPaginationStoryQuery {
