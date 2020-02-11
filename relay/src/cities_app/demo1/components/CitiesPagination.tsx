@@ -25,36 +25,10 @@ const Page = styled.div`
   }
 `;
 
-export const loadNextPage = (relay: RelayRefetchProp) => (
-  currentPage: CitiesPagination_page
-) => {
-  let { nodes } = currentPage;
-  if (nodes && nodes.length > 0) {
-    let after = nodes[nodes.length - 1].id;
-    currentPage.hasNext &&
-      relay.refetch(nextVars => {
-        return { ...nextVars, after };
-      });
-  }
-};
-
-export const loadPrevPage = (relay: RelayRefetchProp) => (
-  currentPage: CitiesPagination_page
-) => {
-  let { nodes } = currentPage;
-  if (nodes && nodes.length > 0) {
-    let before = nodes[0].id;
-    currentPage.hasPrev &&
-      relay.refetch(prevVars => {
-        return { ...prevVars, before };
-      });
-  }
-};
-
 interface Props {
   page: CitiesPagination_page;
-  loadPrevPage: any;
-  loadNextPage: any;
+  loadPrevPage: (page: CitiesPagination_page) => void;
+  loadNextPage: (page: CitiesPagination_page) => void;
 }
 
 /**
