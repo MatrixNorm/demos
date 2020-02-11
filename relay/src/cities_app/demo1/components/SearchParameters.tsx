@@ -8,13 +8,13 @@ import {
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import * as t from "../types.codegen";
 
-interface Props {
+type Props = {
   metadata: SearchParameters_metadata;
   initialSearchParams: t.UiCitySearchParams;
   environment: IEnvironment;
   refetch: any;
   render: any;
-}
+};
 
 export type EventT = ["fieldChange", [string, any]] | ["applyChange"];
 export type DispatchT = (event: EventT) => void;
@@ -55,11 +55,10 @@ function commitSearchParamsInRelaystore(
   relayEnv.retain(operationDescriptor);
 }
 
-function SearchParameters({
+export function SearchParameters({
   metadata,
   initialSearchParams,
   environment,
-  refetch,
   render
 }: Props) {
   const [searchParams, setSearchParams] = useState({
@@ -74,7 +73,6 @@ function SearchParameters({
   let dispatch = (event: EventT) => {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
-      console.log(1, searchParams);
       setSearchParams({
         ...searchParams,
         [fieldName]: fieldValue
@@ -83,18 +81,8 @@ function SearchParameters({
     }
     if (event[0] === "applyChange") {
       commitSearchParamsInRelaystore(searchParams, environment);
-      refetch({ searchParams });
       return;
     }
   };
   return render({ dispatch, searchParams });
 }
-
-export default createFragmentContainer(SearchParameters, {
-  metadata: graphql`
-    fragment SearchParameters_metadata on CitiesMetadata {
-      populationLowerBound
-      populationUpperBound
-    }
-  `
-});

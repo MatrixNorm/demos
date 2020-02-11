@@ -20,6 +20,19 @@ import { CitiesBrowserPanel_cities } from "__relay__/CitiesBrowserPanel_cities.g
 import { CitiesBrowserPanelQuery } from "__relay__/CitiesBrowserPanelQuery.graphql";
 import * as t from "../types.codegen";
 
+export const Xyz = () => {
+  return (
+    <PanelBlock>
+      <div className="search-params-wrapper">
+        <SearchParametersQR />
+      </div>
+      <div className="pagination-panel-wrapper">
+        <PaginationQR />
+      </div>
+    </PanelBlock>
+  );
+};
+
 interface Props {
   cities: CitiesBrowserPanel_cities;
   searchMetadata: any;
