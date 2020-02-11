@@ -31,7 +31,6 @@ export const loadNextPage = (relay: RelayRefetchProp) => (
   let { nodes } = currentPage;
   if (nodes && nodes.length > 0) {
     let after = nodes[nodes.length - 1].id;
-    console.log({ after });
     currentPage.hasNext &&
       relay.refetch(nextVars => {
         return { ...nextVars, after };

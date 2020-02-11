@@ -6,11 +6,11 @@ import {
   IEnvironment
 } from "relay-runtime";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
-import { SearchParamsT } from "../types";
+import * as t from "../types.codegen";
 
 interface Props {
   metadata: SearchParameters_metadata;
-  initialSearchParams: SearchParamsT;
+  initialSearchParams: t.UiCitySearchParams;
   environment: IEnvironment;
   refetch: any;
   render: any;
@@ -19,14 +19,14 @@ interface Props {
 export type EventT = ["fieldChange", [string, any]] | ["applyChange"];
 export type DispatchT = (event: EventT) => void;
 
-const defaultInput: SearchParamsT = {
+const defaultInput: t.UiCitySearchParams = {
   countryNameContains: "",
   populationGte: 0,
   populationLte: 999999999
 };
 
 function commitSearchParamsInRelaystore(
-  searchParams: SearchParamsT,
+  searchParams: t.UiCitySearchParams,
   relayEnv: IEnvironment
 ) {
   const query = graphql`

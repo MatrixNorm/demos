@@ -1,9 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
 import { DispatchT } from "./SearchParameters";
-import { SearchParamsT } from "../types";
 import { SubmitButton } from "../elements/Buttons";
 import { TextInput, NumberInput } from "../elements/Inputs";
+import * as t from "../types.codegen";
 
 const SearchParametersBlock = styled.div`
   input {
@@ -17,7 +17,7 @@ const ParameterSection = styled.section`
 
 interface Props {
   dispatch: DispatchT;
-  searchParams: SearchParamsT;
+  searchParams: t.UiCitySearchParams;
 }
 
 export function SearchParametersPresentational({
@@ -36,7 +36,7 @@ export function SearchParametersPresentational({
         />
       </ParameterSection>
       <ParameterSection>
-        <div>Population more than:</div>
+        <div>Population &#62;</div>
         <NumberInput
           step="100000"
           value={searchParams.populationGte || ""}
@@ -49,7 +49,7 @@ export function SearchParametersPresentational({
         />
       </ParameterSection>
       <ParameterSection>
-        <div>Population less than:</div>
+        <div>Population &#60;</div>
         <NumberInput
           step="100000"
           value={searchParams.populationLte || ""}
