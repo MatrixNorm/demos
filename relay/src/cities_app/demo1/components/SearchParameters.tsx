@@ -1,18 +1,21 @@
+import * as React from "react";
 import { useState } from "react";
-import { graphql, createFragmentContainer } from "react-relay";
+import { graphql, QueryRenderer, createFragmentContainer } from "react-relay";
 import {
   createOperationDescriptor,
   getRequest,
   IEnvironment
 } from "relay-runtime";
+
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
+import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
+import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 import * as t from "../types.codegen";
 
 type Props = {
   metadata: SearchParameters_metadata;
-  initialSearchParams: t.UiCitySearchParams;
+  searchParams: SearchParameters_searchParams;
   environment: IEnvironment;
-  refetch: any;
   render: any;
 };
 
@@ -30,15 +33,11 @@ function commitSearchParamsInRelaystore(
   relayEnv: IEnvironment
 ) {
   const query = graphql`
-    query SearchParametersQuery {
+    query SearchParametersUiQuery {
       __typename
       uiState {
         id
-        citySearchParams {
-          countryNameContains
-          populationGte
-          populationLte
-        }
+        ...SearchParameters_searchParams
       }
     }
   `;
@@ -57,32 +56,97 @@ function commitSearchParamsInRelaystore(
 
 export function SearchParameters({
   metadata,
-  initialSearchParams,
+  searchParams,
   environment,
   render
 }: Props) {
-  const [searchParams, setSearchParams] = useState({
+  const [localSearchParams, setLocalSearchParams] = useState({
     ...defaultInput,
     ...{
       populationGte: metadata.populationLowerBound,
       populationLte: metadata.populationUpperBound
     },
-    ...(initialSearchParams || {})
+    ...(searchParams || {})
   });
 
   let dispatch = (event: EventT) => {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
-      setSearchParams({
-        ...searchParams,
+      setLocalSearchParams({
+        ...localSearchParams,
         [fieldName]: fieldValue
       });
       return;
     }
     if (event[0] === "applyChange") {
-      commitSearchParamsInRelaystore(searchParams, environment);
+      commitSearchParamsInRelaystore(localSearchParams, environment);
       return;
     }
   };
-  return render({ dispatch, searchParams });
+  return render({ dispatch, localSearchParams });
 }
+
+const SearchParametersFC = createFragmentContainer(SearchParameters, {
+  metadata: graphql`
+    fragment SearchParameters_metadata on CitiesMetadata {
+      populationLowerBound
+      populationUpperBound
+    }
+  `,
+  searchParams: graphql`
+    fragment SearchParameters_searchParams on UIState {
+      citySearchParams {
+        countryNameContains
+        populationGte
+        populationLte
+      }
+    }
+  `
+});
+
+export default ({
+  environment,
+  render
+}: {
+  environment: IEnvironment;
+  render: any;
+}) => {
+  return (
+    <QueryRenderer<SearchParametersQuery>
+      query={graphql`
+        query SearchParametersQuery {
+          citiesMetadata {
+            ...SearchParameters_metadata
+          }
+          uiState {
+            ...SearchParameters_searchParams
+          }
+        }
+      `}
+      environment={environment}
+      variables={{}}
+      render={({ error, props }) => {
+        if (error) {
+          return <div>NETWORK ERROR</div>;
+        }
+        if (props) {
+          if (props.citiesMetadata && props.uiState) {
+            return (
+              props.citiesMetadata && (
+                <SearchParametersFC
+                  metadata={props.citiesMetadata}
+                  searchParams={props.uiState}
+                  environment={environment}
+                  render={render}
+                />
+              )
+            );
+          } else {
+            return <div>GRAPHQL ERROR</div>;
+          }
+        }
+        return <div>loading...</div>;
+      }}
+    />
+  );
+};

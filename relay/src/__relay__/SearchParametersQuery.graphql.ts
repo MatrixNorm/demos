@@ -1,18 +1,16 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 3fd08c9c7879d10e61b72750392c5545 */
+/* @relayHash 77b1d4c687fcdb3b261f39460e1c085f */
 
 import { ConcreteRequest } from "relay-runtime";
+import { FragmentRefs } from "relay-runtime";
 export type SearchParametersQueryVariables = {};
 export type SearchParametersQueryResponse = {
-    readonly __typename: string;
+    readonly citiesMetadata: {
+        readonly " $fragmentRefs": FragmentRefs<"SearchParameters_metadata">;
+    } | null;
     readonly uiState: {
-        readonly id: string;
-        readonly citySearchParams: {
-            readonly countryNameContains: string | null;
-            readonly populationGte: number | null;
-            readonly populationLte: number | null;
-        } | null;
+        readonly " $fragmentRefs": FragmentRefs<"SearchParameters_searchParams">;
     } | null;
 };
 export type SearchParametersQuery = {
@@ -24,65 +22,143 @@ export type SearchParametersQuery = {
 
 /*
 query SearchParametersQuery {
-  __typename
+  citiesMetadata {
+    ...SearchParameters_metadata
+  }
+}
+
+fragment SearchParameters_metadata on CitiesMetadata {
+  populationLowerBound
+  populationUpperBound
 }
 */
 
-const node: ConcreteRequest = (function(){
-var v0 = [
-  {
-    "kind": "ScalarField",
-    "alias": null,
-    "name": "__typename",
-    "args": null,
-    "storageKey": null
-  },
-  {
-    "kind": "ClientExtension",
+const node: ConcreteRequest = {
+  "kind": "Request",
+  "fragment": {
+    "kind": "Fragment",
+    "name": "SearchParametersQuery",
+    "type": "Query",
+    "metadata": null,
+    "argumentDefinitions": [],
     "selections": [
       {
         "kind": "LinkedField",
         "alias": null,
-        "name": "uiState",
+        "name": "citiesMetadata",
         "storageKey": null,
         "args": null,
-        "concreteType": "UIState",
+        "concreteType": "CitiesMetadata",
+        "plural": false,
+        "selections": [
+          {
+            "kind": "FragmentSpread",
+            "name": "SearchParameters_metadata",
+            "args": null
+          }
+        ]
+      },
+      {
+        "kind": "ClientExtension",
+        "selections": [
+          {
+            "kind": "LinkedField",
+            "alias": null,
+            "name": "uiState",
+            "storageKey": null,
+            "args": null,
+            "concreteType": "UIState",
+            "plural": false,
+            "selections": [
+              {
+                "kind": "FragmentSpread",
+                "name": "SearchParameters_searchParams",
+                "args": null
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "operation": {
+    "kind": "Operation",
+    "name": "SearchParametersQuery",
+    "argumentDefinitions": [],
+    "selections": [
+      {
+        "kind": "LinkedField",
+        "alias": null,
+        "name": "citiesMetadata",
+        "storageKey": null,
+        "args": null,
+        "concreteType": "CitiesMetadata",
         "plural": false,
         "selections": [
           {
             "kind": "ScalarField",
             "alias": null,
-            "name": "id",
+            "name": "populationLowerBound",
             "args": null,
             "storageKey": null
           },
           {
+            "kind": "ScalarField",
+            "alias": null,
+            "name": "populationUpperBound",
+            "args": null,
+            "storageKey": null
+          }
+        ]
+      },
+      {
+        "kind": "ClientExtension",
+        "selections": [
+          {
             "kind": "LinkedField",
             "alias": null,
-            "name": "citySearchParams",
+            "name": "uiState",
             "storageKey": null,
             "args": null,
-            "concreteType": "UICitySearchParams",
+            "concreteType": "UIState",
             "plural": false,
             "selections": [
               {
-                "kind": "ScalarField",
+                "kind": "LinkedField",
                 "alias": null,
-                "name": "countryNameContains",
+                "name": "citySearchParams",
+                "storageKey": null,
                 "args": null,
-                "storageKey": null
+                "concreteType": "UICitySearchParams",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "countryNameContains",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "populationGte",
+                    "args": null,
+                    "storageKey": null
+                  },
+                  {
+                    "kind": "ScalarField",
+                    "alias": null,
+                    "name": "populationLte",
+                    "args": null,
+                    "storageKey": null
+                  }
+                ]
               },
               {
                 "kind": "ScalarField",
                 "alias": null,
-                "name": "populationGte",
-                "args": null,
-                "storageKey": null
-              },
-              {
-                "kind": "ScalarField",
-                "alias": null,
-                "name": "populationLte",
+                "name": "id",
                 "args": null,
                 "storageKey": null
               }
@@ -91,32 +167,14 @@ var v0 = [
         ]
       }
     ]
-  }
-];
-return {
-  "kind": "Request",
-  "fragment": {
-    "kind": "Fragment",
-    "name": "SearchParametersQuery",
-    "type": "Query",
-    "metadata": null,
-    "argumentDefinitions": [],
-    "selections": (v0/*: any*/)
-  },
-  "operation": {
-    "kind": "Operation",
-    "name": "SearchParametersQuery",
-    "argumentDefinitions": [],
-    "selections": (v0/*: any*/)
   },
   "params": {
     "operationKind": "query",
     "name": "SearchParametersQuery",
     "id": null,
-    "text": "query SearchParametersQuery {\n  __typename\n}\n",
+    "text": "query SearchParametersQuery {\n  citiesMetadata {\n    ...SearchParameters_metadata\n  }\n}\n\nfragment SearchParameters_metadata on CitiesMetadata {\n  populationLowerBound\n  populationUpperBound\n}\n",
     "metadata": {}
   }
 };
-})();
-(node as any).hash = 'f89105c0e6abfb9189eea630631b40ca';
+(node as any).hash = 'ba9f652dbab82f598565ea9362c24a51';
 export default node;
