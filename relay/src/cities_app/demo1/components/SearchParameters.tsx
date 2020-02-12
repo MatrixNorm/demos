@@ -10,26 +10,13 @@ import {
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
-import * as t from "../types.codegen";
-
-type Props = {
-  metadata: SearchParameters_metadata;
-  searchParams: SearchParameters_searchParams;
-  environment: IEnvironment;
-  render: any;
-};
 
 export type EventT = ["fieldChange", [string, any]] | ["applyChange"];
 export type DispatchT = (event: EventT) => void;
-
-const defaultInput: t.UiCitySearchParams = {
-  countryNameContains: "",
-  populationGte: 0,
-  populationLte: 999999999
-};
+export type SearchParametersT = Omit<SearchParameters_searchParams, " $refType">;
 
 function commitSearchParamsInRelaystore(
-  searchParams: t.UiCitySearchParams,
+  searchParams: SearchParametersT,
   relayEnv: IEnvironment
 ) {
   const query = graphql`
@@ -37,10 +24,13 @@ function commitSearchParamsInRelaystore(
       __typename
       uiState {
         id
-        ...SearchParameters_searchParams
+        citySearchParams {
+          ...SearchParameters_searchParams
+        }
       }
     }
   `;
+  console.log(searchParams)
   const request = getRequest(query);
   const operationDescriptor = createOperationDescriptor(request, {});
   let data = {
@@ -54,19 +44,26 @@ function commitSearchParamsInRelaystore(
   relayEnv.retain(operationDescriptor);
 }
 
+type Props = {
+  metadata: SearchParameters_metadata;
+  searchParams: SearchParameters_searchParams | null;
+  environment: IEnvironment;
+  render: any;
+};
+
 export function SearchParameters({
   metadata,
   searchParams,
   environment,
   render
 }: Props) {
-  const [localSearchParams, setLocalSearchParams] = useState({
-    ...defaultInput,
+  const [localSearchParams, setLocalSearchParams] = useState<SearchParametersT>({
     ...{
-      populationGte: metadata.populationLowerBound,
-      populationLte: metadata.populationUpperBound
+      countryNameContains: "",
+      populationGte: metadata.populationUpperBound,
+      populationLte: metadata.populationLowerBound
     },
-    ...(searchParams || {})
+    ...searchParams
   });
 
   let dispatch = (event: EventT) => {
@@ -83,7 +80,7 @@ export function SearchParameters({
       return;
     }
   };
-  return render({ dispatch, localSearchParams });
+  return render({ dispatch, searchParams: localSearchParams });
 }
 
 const SearchParametersFC = createFragmentContainer(SearchParameters, {
@@ -94,12 +91,10 @@ const SearchParametersFC = createFragmentContainer(SearchParameters, {
     }
   `,
   searchParams: graphql`
-    fragment SearchParameters_searchParams on UIState {
-      citySearchParams {
-        countryNameContains
-        populationGte
-        populationLte
-      }
+    fragment SearchParameters_searchParams on UICitySearchParams {
+      countryNameContains
+      populationGte
+      populationLte
     }
   `
 });
@@ -109,7 +104,13 @@ export default ({
   render
 }: {
   environment: IEnvironment;
-  render: any;
+  render: ({
+    dispatch,
+    searchParams
+  }: {
+    dispatch: DispatchT;
+    searchParams: SearchParameters_searchParams;
+  }) => any;
 }) => {
   return (
     <QueryRenderer<SearchParametersQuery>
@@ -119,7 +120,9 @@ export default ({
             ...SearchParameters_metadata
           }
           uiState {
-            ...SearchParameters_searchParams
+            citySearchParams {
+              ...SearchParameters_searchParams
+            }
           }
         }
       `}
@@ -130,12 +133,12 @@ export default ({
           return <div>NETWORK ERROR</div>;
         }
         if (props) {
-          if (props.citiesMetadata && props.uiState) {
+          if (props.citiesMetadata) {
             return (
               props.citiesMetadata && (
                 <SearchParametersFC
                   metadata={props.citiesMetadata}
-                  searchParams={props.uiState}
+                  searchParams={props.uiState?.citySearchParams || null}
                   environment={environment}
                   render={render}
                 />

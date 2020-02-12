@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-/* @relayHash 77b1d4c687fcdb3b261f39460e1c085f */
+/* @relayHash 9860c44321922bb82150517eafeafe09 */
 
 import { ConcreteRequest } from "relay-runtime";
 import { FragmentRefs } from "relay-runtime";
@@ -10,7 +10,9 @@ export type SearchParametersQueryResponse = {
         readonly " $fragmentRefs": FragmentRefs<"SearchParameters_metadata">;
     } | null;
     readonly uiState: {
-        readonly " $fragmentRefs": FragmentRefs<"SearchParameters_searchParams">;
+        readonly citySearchParams: {
+            readonly " $fragmentRefs": FragmentRefs<"SearchParameters_searchParams">;
+        } | null;
     } | null;
 };
 export type SearchParametersQuery = {
@@ -71,9 +73,20 @@ const node: ConcreteRequest = {
             "plural": false,
             "selections": [
               {
-                "kind": "FragmentSpread",
-                "name": "SearchParameters_searchParams",
-                "args": null
+                "kind": "LinkedField",
+                "alias": null,
+                "name": "citySearchParams",
+                "storageKey": null,
+                "args": null,
+                "concreteType": "UICitySearchParams",
+                "plural": false,
+                "selections": [
+                  {
+                    "kind": "FragmentSpread",
+                    "name": "SearchParameters_searchParams",
+                    "args": null
+                  }
+                ]
               }
             ]
           }
@@ -176,5 +189,5 @@ const node: ConcreteRequest = {
     "metadata": {}
   }
 };
-(node as any).hash = 'ba9f652dbab82f598565ea9362c24a51';
+(node as any).hash = '5bd0a7c654c61f36f19fe6d9fca06e6d';
 export default node;

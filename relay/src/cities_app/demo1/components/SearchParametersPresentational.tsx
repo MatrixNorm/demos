@@ -4,6 +4,7 @@ import { DispatchT } from "./SearchParameters";
 import { SubmitButton } from "../elements/Buttons";
 import { TextInput, NumberInput } from "../elements/Inputs";
 import * as t from "../types.codegen";
+import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
 const SearchParametersBlock = styled.div`
   input {
@@ -17,7 +18,7 @@ const ParameterSection = styled.section`
 
 interface Props {
   dispatch: DispatchT;
-  searchParams: t.UiCitySearchParams;
+  searchParams: SearchParameters_searchParams;
 }
 
 export function SearchParametersPresentational({
