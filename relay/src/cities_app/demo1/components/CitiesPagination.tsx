@@ -1,9 +1,5 @@
 import * as React from "react";
-import {
-  graphql,
-  createFragmentContainer,
-  RelayRefetchProp
-} from "react-relay";
+import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
 import CitySummary, { CitySummarySkeleton } from "./CitySummary";

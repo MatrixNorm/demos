@@ -6,7 +6,7 @@ import {
   getRequest,
   IEnvironment
 } from "relay-runtime";
-import CitiesBrowserPanel from "./components/CitiesBrowserPanel";
+import CitiesBrowser from "./components/CitiesBrowser";
 import { UIStateType, SearchParamsType } from "./types";
 
 interface AppProps {
@@ -45,7 +45,7 @@ export default function App({ environment }: AppProps) {
 
   if (state.ready) {
     return (
-      <CitiesBrowserPanel
+      <CitiesBrowser
         searchParams={state.searchParams}
         environment={environment}
       />

@@ -1,11 +1,19 @@
 import * as React from "react";
-import { graphql, createRefetchContainer, RelayRefetchProp } from "react-relay";
-import CitiesPagination from "../components/CitiesPagination";
+import {
+  QueryRenderer,
+  graphql,
+  createRefetchContainer,
+  RelayRefetchProp
+} from "react-relay";
+import { IEnvironment } from "relay-runtime";
+import CitiesPagination from "./CitiesPagination";
+import { SearchParametersT } from "./SearchParameters";
 
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_cities } from "__relay__/CitiesPaginationRefetchContainer_cities.graphql";
+import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
 
-export const loadNextPage = (relay: RelayRefetchProp) => (
+const loadNextPage = (relay: RelayRefetchProp) => (
   currentPage: CitiesPagination_page
 ) => {
   let { nodes } = currentPage;
@@ -18,7 +26,7 @@ export const loadNextPage = (relay: RelayRefetchProp) => (
   }
 };
 
-export const loadPrevPage = (relay: RelayRefetchProp) => (
+const loadPrevPage = (relay: RelayRefetchProp) => (
   currentPage: CitiesPagination_page
 ) => {
   let { nodes } = currentPage;
@@ -31,14 +39,14 @@ export const loadPrevPage = (relay: RelayRefetchProp) => (
   }
 };
 
-type Props = {
-  cities: CitiesPaginationRefetchContainer_cities;
-  relay: RelayRefetchProp;
-};
-
-export default createRefetchContainer(
-  ({ cities, relay }: Props) => {
-    console.log(cities);
+const CitiesPaginationRefetchContainer = createRefetchContainer(
+  ({
+    cities,
+    relay
+  }: {
+    cities: CitiesPaginationRefetchContainer_cities;
+    relay: RelayRefetchProp;
+  }) => {
     return cities.citiesPagination ? (
       <CitiesPagination
         page={cities.citiesPagination}
@@ -86,3 +94,36 @@ export default createRefetchContainer(
     }
   `
 );
+
+type Props = {
+  environment: IEnvironment;
+  searchParams: SearchParametersT;
+};
+
+export default ({ environment, searchParams }: Props) => {
+  return (
+    <QueryRenderer<CitiesPaginationRefetchContainerQuery>
+      query={graphql`
+        query CitiesPaginationRefetchContainerQuery(
+          $pageSize: Int
+          $after: String
+          $before: String
+          $searchParams: CitySearchParamsInput
+        ) {
+          ...CitiesPaginationRefetchContainer_cities
+            @arguments(
+              pageSize: $pageSize
+              after: $after
+              before: $before
+              searchParams: $searchParams
+            )
+        }
+      `}
+      environment={environment}
+      variables={{ searchParams }}
+      render={({ props }) => {
+        return props && <CitiesPaginationRefetchContainer cities={props} />;
+      }}
+    />
+  );
+};
