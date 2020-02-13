@@ -78,7 +78,7 @@ export const full = () => {
       <br />
       <LocalQueryRenderer
         query={graphql`
-          query SearchParametersStoryUiQuery {
+          query CitiesBrowserStoryUiQuery {
             __typename
             uiState {
               id
