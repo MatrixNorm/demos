@@ -1,5 +1,6 @@
 import { commitMutation, graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
+import { ChangeCitiesPaginationPageSizeInput } from "__relay__/ChangeCitiesPaginationPageSizeMutation.graphql";
 
 const mutation = graphql`
   mutation ChangeCitiesPaginationPageSizeMutation(
@@ -19,10 +20,7 @@ const mutation = graphql`
 function getOptimisticResponse({
   pageSize,
   userId
-}: {
-  pageSize: number;
-  userId: string;
-}) {
+}: ChangeCitiesPaginationPageSizeInput) {
   return {
     changeCitiesPaginationPageSize: {
       user: {
@@ -37,27 +35,20 @@ function getOptimisticResponse({
 
 function commit({
   environment,
-  pageSize,
-  userId
+  input
 }: {
   environment: IEnvironment;
-  pageSize: number;
-  userId: string;
+  input: ChangeCitiesPaginationPageSizeInput;
 }) {
-  if (Number.isNaN(pageSize)) {
+  if (Number.isNaN(input.pageSize)) {
     return;
   }
-  const input = {
-    pageSize,
-    userId
-  };
-
   return commitMutation(environment, {
     mutation,
     variables: {
       input
     },
-    optimisticResponse: getOptimisticResponse({ pageSize, userId })
+    optimisticResponse: getOptimisticResponse(input)
   });
 }
 

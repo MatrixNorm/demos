@@ -18,8 +18,7 @@ export default createFragmentContainer(
     ) => {
       ChangeCitiesPaginationPageSizeMutation.commit({
         environment: relay.environment,
-        pageSize: Number(e.target.value),
-        userId: user.id
+        input: { pageSize: Number(e.target.value), userId: user.id }
       });
     };
     return (
