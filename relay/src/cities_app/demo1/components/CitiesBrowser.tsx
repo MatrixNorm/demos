@@ -18,7 +18,7 @@ const PanelBlock = styled.div`
   }
 `;
 
-export default ({ environment }) => {
+export default ({ environment }: { environment: IEnvironment }) => {
   return (
     <PanelBlock>
       <div className="search-params-wrapper">
@@ -36,7 +36,7 @@ export default ({ environment }) => {
   );
 };
 
-const X = ({ environment }) => {
+const X = ({ environment }: { environment: IEnvironment }) => {
   return (
     <LocalQueryRenderer<CitiesBrowserUiQuery>
       query={graphql`
@@ -59,7 +59,13 @@ const X = ({ environment }) => {
           props && (
             <CitiesPagination
               environment={environment}
-              searchParams={props.uiState?.citySearchParams || null}
+              searchParams={
+                props.uiState?.citySearchParams || {
+                  countryNameContains: null,
+                  populationGte: null,
+                  populationLte: null
+                }
+              }
             />
           )
         );

@@ -1,10 +1,7 @@
 import * as React from "react";
-import {
-  createRelayEnvironment,
-  createTestingEnv,
-  loadingForeverEnvironment
-} from "../env";
-import CitiesBrowserPanel from "../components/CitiesBrowser";
+import { graphql, LocalQueryRenderer } from "react-relay";
+import { createRelayEnvironment, loadingForeverEnvironment } from "../env";
+import CitiesBrowser from "../components/CitiesBrowser";
 
 export default { title: "cities_app-demo1/CitiesBrowser" };
 
@@ -68,24 +65,45 @@ export default { title: "cities_app-demo1/CitiesBrowser" };
 
 export const loading = () => {
   const environment = loadingForeverEnvironment();
-  const searchParams = {
-    countryNameContains: null,
-    populationGte: null,
-    populationLte: null
-  };
-  return (
-    <CitiesBrowserPanel environment={environment} searchParams={searchParams} />
-  );
+
+  return <CitiesBrowser environment={environment} />;
 };
 
 export const full = () => {
   const environment = createRelayEnvironment();
-  const searchParams = {
-    countryNameContains: null,
-    populationGte: null,
-    populationLte: null
-  };
+
   return (
-    <CitiesBrowserPanel environment={environment} searchParams={searchParams} />
+    <div>
+      <CitiesBrowser environment={environment} />
+      <br />
+      <LocalQueryRenderer
+        query={graphql`
+          query SearchParametersStoryUiQuery {
+            __typename
+            uiState {
+              id
+              citySearchParams {
+                countryNameContains
+                populationGte
+                populationLte
+              }
+            }
+          }
+        `}
+        environment={environment}
+        variables={{}}
+        render={({ props }: { props: any }) => {
+          return (
+            props && (
+              <div>
+                {props.uiState
+                  ? JSON.stringify(props.uiState.citySearchParams)
+                  : JSON.stringify({})}
+              </div>
+            )
+          );
+        }}
+      />
+    </div>
   );
 };

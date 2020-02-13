@@ -101,6 +101,7 @@ type Props = {
 };
 
 export default ({ environment, searchParams }: Props) => {
+  console.log({ searchParams });
   return (
     <QueryRenderer<CitiesPaginationRefetchContainerQuery>
       query={graphql`

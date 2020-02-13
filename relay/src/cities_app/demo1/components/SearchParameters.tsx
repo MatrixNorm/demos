@@ -60,8 +60,8 @@ export function SearchParameters({
   const [localSearchParams, setLocalSearchParams] = useState<SearchParametersT>({
     ...{
       countryNameContains: "",
-      populationGte: metadata.populationUpperBound,
-      populationLte: metadata.populationLowerBound
+      populationGte: metadata.populationLowerBound,
+      populationLte: metadata.populationUpperBound
     },
     ...searchParams
   });
