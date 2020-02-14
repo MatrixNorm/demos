@@ -3,9 +3,10 @@ import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import ChangeCitiesPaginationPageSizeMutation from "../mutations/ChangeCitiesPaginationPageSizeMutation";
 import { NumberInput } from "../elements/Inputs";
+import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 
 type Props = {
-  user: any;
+  user: UserSettings_user;
   relay: any;
 };
 
@@ -26,7 +27,7 @@ export default createFragmentContainer(
         <span>Pagination Page Size: </span>
         <NumberInput
           step="1"
-          value={user.settings.citiesPaginationPageSize}
+          value={user.settings?.citiesPaginationPageSize || ""}
           onChange={handlePaginationPageSizeChange}
         />
       </UserSettings>

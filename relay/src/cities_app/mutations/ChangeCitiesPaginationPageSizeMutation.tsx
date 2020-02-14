@@ -1,6 +1,9 @@
 import { commitMutation, graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
-import { ChangeCitiesPaginationPageSizeInput } from "__relay__/ChangeCitiesPaginationPageSizeMutation.graphql";
+import {
+  ChangeCitiesPaginationPageSizeInput,
+  ChangeCitiesPaginationPageSizeMutationResponse
+} from "__relay__/ChangeCitiesPaginationPageSizeMutation.graphql";
 
 const mutation = graphql`
   mutation ChangeCitiesPaginationPageSizeMutation(
@@ -20,7 +23,7 @@ const mutation = graphql`
 function getOptimisticResponse({
   pageSize,
   userId
-}: ChangeCitiesPaginationPageSizeInput) {
+}: ChangeCitiesPaginationPageSizeInput): ChangeCitiesPaginationPageSizeMutationResponse {
   return {
     changeCitiesPaginationPageSize: {
       user: {
