@@ -8,16 +8,6 @@ export type Scalars = {
   Float: number,
 };
 
-export type ChangeCitiesPaginationPageSizeInput = {
-  pageSize: Scalars['Int'],
-  userId: Scalars['ID'],
-};
-
-export type ChangeCitiesPaginationPageSizePayload = {
-   __typename?: 'ChangeCitiesPaginationPageSizePayload',
-  user?: Maybe<User>,
-};
-
 export type CitiesMetadata = {
    __typename?: 'CitiesMetadata',
   populationLowerBound: Scalars['Int'],
@@ -66,12 +56,12 @@ export type CitySearchParamsInput = {
 
 export type Mutation = {
    __typename?: 'Mutation',
-  changeCitiesPaginationPageSize: ChangeCitiesPaginationPageSizePayload,
+  updateUserSettings: UpdateUserSettingsPayload,
 };
 
 
-export type MutationChangeCitiesPaginationPageSizeArgs = {
-  input?: Maybe<ChangeCitiesPaginationPageSizeInput>
+export type MutationUpdateUserSettingsArgs = {
+  input: UpdateUserSettingsInput
 };
 
 export type Node = {
@@ -119,14 +109,32 @@ export type UiState = {
   citySearchParams?: Maybe<UiCitySearchParams>,
 };
 
+export type UpdateUserSettingsInput = {
+  userId: Scalars['ID'],
+  fieldsForUpdate: UserSettingsInput,
+};
+
+export type UpdateUserSettingsPayload = {
+   __typename?: 'UpdateUserSettingsPayload',
+  user: User,
+};
+
 export type User = Node & {
    __typename?: 'User',
   id: Scalars['ID'],
   name: Scalars['String'],
-  settings?: Maybe<UserSettings>,
+  settings: UserSettings,
 };
 
 export type UserSettings = {
    __typename?: 'UserSettings',
+  citiesPaginationPageSize: Scalars['Int'],
+  foo: Scalars['String'],
+  bar: Scalars['Int'],
+};
+
+export type UserSettingsInput = {
   citiesPaginationPageSize?: Maybe<Scalars['Int']>,
+  foo?: Maybe<Scalars['String']>,
+  bar?: Maybe<Scalars['Int']>,
 };

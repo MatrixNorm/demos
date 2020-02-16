@@ -1,7 +1,7 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
-import ChangeCitiesPaginationPageSizeMutation from "../mutations/ChangeCitiesPaginationPageSizeMutation";
+import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation";
 import { NumberInput } from "../elements/Inputs";
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 
@@ -17,9 +17,12 @@ export default createFragmentContainer(
     const handlePaginationPageSizeChange = (
       e: React.ChangeEvent<HTMLInputElement>
     ) => {
-      ChangeCitiesPaginationPageSizeMutation.commit({
+      UpdateUserSettingsMutation.commit({
         environment: relay.environment,
-        input: { pageSize: Number(e.target.value), userId: user.id }
+        input: {
+          userId: user.id,
+          citiesPaginationPageSize: Number(e.target.value)
+        }
       });
     };
     return (
@@ -39,6 +42,8 @@ export default createFragmentContainer(
         id
         settings {
           citiesPaginationPageSize
+          foo
+          bar
         }
       }
     `
