@@ -13,6 +13,7 @@ type Props = {
 };
 
 export const UserSettings = styled.section``;
+export const Section = styled.section``;
 
 export default createFragmentContainer(
   ({ user, relay }: Props) => {
@@ -48,16 +49,22 @@ export default createFragmentContainer(
     };
     return (
       <UserSettings>
-        <span>Pagination Page Size: </span>
-        <NumberInput
-          step="1"
-          value={user.settings.citiesPaginationPageSize}
-          onChange={handleCitiesPaginationPageSize}
-        />
-        <span>Foo: </span>
-        <TextInput value={user.settings.foo} onChange={handleFoo} />
-        <span>Bar: </span>
-        <NumberInput step="1" value={user.settings.bar} onChange={handleBar} />
+        <Section>
+          <span>Pagination Page Size: </span>
+          <NumberInput
+            step="1"
+            value={locCache.citiesPaginationPageSize}
+            onChange={handleCitiesPaginationPageSize}
+          />
+        </Section>
+        <Section>
+          <span>Foo: </span>
+          <TextInput value={locCache.foo} onChange={handleFoo} />
+        </Section>
+        <Section>
+          <span>Bar: </span>
+          <NumberInput step="1" value={locCache.bar} onChange={handleBar} />
+        </Section>
         <SubmitButton onChange={handleSubmit}>Save</SubmitButton>
       </UserSettings>
     );

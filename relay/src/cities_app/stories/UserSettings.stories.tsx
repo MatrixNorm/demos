@@ -13,7 +13,9 @@ export const citySummary = () => {
       __type: "User",
       name: "Nik",
       settings: {
-        citiesPaginationPageSize: 10
+        citiesPaginationPageSize: 10,
+        foo: "Hello, Cunt",
+        bar: 11
       }
     }
   };
@@ -29,14 +31,17 @@ export const citySummary = () => {
       }
     },
     Mutation: {
-      changeCitiesPaginationPageSize(_: any, { input }: any) {
+      updateUserSettings(_: any, { input }: any) {
         console.log(input);
-        let { userId, pageSize } = input;
-        nodes[userId].settings.citiesPaginationPageSize = pageSize;
+        let { userId, citiesPaginationPageSize } = input;
+        nodes[
+          userId
+        ].settings.citiesPaginationPageSize = citiesPaginationPageSize;
         return nodes[userId];
       }
     }
   });
+  window.relayStore = environment.getStore().getSource()._records;
   return (
     <QueryRenderer<UserSettingsStoryQuery>
       query={graphql`
@@ -50,7 +55,7 @@ export const citySummary = () => {
       `}
       environment={environment}
       variables={{ userId: "user#777" }}
-      render={({ error, props }) => {
+      render={({ props }) => {
         return props && props.node && <UserSettings user={props.node} />;
       }}
     />
