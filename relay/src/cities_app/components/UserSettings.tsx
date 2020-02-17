@@ -17,7 +17,7 @@ export const Section = styled.section``;
 
 export default createFragmentContainer(
   ({ user, relay }: Props) => {
-    console.log('UserSettings component', user.settings)
+    console.log("UserSettings component", user.settings);
     const [locCache, setLocCache] = useState(user.settings);
     const handleCitiesPaginationPageSize = (
       e: React.ChangeEvent<HTMLInputElement>
@@ -40,16 +40,15 @@ export default createFragmentContainer(
       });
     };
     const handleSubmit = () => {
-      let diff = {};
+      let diff: Partial<UserSettings_user["settings"]> = {};
       for (let attr of Object.keys(user.settings)) {
+        //@ts-ignore
         if (locCache[attr] !== user.settings[attr]) {
+          //@ts-ignore
           diff[attr] = locCache[attr];
         }
       }
-      if (
-        Object.values(diff).filter(v => v !== null && v !== undefined).length >
-        0
-      ) {
+      if (Object.values(diff).filter(Boolean).length > 0) {
         UpdateUserSettingsMutation.commit({
           environment: relay.environment,
           input: {

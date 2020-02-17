@@ -49,7 +49,7 @@ export const citySummary = () => {
       }
     }
   });
-
+  //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
 
   return (
