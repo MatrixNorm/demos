@@ -111,7 +111,9 @@ export type UiState = {
 
 export type UpdateUserSettingsInput = {
   userId: Scalars['ID'],
-  fieldsForUpdate: UserSettingsInput,
+  citiesPaginationPageSize?: Maybe<Scalars['Int']>,
+  foo?: Maybe<Scalars['String']>,
+  bar?: Maybe<Scalars['Int']>,
 };
 
 export type UpdateUserSettingsPayload = {
@@ -131,10 +133,4 @@ export type UserSettings = {
   citiesPaginationPageSize: Scalars['Int'],
   foo: Scalars['String'],
   bar: Scalars['Int'],
-};
-
-export type UserSettingsInput = {
-  citiesPaginationPageSize?: Maybe<Scalars['Int']>,
-  foo?: Maybe<Scalars['String']>,
-  bar?: Maybe<Scalars['Int']>,
 };

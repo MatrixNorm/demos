@@ -53,21 +53,46 @@ export const citySummary = () => {
   window.relayStore = environment.getStore().getSource()._records;
 
   return (
-    <QueryRenderer<UserSettingsStoryQuery>
-      query={graphql`
-        query UserSettingsStoryQuery($userId: ID!) {
-          node(id: $userId) {
-            ... on User {
-              ...UserSettings_user
+    <>
+      <QueryRenderer<UserSettingsStoryQuery>
+        query={graphql`
+          query UserSettingsStoryQuery($userId: ID!) {
+            node(id: $userId) {
+              ... on User {
+                ...UserSettings_user
+              }
             }
           }
-        }
-      `}
-      environment={environment}
-      variables={{ userId: "user#777" }}
-      render={({ props }) => {
-        return props && props.node && <UserSettings user={props.node} />;
-      }}
-    />
+        `}
+        environment={environment}
+        variables={{ userId: "user#777" }}
+        render={({ props }) => {
+          return props && props.node && <UserSettings user={props.node} />;
+        }}
+      />
+      <QueryRenderer<any>
+        query={graphql`
+          query UserSettingsStory2Query($userId: ID!) {
+            node(id: $userId) {
+              ... on User {
+                settings {
+                  citiesPaginationPageSize
+                  foo
+                  bar
+                }
+              }
+            }
+          }
+        `}
+        environment={environment}
+        variables={{ userId: "user#777" }}
+        render={({ props }) => {
+          return (
+            props &&
+            props.node && <div>{JSON.stringify(props.node.settings)}</div>
+          );
+        }}
+      />
+    </>
   );
 };
