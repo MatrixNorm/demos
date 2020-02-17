@@ -4,37 +4,53 @@ import {
   UpdateUserSettingsInput,
   UpdateUserSettingsMutationResponse
 } from "__relay__/UpdateUserSettingsMutation.graphql";
+import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
+
+type UserSettings = UserSettings_user["settings"];
 
 const mutation = graphql`
   mutation UpdateUserSettingsMutation($input: UpdateUserSettingsInput!) {
     updateUserSettings(input: $input) {
-      userId
-      citiesPaginationPageSize
-      foo
-      bar
+      user {
+        id
+        settings {
+          citiesPaginationPageSize
+          foo
+          bar
+        }
+      }
     }
   }
 `;
 
 function getOptimisticResponse(
-  input: UpdateUserSettingsInput
+  input: UpdateUserSettingsInput,
+  currentSettings: UserSettings
 ): UpdateUserSettingsMutationResponse {
   return {
     updateUserSettings: {
-      userId: input.userId,
-      citiesPaginationPageSize: input.citiesPaginationPageSize || null,
-      foo: input.foo || null,
-      bar: input.bar || null
+      user: {
+        id: input.userId,
+        settings: {
+          citiesPaginationPageSize:
+            input.citiesPaginationPageSize ||
+            currentSettings.citiesPaginationPageSize,
+          foo: input.foo || currentSettings.foo,
+          bar: input.bar || currentSettings.bar
+        }
+      }
     }
   };
 }
 
 function commit({
   environment,
-  input
+  input,
+  currentSettings
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
+  currentSettings: UserSettings;
 }) {
   // XXX need validation?
   return commitMutation(environment, {
@@ -42,7 +58,7 @@ function commit({
     variables: {
       input
     },
-    optimisticResponse: getOptimisticResponse(input)
+    optimisticResponse: getOptimisticResponse(input, currentSettings)
   });
 }
 

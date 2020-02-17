@@ -33,15 +33,25 @@ export const citySummary = () => {
     Mutation: {
       updateUserSettings(_: any, { input }: any) {
         console.log(input);
-        let { userId, citiesPaginationPageSize } = input;
-        nodes[
-          userId
-        ].settings.citiesPaginationPageSize = citiesPaginationPageSize;
-        return nodes[userId];
+        let { userId, citiesPaginationPageSize, foo, bar } = input;
+        let settingsRef = nodes[userId].settings;
+        if (citiesPaginationPageSize) {
+          settingsRef.citiesPaginationPageSize = citiesPaginationPageSize;
+        }
+        if (foo) {
+          settingsRef.foo = foo;
+        }
+        if (bar) {
+          settingsRef.bar = bar;
+        }
+        console.log(nodes[userId]);
+        return { user: nodes[userId] };
       }
     }
   });
+
   window.relayStore = environment.getStore().getSource()._records;
+
   return (
     <QueryRenderer<UserSettingsStoryQuery>
       query={graphql`

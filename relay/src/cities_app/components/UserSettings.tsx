@@ -17,6 +17,7 @@ export const Section = styled.section``;
 
 export default createFragmentContainer(
   ({ user, relay }: Props) => {
+    console.log('UserSettings component', user.settings)
     const [locCache, setLocCache] = useState(user.settings);
     const handleCitiesPaginationPageSize = (
       e: React.ChangeEvent<HTMLInputElement>
@@ -39,13 +40,25 @@ export default createFragmentContainer(
       });
     };
     const handleSubmit = () => {
-      UpdateUserSettingsMutation.commit({
-        environment: relay.environment,
-        input: {
-          userId: user.id,
-          ...locCache
+      let diff = {};
+      for (let attr of Object.keys(user.settings)) {
+        if (locCache[attr] !== user.settings[attr]) {
+          diff[attr] = locCache[attr];
         }
-      });
+      }
+      if (
+        Object.values(diff).filter(v => v !== null && v !== undefined).length >
+        0
+      ) {
+        UpdateUserSettingsMutation.commit({
+          environment: relay.environment,
+          input: {
+            userId: user.id,
+            ...diff
+          },
+          currentSettings: user.settings
+        });
+      }
     };
     return (
       <UserSettings>
@@ -65,7 +78,7 @@ export default createFragmentContainer(
           <span>Bar: </span>
           <NumberInput step="1" value={locCache.bar} onChange={handleBar} />
         </Section>
-        <SubmitButton onChange={handleSubmit}>Save</SubmitButton>
+        <SubmitButton onClick={handleSubmit}>Save</SubmitButton>
       </UserSettings>
     );
   },

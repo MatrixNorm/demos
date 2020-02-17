@@ -10,10 +10,7 @@ input UpdateUserSettingsInput {
 }
 
 type UpdateUserSettingsPayload {
-  userId: ID!
-  citiesPaginationPageSize: Int
-  foo: String
-  bar: Int
+  user: User!
 }
 
 type Mutation {

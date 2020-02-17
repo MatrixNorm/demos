@@ -50,6 +50,7 @@ export const createTestingEnv = (resolvers: any) => {
       {},
       variables
     );
+    console.log(resp);
     return resp;
   });
 
