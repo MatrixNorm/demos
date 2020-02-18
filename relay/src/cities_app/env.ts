@@ -5,7 +5,8 @@ import { graphql, graphqlSync } from "graphql";
 import { makeExecutableSchema } from "graphql-tools";
 // @ts-ignore
 import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
-import { serverResolvers, dbUsers } from "./resolvers/index";
+import { serverResolvers } from "./resolvers/index";
+import * as db from "./resolvers/database";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
@@ -19,10 +20,10 @@ export const createRelayEnvironment = () => {
       serverSchema,
       operation.text,
       {},
-      { user: dbUsers["user#1"] },
+      { user: db.users["user#1"] },
       variables
     );
-    console.log(resp);
+    console.log({resp});
     return resp;
   });
   const store = new Store(new RecordSource());

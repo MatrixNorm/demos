@@ -1,12 +1,36 @@
 import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
-import { createTestingEnv } from "../env";
+import { createTestingEnv, createRelayEnvironment } from "../env";
 import UserSettings from "../components/UserSettings";
 import { UserSettingsStoryQuery } from "__relay__/UserSettingsStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/UserSettings" };
 
-export const citySummary = () => {
+const query1 = graphql`
+  query UserSettingsStoryQuery($userId: ID!) {
+    node(id: $userId) {
+      ... on User {
+        ...UserSettings_user
+      }
+    }
+  }
+`;
+
+const query2 = graphql`
+  query UserSettingsStory2Query($userId: ID!) {
+    node(id: $userId) {
+      ... on User {
+        settings {
+          citiesPaginationPageSize
+          foo
+          bar
+        }
+      }
+    }
+  }
+`;
+
+export const demo1 = () => {
   let nodes: { [key: string]: any } = {
     "user#777": {
       id: "user#777",
@@ -55,15 +79,7 @@ export const citySummary = () => {
   return (
     <>
       <QueryRenderer<UserSettingsStoryQuery>
-        query={graphql`
-          query UserSettingsStoryQuery($userId: ID!) {
-            node(id: $userId) {
-              ... on User {
-                ...UserSettings_user
-              }
-            }
-          }
-        `}
+        query={query1}
         environment={environment}
         variables={{ userId: "user#777" }}
         render={({ props }) => {
@@ -71,21 +87,38 @@ export const citySummary = () => {
         }}
       />
       <QueryRenderer<any>
-        query={graphql`
-          query UserSettingsStory2Query($userId: ID!) {
-            node(id: $userId) {
-              ... on User {
-                settings {
-                  citiesPaginationPageSize
-                  foo
-                  bar
-                }
-              }
-            }
-          }
-        `}
+        query={query2}
         environment={environment}
         variables={{ userId: "user#777" }}
+        render={({ props }) => {
+          return (
+            props &&
+            props.node && <div>{JSON.stringify(props.node.settings)}</div>
+          );
+        }}
+      />
+    </>
+  );
+};
+
+export const full = () => {
+  const environment = createRelayEnvironment();
+  //@ts-ignore
+  window.relayStore = environment.getStore().getSource()._records;
+  return (
+    <>
+      <QueryRenderer<UserSettingsStoryQuery>
+        query={query1}
+        environment={environment}
+        variables={{ userId: "user#1" }}
+        render={({ props }) => {
+          return props && props.node && <UserSettings user={props.node} />;
+        }}
+      />
+      <QueryRenderer<any>
+        query={query2}
+        environment={environment}
+        variables={{ userId: "user#1" }}
         render={({ props }) => {
           return (
             props &&

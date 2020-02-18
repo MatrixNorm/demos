@@ -1,47 +1,22 @@
-import * as _ from "lodash";
 import citiesPagination from "./citiesPagination";
-// @ts-ignore
-import citiesTxt from "raw-loader!../resources/cities.json.txt";
+import Mutts from "./mutations";
+import * as db from "./database";
 import * as t from "../types.codegen";
-
-const cities: t.City[] = _.orderBy(
-  JSON.parse(citiesTxt).map((city: t.City) => ({
-    ...city,
-    id: city.id.toString()
-  })),
-  ["population"],
-  ["desc"]
-);
-const countries = [...new Set(cities.map(i => i.country))];
-const citiesMetadata = {
-  populationLowerBound: cities
-    .map(c => c.population)
-    .reduce((a, b) => Math.min(a, b)),
-  populationUpperBound: cities
-    .map(c => c.population)
-    .reduce((a, b) => Math.max(a, b))
-};
-
-export const dbUsers: { [key: string]: t.User } = {
-  "user#anon": {
-    id: "user#anon",
-    name: "anon",
-    settings: { citiesPaginationPageSize: 4 }
-  },
-  "user#1": {
-    id: "user#1",
-    name: "Bob",
-    settings: { citiesPaginationPageSize: 5 }
-  }
-};
 
 export const serverResolvers = {
   Query: {
     viewer: () => {
       // logged-in user
-      return dbUsers["user#1"];
+      return db.users["user#1"];
     },
     node: (_: any, { id }: t.Node) => {
+      console.log(id);
+      if (id.startsWith("user")) {
+        return db.users[id];
+      }
+      if (id.startsWith("city")) {
+        return db.cities.find(c => c.id === id);
+      }
       return { id };
     },
     citiesPagination: (
@@ -50,14 +25,14 @@ export const serverResolvers = {
       context: { user: t.User }
     ): t.CitiesPagination => {
       return citiesPagination(
-        cities,
+        db.cities,
         args,
         context.user.settings?.citiesPaginationPageSize || 3
       );
     },
     citiesMetadata: () => {
       return {
-        ...citiesMetadata,
+        ...db.citiesMetadata,
         latLowerBound: 11.97,
         latUpperBound: 67.53,
         lngLowerBound: 9.47,
@@ -65,15 +40,21 @@ export const serverResolvers = {
       };
     },
     countries: (_: any, { searchString }: t.QueryCountriesArgs) => {
-      return countries
+      return db.countries
         .filter(c => c.toLowerCase().includes(searchString))
         .slice(0, 8);
     }
   },
   Node: {
-    __resolveType(node: any) {
-      console.log({ node });
-      return node;
+    __resolveType(node: t.Node) {
+      if (node.id.startsWith("user")) {
+        return "User";
+      }
+      if (node.id.startsWith("city")) {
+        return "City";
+      }
+      return null;
     }
-  }
+  },
+  Mutation: Mutts
 };
