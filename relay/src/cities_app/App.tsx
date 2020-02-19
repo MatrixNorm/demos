@@ -2,6 +2,7 @@ import * as React from "react";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import { IEnvironment } from "relay-runtime";
 import CitiesBrowser from "./components/CitiesBrowser";
+import SettingsPage from "./pages/SettingsPage";
 
 export default function App({ environment }: { environment: IEnvironment }) {
   return (
@@ -22,7 +23,7 @@ export default function App({ environment }: { environment: IEnvironment }) {
             <CitiesBrowser environment={environment} />
           </Route>
           <Route path="/settings">
-            <UserSettings />
+            <SettingsPage environment={environment} />
           </Route>
         </Switch>
       </div>

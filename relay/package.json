@@ -73,6 +73,7 @@
     "relay-compiler-language-typescript": "^10.1.4",
     "shadow-cljs": "^2.8.83",
     "source-map-loader": "^0.2.4",
+    "storybook-react-router": "^1.0.8",
     "style-loader": "^1.0.0",
     "typescript": "^3.7.5",
     "webpack": "^4.31.0",
