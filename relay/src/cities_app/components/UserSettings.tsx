@@ -70,11 +70,11 @@ export default createFragmentContainer(
           />
         </Section>
         <Section>
-          <span>Foo: </span>
+          <span>Foo:</span>
           <TextInput value={locCache.foo} onChange={handleFoo} />
         </Section>
         <Section>
-          <span>Bar: </span>
+          <span>Bar:</span>
           <NumberInput step="1" value={locCache.bar} onChange={handleBar} />
         </Section>
         <SubmitButton onClick={handleSubmit}>Save</SubmitButton>
