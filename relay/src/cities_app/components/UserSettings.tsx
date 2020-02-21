@@ -15,82 +15,81 @@ type Props = {
 export const UserSettings = styled.section``;
 export const Section = styled.section``;
 
-export default createFragmentContainer(
-  ({ user, relay }: Props) => {
-    console.log("UserSettings component", user.settings);
-    const [locCache, setLocCache] = useState(user.settings);
-    const handleCitiesPaginationPageSize = (
-      e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-      setLocCache({
-        ...locCache,
-        citiesPaginationPageSize: Number(e.target.value)
-      });
-    };
-    const handleFoo = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setLocCache({
-        ...locCache,
-        foo: e.target.value
-      });
-    };
-    const handleBar = (e: React.ChangeEvent<HTMLInputElement>) => {
-      setLocCache({
-        ...locCache,
-        bar: Number(e.target.value)
-      });
-    };
-    const handleSubmit = () => {
-      let diff: Partial<UserSettings_user["settings"]> = {};
-      for (let attr of Object.keys(user.settings)) {
+export const UserSettingsComponent = ({ user, relay }: Props) => {
+  console.log("UserSettings component", user.settings);
+  const [locCache, setLocCache] = useState(user.settings);
+  const handleCitiesPaginationPageSize = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setLocCache({
+      ...locCache,
+      citiesPaginationPageSize: Number(e.target.value)
+    });
+  };
+  const handleFoo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocCache({
+      ...locCache,
+      foo: e.target.value
+    });
+  };
+  const handleBar = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLocCache({
+      ...locCache,
+      bar: Number(e.target.value)
+    });
+  };
+  const handleSubmit = () => {
+    let diff: Partial<UserSettings_user["settings"]> = {};
+    for (let attr of Object.keys(user.settings)) {
+      //@ts-ignore
+      if (locCache[attr] !== user.settings[attr]) {
         //@ts-ignore
-        if (locCache[attr] !== user.settings[attr]) {
-          //@ts-ignore
-          diff[attr] = locCache[attr];
-        }
+        diff[attr] = locCache[attr];
       }
-      if (Object.values(diff).filter(Boolean).length > 0) {
-        UpdateUserSettingsMutation.commit({
-          environment: relay.environment,
-          input: {
-            userId: user.id,
-            ...diff
-          },
-          currentSettings: user.settings
-        });
+    }
+    if (Object.values(diff).filter(Boolean).length > 0) {
+      UpdateUserSettingsMutation.commit({
+        environment: relay.environment,
+        input: {
+          userId: user.id,
+          ...diff
+        },
+        currentSettings: user.settings
+      });
+    }
+  };
+  return (
+    <UserSettings>
+      <Section>
+        <span>Pagination Page Size: </span>
+        <NumberInput
+          step="1"
+          value={locCache.citiesPaginationPageSize}
+          onChange={handleCitiesPaginationPageSize}
+        />
+      </Section>
+      <Section>
+        <span>Foo:</span>
+        <TextInput value={locCache.foo} onChange={handleFoo} />
+      </Section>
+      <Section>
+        <span>Bar:</span>
+        <NumberInput step="1" value={locCache.bar} onChange={handleBar} />
+      </Section>
+      <SubmitButton onClick={handleSubmit}>Save</SubmitButton>
+    </UserSettings>
+  );
+};
+
+export default createFragmentContainer(UserSettingsComponent, {
+  user: graphql`
+    fragment UserSettings_user on User {
+      id
+      settings {
+        citiesPaginationPageSize
+        foo
+        bar
       }
-    };
-    return (
-      <UserSettings>
-        <Section>
-          <span>Pagination Page Size: </span>
-          <NumberInput
-            step="1"
-            value={locCache.citiesPaginationPageSize}
-            onChange={handleCitiesPaginationPageSize}
-          />
-        </Section>
-        <Section>
-          <span>Foo:</span>
-          <TextInput value={locCache.foo} onChange={handleFoo} />
-        </Section>
-        <Section>
-          <span>Bar:</span>
-          <NumberInput step="1" value={locCache.bar} onChange={handleBar} />
-        </Section>
-        <SubmitButton onClick={handleSubmit}>Save</SubmitButton>
-      </UserSettings>
-    );
-  },
-  {
-    user: graphql`
-      fragment UserSettings_user on User {
-        id
-        settings {
-          citiesPaginationPageSize
-          foo
-          bar
-        }
-      }
-    `
-  }
-);
+    }
+  `
+});

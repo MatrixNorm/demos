@@ -5,10 +5,22 @@ extend type Query {
 type UIState {
   id: ID!
   citySearchParams: UICitySearchParams
+  notifications: [UINotification!]
 }
 
 type UICitySearchParams {
   countryNameContains: String
   populationGte: Int
   populationLte: Int
+}
+
+type UINotification implements Node {
+  id: ID!
+  kind: UINotificationKind!
+  text: String!
+}
+
+enum UINotificationKind {
+  INFO
+  ERROR
 }
