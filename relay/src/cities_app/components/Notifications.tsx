@@ -12,12 +12,9 @@ const Notification_ = ({
   className: string;
 }) => {
   const { id, kind, text } = notification;
-  const handleClose = () => {
-    console.log(`close notification with id=${id}`);
-  };
   return (
     <div className={className}>
-      <span className="button-close" onClick={handleClose}>
+      <span className="button-close" onClick={() => remNotification(id)}>
         x
       </span>
       <div className="text">{text}</div>
@@ -53,12 +50,18 @@ export const Notification = createFragmentContainer(
   }
 );
 
-const Notifications_ = ({ state }: { state: Notifications_state }) => {
+const Notifications_ = ({
+  state,
+  className
+}: {
+  state: Notifications_state;
+  className: string;
+}) => {
   return (
-    <ol>
+    <ol className={className}>
       {state.notifications &&
         state.notifications.map(notification => (
-          <li key={notification.id}>
+          <li key={notification.id} className="list-item">
             <Notification notification={notification} />
           </li>
         ))}
@@ -66,13 +69,32 @@ const Notifications_ = ({ state }: { state: Notifications_state }) => {
   );
 };
 
-export const Notifications = createFragmentContainer(Notifications_, {
-  state: graphql`
-    fragment Notifications_state on UIState {
-      notifications {
-        id
-        ...Notifications_notification
-      }
+export const Notifications = createFragmentContainer(
+  styled(Notifications_)`
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    .list-item {
+      margin-bottom: 1em;
     }
-  `
-});
+  `,
+  {
+    state: graphql`
+      fragment Notifications_state on UIState {
+        notifications {
+          id
+          ...Notifications_notification
+        }
+      }
+    `
+  }
+);
+
+export const remNotification = (notificationId: string) => {
+  console.log(`close notification with id=${notificationId}`);
+};
+
+type NotificationType = Omit<Notifications_notification, " $refType">;
+
+export const addNotification = (notification: NotificationType) => {};

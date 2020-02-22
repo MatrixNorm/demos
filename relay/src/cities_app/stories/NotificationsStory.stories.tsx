@@ -5,46 +5,46 @@ import { Notification, Notifications } from "../components/Notifications";
 
 export default { title: "cities_app-demo1/Notifications" };
 
-// export const single = () => {
-//   const env = createMockEnvironment();
-//   setTimeout(() => {
-//     env.mock.resolveMostRecentOperation((operation: any) => {
-//       let payload = MockPayloadGenerator.generate(operation, {
-//         UINotification() {
-//           return {
-//             id: "notif#1",
-//             kind: "INFO",
-//             text:
-//               "Updated settings saved without any problems. You can go and f. yourself."
-//           };
-//         }
-//       });
-//       console.log({ operation, payload });
-//       return payload;
-//     });
-//   }, 0);
-//   return (
-//     <QueryRenderer<any>
-//       query={graphql`
-//         query NotificationsStoryQuery @relay_test_operation {
-//           notification: node(id: "notification_id") {
-//             ...Notifications_notification
-//           }
-//         }
-//       `}
-//       environment={env}
-//       variables={{}}
-//       render={({ props }) => {
-//         return (
-//           props &&
-//           props.notification && (
-//             <Notification notification={props.notification} />
-//           )
-//         );
-//       }}
-//     />
-//   );
-// };
+export const single = () => {
+  const env = createMockEnvironment();
+  setTimeout(() => {
+    env.mock.resolveMostRecentOperation((operation: any) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UINotification() {
+          return {
+            id: "notif#1",
+            kind: "INFO",
+            text:
+              "Updated settings saved without any problems. You can go and f. yourself."
+          };
+        }
+      });
+      console.log({ operation, payload });
+      return payload;
+    });
+  }, 0);
+  return (
+    <QueryRenderer<any>
+      query={graphql`
+        query NotificationsStoryOneQuery @relay_test_operation {
+          notification: node(id: "notification_id") {
+            ...Notifications_notification
+          }
+        }
+      `}
+      environment={env}
+      variables={{}}
+      render={({ props }) => {
+        return (
+          props &&
+          props.notification && (
+            <Notification notification={props.notification} />
+          )
+        );
+      }}
+    />
+  );
+};
 
 export const multiple = () => {
   const env = createMockEnvironment();
@@ -55,7 +55,6 @@ export const multiple = () => {
           return `uuid-${generateId()}`;
         },
         UIState() {
-          console.log(11111)
           return {
             notifications: [
               {
@@ -63,19 +62,16 @@ export const multiple = () => {
                 text: "Lorem ipsum"
               },
               {
+                kind: "ERROR",
+                text: "This sucks"
+              },
+              {
                 kind: "INFO",
-                text: "Lorem ipsum"
+                text: "Everything is tip-top"
               }
             ]
           };
         },
-        // UINotification(x) {
-        //   console.log(x);
-        //   return {
-        //     kind: "INFO",
-        //     text: "Lorem ipsum"
-        //   };
-        // }
       });
       console.log({ operation, payload });
       return payload;
@@ -84,11 +80,10 @@ export const multiple = () => {
   return (
     <QueryRenderer<any>
       query={graphql`
-        query NotificationsStory2Query @relay_test_operation {
+        query NotificationsStoryManyQuery @relay_test_operation {
+          __typename
           uiState {
-            notifications {
-              ...Notifications_notification
-            }
+            ...Notifications_state
           }
         }
       `}
