@@ -28,7 +28,7 @@
     "react-relay": "^7.1.0",
     "react-router-dom": "^5.1.2",
     "relay-compiler": "^7.1.0",
-    "relay-test-utils": "^8.0.0",
+    "relay-test-utils": "^7.1.0",
     "styled-components": "^5.0.0",
     "xstate": "^4.7.5"
   },
@@ -70,6 +70,7 @@
     "jest": "^24.9.0",
     "lumo-cljs": "^1.10.1",
     "raw-loader": "^3.1.0",
+    "react-test-renderer": "^16.12.0",
     "relay-compiler-language-typescript": "^10.1.4",
     "shadow-cljs": "^2.8.83",
     "source-map-loader": "^0.2.4",
