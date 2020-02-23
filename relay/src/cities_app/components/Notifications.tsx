@@ -1,5 +1,6 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
+import { commitLocalUpdate, IEnvironment } from "relay-runtime";
 import styled from "styled-components";
 import { Notifications_notification } from "__relay__/Notifications_notification.graphql";
 import { Notifications_state } from "__relay__/Notifications_state.graphql";
@@ -95,6 +96,52 @@ export const remNotification = (notificationId: string) => {
   console.log(`close notification with id=${notificationId}`);
 };
 
-type NotificationType = Omit<Notifications_notification, " $refType">;
+type NotificationDataType = Omit<Notifications_notification, " $refType" | "id">;
 
-export const addNotification = (notification: NotificationType) => {};
+function uuidGen() {
+  let date = new Date().toISOString();
+  let random = Math.random()
+    .toString()
+    .slice(2);
+  return `client:UINotification-${date}-${random}`;
+}
+
+export const addNotification = (
+  notification: NotificationDataType,
+  environment: IEnvironment
+) => {
+  commitLocalUpdate(environment, store => {
+    const root = store.get("client:root");
+    if (!root) return;
+    const notificationId = uuidGen()
+    const newNotificationRecord = store.create(
+      notificationId,
+      "UINotification"
+    );
+    newNotificationRecord.setValue(notificationId, "id");
+    newNotificationRecord.setValue(notification.kind, "kind");
+    newNotificationRecord.setValue(notification.text, "text");
+    environment.retain({
+      //@ts-ignore
+      dataID: newNotificationRecord.getDataID(),
+      variables: {},
+      node: { selections: [] }
+    })
+
+    const uiStateRecord = root.getOrCreateLinkedRecord("uiState", "UIState");
+    environment.retain({
+      //@ts-ignore
+      dataID: uiStateRecord.getDataID(),
+      variables: {},
+      node: { selections: [] }
+    })
+
+    const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
+    if (notificationRecords) {
+      notificationRecords.push(newNotificationRecord);
+    } else {
+      uiStateRecord.setLinkedRecords([newNotificationRecord], "notifications");
+    }
+    
+  });
+};

@@ -1,7 +1,12 @@
 import * as React from "react";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { graphql, QueryRenderer } from "react-relay";
-import { Notification, Notifications } from "../components/Notifications";
+import {
+  Notification,
+  Notifications,
+  addNotification
+} from "../components/Notifications";
+import { createTestingEnv } from "../env";
 
 export default { title: "cities_app-demo1/Notifications" };
 
@@ -71,7 +76,7 @@ export const multiple = () => {
               }
             ]
           };
-        },
+        }
       });
       console.log({ operation, payload });
       return payload;
@@ -92,6 +97,62 @@ export const multiple = () => {
       render={({ props }) => {
         return (
           props && props.uiState && <Notifications state={props.uiState} />
+        );
+      }}
+    />
+  );
+};
+
+export const adding = () => {
+  const environment = createTestingEnv({
+    Query: {
+      node(_: any, { id }: { id: string }) {
+        return { id };
+      }
+    },
+    Node: {
+      __resolveType(node: any) {
+        return node.__type || null;
+      }
+    }
+  });
+  //@ts-ignore
+  window.relayEnv = environment;
+  //@ts-ignore
+  window.relayStore = environment.getStore().getSource()._records;
+
+  const handleAddNotification = () => {
+    addNotification(
+      {
+        kind: "INFO",
+        text: "Lorem"
+      },
+      environment
+    );
+  };
+  const runGC = () => {
+    //@ts-ignore
+    environment.getStore()._scheduleGC();
+  };
+
+  return (
+    <QueryRenderer<any>
+      query={graphql`
+        query NotificationsStoryAddingQuery {
+          __typename
+        }
+      `}
+      environment={environment}
+      variables={{}}
+      render={({ props }) => {
+        return (
+          props && (
+            <>
+              <button onClick={handleAddNotification}>Add Notification</button>
+              <br />
+              <button onClick={runGC}>Run GC</button>
+            </>
+          )
         );
       }}
     />
