@@ -1,6 +1,11 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
-import { commitLocalUpdate, IEnvironment } from "relay-runtime";
+import {
+  commitLocalUpdate,
+  IEnvironment,
+  getRequest,
+  createOperationDescriptor
+} from "relay-runtime";
 import styled from "styled-components";
 import { Notifications_notification } from "__relay__/Notifications_notification.graphql";
 import { Notifications_state } from "__relay__/Notifications_state.graphql";
@@ -96,7 +101,10 @@ export const remNotification = (notificationId: string) => {
   console.log(`close notification with id=${notificationId}`);
 };
 
-type NotificationDataType = Omit<Notifications_notification, " $refType" | "id">;
+type NotificationDataType = Omit<
+  Notifications_notification,
+  " $refType" | "id"
+>;
 
 function uuidGen() {
   let date = new Date().toISOString();
@@ -113,7 +121,8 @@ export const addNotification = (
   commitLocalUpdate(environment, store => {
     const root = store.get("client:root");
     if (!root) return;
-    const notificationId = uuidGen()
+
+    const notificationId = uuidGen();
     const newNotificationRecord = store.create(
       notificationId,
       "UINotification"
@@ -121,27 +130,32 @@ export const addNotification = (
     newNotificationRecord.setValue(notificationId, "id");
     newNotificationRecord.setValue(notification.kind, "kind");
     newNotificationRecord.setValue(notification.text, "text");
-    environment.retain({
-      //@ts-ignore
-      dataID: newNotificationRecord.getDataID(),
-      variables: {},
-      node: { selections: [] }
-    })
 
     const uiStateRecord = root.getOrCreateLinkedRecord("uiState", "UIState");
-    environment.retain({
-      //@ts-ignore
-      dataID: uiStateRecord.getDataID(),
-      variables: {},
-      node: { selections: [] }
-    })
-
     const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
     if (notificationRecords) {
-      notificationRecords.push(newNotificationRecord);
+      uiStateRecord.setLinkedRecords(
+        [newNotificationRecord, ...notificationRecords],
+        "notifications"
+      );
     } else {
       uiStateRecord.setLinkedRecords([newNotificationRecord], "notifications");
     }
-    
+
+    const query = graphql`
+      query NotificationsUiRetainQuery {
+        __typename
+        uiState {
+          notifications {
+            id
+            kind
+            text
+          }
+        }
+      }
+    `;
+    const request = getRequest(query);
+    const operationDescriptor = createOperationDescriptor(request, {});
+    environment.retain(operationDescriptor);
   });
 };
