@@ -15,6 +15,7 @@ const baseBuild = ({ buildId }) => env => {
   const lang = process.env.LANG;
 
   return {
+    target: "node",
     entry: {
       main: `./src/${buildId}/main.${lang === "ts" ? "tsx" : "js"}`
     },
@@ -49,16 +50,11 @@ const baseBuild = ({ buildId }) => env => {
           use: {
             loader: "babel-loader",
             options: {
-              presets: (function() {
-                let base = [
-                  "@babel/preset-react",
-                  ["@babel/preset-env", { targets: { chrome: "76" } }]
-                ];
-                if (lang === "ts") {
-                  return [...base, "@babel/typescript"];
-                }
-                return base;
-              })(),
+              presets: [
+                "@babel/preset-react",
+                ["@babel/preset-env", { targets: { chrome: "76" } }],
+                "@babel/typescript"
+              ],
               plugins: [
                 [
                   "relay",
