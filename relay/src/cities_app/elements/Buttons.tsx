@@ -37,3 +37,4 @@ export const PrevButton = styled(BasePaginationButton)`
 `;
 
 export const SubmitButton = styled.button``;
+

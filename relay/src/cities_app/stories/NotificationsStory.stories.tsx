@@ -24,7 +24,6 @@ export const single = () => {
           };
         }
       });
-      console.log({ operation, payload });
       return payload;
     });
   }, 0);

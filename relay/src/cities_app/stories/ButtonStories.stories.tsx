@@ -3,7 +3,7 @@ import { NextButton, PrevButton } from "../elements/Buttons";
 
 export default { title: "cities_app-demo1/Buttons" };
 
-export const buttons = () => {
+export const prevNextButtons = () => {
   return (
     <div>
       <NextButton />

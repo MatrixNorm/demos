@@ -5,4 +5,9 @@
  :builds
  {:cities-app {:target :browser
                :output-dir "cljs_build/js"
-               :modules {:main {:entries [cljs.cities-app.main]}}}}}
+               :modules {:main {:entries [cljs.cities-app.main]}}}
+  
+  :test {:target    :node-test
+         :output-to "cljs_build/tests/node-tests.js"
+         :ns-regexp "-test$"
+         :autorun   true}}}
