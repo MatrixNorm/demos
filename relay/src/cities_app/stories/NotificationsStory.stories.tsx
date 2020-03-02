@@ -139,6 +139,9 @@ export const adding = () => {
       query={graphql`
         query NotificationsStoryAddingQuery {
           __typename
+          uiState {
+            ...Notifications_state
+          }
         }
       `}
       environment={environment}
@@ -147,6 +150,68 @@ export const adding = () => {
         return (
           props && (
             <>
+              {props.uiState && <Notifications state={props.uiState} />}
+              <br />
+              <button onClick={handleAddNotification}>Add Notification</button>
+              <br />
+              <button onClick={runGC}>Run GC</button>
+            </>
+          )
+        );
+      }}
+    />
+  );
+};
+
+export const adding2 = () => {
+  const env = createMockEnvironment();
+  setTimeout(() => {
+    env.mock.resolveMostRecentOperation(operation => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        ID(_, generateId) {
+          return `uuid-${generateId()}`;
+        },
+        UIState() {
+          return {
+            notifications: []
+          };
+        }
+      });
+      return payload;
+    });
+  }, 0);
+  const handleAddNotification = () => {
+    addNotification(
+      {
+        kind: "INFO",
+        text: "Lorem"
+      },
+      env
+    );
+  };
+  const runGC = () => {
+    //@ts-ignore
+    env.getStore()._scheduleGC();
+  };
+
+  return (
+    <QueryRenderer<any>
+      query={graphql`
+        query NotificationsStoryAdding2Query {
+          __typename
+          uiState {
+            ...Notifications_state
+          }
+        }
+      `}
+      environment={env}
+      variables={{}}
+      render={({ props }) => {
+        return (
+          props && (
+            <>
+              {props.uiState && <Notifications state={props.uiState} />}
+              <br />
               <button onClick={handleAddNotification}>Add Notification</button>
               <br />
               <button onClick={runGC}>Run GC</button>
