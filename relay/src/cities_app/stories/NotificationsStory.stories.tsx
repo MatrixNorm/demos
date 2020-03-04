@@ -131,7 +131,7 @@ export const adding = () => {
   };
   const runGC = () => {
     //@ts-ignore
-    environment.getStore()._scheduleGC();
+    environment.getStore().__gc();
   };
 
   return (

@@ -1,6 +1,6 @@
 ;; shadow-cljs configuration
 {:source-paths
- ["src_cljs" "babel_gen"]
+ ["babel_gen"]
  :dev-http {8080 "cljs_build"}
  :builds
  {:cities-app {:target :browser

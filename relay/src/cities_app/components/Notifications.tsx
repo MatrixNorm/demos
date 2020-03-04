@@ -88,8 +88,13 @@ export const Notifications = createFragmentContainer(Notifications_, {
   `
 });
 
-export const remNotification = (notificationId: string) => {
-  console.log(`close notification with id=${notificationId}`);
+export const remNotification = (
+  notificationId: string,
+  environment: IEnvironment
+) => {
+  commitLocalUpdate(environment, store => {
+    store.delete(notificationId);
+  });
 };
 
 type NotificationDataType = Omit<
@@ -108,12 +113,11 @@ function uuidGen() {
 export const addNotification = (
   notification: NotificationDataType,
   environment: IEnvironment
-) => {
+): string => {
+  const notificationId = uuidGen();
   commitLocalUpdate(environment, store => {
     const root = store.get("client:root");
     if (!root) return;
-
-    const notificationId = uuidGen();
     const newNotificationRecord = store.create(
       notificationId,
       "UINotification"
@@ -149,4 +153,5 @@ export const addNotification = (
     const operationDescriptor = createOperationDescriptor(request, {});
     environment.retain(operationDescriptor);
   });
+  return notificationId;
 };
