@@ -120,14 +120,17 @@ export const adding = () => {
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
 
+  let counter = 0;
+
   const handleAddNotification = () => {
     addNotification(
       {
         kind: "INFO",
-        text: "Lorem"
+        text: `Lorem-${counter}`
       },
       environment
     );
+    counter++;
   };
   const runGC = () => {
     //@ts-ignore

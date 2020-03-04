@@ -1,11 +1,10 @@
 import * as React from "react";
-import { graphql, createFragmentContainer } from "react-relay";
+import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import {
   commitLocalUpdate,
   IEnvironment,
   getRequest,
-  createOperationDescriptor,
-  RelayProfiler
+  createOperationDescriptor
 } from "relay-runtime";
 import styled from "styled-components";
 import { CloseCrossIcon } from "../elements/Icons";
@@ -29,16 +28,18 @@ const NotificationStyled = styled.div`
 `;
 
 const Notification_ = ({
-  notification
+  notification,
+  relay
 }: {
   notification: Notifications_notification;
+  relay: RelayProp;
 }) => {
   const { id, kind, text } = notification;
   return (
     <NotificationStyled>
       <CloseCrossIcon
         className="button-close"
-        onClick={() => remNotification(id)}
+        onClick={() => remNotification(id, relay.environment)}
       />
       <div className="text">{text}</div>
     </NotificationStyled>
