@@ -4,7 +4,8 @@ import {
   commitLocalUpdate,
   IEnvironment,
   getRequest,
-  createOperationDescriptor
+  createOperationDescriptor,
+  RelayProfiler
 } from "relay-runtime";
 import styled from "styled-components";
 import { CloseCrossIcon } from "../elements/Icons";
@@ -93,7 +94,15 @@ export const remNotification = (
   environment: IEnvironment
 ) => {
   commitLocalUpdate(environment, store => {
+    const root = store.get("client:root");
+    if (!root) return;
     store.delete(notificationId);
+    const uiStateRecord = root.getLinkedRecord("uiState");
+    if (!uiStateRecord) return;
+    const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
+    if (!notificationRecords) return;
+    const notificationRecords2 = notificationRecords.filter(rp => rp !== null);
+    uiStateRecord.setLinkedRecords(notificationRecords2, "notifications");
   });
 };
 

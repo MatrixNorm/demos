@@ -13,7 +13,7 @@ import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
 import { addNotification, remNotification } from "../Notifications";
 
-describe("Notification", () => {
+describe("Single Notification", () => {
   let env: IEnvironment;
   let request;
   let operation: OperationDescriptor;
@@ -68,13 +68,11 @@ describe("Notification", () => {
 
   test("remove", () => {
     //@ts-ignore
-    console.log(JSON.stringify(env.getStore().getSource()._records, null, 2));
+    //console.log(JSON.stringify(env.getStore().getSource()._records, null, 2));
     remNotification(notificationId, env);
-    console.log(JSON.stringify(env.getStore().getSource()._records, null, 2));
     let response = env.lookup(operation.fragment);
     //@ts-ignore
     const notifications = response.data.uiState.notifications;
-
     expect(notifications.length).toEqual(0);
   });
 });
