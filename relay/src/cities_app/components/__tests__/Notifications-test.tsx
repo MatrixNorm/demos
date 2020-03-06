@@ -11,9 +11,13 @@ import {
 } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
-import { addNotification, remNotification } from "../Notifications";
+import {
+  addNotification,
+  remNotification,
+  Notification
+} from "../Notifications";
 
-describe("Single Notification", () => {
+describe("add, retain, remove", () => {
   let env: IEnvironment;
   let request;
   let operation: OperationDescriptor;
@@ -31,7 +35,7 @@ describe("Single Notification", () => {
     env = createMockEnvironment({ store });
     notificationId = addNotification({ kind: "INFO", text: "lalala" }, env);
     const query = graphql`
-      query NotificationsTestQuery {
+      query NotificationsTestAddRetainRemoveQuery {
         __typename
         uiState {
           notifications {
@@ -74,5 +78,46 @@ describe("Single Notification", () => {
     //@ts-ignore
     const notifications = response.data.uiState.notifications;
     expect(notifications.length).toEqual(0);
+  });
+});
+
+describe("render single", () => {
+  test("1", () => {
+    const env = createMockEnvironment();
+    const container = TestRenderer.create(
+      <QueryRenderer<any>
+        query={graphql`
+          query NotificationsTestRenderSingleQuery @relay_test_operation {
+            notification: node(id: "notification#1") {
+              ...Notifications_notification
+            }
+          }
+        `}
+        environment={env}
+        variables={{}}
+        render={({ props }) => {
+          return (
+            props &&
+            props.notification && (
+              <Notification notification={props.notification} />
+            )
+          );
+        }}
+      />
+    );
+    env.mock.resolveMostRecentOperation(operation => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UINotification() {
+          return {
+            id: "notification#1",
+            kind: "INFO",
+            text: "lorem ipsum"
+          };
+        }
+      });
+      return payload;
+    });
+    const textEl = container.root.findByProps({'className': 'text'});
+    expect(textEl.children[0]).toEqual("lorem ipsum");
   });
 });
