@@ -14,7 +14,8 @@ import * as TestRenderer from "react-test-renderer";
 import {
   addNotification,
   remNotification,
-  Notification
+  Notification,
+  Notifications
 } from "../Notifications";
 
 describe("add, retain, remove", () => {
@@ -117,7 +118,60 @@ describe("render single", () => {
       });
       return payload;
     });
-    const textEl = container.root.findByProps({'className': 'text'});
+    const textEl = container.root.findByProps({ className: "text" });
     expect(textEl.children[0]).toEqual("lorem ipsum");
+  });
+});
+
+describe("render many", () => {
+  test("1", () => {
+    const env = createMockEnvironment();
+    const container = TestRenderer.create(
+      <QueryRenderer<any>
+        query={graphql`
+          query NotificationsTestRenderManyQuery @relay_test_operation {
+            __typename
+            uiState {
+              ...Notifications_state
+            }
+          }
+        `}
+        environment={env}
+        variables={{}}
+        render={({ props }) => {
+          return (
+            props && props.uiState && <Notifications state={props.uiState} />
+          );
+        }}
+      />
+    );
+    env.mock.resolveMostRecentOperation(operation => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UIState() {
+          return {
+            notifications: [
+              {
+                id: "notif#1",
+                kind: "INFO",
+                text: "Lorem ipsum"
+              },
+              {
+                id: "notif#2",
+                kind: "ERROR",
+                text: "This sucks"
+              },
+              {
+                id: "notif#3",
+                kind: "INFO",
+                text: "Everything is tip-top"
+              }
+            ]
+          };
+        }
+      });
+      return payload;
+    });
+    const ol = container.root.findByType("ol");
+    expect(ol.children.length).toEqual(3);
   });
 });
