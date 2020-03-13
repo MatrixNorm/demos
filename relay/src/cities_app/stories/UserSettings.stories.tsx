@@ -31,14 +31,14 @@ const query2 = graphql`
 `;
 
 export const demo1 = () => {
-  let nodes: { [key: string]: any } = {
+  let nodes: any = {
     "user#777": {
       id: "user#777",
       __type: "User",
       name: "Nik",
       settings: {
         citiesPaginationPageSize: 10,
-        foo: "Hello, Cunt",
+        foo: "Hello, Nik",
         bar: 11
       }
     }
@@ -56,7 +56,6 @@ export const demo1 = () => {
     },
     Mutation: {
       updateUserSettings(_: any, { input }: any) {
-        console.log(input);
         let { userId, citiesPaginationPageSize, foo, bar } = input;
         let settingsRef = nodes[userId].settings;
         if (citiesPaginationPageSize) {
@@ -68,7 +67,6 @@ export const demo1 = () => {
         if (bar) {
           settingsRef.bar = bar;
         }
-        console.log(nodes[userId]);
         return { user: nodes[userId] };
       }
     }

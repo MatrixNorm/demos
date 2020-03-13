@@ -23,7 +23,7 @@ const mutation = graphql`
   }
 `;
 
-function getOptimisticResponse(
+function buildOptimisticResponse(
   input: UpdateUserSettingsInput,
   currentSettings: UserSettings
 ): UpdateUserSettingsMutationResponse {
@@ -58,7 +58,7 @@ function commit({
     variables: {
       input
     },
-    optimisticResponse: getOptimisticResponse(input, currentSettings)
+    optimisticResponse: buildOptimisticResponse(input, currentSettings)
   });
 }
 

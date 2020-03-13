@@ -6,6 +6,7 @@ import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation"
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
+import { UpdateUserSettingsInput } from "__relay__/UpdateUserSettingsMutation.graphql";
 
 type Props = {
   user: UserSettings_user;
@@ -18,6 +19,7 @@ export const Section = styled.section``;
 export const UserSettingsComponent = ({ user, relay }: Props) => {
   console.log("UserSettings component", user.settings);
   const [locCache, setLocCache] = useState(user.settings);
+
   const handleCitiesPaginationPageSize = (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -26,20 +28,23 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       citiesPaginationPageSize: Number(e.target.value)
     });
   };
+
   const handleFoo = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocCache({
       ...locCache,
       foo: e.target.value
     });
   };
+
   const handleBar = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLocCache({
       ...locCache,
       bar: Number(e.target.value)
     });
   };
+
   const handleSubmit = () => {
-    let diff: Partial<UserSettings_user["settings"]> = {};
+    const diff: Omit<UpdateUserSettingsInput, "userId"> = {};
     for (let attr of Object.keys(user.settings)) {
       //@ts-ignore
       if (locCache[attr] !== user.settings[attr]) {
@@ -47,7 +52,8 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
         diff[attr] = locCache[attr];
       }
     }
-    if (Object.values(diff).filter(Boolean).length > 0) {
+    const isDiffReal = Object.values(diff).filter(Boolean).length > 0;
+    if (isDiffReal) {
       UpdateUserSettingsMutation.commit({
         environment: relay.environment,
         input: {
@@ -58,6 +64,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       });
     }
   };
+
   return (
     <UserSettings>
       <Section>
