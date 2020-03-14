@@ -68,20 +68,30 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
   return (
     <UserSettings>
       <Section>
-        <span>Pagination Page Size: </span>
+        <span>Pagination Page Size</span>
         <NumberInput
           step="1"
           value={locCache.citiesPaginationPageSize}
           onChange={handleCitiesPaginationPageSize}
+          test-id="pagination-page-size-input"
         />
       </Section>
       <Section>
-        <span>Foo:</span>
-        <TextInput value={locCache.foo} onChange={handleFoo} />
+        <span>Foo</span>
+        <TextInput
+          value={locCache.foo}
+          onChange={handleFoo}
+          test-id="foo-input"
+        />
       </Section>
       <Section>
-        <span>Bar:</span>
-        <NumberInput step="1" value={locCache.bar} onChange={handleBar} />
+        <span>Bar</span>
+        <NumberInput
+          step="1"
+          value={locCache.bar}
+          onChange={handleBar}
+          test-id="bar-input"
+        />
       </Section>
       <SubmitButton onClick={handleSubmit}>Save</SubmitButton>
     </UserSettings>
