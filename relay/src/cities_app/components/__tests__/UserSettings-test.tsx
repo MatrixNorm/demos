@@ -6,9 +6,12 @@ import * as TestRenderer from "react-test-renderer";
 import UserSettings from "../UserSettings";
 
 describe("XXX", () => {
-  test("1", () => {
-    const env = createMockEnvironment();
-    const container = TestRenderer.create(
+  let env: any;
+  let container: any;
+
+  beforeEach(() => {
+    env = createMockEnvironment();
+    container = TestRenderer.create(
       <QueryRenderer<any>
         query={graphql`
           query UserSettingsTestQuery @relay_test_operation {
@@ -40,6 +43,9 @@ describe("XXX", () => {
       });
       return payload;
     });
+  });
+
+  test("1", () => {
     const paginationPageSizeInput = container.root.findByProps({
       "test-id": "pagination-page-size-input"
     });
@@ -52,5 +58,35 @@ describe("XXX", () => {
       "test-id": "bar-input"
     });
     expect(barInput.props.value).toEqual(15);
+  });
+
+  test("change paginationPageSizeInput", () => {
+    const input = container.root.findByProps({
+      "test-id": "pagination-page-size-input"
+    });
+    const section = container.root.findByProps({
+      "test-id": "pagination-page-size-section"
+    });
+    const submit = container.root.findByProps({
+      "test-id": "submit-button"
+    });
+
+    expect(input.props.value).toEqual(10);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submit.props.className.includes("editing")).toBe(false);
+    TestRenderer.act(() => {
+      input.props.onChange({ target: { value: 5 } });
+    });
+
+    expect(input.props.value).toEqual(5);
+    expect(section.props.className.includes("editing")).toBe(true);
+    expect(submit.props.className.includes("editing")).toBe(true);
+
+    TestRenderer.act(() => {
+      input.props.onChange({ target: { value: 10 } });
+    });
+    expect(input.props.value).toEqual(10);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submit.props.className.includes("editing")).toBe(false);
   });
 });
