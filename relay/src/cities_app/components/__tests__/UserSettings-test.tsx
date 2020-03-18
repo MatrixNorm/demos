@@ -60,33 +60,45 @@ describe("XXX", () => {
     expect(barInput.props.value).toEqual(15);
   });
 
-  test("change paginationPageSizeInput", () => {
+  function changeInput(name: string, initialValue: any, changedValue: any) {
     const input = container.root.findByProps({
-      "test-id": "pagination-page-size-input"
+      "test-id": `${name}-input`
     });
     const section = container.root.findByProps({
-      "test-id": "pagination-page-size-section"
+      "test-id": `${name}-section`
     });
     const submit = container.root.findByProps({
       "test-id": "submit-button"
     });
 
-    expect(input.props.value).toEqual(10);
+    expect(input.props.value).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submit.props.className.includes("editing")).toBe(false);
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: 5 } });
+      input.props.onChange({ target: { value: changedValue } });
     });
 
-    expect(input.props.value).toEqual(5);
+    expect(input.props.value).toEqual(changedValue);
     expect(section.props.className.includes("editing")).toBe(true);
     expect(submit.props.className.includes("editing")).toBe(true);
 
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: 10 } });
+      input.props.onChange({ target: { value: initialValue } });
     });
-    expect(input.props.value).toEqual(10);
+    expect(input.props.value).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submit.props.className.includes("editing")).toBe(false);
+  }
+
+  test("change paginationPageSizeInput", () => {
+    changeInput("pagination-page-size", 10, 5);
+  });
+
+  test("change fooInput", () => {
+    changeInput("foo", "foo_value", "foo_value_new");
+  });
+
+  test("change barInput", () => {
+    changeInput("bar", 15, 23);
   });
 });
