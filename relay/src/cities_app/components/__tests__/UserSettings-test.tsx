@@ -1,13 +1,40 @@
 /* globals describe test expect beforeEach */
 import * as React from "react";
 import { graphql, QueryRenderer } from "react-relay";
+import {
+  createOperationDescriptor,
+  getRequest,
+  OperationDescriptor
+} from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
 import UserSettings from "../UserSettings";
 
-describe("XXX", () => {
+function lookupSettingFromStore(environment: any) {
+  const query = graphql`
+    query UserSettingsTestLookupQuery {
+      viewer {
+        settings {
+          citiesPaginationPageSize
+          foo
+          bar
+        }
+      }
+    }
+  `;
+  const operation = createOperationDescriptor(getRequest(query), {});
+  const response = environment.lookup(operation.fragment);
+  return response.data.viewer.settings;
+}
+
+describe("???", () => {
   let env: any;
   let container: any;
+  const initialSettings = {
+    citiesPaginationPageSize: 10,
+    foo: "foo_value",
+    bar: 15
+  };
 
   beforeEach(() => {
     env = createMockEnvironment();
@@ -27,17 +54,13 @@ describe("XXX", () => {
         }}
       />
     );
-    env.mock.resolveMostRecentOperation(operation => {
+    env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
       let payload = MockPayloadGenerator.generate(operation, {
         User() {
           return {
             id: "user#1",
-            name: "Covid",
-            settings: {
-              citiesPaginationPageSize: 10,
-              foo: "foo_value",
-              bar: 15
-            }
+            name: "Covid19",
+            settings: initialSettings
           };
         }
       });
@@ -45,22 +68,26 @@ describe("XXX", () => {
     });
   });
 
-  test("1", () => {
-    const paginationPageSizeInput = container.root.findByProps({
-      "test-id": "pagination-page-size-input"
-    });
-    expect(paginationPageSizeInput.props.value).toEqual(10);
-    const fooInput = container.root.findByProps({
-      "test-id": "foo-input"
-    });
-    expect(fooInput.props.value).toEqual("foo_value");
-    const barInput = container.root.findByProps({
-      "test-id": "bar-input"
-    });
-    expect(barInput.props.value).toEqual(15);
-  });
+  // test("initial render", () => {
+  //   const paginationPageSizeInput = container.root.findByProps({
+  //     "test-id": "pagination-page-size-input"
+  //   });
+  //   expect(paginationPageSizeInput.props.value).toEqual(10);
+  //   const fooInput = container.root.findByProps({
+  //     "test-id": "foo-input"
+  //   });
+  //   expect(fooInput.props.value).toEqual("foo_value");
+  //   const barInput = container.root.findByProps({
+  //     "test-id": "bar-input"
+  //   });
+  //   expect(barInput.props.value).toEqual(15);
+  // });
 
-  function changeInput(name: string, initialValue: any, changedValue: any) {
+  function locallyChangeSingleInput(
+    name: string,
+    initialValue: any,
+    changedValue: any
+  ) {
     const input = container.root.findByProps({
       "test-id": `${name}-input`
     });
@@ -90,15 +117,39 @@ describe("XXX", () => {
     expect(submit.props.className.includes("editing")).toBe(false);
   }
 
-  test("change paginationPageSizeInput", () => {
-    changeInput("pagination-page-size", 10, 5);
+  test("locally change paginationPageSizeInput", () => {
+    locallyChangeSingleInput("pagination-page-size", 10, 5);
   });
 
-  test("change fooInput", () => {
-    changeInput("foo", "foo_value", "foo_value_new");
+  test("locally change fooInput", () => {
+    locallyChangeSingleInput("foo", "foo_value", "foo_value_new");
   });
 
-  test("change barInput", () => {
-    changeInput("bar", 15, 23);
+  test("locally change barInput", () => {
+    locallyChangeSingleInput("bar", 15, 23);
+  });
+
+  test("mut1", () => {
+    const initValue = initialSettings.citiesPaginationPageSize;
+    const newValue = initValue + 3;
+    const input = container.root.findByProps({
+      "test-id": "pagination-page-size-input"
+    });
+    const submitButton = container.root.findByProps({
+      "test-id": "submit-button"
+    });
+    TestRenderer.act(() => {
+      input.props.onChange({ target: { value: newValue } });
+    });
+    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
+      initValue
+    );
+    TestRenderer.act(() => {
+      submitButton.props.onClick();
+    });
+    //console.log(env.mock.getAllOperations());
+    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
+      newValue
+    );
   });
 });
