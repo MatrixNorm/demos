@@ -147,7 +147,8 @@ describe("???", () => {
     TestRenderer.act(() => {
       submitButton.props.onClick();
     });
-    //console.log(env.mock.getAllOperations());
+    const mutation = env.mock.getMostRecentOperation();
+    expect(mutation.root.node.name).toBe('UpdateUserSettingsMutation');
     expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
       newValue
     );
