@@ -30,11 +30,14 @@ function lookupSettingFromStore(environment: any) {
 describe("???", () => {
   let env: any;
   let container: any;
-  const initialSettings = {
+  let initialSettings = {
     citiesPaginationPageSize: 10,
     foo: "foo_value",
     bar: 15
   };
+  let inputElements: any = {};
+  let sectionElements: any = {};
+  let submitButton: any;
 
   beforeEach(() => {
     env = createMockEnvironment();
@@ -66,22 +69,40 @@ describe("???", () => {
       });
       return payload;
     });
+    inputElements = {
+      citiesPaginationPageSize: container.root.findByProps({
+        "test-id": "cities-pagination-page-size-input"
+      }),
+      foo: container.root.findByProps({
+        "test-id": "foo-input"
+      }),
+      bar: container.root.findByProps({
+        "test-id": "bar-input"
+      })
+    };
+    sectionElements = {
+      citiesPaginationPageSize: container.root.findByProps({
+        "test-id": "cities-pagination-page-size-section"
+      }),
+      foo: container.root.findByProps({
+        "test-id": "foo-section"
+      }),
+      bar: container.root.findByProps({
+        "test-id": "bar-section"
+      })
+    };
+    submitButton = container.root.findByProps({
+      "test-id": "submit-button"
+    });
   });
 
-  // test("initial render", () => {
-  //   const paginationPageSizeInput = container.root.findByProps({
-  //     "test-id": "pagination-page-size-input"
-  //   });
-  //   expect(paginationPageSizeInput.props.value).toEqual(10);
-  //   const fooInput = container.root.findByProps({
-  //     "test-id": "foo-input"
-  //   });
-  //   expect(fooInput.props.value).toEqual("foo_value");
-  //   const barInput = container.root.findByProps({
-  //     "test-id": "bar-input"
-  //   });
-  //   expect(barInput.props.value).toEqual(15);
-  // });
+  test("initial render", () => {
+    expect(inputElements.citiesPaginationPageSize.props.value).toEqual(
+      initialSettings.citiesPaginationPageSize
+    );
+    expect(inputElements.foo.props.value).toEqual(initialSettings.foo);
+    expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
+  });
 
   function locallyChangeSingleInput(
     name: string,
@@ -117,40 +138,92 @@ describe("???", () => {
     expect(submit.props.className.includes("editing")).toBe(false);
   }
 
-  test("locally change paginationPageSizeInput", () => {
-    locallyChangeSingleInput("pagination-page-size", 10, 5);
+  test("locally change paginationPageSize", () => {
+    locallyChangeSingleInput(
+      "cities-pagination-page-size",
+      initialSettings.citiesPaginationPageSize,
+      initialSettings.citiesPaginationPageSize + 1
+    );
   });
 
-  test("locally change fooInput", () => {
-    locallyChangeSingleInput("foo", "foo_value", "foo_value_new");
+  test("locally change foo", () => {
+    locallyChangeSingleInput(
+      "foo",
+      initialSettings.foo,
+      initialSettings.foo + 1
+    );
   });
 
-  test("locally change barInput", () => {
-    locallyChangeSingleInput("bar", 15, 23);
+  test("locally change bar", () => {
+    locallyChangeSingleInput(
+      "bar",
+      initialSettings.bar,
+      initialSettings.bar + 1
+    );
   });
 
-  test("mut1", () => {
+  test("mutate citiesPaginationPageSize", () => {
     const initValue = initialSettings.citiesPaginationPageSize;
-    const newValue = initValue + 3;
-    const input = container.root.findByProps({
-      "test-id": "pagination-page-size-input"
-    });
-    const submitButton = container.root.findByProps({
-      "test-id": "submit-button"
-    });
+    const newValue = initValue + 1;
+    const input = inputElements.citiesPaginationPageSize;
+    const section = sectionElements.citiesPaginationPageSize;
+
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+
     TestRenderer.act(() => {
       input.props.onChange({ target: { value: newValue } });
     });
+
+    expect(input.props.value).toEqual(newValue);
     expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
       initValue
     );
-    TestRenderer.act(() => {
-      submitButton.props.onClick();
-    });
-    const mutation = env.mock.getMostRecentOperation();
-    expect(mutation.root.node.name).toBe('UpdateUserSettingsMutation');
-    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
-      newValue
-    );
+    expect(section.props.className.includes("editing")).toBe(true);
+    expect(submitButton.props.className.includes("editing")).toBe(true);
+    
+    // TestRenderer.act(() => {
+    //   submitButton.props.onClick();
+    // });
+
+    // expect(input.props.value).toEqual(newValue);
+    // expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
+    //   newValue
+    // );
+    //expect(section.props.className.includes("editing")).toBe(false);
+    
+    // expect(submitButton.props.className.includes("editing")).toBe(false);
+    // const mutation = env.mock.getMostRecentOperation();
+    // expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
+    // expect(mutation.root.variables).toMatchObject({
+    //   input: {
+    //     userId: "user#1",
+    //     citiesPaginationPageSize: newValue
+    //   }
+    // });
+    // env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+    //   let payload = MockPayloadGenerator.generate(operation, {
+    //     updateUserSettings(_, { input }) {
+    //       //console.log(111, input);
+    //       return {
+    //         user: {
+    //           id: "user#1",
+    //           settings: {
+    //             ...initialSettings,
+    //             citiesPaginationPageSize: newValue + 1
+    //           }
+    //         }
+    //       };
+    //     }
+    //   });
+    //   console.log(JSON.stringify(payload));
+    //   return payload;
+    // });
+    // expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
+    //   newValue + 1
+    // );
+    //expect(input.props.value).toEqual(newValue + 1);
+    // expect(section.props.className.includes("editing")).toBe(false);
+    // expect(submit.props.className.includes("editing")).toBe(false);
   });
 });

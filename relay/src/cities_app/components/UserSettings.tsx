@@ -17,9 +17,9 @@ export const UserSettings = styled.section``;
 export const Section = styled.section``;
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
-  //console.log("UserSettings component", user.settings);
   const [locCache, setLocCache] = useState(user.settings);
   const [isDiff, setIsDiff] = useState<any>({});
+  console.log(user.settings, locCache, isDiff);
 
   const handleCitiesPaginationPageSize = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -82,7 +82,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
   return (
     <UserSettings>
       <Section
-        test-id="pagination-page-size-section"
+        test-id="cities-pagination-page-size-section"
         className={isDiff.citiesPaginationPageSize ? "editing" : ""}
       >
         <span>Pagination Page Size</span>
@@ -90,7 +90,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
           step="1"
           value={locCache.citiesPaginationPageSize}
           onChange={handleCitiesPaginationPageSize}
-          test-id="pagination-page-size-input"
+          test-id="cities-pagination-page-size-input"
         />
       </Section>
       <Section test-id="foo-section" className={isDiff.foo ? "editing" : ""}>
