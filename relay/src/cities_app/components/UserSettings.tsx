@@ -19,7 +19,7 @@ export const Section = styled.section``;
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
   const [locCache, setLocCache] = useState(user.settings);
-  //console.log("UserSettingsComponent", user.settings, locCache);
+  console.log("UserSettingsComponent", user.settings, locCache);
 
   const diff = (attr: keyof UserSettingsType | null) => {
     if (attr) {

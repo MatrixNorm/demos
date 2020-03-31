@@ -201,29 +201,28 @@ describe("???", () => {
         citiesPaginationPageSize: newValue
       }
     });
-    // env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-    //   let payload = MockPayloadGenerator.generate(operation, {
-    //     updateUserSettings(_, { input }) {
-    //       //console.log(111, input);
-    //       return {
-    //         user: {
-    //           id: "user#1",
-    //           settings: {
-    //             ...initialSettings,
-    //             citiesPaginationPageSize: newValue + 1
-    //           }
-    //         }
-    //       };
-    //     }
-    //   });
-    //   console.log(JSON.stringify(payload));
-    //   return payload;
-    // });
-    // expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
-    //   newValue + 1
-    // );
-    //expect(input.props.value).toEqual(newValue + 1);
+
+    env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UpdateUserSettingsPayload() {
+          return {
+            user: {
+              id: "user#1",
+              settings: {
+                ...initialSettings,
+                citiesPaginationPageSize: newValue + 1
+              }
+            }
+          };
+        }
+      });
+      return payload;
+    });
+    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
+      newValue + 1
+    );
+    expect(input.props.value).toEqual(newValue + 1);
     // expect(section.props.className.includes("editing")).toBe(false);
-    // expect(submit.props.className.includes("editing")).toBe(false);
+    // expect(submitButton.props.className.includes("editing")).toBe(false);
   });
 });
