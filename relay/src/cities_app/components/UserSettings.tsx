@@ -12,14 +12,23 @@ type Props = {
   user: UserSettings_user;
   relay: any;
 };
+type UserSettingsType = UserSettings_user["settings"];
 
 export const UserSettings = styled.section``;
 export const Section = styled.section``;
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
   const [locCache, setLocCache] = useState(user.settings);
-  const [isDiff, setIsDiff] = useState<any>({});
-  console.log(user.settings, locCache, isDiff);
+  //console.log("UserSettingsComponent", user.settings, locCache);
+
+  const diff = (attr: keyof UserSettingsType | null) => {
+    if (attr) {
+      return user.settings[attr] !== locCache[attr];
+    }
+    return Object.keys(user.settings)
+      .map(attr => user.settings[attr] !== locCache[attr])
+      .some(Boolean);
+  };
 
   const handleCitiesPaginationPageSize = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -29,10 +38,6 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       ...locCache,
       citiesPaginationPageSize
     });
-    setIsDiff({
-      citiesPaginationPageSize:
-        user.settings.citiesPaginationPageSize !== citiesPaginationPageSize
-    });
   };
 
   const handleFoo = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,9 +45,6 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
     setLocCache({
       ...locCache,
       foo
-    });
-    setIsDiff({
-      foo: user.settings.foo !== foo
     });
   };
 
@@ -52,9 +54,9 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       ...locCache,
       bar
     });
-    setIsDiff({
-      bar: user.settings.bar !== bar
-    });
+    // setIsDiff({
+    //   bar: user.settings.bar !== bar
+    // });
   };
 
   const handleSubmit = () => {
@@ -83,7 +85,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
     <UserSettings>
       <Section
         test-id="cities-pagination-page-size-section"
-        className={isDiff.citiesPaginationPageSize ? "editing" : ""}
+        className={diff("citiesPaginationPageSize") ? "editing" : ""}
       >
         <span>Pagination Page Size</span>
         <NumberInput
@@ -93,7 +95,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
           test-id="cities-pagination-page-size-input"
         />
       </Section>
-      <Section test-id="foo-section" className={isDiff.foo ? "editing" : ""}>
+      <Section test-id="foo-section" className={diff("foo") ? "editing" : ""}>
         <span>Foo</span>
         <TextInput
           value={locCache.foo}
@@ -101,7 +103,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
           test-id="foo-input"
         />
       </Section>
-      <Section test-id="bar-section" className={isDiff.bar ? "editing" : ""}>
+      <Section test-id="bar-section" className={diff("bar") ? "editing" : ""}>
         <span>Bar</span>
         <NumberInput
           step="1"
@@ -113,7 +115,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       <SubmitButton
         onClick={handleSubmit}
         test-id="submit-button"
-        className={Object.values(isDiff).some(Boolean) ? "editing" : ""}
+        className={diff(null) ? "editing" : ""}
       >
         Save
       </SubmitButton>

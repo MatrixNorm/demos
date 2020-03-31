@@ -182,25 +182,25 @@ describe("???", () => {
     expect(section.props.className.includes("editing")).toBe(true);
     expect(submitButton.props.className.includes("editing")).toBe(true);
     
-    // TestRenderer.act(() => {
-    //   submitButton.props.onClick();
-    // });
+    TestRenderer.act(() => {
+      submitButton.props.onClick();
+    });
 
-    // expect(input.props.value).toEqual(newValue);
-    // expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
-    //   newValue
-    // );
-    //expect(section.props.className.includes("editing")).toBe(false);
+    expect(input.props.value).toEqual(newValue);
+    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
+      newValue
+    );
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
     
-    // expect(submitButton.props.className.includes("editing")).toBe(false);
-    // const mutation = env.mock.getMostRecentOperation();
-    // expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
-    // expect(mutation.root.variables).toMatchObject({
-    //   input: {
-    //     userId: "user#1",
-    //     citiesPaginationPageSize: newValue
-    //   }
-    // });
+    const mutation = env.mock.getMostRecentOperation();
+    expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
+    expect(mutation.root.variables).toMatchObject({
+      input: {
+        userId: "user#1",
+        citiesPaginationPageSize: newValue
+      }
+    });
     // env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
     //   let payload = MockPayloadGenerator.generate(operation, {
     //     updateUserSettings(_, { input }) {
