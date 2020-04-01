@@ -94,6 +94,8 @@ describe("???", () => {
     submitButton = container.root.findByProps({
       "test-id": "submit-button"
     });
+
+    TestRenderer.act(() => {});
   });
 
   test("initial render", () => {
@@ -181,7 +183,7 @@ describe("???", () => {
     );
     expect(section.props.className.includes("editing")).toBe(true);
     expect(submitButton.props.className.includes("editing")).toBe(true);
-    
+
     TestRenderer.act(() => {
       submitButton.props.onClick();
     });
@@ -192,7 +194,7 @@ describe("???", () => {
     );
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
-    
+
     const mutation = env.mock.getMostRecentOperation();
     expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
     expect(mutation.root.variables).toMatchObject({
@@ -218,11 +220,54 @@ describe("???", () => {
       });
       return payload;
     });
+    TestRenderer.act(() => {});
     expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
       newValue + 1
     );
     expect(input.props.value).toEqual(newValue + 1);
-    // expect(section.props.className.includes("editing")).toBe(false);
-    // expect(submitButton.props.className.includes("editing")).toBe(false);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+  });
+
+  test("props override local state", () => {
+    /**
+     * Relay store should have priority over component local state.
+     * Say we updated field `foo` and issued mutation. Then server responds with
+     * updated user settings. But on server setting `bar` (=A) is different from client (=B).
+     * (E.g. we could use different device). Then relay store is updated with bar=A, but
+     * component local state could still have bar=B. That's wrong.
+     */
+    const initValue = initialSettings.citiesPaginationPageSize;
+    const newValue = initValue + 1;
+    const input = inputElements.citiesPaginationPageSize;
+
+    TestRenderer.act(() => {
+      input.props.onChange({ target: { value: newValue } });
+    });
+    TestRenderer.act(() => {
+      submitButton.props.onClick();
+    });
+
+    expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
+    
+    env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UpdateUserSettingsPayload() {
+          return {
+            user: {
+              id: "user#1",
+              settings: {
+                ...initialSettings,
+                citiesPaginationPageSize: newValue,
+                bar: initialSettings.bar + 1
+              }
+            }
+          };
+        }
+      });
+      return payload;
+    });
+    TestRenderer.act(() => {});
+    expect(inputElements.bar.props.value).toEqual(initialSettings.bar + 1);
   });
 });

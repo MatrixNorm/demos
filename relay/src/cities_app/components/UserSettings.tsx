@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation";
@@ -19,7 +19,19 @@ export const Section = styled.section``;
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
   const [locCache, setLocCache] = useState(user.settings);
-  console.log("UserSettingsComponent", user.settings, locCache);
+  //console.log("UserSettingsComponent", user.settings, locCache);
+
+  const prevUserSettings = useRef<string | null>(null);
+
+  useEffect(() => {
+    const jsoned = JSON.stringify(user.settings);
+    if (prevUserSettings.current !== jsoned) {
+      if (prevUserSettings.current) {
+        setLocCache(user.settings);
+      }
+      prevUserSettings.current = jsoned;
+    }
+  });
 
   const diff = (attr: keyof UserSettingsType | null) => {
     if (attr) {
