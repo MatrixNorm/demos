@@ -2,35 +2,44 @@
 import * as React from "react";
 import { graphql, QueryRenderer } from "react-relay";
 import {
+  commitLocalUpdate,
   createOperationDescriptor,
   getRequest,
   OperationDescriptor
 } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
-import UserSettings from "../UserSettings";
+import UserSettingsComponent from "../UserSettings";
+import { UserSettingsType } from "../UserSettings";
 
-function lookupSettingFromStore(environment: any) {
-  const query = graphql`
-    query UserSettingsTestLookupQuery {
-      viewer {
-        settings {
-          citiesPaginationPageSize
-          foo
-          bar
-        }
-      }
-    }
-  `;
+function lookupFromStore(query: any, environment: any) {
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
-  return response.data.viewer.settings;
+  return response.data;
+}
+
+function lookupSettingFromStore(environment: any) {
+  const data = lookupFromStore(
+    graphql`
+      query UserSettingsTestLookupQuery {
+        viewer {
+          settings {
+            citiesPaginationPageSize
+            foo
+            bar
+          }
+        }
+      }
+    `,
+    environment
+  );
+  return data.viewer.settings;
 }
 
 describe("???", () => {
   let env: any;
   let container: any;
-  let initialSettings = {
+  let initialSettings: UserSettingsType = {
     citiesPaginationPageSize: 10,
     foo: "foo_value",
     bar: 15
@@ -53,7 +62,10 @@ describe("???", () => {
         environment={env}
         variables={{}}
         render={({ props }) => {
-          return props && props.viewer && <UserSettings user={props.viewer} />;
+          return (
+            props &&
+            props.viewer && <UserSettingsComponent user={props.viewer} />
+          );
         }}
       />
     );
@@ -106,43 +118,62 @@ describe("???", () => {
     expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
   });
 
+  test("component reacts to update store", () => {
+    /**
+     * If component has a local state then it could shadow store updates
+     * that are delivered to component via props. E.g. consider implementation
+     * by `setState` hook.
+     */
+    commitLocalUpdate(env, store => {
+      const settings = store
+        .get("client:root")
+        ?.getLinkedRecord("viewer")
+        ?.getLinkedRecord("settings");
+
+      settings?.setValue(
+        initialSettings.citiesPaginationPageSize + 11,
+        "citiesPaginationPageSize"
+      );
+      settings?.setValue(initialSettings.foo + "@@@", "foo");
+    });
+    TestRenderer.act(() => {});
+    expect(inputElements.citiesPaginationPageSize.props.value).toEqual(
+      initialSettings.citiesPaginationPageSize + 11
+    );
+    expect(inputElements.foo.props.value).toEqual(initialSettings.foo + "@@@");
+    expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
+  });
+
   function locallyChangeSingleInput(
     name: string,
     initialValue: any,
     changedValue: any
   ) {
-    const input = container.root.findByProps({
-      "test-id": `${name}-input`
-    });
-    const section = container.root.findByProps({
-      "test-id": `${name}-section`
-    });
-    const submit = container.root.findByProps({
-      "test-id": "submit-button"
-    });
+    const input = inputElements[name];
+    const section = sectionElements[name];
 
     expect(input.props.value).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(false);
-    expect(submit.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+
     TestRenderer.act(() => {
       input.props.onChange({ target: { value: changedValue } });
     });
-
     expect(input.props.value).toEqual(changedValue);
     expect(section.props.className.includes("editing")).toBe(true);
-    expect(submit.props.className.includes("editing")).toBe(true);
+    expect(submitButton.props.className.includes("editing")).toBe(true);
 
     TestRenderer.act(() => {
       input.props.onChange({ target: { value: initialValue } });
     });
     expect(input.props.value).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(false);
-    expect(submit.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
   }
 
-  test("locally change paginationPageSize", () => {
+  test("locally change citiesPaginationPageSize", () => {
     locallyChangeSingleInput(
-      "cities-pagination-page-size",
+      "citiesPaginationPageSize",
       initialSettings.citiesPaginationPageSize,
       initialSettings.citiesPaginationPageSize + 1
     );
@@ -164,46 +195,41 @@ describe("???", () => {
     );
   });
 
-  test("mutate citiesPaginationPageSize", () => {
-    const initValue = initialSettings.citiesPaginationPageSize;
-    const newValue = initValue + 1;
-    const input = inputElements.citiesPaginationPageSize;
-    const section = sectionElements.citiesPaginationPageSize;
+  function mutateSingleFieldResolved(name: string, initialSettings: any) {
+    const initialValue = initialSettings[name];
+    const newValue = initialValue + 1;
+    const input = inputElements[name];
+    const section = sectionElements[name];
 
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
-
+    // change component's local state
     TestRenderer.act(() => {
       input.props.onChange({ target: { value: newValue } });
     });
-
     expect(input.props.value).toEqual(newValue);
-    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
-      initValue
-    );
+    expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(true);
     expect(submitButton.props.className.includes("editing")).toBe(true);
-
+    // start mutation
     TestRenderer.act(() => {
       submitButton.props.onClick();
     });
-
-    expect(input.props.value).toEqual(newValue);
-    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
-      newValue
-    );
-    expect(section.props.className.includes("editing")).toBe(false);
-    expect(submitButton.props.className.includes("editing")).toBe(false);
-
     const mutation = env.mock.getMostRecentOperation();
+    // mutation started
     expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
     expect(mutation.root.variables).toMatchObject({
       input: {
         userId: "user#1",
-        citiesPaginationPageSize: newValue
+        [name]: newValue
       }
     });
-
+    // optimistic update is applied
+    expect(input.props.value).toEqual(newValue);
+    expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+    // server response overrides everything
     env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
       let payload = MockPayloadGenerator.generate(operation, {
         UpdateUserSettingsPayload() {
@@ -212,7 +238,7 @@ describe("???", () => {
               id: "user#1",
               settings: {
                 ...initialSettings,
-                citiesPaginationPageSize: newValue + 1
+                [name]: newValue + 1
               }
             }
           };
@@ -220,13 +246,15 @@ describe("???", () => {
       });
       return payload;
     });
+    expect(lookupSettingFromStore(env)[name]).toEqual(newValue + 1);
     TestRenderer.act(() => {});
-    expect(lookupSettingFromStore(env).citiesPaginationPageSize).toEqual(
-      newValue + 1
-    );
     expect(input.props.value).toEqual(newValue + 1);
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
+  }
+
+  test("mutate citiesPaginationPageSize", () => {
+    mutateSingleFieldResolved("citiesPaginationPageSize", initialSettings);
   });
 
   test("props override local state", () => {
@@ -249,7 +277,7 @@ describe("???", () => {
     });
 
     expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
-    
+
     env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
       let payload = MockPayloadGenerator.generate(operation, {
         UpdateUserSettingsPayload() {

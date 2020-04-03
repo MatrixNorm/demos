@@ -12,7 +12,7 @@ type Props = {
   user: UserSettings_user;
   relay: any;
 };
-type UserSettingsType = UserSettings_user["settings"];
+export type UserSettingsType = UserSettings_user["settings"];
 
 export const UserSettings = styled.section``;
 export const Section = styled.section``;
@@ -66,9 +66,6 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       ...locCache,
       bar
     });
-    // setIsDiff({
-    //   bar: user.settings.bar !== bar
-    // });
   };
 
   const handleSubmit = () => {
