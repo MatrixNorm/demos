@@ -257,6 +257,72 @@ describe("???", () => {
     mutateSingleFieldResolved("citiesPaginationPageSize", initialSettings);
   });
 
+  test("mutate foo", () => {
+    mutateSingleFieldResolved("foo", initialSettings);
+  });
+
+  test("mutate bar", () => {
+    mutateSingleFieldResolved("bar", initialSettings);
+  });
+
+  function mutateSingleFieldRejected(name: string, initialSettings: any) {
+    const initialValue = initialSettings[name];
+    const newValue = initialValue + 1;
+    const input = inputElements[name];
+    const section = sectionElements[name];
+
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+    // change component's local state
+    TestRenderer.act(() => {
+      input.props.onChange({ target: { value: newValue } });
+    });
+    expect(input.props.value).toEqual(newValue);
+    expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
+    expect(section.props.className.includes("editing")).toBe(true);
+    expect(submitButton.props.className.includes("editing")).toBe(true);
+    // start mutation
+    TestRenderer.act(() => {
+      submitButton.props.onClick();
+    });
+    const mutation = env.mock.getMostRecentOperation();
+    // mutation started
+    expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
+    expect(mutation.root.variables).toMatchObject({
+      input: {
+        userId: "user#1",
+        [name]: newValue
+      }
+    });
+    // optimistic update is applied
+    expect(input.props.value).toEqual(newValue);
+    expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+    // server response overrides everything
+    env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UpdateUserSettingsPayload() {
+          return {
+            user: {
+              id: "user#1",
+              settings: {
+                ...initialSettings,
+                [name]: newValue + 1
+              }
+            }
+          };
+        }
+      });
+      return payload;
+    });
+    expect(lookupSettingFromStore(env)[name]).toEqual(newValue + 1);
+    TestRenderer.act(() => {});
+    expect(input.props.value).toEqual(newValue + 1);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+  }
+
   test("props override local state", () => {
     /**
      * Relay store should have priority over component local state.

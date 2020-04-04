@@ -38,6 +38,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
       return user.settings[attr] !== locCache[attr];
     }
     return Object.keys(user.settings)
+      //@ts-ignore
       .map(attr => user.settings[attr] !== locCache[attr])
       .some(Boolean);
   };
