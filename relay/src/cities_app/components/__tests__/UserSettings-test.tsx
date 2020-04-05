@@ -83,7 +83,7 @@ describe("???", () => {
     });
     inputElements = {
       citiesPaginationPageSize: container.root.findByProps({
-        "test-id": "cities-pagination-page-size-input"
+        "test-id": "citiesPaginationPageSize-input"
       }),
       foo: container.root.findByProps({
         "test-id": "foo-input"
@@ -94,7 +94,7 @@ describe("???", () => {
     };
     sectionElements = {
       citiesPaginationPageSize: container.root.findByProps({
-        "test-id": "cities-pagination-page-size-section"
+        "test-id": "citiesPaginationPageSize-section"
       }),
       foo: container.root.findByProps({
         "test-id": "foo-section"

@@ -14,8 +14,15 @@ type Props = {
 };
 export type UserSettingsType = UserSettings_user["settings"];
 
-export const UserSettings = styled.section``;
-export const Section = styled.section``;
+export const UserSettings = styled.div``;
+export const Section = styled.section`
+  display: flex;
+  min-height: 30px;
+
+  .setting-name {
+    flex: auto;
+  }
+`;
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
   const [locCache, setLocCache] = useState(user.settings);
@@ -37,36 +44,25 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
     if (attr) {
       return user.settings[attr] !== locCache[attr];
     }
-    return Object.keys(user.settings)
-      //@ts-ignore
-      .map(attr => user.settings[attr] !== locCache[attr])
-      .some(Boolean);
+    return (
+      Object.keys(user.settings)
+        //@ts-ignore
+        .map((attr) => user.settings[attr] !== locCache[attr])
+        .some(Boolean)
+    );
   };
 
-  const handleCitiesPaginationPageSize = (
-    e: React.ChangeEvent<HTMLInputElement>
+  const makeHandler = (
+    param: keyof UserSettingsType,
+    transform: (_: string) => any = (x) => x
   ) => {
-    let citiesPaginationPageSize = Number(e.target.value);
-    setLocCache({
-      ...locCache,
-      citiesPaginationPageSize
-    });
-  };
-
-  const handleFoo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let foo = e.target.value;
-    setLocCache({
-      ...locCache,
-      foo
-    });
-  };
-
-  const handleBar = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let bar = Number(e.target.value);
-    setLocCache({
-      ...locCache,
-      bar
-    });
+    return (e: React.ChangeEvent<HTMLInputElement>) => {
+      let value = transform(e.target.value);
+      setLocCache({
+        ...locCache,
+        [param]: value,
+      });
+    };
   };
 
   const handleSubmit = () => {
@@ -84,9 +80,9 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
         environment: relay.environment,
         input: {
           userId: user.id,
-          ...diff
+          ...diff,
         },
-        currentSettings: user.settings
+        currentSettings: user.settings,
       });
     }
   };
@@ -94,31 +90,31 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
   return (
     <UserSettings>
       <Section
-        test-id="cities-pagination-page-size-section"
+        test-id="citiesPaginationPageSize-section"
         className={diff("citiesPaginationPageSize") ? "editing" : ""}
       >
-        <span>Pagination Page Size</span>
+        <span className="setting-name">Pagination Page Size</span>
         <NumberInput
           step="1"
-          value={locCache.citiesPaginationPageSize}
-          onChange={handleCitiesPaginationPageSize}
-          test-id="cities-pagination-page-size-input"
+          value={locCache["citiesPaginationPageSize"]}
+          onChange={makeHandler("citiesPaginationPageSize", Number)}
+          test-id="citiesPaginationPageSize-input"
         />
       </Section>
       <Section test-id="foo-section" className={diff("foo") ? "editing" : ""}>
-        <span>Foo</span>
+        <span className="setting-name">Foo</span>
         <TextInput
-          value={locCache.foo}
-          onChange={handleFoo}
+          value={locCache["foo"]}
+          onChange={makeHandler("foo")}
           test-id="foo-input"
         />
       </Section>
       <Section test-id="bar-section" className={diff("bar") ? "editing" : ""}>
-        <span>Bar</span>
+        <span className="setting-name">Bar</span>
         <NumberInput
           step="1"
-          value={locCache.bar}
-          onChange={handleBar}
+          value={locCache["bar"]}
+          onChange={makeHandler("bar", Number)}
           test-id="bar-input"
         />
       </Section>
@@ -127,7 +123,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
         test-id="submit-button"
         className={diff(null) ? "editing" : ""}
       >
-        Save
+        Sync
       </SubmitButton>
     </UserSettings>
   );
@@ -143,5 +139,5 @@ export default createFragmentContainer(UserSettingsComponent, {
         bar
       }
     }
-  `
+  `,
 });

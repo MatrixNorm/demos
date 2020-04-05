@@ -91,7 +91,7 @@ export const demo1 = () => {
         render={({ props }) => {
           return (
             props &&
-            props.node && <div>{JSON.stringify(props.node.settings)}</div>
+            props.node && <pre>{JSON.stringify(props.node.settings, null, 2)}</pre>
           );
         }}
       />
