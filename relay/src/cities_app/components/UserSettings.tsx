@@ -19,6 +19,10 @@ export const Section = styled.section`
   display: flex;
   min-height: 30px;
 
+  .editing: {
+    background: red;
+  }
+
   .setting-name {
     flex: auto;
   }

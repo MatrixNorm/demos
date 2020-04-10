@@ -73,7 +73,6 @@ export const demo1 = () => {
   });
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
-
   return (
     <>
       <QueryRenderer<UserSettingsStoryQuery>
