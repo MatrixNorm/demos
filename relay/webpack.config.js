@@ -26,13 +26,15 @@ const baseBuild = ({ buildId }) => env => {
     },
     mode: mode,
     devServer: {
+      //contentBase: [`./src/${buildId}`],
       publicPath: "/",
-      historyApiFallback: true
+      //historyApiFallback: true,
+      //watchContentBase: true
     },
     devtool: "source-map",
     plugins: [
       new HtmlWebpackPlugin({
-        template: `src/${buildId}/index.html`
+        template: `./src/${buildId}/index.html`
       })
     ],
     resolve: {
@@ -56,12 +58,12 @@ const baseBuild = ({ buildId }) => env => {
                 "@babel/typescript"
               ],
               plugins: [
-                [
-                  "relay",
-                  {
-                    artifactDirectory: `./src/__relay__`
-                  }
-                ],
+                // [
+                //   "relay",
+                //   {
+                //     artifactDirectory: `./src/__relay__`
+                //   }
+                // ],
                 "@babel/proposal-class-properties",
                 "@babel/proposal-object-rest-spread",
                 "@babel/plugin-proposal-optional-chaining",

@@ -1,5 +1,8 @@
 module.exports = {
-  stories: [`../src/${process.env.APP_DIR}/**/*.stories.tsx`],
+  stories: [
+    `../src/${process.env.APP_DIR}/**/*.stories.tsx`,
+    `../src/${process.env.APP_DIR}/**/*.stories.js`
+  ],
   addons: ["@storybook/addon-actions", "@storybook/addon-links"],
   webpackFinal: config => {
     let plugins = config.module.rules[0].use[0].options.plugins;
