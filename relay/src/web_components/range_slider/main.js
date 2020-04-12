@@ -5,7 +5,7 @@ import RangeSlider from "./RangeSlider";
 customElements.define("matrixnorm-range-slider", RangeSlider);
 
 const App = () => {
-  return <matrixnorm-range-slider></matrixnorm-range-slider>;
+  return <matrixnorm-range-slider min="50" max="500"></matrixnorm-range-slider>;
 };
 
 ReactDOM.render(<App />, document.getElementById("app"));
