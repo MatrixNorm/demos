@@ -120,11 +120,21 @@ export default class RangeSlider extends HTMLElement {
   }
 
   onUpperChange(evt) {
-    console.log(evt.target.value);
+    this.dispatchEvent(
+      new CustomEvent("range-update", {
+        detail: { lower: this.lowerInput.value, upper: evt.target.value },
+        bubbles: false
+      })
+    );
   }
 
   onLowerChange(evt) {
-    console.log(evt.target.value);
+    this.dispatchEvent(
+      new CustomEvent("range-update", {
+        detail: { lower: evt.target.value, upper: this.upperInput.value },
+        bubbles: false
+      })
+    );
   }
 
   setLowerText(value) {
