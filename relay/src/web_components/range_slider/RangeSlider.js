@@ -53,11 +53,6 @@ export default class RangeSlider extends HTMLElement {
     this.upperInput = this.shadowRoot.getElementById("upper-input");
     this.lowerInput = this.shadowRoot.getElementById("lower-input");
 
-    // this.upperInput.setAttribute("min", this.getAttribute("min"));
-    // this.upperInput.setAttribute("max", this.getAttribute("max"));
-    // this.lowerInput.setAttribute("min", this.getAttribute("min"));
-    // this.lowerInput.setAttribute("max", this.getAttribute("max"));
-
     this.onUpperChange = this.onUpperChange.bind(this);
     this.onUpperInput = this.onUpperInput.bind(this);
     this.onLowerChange = this.onLowerChange.bind(this);
@@ -65,6 +60,10 @@ export default class RangeSlider extends HTMLElement {
   }
 
   connectedCallback() {
+    this.upperInput.setAttribute("min", this.getAttribute("min"));
+    this.upperInput.setAttribute("max", this.getAttribute("max"));
+    this.lowerInput.setAttribute("min", this.getAttribute("min"));
+    this.lowerInput.setAttribute("max", this.getAttribute("max"));
     this.upperInput.addEventListener("change", this.onUpperChange);
     this.upperInput.addEventListener("input", this.onUpperInput);
     this.lowerInput.addEventListener("change", this.onLowerChange);
