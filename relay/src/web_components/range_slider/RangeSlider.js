@@ -1,12 +1,17 @@
 const tmpl = document.createElement("template");
 tmpl.innerHTML = `
   <style>
-    #container { 
+    #container {
+      min-width: 150px;
+    }
+    #input-container {
       position: relative;
+      height: 20px;
     }
     input[type=range] {
       -webkit-appearance: none;
       position: absolute;
+      width: 100%;
     }
     input[type=range]:focus {
       outline: none;
@@ -36,11 +41,22 @@ tmpl.innerHTML = `
       border-right: 8px solid transparent;
       border-bottom: 12px solid goldenrod;
     }
+    #lower-text {
+      float: left;
+    }
+    #upper-text {
+      float: right;
+    }
   </style>
-  
   <div id="container">
-    <input id="upper-input" type="range" name="upper" min="50" max="500">
-    <input id="lower-input" type="range" name="lower" min="50" max="500">
+    <div id="input-container">
+      <input id="upper-input" type="range" name="upper" min="50" max="500">
+      <input id="lower-input" type="range" name="lower" min="50" max="500">
+    </div>
+    <div>
+      <span id="lower-text"></span>
+      <span id="upper-text"></span>
+    </div>
   </div>
 `;
 
@@ -60,10 +76,16 @@ export default class RangeSlider extends HTMLElement {
   }
 
   connectedCallback() {
-    this.upperInput.setAttribute("min", this.getAttribute("min"));
-    this.upperInput.setAttribute("max", this.getAttribute("max"));
-    this.lowerInput.setAttribute("min", this.getAttribute("min"));
-    this.lowerInput.setAttribute("max", this.getAttribute("max"));
+    const [min, max] = [this.getAttribute("min"), this.getAttribute("max")];
+    this.upperInput.value = max;
+    this.lowerInput.value = min;
+    this.setLowerText(min);
+    this.setUpperText(max);
+    this.upperInput.setAttribute("min", min);
+    this.upperInput.setAttribute("max", max);
+    this.lowerInput.setAttribute("min", min);
+    this.lowerInput.setAttribute("max", max);
+
     this.upperInput.addEventListener("change", this.onUpperChange);
     this.upperInput.addEventListener("input", this.onUpperInput);
     this.lowerInput.addEventListener("change", this.onLowerChange);
@@ -77,20 +99,14 @@ export default class RangeSlider extends HTMLElement {
     this.lowerInput.removeEventListener("input");
   }
 
-  onUpperChange(evt) {
-    console.log(evt.target.value);
-  }
-
   onUpperInput(evt) {
     const upper = Number(evt.target.value);
     const lower = Number(this.lowerInput.value);
     if (lower > upper) {
       this.lowerInput.value = upper;
+      this.setLowerText(upper);
     }
-  }
-
-  onLowerChange(evt) {
-    console.log(evt.target.value);
+    this.setUpperText(upper);
   }
 
   onLowerInput(evt) {
@@ -98,6 +114,26 @@ export default class RangeSlider extends HTMLElement {
     const upper = Number(this.upperInput.value);
     if (upper < lower) {
       this.upperInput.value = lower;
+      this.setUpperText(lower);
     }
+    this.setLowerText(lower);
+  }
+
+  onUpperChange(evt) {
+    console.log(evt.target.value);
+  }
+
+  onLowerChange(evt) {
+    console.log(evt.target.value);
+  }
+
+  setLowerText(value) {
+    const textEl = this.shadowRoot.getElementById("lower-text");
+    textEl.innerHTML = value;
+  }
+
+  setUpperText(value) {
+    const textEl = this.shadowRoot.getElementById("upper-text");
+    textEl.innerHTML = value;
   }
 }
