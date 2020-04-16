@@ -13,15 +13,16 @@ type Props = {
   step: number;
   x1: number;
   x2: number;
+  onChange: any;
 };
 
-export default function({ min, max, step, x1, x2 }: Props) {
+export default function({ min, max, step, x1, x2, onChange }: Props) {
   const sliderEl = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!sliderEl.current) return;
     const listener = (evt: any) => {
-      console.log(evt);
+      onChange(evt.detail);
     };
     sliderEl.current.addEventListener("range-update", listener);
     return () => {

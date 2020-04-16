@@ -12,10 +12,15 @@ const mockRefType: any = null;
 export const aaa1 = () => {
   const searchParams = {
     countryNameContains: "braz",
-    populationGte: 1000,
-    populationLte: 30000,
+    populationGte: 2000000,
+    populationLte: 6000000,
     " $refType": mockRefType
   };
+  const searchMetadata = {
+    populationLowerBound: 80000,
+    populationUpperBound: 9000000,
+    " $refType": mockRefType
+  }
   const dispatch = ([eventType, payload]: EventT) => {
     console.log(eventType, payload);
   };
@@ -23,6 +28,7 @@ export const aaa1 = () => {
   return (
     <SearchParametersPresentational
       searchParams={searchParams}
+      searchMetadata={searchMetadata}
       dispatch={dispatch}
     />
   );

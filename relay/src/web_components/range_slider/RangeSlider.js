@@ -83,12 +83,13 @@ export default class RangeSlider extends HTMLElement {
       this.getAttribute("x2"),
       this.getAttribute("step"),
     ];
-    this.precision = step.split(".")[1].length;
+    this.precision = step.split(".")[1]?.length || 0;
 
     this.lowerInput.setAttribute("min", min);
     this.lowerInput.setAttribute("max", max);
     this.lowerInput.setAttribute("step", step);
     this.lowerInput.value = x1 ? x1 : min;
+    console.log(min, max, step, x1 ? x1 : min)
     this.lowerInput.addEventListener("change", this.onLowerChange);
     this.lowerInput.addEventListener("input", this.onLowerInput);
     this.setLowerText(Number(min));
@@ -132,7 +133,7 @@ export default class RangeSlider extends HTMLElement {
   onUpperChange(evt) {
     this.dispatchEvent(
       new CustomEvent("range-update", {
-        detail: { lower: this.lowerInput.value, upper: evt.target.value },
+        details: { lower: this.lowerInput.value, upper: evt.target.value },
         bubbles: false,
       })
     );
@@ -141,7 +142,7 @@ export default class RangeSlider extends HTMLElement {
   onLowerChange(evt) {
     this.dispatchEvent(
       new CustomEvent("range-update", {
-        detail: { lower: evt.target.value, upper: this.upperInput.value },
+        details: { lower: evt.target.value, upper: this.upperInput.value },
         bubbles: false,
       })
     );
