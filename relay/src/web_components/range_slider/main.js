@@ -8,8 +8,8 @@ const App = () => {
   const sliderEl = useRef(null);
 
   useEffect(() => {
-    sliderEl.current.addEventListener("range-update", evt => {
-      console.log(evt);
+    sliderEl.current.addEventListener("range-update", (evt) => {
+      console.log("range-update: ", evt);
     });
     return () => {
       removeEventListener("range-update");
@@ -19,8 +19,11 @@ const App = () => {
   return (
     <matrixnorm-range-slider
       ref={sliderEl}
-      min="50"
-      max="500"
+      min="-1"
+      max="1"
+      x1="-0.3"
+      x2="0.7"
+      step="0.01"
     ></matrixnorm-range-slider>
   );
 };

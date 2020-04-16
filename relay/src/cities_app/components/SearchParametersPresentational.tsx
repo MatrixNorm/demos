@@ -2,8 +2,8 @@ import * as React from "react";
 import styled from "styled-components";
 import { DispatchT } from "./SearchParameters";
 import { SubmitButton } from "../elements/Buttons";
+import RangeSlider from "../elements/RangeSlider";
 import { TextInput, NumberInput } from "../elements/Inputs";
-import * as t from "../types.codegen";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
 const SearchParametersBlock = styled.div`
@@ -23,7 +23,7 @@ interface Props {
 
 export function SearchParametersPresentational({
   dispatch,
-  searchParams
+  searchParams,
 }: Props) {
   return (
     <SearchParametersBlock>
@@ -31,33 +31,21 @@ export function SearchParametersPresentational({
         <div>Country:</div>
         <TextInput
           value={searchParams.countryNameContains || ""}
-          onChange={e =>
+          onChange={(e) =>
             dispatch(["fieldChange", ["countryNameContains", e.target.value]])
           }
         />
       </ParameterSection>
       <ParameterSection>
-        <div>Population &#62;</div>
+        <div>Population</div>
+        <RangeSlider min={1} max={9} />
         <NumberInput
           step="100000"
           value={searchParams.populationGte || ""}
-          onChange={e =>
+          onChange={(e) =>
             dispatch([
               "fieldChange",
-              ["populationGte", parseInt(e.target.value) || null]
-            ])
-          }
-        />
-      </ParameterSection>
-      <ParameterSection>
-        <div>Population &#60;</div>
-        <NumberInput
-          step="100000"
-          value={searchParams.populationLte || ""}
-          onChange={e =>
-            dispatch([
-              "fieldChange",
-              ["populationLte", parseInt(e.target.value) || null]
+              ["populationGte", parseInt(e.target.value) || null],
             ])
           }
         />

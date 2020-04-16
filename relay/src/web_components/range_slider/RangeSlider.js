@@ -50,8 +50,8 @@ tmpl.innerHTML = `
   </style>
   <div id="container">
     <div id="input-container">
-      <input id="upper-input" type="range" name="upper" min="50" max="500">
-      <input id="lower-input" type="range" name="lower" min="50" max="500">
+      <input id="upper-input" type="range" name="upper"/>
+      <input id="lower-input" type="range" name="lower"/>
     </div>
     <div>
       <span id="lower-text"></span>
@@ -76,27 +76,37 @@ export default class RangeSlider extends HTMLElement {
   }
 
   connectedCallback() {
-    const [min, max] = [this.getAttribute("min"), this.getAttribute("max")];
-    this.upperInput.value = max;
-    this.lowerInput.value = min;
-    this.setLowerText(min);
-    this.setUpperText(max);
-    this.upperInput.setAttribute("min", min);
-    this.upperInput.setAttribute("max", max);
+    const [min, max, x1, x2, step] = [
+      this.getAttribute("min"),
+      this.getAttribute("max"),
+      this.getAttribute("x1"),
+      this.getAttribute("x2"),
+      this.getAttribute("step"),
+    ];
+    this.precision = step.split(".")[1].length;
+
     this.lowerInput.setAttribute("min", min);
     this.lowerInput.setAttribute("max", max);
-
-    this.upperInput.addEventListener("change", this.onUpperChange);
-    this.upperInput.addEventListener("input", this.onUpperInput);
+    this.lowerInput.setAttribute("step", step);
+    this.lowerInput.value = x1 ? x1 : min;
     this.lowerInput.addEventListener("change", this.onLowerChange);
     this.lowerInput.addEventListener("input", this.onLowerInput);
+    this.setLowerText(Number(min));
+
+    this.upperInput.setAttribute("min", min);
+    this.upperInput.setAttribute("max", max);
+    this.upperInput.setAttribute("step", step);
+    this.upperInput.value = x2 ? x2 : max;
+    this.upperInput.addEventListener("change", this.onUpperChange);
+    this.upperInput.addEventListener("input", this.onUpperInput);
+    this.setUpperText(Number(max));
   }
 
   disconnectedCallback() {
-    this.upperInput.removeEventListener("change");
-    this.upperInput.removeEventListener("input");
-    this.lowerInput.removeEventListener("change");
-    this.lowerInput.removeEventListener("input");
+    this.upperInput.removeEventListener("change", this.onUpperChange);
+    this.upperInput.removeEventListener("input", this.onUpperInput);
+    this.lowerInput.removeEventListener("change", this.onLowerChange);
+    this.lowerInput.removeEventListener("input", this.onLowerInput);
   }
 
   onUpperInput(evt) {
@@ -123,7 +133,7 @@ export default class RangeSlider extends HTMLElement {
     this.dispatchEvent(
       new CustomEvent("range-update", {
         detail: { lower: this.lowerInput.value, upper: evt.target.value },
-        bubbles: false
+        bubbles: false,
       })
     );
   }
@@ -132,18 +142,26 @@ export default class RangeSlider extends HTMLElement {
     this.dispatchEvent(
       new CustomEvent("range-update", {
         detail: { lower: evt.target.value, upper: this.upperInput.value },
-        bubbles: false
+        bubbles: false,
       })
     );
   }
 
   setLowerText(value) {
+    // https://stackoverflow.com/questions/6134039/format-number-to-always-show-2-decimal-places
     const textEl = this.shadowRoot.getElementById("lower-text");
-    textEl.innerHTML = value;
+    textEl.innerHTML = this.printToPrecision(value);
   }
 
   setUpperText(value) {
     const textEl = this.shadowRoot.getElementById("upper-text");
-    textEl.innerHTML = value;
+    textEl.innerHTML = this.printToPrecision(value);
+  }
+
+  printToPrecision(number) {
+    return number.toLocaleString(undefined, {
+      maximumFractionDigits: this.precision,
+      minimumFractionDigits: this.precision,
+    });
   }
 }

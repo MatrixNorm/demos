@@ -10,9 +10,11 @@ if (!customElements.get("matrixnorm-range-slider")) {
 type Props = {
   min: number;
   max: number;
+  x1: number;
+  x2: number;
 };
 
-export default function({ min, max }: Props) {
+export default function({ min, max, x1, x2 }: Props) {
   const sliderEl = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -25,12 +27,14 @@ export default function({ min, max }: Props) {
       removeEventListener("range-update", listener);
     };
   }, []);
-
+  console.log(x1.toString());
   return (
     <matrixnorm-range-slider
       ref={sliderEl}
-      min={min}
-      max={max}
+      min={min.toString()}
+      max={max.toString()}
+      x1={x1.toString()}
+      x2={x2.toString()}
     ></matrixnorm-range-slider>
   );
 }

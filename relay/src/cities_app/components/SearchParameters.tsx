@@ -4,7 +4,7 @@ import { graphql, QueryRenderer, createFragmentContainer } from "react-relay";
 import {
   createOperationDescriptor,
   getRequest,
-  IEnvironment
+  IEnvironment,
 } from "relay-runtime";
 
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
@@ -13,7 +13,10 @@ import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
 export type EventT = ["fieldChange", [string, any]] | ["applyChange"];
 export type DispatchT = (event: EventT) => void;
-export type SearchParametersT = Omit<SearchParameters_searchParams, " $refType">;
+export type SearchParametersT = Omit<
+  SearchParameters_searchParams,
+  " $refType"
+>;
 
 function commitSearchParamsInRelaystore(
   searchParams: SearchParametersT,
@@ -30,15 +33,15 @@ function commitSearchParamsInRelaystore(
       }
     }
   `;
-  console.log(searchParams)
+  console.log(searchParams);
   const request = getRequest(query);
   const operationDescriptor = createOperationDescriptor(request, {});
   let data = {
     __typename: "__Root",
     uiState: {
       id: "client:UIState",
-      citySearchParams: { ...searchParams }
-    }
+      citySearchParams: { ...searchParams },
+    },
   };
   relayEnv.commitPayload(operationDescriptor, data);
   relayEnv.retain(operationDescriptor);
@@ -55,23 +58,25 @@ export function SearchParameters({
   metadata,
   searchParams,
   environment,
-  render
+  render,
 }: Props) {
-  const [localSearchParams, setLocalSearchParams] = useState<SearchParametersT>({
-    ...{
-      countryNameContains: "",
-      populationGte: metadata.populationLowerBound,
-      populationLte: metadata.populationUpperBound
-    },
-    ...searchParams
-  });
+  const [localSearchParams, setLocalSearchParams] = useState<SearchParametersT>(
+    {
+      ...{
+        countryNameContains: "",
+        populationGte: metadata.populationLowerBound,
+        populationLte: metadata.populationUpperBound,
+      },
+      ...searchParams,
+    }
+  );
 
   let dispatch = (event: EventT) => {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
       setLocalSearchParams({
         ...localSearchParams,
-        [fieldName]: fieldValue
+        [fieldName]: fieldValue,
       });
       return;
     }
@@ -80,7 +85,11 @@ export function SearchParameters({
       return;
     }
   };
-  return render({ dispatch, searchParams: localSearchParams });
+  return render({
+    dispatch,
+    searchParams: localSearchParams,
+    searchMetadata: metadata,
+  });
 }
 
 const SearchParametersFC = createFragmentContainer(SearchParameters, {
@@ -96,17 +105,17 @@ const SearchParametersFC = createFragmentContainer(SearchParameters, {
       populationGte
       populationLte
     }
-  `
+  `,
 });
 
 export default ({
   environment,
-  render
+  render,
 }: {
   environment: IEnvironment;
   render: ({
     dispatch,
-    searchParams
+    searchParams,
   }: {
     dispatch: DispatchT;
     searchParams: SearchParameters_searchParams;
