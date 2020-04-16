@@ -13,5 +13,5 @@ export const numberInput = () => {
 };
 
 export const rangeSlider = () => {
-  return <RangeSlider min={-1} max={+1} x1={-0.2} x2={0.5} />;
+  return <RangeSlider min={-1} max={+1} x1={-0.2} x2={0.5} step={0.01} />;
 };

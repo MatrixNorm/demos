@@ -12,34 +12,33 @@ tmpl.innerHTML = `
       -webkit-appearance: none;
       position: absolute;
       width: 100%;
+      overflow: hidden;
     }
     input[type=range]:focus {
       outline: none;
     }
     input[type=range]::-webkit-slider-runnable-track {
       width: 300px;
-      height: 5px;
-      background: #ddd;
+      height: 10px;
+      background: #7f97b0;
       border: none;
       border-radius: 3px;
     }
     input[type=range]::-webkit-slider-thumb { 
       -webkit-appearance: none;
       border: none;
-      height: 0;
-      width: 0;      
+      height: 10px;
+      width: 10px;
+      background: goldenrod;
+      cursor: ew-resize;
+      z-index: 1;
+      position: relative;
     }
     #upper-input::-webkit-slider-thumb {
-      margin-top: -12px;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;      
-      border-top: 12px solid goldenrod;
+      box-shadow: 4000px 0 0 4000px  #ddd;
     }
     #lower-input::-webkit-slider-thumb {
-      margin-top: 4px;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-bottom: 12px solid goldenrod;
+      box-shadow: -4000px 0 0 4000px  #ddd;
     }
     #lower-text {
       float: left;
@@ -68,6 +67,7 @@ export default class RangeSlider extends HTMLElement {
 
     this.upperInput = this.shadowRoot.getElementById("upper-input");
     this.lowerInput = this.shadowRoot.getElementById("lower-input");
+    this.filledSegment = this.shadowRoot.getElementById("filled-segment");
 
     this.onUpperChange = this.onUpperChange.bind(this);
     this.onUpperInput = this.onUpperInput.bind(this);
