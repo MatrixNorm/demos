@@ -11,15 +11,29 @@ import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.g
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-export type EventT = ["fieldChange", [string, any]] | ["applyChange"];
-export type DispatchT = (event: EventT) => void;
-export type SearchParametersT = Omit<
+export type SearchParametersType = Omit<
   SearchParameters_searchParams,
   " $refType"
 >;
 
+export type EventType =
+  | ["fieldChange", [keyof SearchParametersType, any]]
+  | ["applyChange"];
+
+export type DispatchFunctionType = (event: EventType) => void;
+
+export type RenderCallbackType = ({
+  dispatch,
+  searchParams,
+  searchMetadata,
+}: {
+  dispatch: DispatchFunctionType;
+  searchParams: SearchParametersType;
+  searchMetadata: SearchParameters_metadata;
+}) => any;
+
 function commitSearchParamsInRelaystore(
-  searchParams: SearchParametersT,
+  searchParams: SearchParametersType,
   relayEnv: IEnvironment
 ) {
   const query = graphql`
@@ -48,30 +62,29 @@ function commitSearchParamsInRelaystore(
 }
 
 type Props = {
-  metadata: SearchParameters_metadata;
+  searchMetadata: SearchParameters_metadata;
   searchParams: SearchParameters_searchParams | null;
   environment: IEnvironment;
-  render: any;
+  render: RenderCallbackType;
 };
 
 export function SearchParameters({
-  metadata,
+  searchMetadata,
   searchParams,
   environment,
   render,
 }: Props) {
-  const [localSearchParams, setLocalSearchParams] = useState<SearchParametersT>(
-    {
-      ...{
-        countryNameContains: "",
-        populationGte: metadata.populationLowerBound,
-        populationLte: metadata.populationUpperBound,
-      },
-      ...searchParams,
-    }
-  );
+  const [localSearchParams, setLocalSearchParams] = useState<
+    SearchParametersType
+  >({
+    countryNameContains: searchParams?.countryNameContains || "",
+    populationGte:
+      searchParams?.populationGte || searchMetadata.populationLowerBound,
+    populationLte:
+      searchParams?.populationLte || searchMetadata.populationUpperBound,
+  });
 
-  let dispatch = (event: EventT) => {
+  let dispatch = (event: EventType) => {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
       setLocalSearchParams({
@@ -88,7 +101,7 @@ export function SearchParameters({
   return render({
     dispatch,
     searchParams: localSearchParams,
-    searchMetadata: metadata,
+    searchMetadata,
   });
 }
 
@@ -113,13 +126,7 @@ export default ({
   render,
 }: {
   environment: IEnvironment;
-  render: ({
-    dispatch,
-    searchParams,
-  }: {
-    dispatch: DispatchT;
-    searchParams: SearchParameters_searchParams;
-  }) => any;
+  render: RenderCallbackType;
 }) => {
   return (
     <QueryRenderer<SearchParametersQuery>
@@ -146,7 +153,7 @@ export default ({
             return (
               props.citiesMetadata && (
                 <SearchParametersFC
-                  metadata={props.citiesMetadata}
+                  searchMetadata={props.citiesMetadata}
                   searchParams={props.uiState?.citySearchParams || null}
                   environment={environment}
                   render={render}

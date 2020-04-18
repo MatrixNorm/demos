@@ -1,9 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import { DispatchT } from "./SearchParameters";
+import { DispatchFunctionType } from "./SearchParameters";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
-import { TextInput, NumberInput } from "../elements/Inputs";
+import { TextInput } from "../elements/Inputs";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 
@@ -18,7 +18,7 @@ const ParameterSection = styled.section`
 `;
 
 interface Props {
-  dispatch: DispatchT;
+  dispatch: DispatchFunctionType;
   searchParams: SearchParameters_searchParams;
   searchMetadata: SearchParameters_metadata;
 }
@@ -47,23 +47,11 @@ export function SearchParametersPresentational({
           x1={searchParams.populationGte || searchMetadata.populationUpperBound}
           x2={searchParams.populationLte || searchMetadata.populationUpperBound}
           step={1000}
-          onChange={(range) =>
-            dispatch([
-              "fieldChange",
-              ["populationGte", parseInt(e.target.value) || null],
-            ])
-          }
+          onChange={(range: any) => {
+            dispatch(["fieldChange", ["populationGte", range.lower]]);
+            dispatch(["fieldChange", ["populationLte", range.upper]]);
+          }}
         />
-        {/*<NumberInput
-          step="100000"
-          value={searchParams.populationGte || ""}
-          onChange={(e) =>
-            dispatch([
-              "fieldChange",
-              ["populationGte", parseInt(e.target.value) || null],
-            ])
-          }
-        />*/}
       </ParameterSection>
       <div>
         <SubmitButton onClick={() => dispatch(["applyChange"])}>

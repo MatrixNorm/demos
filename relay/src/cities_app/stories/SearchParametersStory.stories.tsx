@@ -2,14 +2,14 @@ import * as React from "react";
 import { LocalQueryRenderer, graphql } from "react-relay";
 import { createTestingEnv } from "../env";
 import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
-import SearchParameters, { EventT } from "../components/SearchParameters";
+import SearchParameters, { EventType } from "../components/SearchParameters";
 
 export default { title: "cities_app-demo1/SearchParameters" };
 
 // https://github.com/facebook/relay/issues/2394
 const mockRefType: any = null;
 
-export const aaa1 = () => {
+export const Presentational = () => {
   const searchParams = {
     countryNameContains: "braz",
     populationGte: 2000000,
@@ -21,7 +21,7 @@ export const aaa1 = () => {
     populationUpperBound: 9000000,
     " $refType": mockRefType
   }
-  const dispatch = ([eventType, payload]: EventT) => {
+  const dispatch = ([eventType, payload]: EventType) => {
     console.log(eventType, payload);
   };
 
@@ -62,7 +62,6 @@ export const bbb2 = () => {
         }}
       />
       <br />
-
       <LocalQueryRenderer
         query={graphql`
           query SearchParametersStoryUiQuery {
