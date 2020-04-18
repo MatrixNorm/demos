@@ -43,7 +43,6 @@ const X = ({ environment }: { environment: IEnvironment }) => {
         query CitiesBrowserUiQuery {
           __typename
           uiState {
-            id
             citySearchParams {
               countryNameContains
               populationGte

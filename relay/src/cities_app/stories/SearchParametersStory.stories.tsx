@@ -14,13 +14,13 @@ export const Presentational = () => {
     countryNameContains: "braz",
     populationGte: 2000000,
     populationLte: 6000000,
-    " $refType": mockRefType
+    " $refType": mockRefType,
   };
   const searchMetadata = {
     populationLowerBound: 80000,
     populationUpperBound: 9000000,
-    " $refType": mockRefType
-  }
+    " $refType": mockRefType,
+  };
   const dispatch = ([eventType, payload]: EventType) => {
     console.log(eventType, payload);
   };
@@ -30,6 +30,7 @@ export const Presentational = () => {
       searchParams={searchParams}
       searchMetadata={searchMetadata}
       dispatch={dispatch}
+      showApplyButton={true}
     />
   );
 };
@@ -40,25 +41,20 @@ export const bbb2 = () => {
       citiesMetadata: () => {
         return {
           populationLowerBound: 1000,
-          populationUpperBound: 9999
+          populationUpperBound: 10000,
         };
-      }
+      },
     },
     Node: {
-      __resolveType() {}
-    }
+      __resolveType() {},
+    },
   });
   return (
     <div>
       <SearchParameters
         environment={environment}
-        render={({ dispatch, searchParams }) => {
-          return (
-            <SearchParametersPresentational
-              searchParams={searchParams}
-              dispatch={dispatch}
-            />
-          );
+        render={(args) => {
+          return <SearchParametersPresentational {...args} />;
         }}
       />
       <br />
@@ -67,7 +63,6 @@ export const bbb2 = () => {
           query SearchParametersStoryUiQuery {
             __typename
             uiState {
-              id
               citySearchParams {
                 countryNameContains
                 populationGte

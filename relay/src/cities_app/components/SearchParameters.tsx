@@ -7,7 +7,7 @@ import {
   IEnvironment,
 } from "relay-runtime";
 
-import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
+import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
@@ -22,15 +22,13 @@ export type EventType =
 
 export type DispatchFunctionType = (event: EventType) => void;
 
-export type RenderCallbackType = ({
-  dispatch,
-  searchParams,
-  searchMetadata,
-}: {
+export type RenderCallbackArgsType = {
   dispatch: DispatchFunctionType;
   searchParams: SearchParametersType;
-  searchMetadata: SearchParameters_metadata;
-}) => any;
+  searchMetadata: SearchParameters_searchMetadata;
+  showApplyButton: Boolean;
+};
+export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
 function commitSearchParamsInRelaystore(
   searchParams: SearchParametersType,
@@ -40,7 +38,6 @@ function commitSearchParamsInRelaystore(
     query SearchParametersUiQuery {
       __typename
       uiState {
-        id
         citySearchParams {
           ...SearchParameters_searchParams
         }
@@ -62,7 +59,7 @@ function commitSearchParamsInRelaystore(
 }
 
 type Props = {
-  searchMetadata: SearchParameters_metadata;
+  searchMetadata: SearchParameters_searchMetadata;
   searchParams: SearchParameters_searchParams | null;
   environment: IEnvironment;
   render: RenderCallbackType;
@@ -102,12 +99,13 @@ export function SearchParameters({
     dispatch,
     searchParams: localSearchParams,
     searchMetadata,
+    showApplyButton: true,
   });
 }
 
 const SearchParametersFC = createFragmentContainer(SearchParameters, {
-  metadata: graphql`
-    fragment SearchParameters_metadata on CitiesMetadata {
+  searchMetadata: graphql`
+    fragment SearchParameters_searchMetadata on CitiesMetadata {
       populationLowerBound
       populationUpperBound
     }
@@ -133,7 +131,7 @@ export default ({
       query={graphql`
         query SearchParametersQuery {
           citiesMetadata {
-            ...SearchParameters_metadata
+            ...SearchParameters_searchMetadata
           }
           uiState {
             citySearchParams {
