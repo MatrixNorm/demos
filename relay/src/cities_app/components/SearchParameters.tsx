@@ -12,7 +12,11 @@ import { SearchParameters_searchParams } from "__relay__/SearchParameters_search
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
 export type SearchParametersType = Omit<
-  SearchParameters_searchParams,
+  {
+    [P in keyof SearchParameters_searchParams]: NonNullable<
+      SearchParameters_searchParams[P]
+    >;
+  },
   " $refType"
 >;
 
@@ -31,7 +35,7 @@ export type RenderCallbackArgsType = {
 export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
 function commitSearchParamsInRelaystore(
-  searchParams: SearchParametersType,
+  searchParams: SearchParameters_searchParams,
   relayEnv: IEnvironment
 ) {
   const query = graphql`
@@ -44,7 +48,6 @@ function commitSearchParamsInRelaystore(
       }
     }
   `;
-  console.log(searchParams);
   const request = getRequest(query);
   const operationDescriptor = createOperationDescriptor(request, {});
   let data = {
@@ -58,9 +61,26 @@ function commitSearchParamsInRelaystore(
   relayEnv.retain(operationDescriptor);
 }
 
+/**
+ * Transformation that maps null into appropriate value for display in input element.
+ * E.g. empty string for text input or lower bound for range input, etc.
+ */
+function presentationalTransformation(
+  searchParams: SearchParameters_searchParams,
+  searchMetadata: SearchParameters_searchMetadata
+): SearchParametersType {
+  return {
+    countryNameContains: searchParams.countryNameContains || "",
+    populationGte:
+      searchParams.populationGte || searchMetadata.populationLowerBound,
+    populationLte:
+      searchParams.populationLte || searchMetadata.populationUpperBound,
+  };
+}
+
 type Props = {
   searchMetadata: SearchParameters_searchMetadata;
-  searchParams: SearchParameters_searchParams | null;
+  searchParams: SearchParameters_searchParams;
   environment: IEnvironment;
   render: RenderCallbackType;
 };
@@ -72,16 +92,19 @@ export function SearchParameters({
   render,
 }: Props) {
   const [localSearchParams, setLocalSearchParams] = useState<
-    SearchParametersType
-  >({
-    countryNameContains: searchParams?.countryNameContains || "",
-    populationGte:
-      searchParams?.populationGte || searchMetadata.populationLowerBound,
-    populationLte:
-      searchParams?.populationLte || searchMetadata.populationUpperBound,
-  });
+    SearchParameters_searchParams
+  >(searchParams);
 
-  let dispatch = (event: EventType) => {
+  function isLocalDiff(): Boolean {
+    return (
+      Object.keys(searchParams)
+        //@ts-ignore
+        .map(attr => searchParams[attr] !== localSearchParams[attr])
+        .some(Boolean)
+    ); 
+  }
+
+  function dispatch(event: EventType) {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
       setLocalSearchParams({
@@ -94,30 +117,55 @@ export function SearchParameters({
       commitSearchParamsInRelaystore(localSearchParams, environment);
       return;
     }
-  };
+  }
   return render({
     dispatch,
-    searchParams: localSearchParams,
+    searchParams: presentationalTransformation(
+      localSearchParams,
+      searchMetadata
+    ),
     searchMetadata,
-    showApplyButton: true,
+    showApplyButton: isLocalDiff(),
   });
 }
 
-const SearchParametersFC = createFragmentContainer(SearchParameters, {
-  searchMetadata: graphql`
-    fragment SearchParameters_searchMetadata on CitiesMetadata {
-      populationLowerBound
-      populationUpperBound
+type PropsFC = {
+  searchMetadata: SearchParameters_searchMetadata | null;
+  searchParams: SearchParameters_searchParams | null;
+  environment: IEnvironment;
+  render: RenderCallbackType;
+};
+
+const SearchParametersFC = createFragmentContainer(
+  function SearchParameters_(props: PropsFC) {
+    const { searchMetadata } = props;
+    if (!searchMetadata) {
+      return <div>data error</div>;
     }
-  `,
-  searchParams: graphql`
-    fragment SearchParameters_searchParams on UICitySearchParams {
-      countryNameContains
-      populationGte
-      populationLte
-    }
-  `,
-});
+    const searchParams = props.searchParams || {
+      countryNameContains: null,
+      populationGte: null,
+      populationLte: null,
+      " $refType": "SearchParameters_searchParams",
+    };
+    return <SearchParameters {...{ ...props, searchParams, searchMetadata }} />;
+  },
+  {
+    searchMetadata: graphql`
+      fragment SearchParameters_searchMetadata on CitiesMetadata {
+        populationLowerBound
+        populationUpperBound
+      }
+    `,
+    searchParams: graphql`
+      fragment SearchParameters_searchParams on UICitySearchParams {
+        countryNameContains
+        populationGte
+        populationLte
+      }
+    `,
+  }
+);
 
 export default ({
   environment,
@@ -147,20 +195,14 @@ export default ({
           return <div>NETWORK ERROR</div>;
         }
         if (props) {
-          if (props.citiesMetadata) {
-            return (
-              props.citiesMetadata && (
-                <SearchParametersFC
-                  searchMetadata={props.citiesMetadata}
-                  searchParams={props.uiState?.citySearchParams || null}
-                  environment={environment}
-                  render={render}
-                />
-              )
-            );
-          } else {
-            return <div>GRAPHQL ERROR</div>;
-          }
+          return (
+            <SearchParametersFC
+              searchMetadata={props.citiesMetadata || null}
+              searchParams={props.uiState?.citySearchParams || null}
+              environment={environment}
+              render={render}
+            />
+          );
         }
         return <div>loading...</div>;
       }}

@@ -1,14 +1,9 @@
 import * as React from "react";
 import styled from "styled-components";
-import {
-  DispatchFunctionType,
-  SearchParametersType,
-  RenderCallbackArgsType,
-} from "./SearchParameters";
+import { RenderCallbackArgsType } from "./SearchParameters";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
-import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 
 const SearchParametersBlock = styled.div`
   input {
@@ -42,8 +37,8 @@ export function SearchParametersPresentational({
         <RangeSlider
           min={searchMetadata.populationLowerBound}
           max={searchMetadata.populationUpperBound}
-          x1={searchParams.populationGte || searchMetadata.populationUpperBound}
-          x2={searchParams.populationLte || searchMetadata.populationUpperBound}
+          x1={searchParams.populationGte}
+          x2={searchParams.populationLte}
           step={1}
           onChange={(range: any) => {
             dispatch(["fieldChange", ["populationGte", range.lower]]);
