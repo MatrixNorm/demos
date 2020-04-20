@@ -22,7 +22,10 @@ export default function({ min, max, step, x1, x2, onChange }: Props) {
   useEffect(() => {
     if (!sliderEl.current) return;
     const listener = (evt: any) => {
-      onChange(evt.detail);
+      onChange({
+        lower: Number(evt.detail.lower),
+        upper: Number(evt.detail.upper),
+      });
     };
     sliderEl.current.addEventListener("range-update", listener);
     return () => {

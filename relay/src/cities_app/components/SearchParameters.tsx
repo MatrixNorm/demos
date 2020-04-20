@@ -99,18 +99,18 @@ export function SearchParameters({
     return (
       Object.keys(searchParams)
         //@ts-ignore
-        .map(attr => searchParams[attr] !== localSearchParams[attr])
+        .map((attr) => searchParams[attr] !== localSearchParams[attr])
         .some(Boolean)
-    ); 
+    );
   }
 
   function dispatch(event: EventType) {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
-      setLocalSearchParams({
-        ...localSearchParams,
+      setLocalSearchParams(prevState => ({
+        ...prevState,
         [fieldName]: fieldValue,
-      });
+      }));
       return;
     }
     if (event[0] === "applyChange") {
