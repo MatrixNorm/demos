@@ -107,7 +107,7 @@ export function SearchParameters({
   function dispatch(event: EventType) {
     if (event[0] === "fieldChange") {
       let [fieldName, fieldValue] = event[1];
-      setLocalSearchParams(prevState => ({
+      setLocalSearchParams((prevState) => ({
         ...prevState,
         [fieldName]: fieldValue,
       }));
@@ -130,7 +130,7 @@ export function SearchParameters({
 }
 
 type PropsFC = {
-  searchMetadata: SearchParameters_searchMetadata | null;
+  searchMetadata: SearchParameters_searchMetadata;
   searchParams: SearchParameters_searchParams | null;
   environment: IEnvironment;
   render: RenderCallbackType;
@@ -139,9 +139,6 @@ type PropsFC = {
 const SearchParametersFC = createFragmentContainer(
   function SearchParameters_(props: PropsFC) {
     const { searchMetadata } = props;
-    if (!searchMetadata) {
-      return <div>data error</div>;
-    }
     const searchParams = props.searchParams || {
       countryNameContains: null,
       populationGte: null,
@@ -167,45 +164,61 @@ const SearchParametersFC = createFragmentContainer(
   }
 );
 
-export default ({
+export default function SearchParametersOuterComponent({
   environment,
   render,
 }: {
   environment: IEnvironment;
   render: RenderCallbackType;
-}) => {
+}) {
+  const [reload, setReload] = useState(false);
   return (
-    <QueryRenderer<SearchParametersQuery>
-      query={graphql`
-        query SearchParametersQuery {
-          citiesMetadata {
-            ...SearchParameters_searchMetadata
-          }
-          uiState {
-            citySearchParams {
-              ...SearchParameters_searchParams
+    <div>
+      {reload ? (
+        <>
+          <div>something went wrong</div>
+          <button onClick={() => setReload(false)}>Reload</button>
+        </>
+      ) : (
+        <QueryRenderer<SearchParametersQuery>
+          query={graphql`
+            query SearchParametersQuery {
+              citiesMetadata {
+                ...SearchParameters_searchMetadata
+              }
+              uiState {
+                citySearchParams {
+                  ...SearchParameters_searchParams
+                }
+              }
             }
-          }
-        }
-      `}
-      environment={environment}
-      variables={{}}
-      render={({ error, props }) => {
-        if (error) {
-          return <div>NETWORK ERROR</div>;
-        }
-        if (props) {
-          return (
-            <SearchParametersFC
-              searchMetadata={props.citiesMetadata || null}
-              searchParams={props.uiState?.citySearchParams || null}
-              environment={environment}
-              render={render}
-            />
-          );
-        }
-        return <div>loading...</div>;
-      }}
-    />
+          `}
+          environment={environment}
+          variables={{}}
+          render={({ error, props }) => {
+            console.log(error, props);
+            if (error) {
+              setReload(true);
+              return;
+            }
+            if (!props) {
+              return <div>loading...</div>;
+            }
+            if (!props.citiesMetadata) {
+              setReload(true);
+              return;
+            }
+            return (
+              <SearchParametersFC
+                searchMetadata={props.citiesMetadata}
+                searchParams={props.uiState?.citySearchParams || null}
+                environment={environment}
+                render={render}
+              />
+            );
+          }}
+        />
+      )}
+    </div>
   );
-};
+}

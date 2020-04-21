@@ -88,3 +88,45 @@ export const bbb2 = () => {
     </div>
   );
 };
+
+export const noServerData = () => {
+  const environment = createTestingEnv({
+    Query: {
+      citiesMetadata: () => null,
+    },
+    Node: {
+      __resolveType() {},
+    },
+  });
+  return (
+    <div>
+      <SearchParameters
+        environment={environment}
+        render={(args) => {
+          return <SearchParametersPresentational {...args} />;
+        }}
+      />
+    </div>
+  );
+};
+
+export const serverError = () => {
+  const environment = createTestingEnv({
+    Query: {
+      citiesMetadata: () => {throw new Error("sheisse")},
+    },
+    Node: {
+      __resolveType() {},
+    },
+  });
+  return (
+    <div>
+      <SearchParameters
+        environment={environment}
+        render={(args) => {
+          return <SearchParametersPresentational {...args} />;
+        }}
+      />
+    </div>
+  );
+};
