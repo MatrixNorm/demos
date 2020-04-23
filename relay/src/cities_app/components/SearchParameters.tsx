@@ -129,11 +129,8 @@ export function SearchParameters({
   });
 }
 
-type PropsFC = {
-  searchMetadata: SearchParameters_searchMetadata;
+type PropsFC = Omit<Props, "searchParams"> & {
   searchParams: SearchParameters_searchParams | null;
-  environment: IEnvironment;
-  render: RenderCallbackType;
 };
 
 const SearchParametersFC = createFragmentContainer(
