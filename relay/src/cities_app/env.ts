@@ -10,12 +10,14 @@ import * as db from "./resolvers/database";
 
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
-  resolvers: serverResolvers
+  resolvers: serverResolvers,
 });
 
-export const createRelayEnvironment = () => {
+export const createRelayEnvironment = (
+  { timeout }: { timeout: number } = { timeout: 500 }
+) => {
   const network = Network.create(async (operation, variables) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, timeout));
     const resp = await graphql(
       serverSchema,
       operation.text,
@@ -23,7 +25,7 @@ export const createRelayEnvironment = () => {
       { user: db.users["user#1"] },
       variables
     );
-    console.log({resp});
+    console.log({ resp });
     return resp;
   });
   const store = new Store(new RecordSource());
@@ -40,7 +42,7 @@ export const createRelayEnvironment = () => {
 export const createTestingEnv = (resolvers: any) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
-    resolvers: resolvers
+    resolvers: resolvers,
   });
 
   const network = Network.create((operation, variables) => {
@@ -63,7 +65,7 @@ export const createTestingEnv = (resolvers: any) => {
 export const loadingForeverEnvironment = () => {
   const network = Network.create(async () => {
     while (true) {
-      await new Promise(resolve => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 500));
     }
   });
 

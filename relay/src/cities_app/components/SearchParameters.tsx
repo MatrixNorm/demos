@@ -1,24 +1,24 @@
 import * as React from "react";
 import { useState } from "react";
+import styled from "styled-components";
 import { graphql, QueryRenderer, createFragmentContainer } from "react-relay";
 import {
   createOperationDescriptor,
   getRequest,
   IEnvironment,
 } from "relay-runtime";
+import LoadingIndicator from "../elements/LoadingIndicator";
 
+import { NukeFragRef, NukeNulls } from "../typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-export type SearchParametersType = Omit<
-  {
-    [P in keyof SearchParameters_searchParams]: NonNullable<
-      SearchParameters_searchParams[P]
-    >;
-  },
-  " $refType"
+export type SearchParametersType = NukeNulls<
+  NukeFragRef<SearchParameters_searchParams>
 >;
+
+export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 export type EventType =
   | ["fieldChange", [keyof SearchParametersType, any]]
@@ -29,13 +29,13 @@ export type DispatchFunctionType = (event: EventType) => void;
 export type RenderCallbackArgsType = {
   dispatch: DispatchFunctionType;
   searchParams: SearchParametersType;
-  searchMetadata: SearchParameters_searchMetadata;
+  searchMetadata: SearchMetadataType;
   showApplyButton: Boolean;
 };
 export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
 function commitSearchParamsInRelaystore(
-  searchParams: SearchParameters_searchParams,
+  searchParams: NukeFragRef<SearchParameters_searchParams>,
   relayEnv: IEnvironment
 ) {
   const query = graphql`
@@ -66,8 +66,8 @@ function commitSearchParamsInRelaystore(
  * E.g. empty string for text input or lower bound for range input, etc.
  */
 function presentationalTransformation(
-  searchParams: SearchParameters_searchParams,
-  searchMetadata: SearchParameters_searchMetadata
+  searchParams: NukeFragRef<SearchParameters_searchParams>,
+  searchMetadata: SearchMetadataType
 ): SearchParametersType {
   return {
     countryNameContains: searchParams.countryNameContains || "",
@@ -79,8 +79,8 @@ function presentationalTransformation(
 }
 
 type Props = {
-  searchMetadata: SearchParameters_searchMetadata;
-  searchParams: SearchParameters_searchParams;
+  searchMetadata: SearchMetadataType;
+  searchParams: NukeFragRef<SearchParameters_searchParams>;
   environment: IEnvironment;
   render: RenderCallbackType;
 };
@@ -92,7 +92,7 @@ export function SearchParameters({
   render,
 }: Props) {
   const [localSearchParams, setLocalSearchParams] = useState<
-    SearchParameters_searchParams
+    NukeFragRef<SearchParameters_searchParams>
   >(searchParams);
 
   function isLocalDiff(): Boolean {
@@ -129,18 +129,20 @@ export function SearchParameters({
   });
 }
 
-type PropsFC = Omit<Props, "searchParams"> & {
+type PropsFC = {
+  searchMetadata: SearchParameters_searchMetadata;
   searchParams: SearchParameters_searchParams | null;
+  environment: IEnvironment;
+  render: RenderCallbackType;
 };
 
 const SearchParametersFC = createFragmentContainer(
-  function SearchParameters_(props: PropsFC) {
+  function(props: PropsFC) {
     const { searchMetadata } = props;
     const searchParams = props.searchParams || {
       countryNameContains: null,
       populationGte: null,
       populationLte: null,
-      " $refType": "SearchParameters_searchParams",
     };
     return <SearchParameters {...{ ...props, searchParams, searchMetadata }} />;
   },
@@ -161,6 +163,13 @@ const SearchParametersFC = createFragmentContainer(
   }
 );
 
+const Container = styled.div`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+`;
+
 export default function SearchParametersOuterComponent({
   environment,
   render,
@@ -170,12 +179,12 @@ export default function SearchParametersOuterComponent({
 }) {
   const [reload, setReload] = useState(false);
   return (
-    <div>
+    <Container>
       {reload ? (
-        <>
+        <div>
           <div>something went wrong</div>
           <button onClick={() => setReload(false)}>Reload</button>
-        </>
+        </div>
       ) : (
         <QueryRenderer<SearchParametersQuery>
           query={graphql`
@@ -193,13 +202,12 @@ export default function SearchParametersOuterComponent({
           environment={environment}
           variables={{}}
           render={({ error, props }) => {
-            console.log(error, props);
             if (error) {
               setReload(true);
               return;
             }
             if (!props) {
-              return <div>loading...</div>;
+              return <LoadingIndicator />;
             }
             if (!props.citiesMetadata) {
               setReload(true);
@@ -216,6 +224,6 @@ export default function SearchParametersOuterComponent({
           }}
         />
       )}
-    </div>
+    </Container>
   );
 }

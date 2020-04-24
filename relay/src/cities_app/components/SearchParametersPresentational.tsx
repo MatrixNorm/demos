@@ -5,14 +5,19 @@ import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
 
-const SearchParametersBlock = styled.div`
-  input {
-    width: calc(100% - 4px);
-  }
-`;
+const SearchParametersBlock = styled.div``;
 
 const ParameterSection = styled.section`
   margin-bottom: 20px;
+
+  input {
+    width: calc(100% - 4px);
+  }
+
+  matrixnorm-range-slider {
+    position: relative;
+    left: -2px;
+  }
 `;
 
 export function SearchParametersPresentational({

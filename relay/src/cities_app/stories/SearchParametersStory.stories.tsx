@@ -1,6 +1,6 @@
 import * as React from "react";
 import { LocalQueryRenderer, graphql } from "react-relay";
-import { createTestingEnv } from "../env";
+import { createTestingEnv, loadingForeverEnvironment } from "../env";
 import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
 import SearchParameters, { EventType } from "../components/SearchParameters";
 
@@ -35,13 +35,13 @@ export const Presentational = () => {
   );
 };
 
-export const bbb2 = () => {
+export const success = () => {
   const environment = createTestingEnv({
     Query: {
       citiesMetadata: () => {
         return {
-          populationLowerBound: 1000,
-          populationUpperBound: 10000,
+          populationLowerBound: 100000,
+          populationUpperBound: 1000000,
         };
       },
     },
@@ -51,12 +51,14 @@ export const bbb2 = () => {
   });
   return (
     <div>
-      <SearchParameters
-        environment={environment}
-        render={(args) => {
-          return <SearchParametersPresentational {...args} />;
-        }}
-      />
+      <div style={{ width: "200px" }}>
+        <SearchParameters
+          environment={environment}
+          render={(args) => {
+            return <SearchParametersPresentational {...args} />;
+          }}
+        />
+      </div>
       <br />
       <LocalQueryRenderer
         query={graphql`
@@ -99,7 +101,7 @@ export const noServerData = () => {
     },
   });
   return (
-    <div>
+    <div style={{ width: "200px" }}>
       <SearchParameters
         environment={environment}
         render={(args) => {
@@ -113,14 +115,30 @@ export const noServerData = () => {
 export const serverError = () => {
   const environment = createTestingEnv({
     Query: {
-      citiesMetadata: () => {throw new Error("sheisse")},
+      citiesMetadata: () => {
+        throw new Error("sheisse");
+      },
     },
     Node: {
       __resolveType() {},
     },
   });
   return (
-    <div>
+    <div style={{ width: "200px" }}>
+      <SearchParameters
+        environment={environment}
+        render={(args) => {
+          return <SearchParametersPresentational {...args} />;
+        }}
+      />
+    </div>
+  );
+};
+
+export const loading = () => {
+  const environment = loadingForeverEnvironment();
+  return (
+    <div style={{ width: "200px" }}>
       <SearchParameters
         environment={environment}
         render={(args) => {
