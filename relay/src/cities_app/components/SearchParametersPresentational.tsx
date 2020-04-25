@@ -18,6 +18,11 @@ const ParameterSection = styled.section`
     position: relative;
     left: -2px;
   }
+
+  .label {
+    font-size: 0.9em;
+    margin-bottom: 0.5em;
+  }
 `;
 
 export function SearchParametersPresentational({
@@ -29,7 +34,7 @@ export function SearchParametersPresentational({
   return (
     <SearchParametersBlock>
       <ParameterSection>
-        <div>Country:</div>
+        <div className="label">Country</div>
         <TextInput
           value={searchParams.countryNameContains || ""}
           onChange={(e) =>
@@ -38,7 +43,7 @@ export function SearchParametersPresentational({
         />
       </ParameterSection>
       <ParameterSection>
-        <div>Population</div>
+        <div className="label">Population</div>
         <RangeSlider
           min={searchMetadata.populationLowerBound}
           max={searchMetadata.populationUpperBound}

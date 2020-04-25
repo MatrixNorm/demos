@@ -3,11 +3,11 @@ import {
   QueryRenderer,
   graphql,
   createRefetchContainer,
-  RelayRefetchProp
+  RelayRefetchProp,
 } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import CitiesPagination from "./CitiesPagination";
-import { SearchParametersT } from "./SearchParameters";
+import { SearchParametersType } from "./SearchParameters";
 
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_cities } from "__relay__/CitiesPaginationRefetchContainer_cities.graphql";
@@ -20,7 +20,7 @@ const loadNextPage = (relay: RelayRefetchProp) => (
   if (nodes && nodes.length > 0) {
     let after = nodes[nodes.length - 1].id;
     currentPage.hasNext &&
-      relay.refetch(nextVars => {
+      relay.refetch((nextVars) => {
         return { ...nextVars, after };
       });
   }
@@ -33,7 +33,7 @@ const loadPrevPage = (relay: RelayRefetchProp) => (
   if (nodes && nodes.length > 0) {
     let before = nodes[0].id;
     currentPage.hasPrev &&
-      relay.refetch(prevVars => {
+      relay.refetch((prevVars) => {
         return { ...prevVars, before };
       });
   }
@@ -42,7 +42,7 @@ const loadPrevPage = (relay: RelayRefetchProp) => (
 const CitiesPaginationRefetchContainer = createRefetchContainer(
   ({
     cities,
-    relay
+    relay,
   }: {
     cities: CitiesPaginationRefetchContainer_cities;
     relay: RelayRefetchProp;
@@ -75,7 +75,7 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
           ...CitiesPagination_page
         }
       }
-    `
+    `,
   },
   graphql`
     query CitiesPaginationRefetchContainerRefetchQuery(
@@ -97,7 +97,7 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
 
 type Props = {
   environment: IEnvironment;
-  searchParams: SearchParametersT;
+  searchParams: SearchParametersType;
 };
 
 export default ({ environment, searchParams }: Props) => {
