@@ -17,24 +17,28 @@ import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 export type SearchParametersType = NukeNulls<
   NukeFragRef<SearchParameters_searchParams>
 >;
-
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 export type EventType =
-  | ["fieldChange", [keyof SearchParametersType, any]]
+  | [
+      "fieldChange",
+      (
+        | ["countryNameContains", string]
+        | ["populationGte", number]
+        | ["populationLte", number]
+      )
+    ]
   | ["applyChange"];
 
-export type DispatchFunctionType = (event: EventType) => void;
-
 export type RenderCallbackArgsType = {
-  dispatch: DispatchFunctionType;
+  dispatch: (event: EventType) => void;
   searchParams: SearchParametersType;
   searchMetadata: SearchMetadataType;
   showApplyButton: Boolean;
 };
 export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
-function commitSearchParamsInRelaystore(
+function commitSearchParamsInRelayStore(
   searchParams: NukeFragRef<SearchParameters_searchParams>,
   relayEnv: IEnvironment
 ) {
@@ -78,31 +82,20 @@ function presentationalTransformation(
   };
 }
 
-type Props = {
+type HookProps = {
   searchMetadata: SearchMetadataType;
   searchParams: NukeFragRef<SearchParameters_searchParams>;
   environment: IEnvironment;
-  render: RenderCallbackType;
 };
 
-export function SearchParameters({
-  searchMetadata,
+function useSearchParameters({
   searchParams,
+  searchMetadata,
   environment,
-  render,
-}: Props) {
+}: HookProps) {
   const [localSearchParams, setLocalSearchParams] = useState<
     NukeFragRef<SearchParameters_searchParams>
   >(searchParams);
-
-  function isLocalDiff(): Boolean {
-    return (
-      Object.keys(searchParams)
-        //@ts-ignore
-        .map((attr) => searchParams[attr] !== localSearchParams[attr])
-        .some(Boolean)
-    );
-  }
 
   function dispatch(event: EventType) {
     if (event[0] === "fieldChange") {
@@ -114,19 +107,22 @@ export function SearchParameters({
       return;
     }
     if (event[0] === "applyChange") {
-      commitSearchParamsInRelaystore(localSearchParams, environment);
+      commitSearchParamsInRelayStore(localSearchParams, environment);
       return;
     }
   }
-  return render({
-    dispatch,
-    searchParams: presentationalTransformation(
-      localSearchParams,
-      searchMetadata
-    ),
-    searchMetadata,
-    showApplyButton: isLocalDiff(),
-  });
+
+  const localDiff = Object.keys(searchParams)
+    //@ts-ignore
+    .map((attr) => searchParams[attr] !== localSearchParams[attr])
+    .some(Boolean);
+
+  const displayableSearchParams = presentationalTransformation(
+    localSearchParams,
+    searchMetadata
+  );
+
+  return { dispatch, displayableSearchParams, localDiff };
 }
 
 type PropsFC = {
@@ -138,13 +134,29 @@ type PropsFC = {
 
 const SearchParametersFC = createFragmentContainer(
   function(props: PropsFC) {
-    const { searchMetadata } = props;
-    const searchParams = props.searchParams || {
-      countryNameContains: null,
-      populationGte: null,
-      populationLte: null,
-    };
-    return <SearchParameters {...{ ...props, searchParams, searchMetadata }} />;
+    const {
+      dispatch,
+      displayableSearchParams,
+      localDiff,
+    } = useSearchParameters({
+      searchParams: {
+        ...{
+          countryNameContains: null,
+          populationGte: null,
+          populationLte: null,
+        },
+        ...(props.searchParams || {}),
+      },
+
+      searchMetadata: props.searchMetadata,
+      environment: props.environment,
+    });
+    return props.render({
+      dispatch,
+      searchParams: displayableSearchParams,
+      searchMetadata: props.searchMetadata,
+      showApplyButton: localDiff,
+    });
   },
   {
     searchMetadata: graphql`
