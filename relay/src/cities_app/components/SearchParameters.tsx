@@ -185,9 +185,11 @@ const Container = styled.div`
 export default function SearchParametersOuterComponent({
   environment,
   render,
+  loading,
 }: {
   environment: IEnvironment;
   render: RenderCallbackType;
+  loading: () => JSX.Element;
 }) {
   const [reload, setReload] = useState(false);
   return (
@@ -219,7 +221,7 @@ export default function SearchParametersOuterComponent({
               return;
             }
             if (!props) {
-              return <LoadingIndicator />;
+              return React.createElement(loading, {}, null);
             }
             if (!props.citiesMetadata) {
               setReload(true);

@@ -1,7 +1,10 @@
 import * as React from "react";
 import { LocalQueryRenderer, graphql } from "react-relay";
 import { createTestingEnv, loadingForeverEnvironment } from "../env";
-import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
+import {
+  SearchParametersPresentational,
+  SearchParametersPresentationalLoading,
+} from "../components/SearchParametersPresentational";
 import SearchParameters, { EventType } from "../components/SearchParameters";
 
 export default { title: "cities_app-demo1/SearchParameters" };
@@ -35,6 +38,10 @@ export const Presentational = () => {
   );
 };
 
+export const PresentationalSkeleton = () => {
+  return <SearchParametersPresentational />;
+};
+
 export const success = () => {
   const environment = createTestingEnv({
     Query: {
@@ -57,6 +64,7 @@ export const success = () => {
           render={(args) => {
             return <SearchParametersPresentational {...args} />;
           }}
+          loading={SearchParametersPresentationalLoading}
         />
       </div>
       <br />
@@ -107,6 +115,7 @@ export const noServerData = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
+        loading={SearchParametersPresentationalLoading}
       />
     </div>
   );
@@ -130,6 +139,7 @@ export const serverError = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
+        loading={SearchParametersPresentationalLoading}
       />
     </div>
   );
@@ -144,6 +154,7 @@ export const loading = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
+        loading={SearchParametersPresentationalLoading}
       />
     </div>
   );
