@@ -1,6 +1,10 @@
 import * as React from "react";
 import { LocalQueryRenderer, graphql } from "react-relay";
-import { createTestingEnv, loadingForeverEnvironment } from "../env";
+import {
+  createTestingEnv,
+  loadingForeverEnvironment,
+  createRelayEnvironment,
+} from "../env";
 import {
   SearchParametersPresentational,
   SearchParametersPresentationalLoading,
@@ -115,7 +119,7 @@ export const noServerData = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={SearchParametersPresentationalLoading}
+        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );
@@ -139,7 +143,7 @@ export const serverError = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={SearchParametersPresentationalLoading}
+        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );
@@ -154,7 +158,22 @@ export const loading = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={SearchParametersPresentationalLoading}
+        loading={() => <SearchParametersPresentational />}
+      />
+    </div>
+  );
+};
+
+export const full = () => {
+  const environment = createRelayEnvironment({ timeout: 1000 });
+  return (
+    <div style={{ width: "200px" }}>
+      <SearchParameters
+        environment={environment}
+        render={(args) => {
+          return <SearchParametersPresentational {...args} />;
+        }}
+        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );

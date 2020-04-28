@@ -5,7 +5,13 @@ import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
 
-const SearchParametersBlock = styled.div``;
+const SearchParametersBlock = styled.div`
+  .submit-button-box {
+    display: flex;
+    justify-content: center;
+    margin-top: 2em;
+  }
+`;
 
 const ParameterSectionSuccess = styled.section`
   margin-bottom: 20px;
@@ -53,18 +59,30 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
     height: 100%;
     z-index: 1;
   }
+
+  matrixnorm-range-slider {
+    visibility: hidden;
+  }
 `;
 
 export function SearchParametersPresentational(
   props: RenderCallbackArgsType | {}
 ) {
-  const { dispatch, searchParams, searchMetadata, showApplyButton } = props || {
-    dispatch: () => {},
+  const { dispatch, searchParams, searchMetadata, showApplyButton } = {
+    ...{
+      dispatch: () => {},
+      searchParams: null,
+      searchMetadata: null,
+      showApplyButton: null,
+    },
+    ...props,
   };
-  console.log(props);
-  const ParameterSection = props.searchMetadata
-    ? ParameterSectionSuccess
-    : ParameterSectionSkeleton;
+
+  const ParameterSection =
+    Object.keys(props).length > 0
+      ? ParameterSectionSuccess
+      : ParameterSectionSkeleton;
+
   return (
     <SearchParametersBlock>
       <ParameterSection>
@@ -96,7 +114,7 @@ export function SearchParametersPresentational(
         </div>
       </ParameterSection>
       {showApplyButton && (
-        <div>
+        <div className="submit-button-box">
           <SubmitButton onClick={() => dispatch && dispatch(["applyChange"])}>
             Apply
           </SubmitButton>
