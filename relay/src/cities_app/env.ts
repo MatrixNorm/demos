@@ -73,3 +73,14 @@ export const loadingForeverEnvironment = () => {
   const environment = new Environment({ network, store });
   return environment;
 };
+
+export const returnPayloadEnvironment = (payload: any) => {
+  const network = Network.create(() => {
+    const resp = { data: payload };
+    console.log(resp);
+    return resp;
+  });
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};

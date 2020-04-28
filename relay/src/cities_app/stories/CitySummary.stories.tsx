@@ -1,7 +1,11 @@
 import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
-import { createTestingEnv } from "../env";
-import CitySummary, { CitySummarySkeleton } from "../components/CitySummary";
+import {
+  createTestingEnv,
+  loadingForeverEnvironment,
+  returnPayloadEnvironment,
+} from "../env";
+import CitySummary, { defaultData } from "../components/CitySummary";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };
@@ -11,13 +15,13 @@ export const citySummary = () => {
     Query: {
       node: (_: any, { id }: { id: any }) => {
         return { id, name: "Madrid", country: "Spain", population: 3600000 };
-      }
+      },
     },
     Node: {
       __resolveType() {
         return "City";
-      }
-    }
+      },
+    },
   });
   return (
     <QueryRenderer<CitySummaryStoryQuery>
@@ -30,7 +34,7 @@ export const citySummary = () => {
       `}
       environment={environment}
       variables={{ cityId: "city#1" }}
-      render={({ error, props }) => {
+      render={({ props }) => {
         return props && props.city && <CitySummary city={props.city} />;
       }}
     />
@@ -38,5 +42,22 @@ export const citySummary = () => {
 };
 
 export const citySummarySkeleton = () => {
-  return <CitySummarySkeleton />;
+  const env = returnPayloadEnvironment(defaultData);
+  return (
+    <QueryRenderer<CitySummaryStoryQuery>
+      query={graphql`
+        query CitySummaryStoryQuery($cityId: ID!) {
+          city: node(id: $cityId) {
+            ...CitySummary_city
+          }
+        }
+      `}
+      environment={env}
+      variables={{ cityId: "city#1" }}
+      render={({ props }) => {
+        console.log(props);
+        return props && props.city && <CitySummary city={props.city} />;
+      }}
+    />
+  );
 };

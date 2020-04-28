@@ -1,10 +1,12 @@
 import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
-import { createTestingEnv, loadingForeverEnvironment } from "../env";
+import {
+  createTestingEnv,
+  loadingForeverEnvironment,
+  returnPayloadEnvironment,
+} from "../env";
 
-import CitiesPagination, {
-  CitiesPaginationSkeleton
-} from "../components/CitiesPagination";
+import CitiesPagination, { defaultData } from "../components/CitiesPagination";
 
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 import * as t from "../types.codegen";
@@ -31,7 +33,7 @@ export const okState = () => {
             country: "Spain",
             population: 3600000,
             lat: 0,
-            lng: 0
+            lng: 0,
           },
           {
             id: "city#2",
@@ -39,7 +41,7 @@ export const okState = () => {
             country: "Italy",
             population: 4600000,
             lat: 0,
-            lng: 0
+            lng: 0,
           },
           {
             id: "city#3",
@@ -47,19 +49,19 @@ export const okState = () => {
             country: "Italy",
             population: 2300000,
             lat: 0,
-            lng: 0
-          }
+            lng: 0,
+          },
         ];
         return {
           nodes,
           hasNext: true,
-          hasPrev: true
+          hasPrev: true,
         };
-      }
+      },
     },
     Node: {
-      __resolveType() {}
-    }
+      __resolveType() {},
+    },
   });
   return (
     <QueryRenderer<CitiesPaginationStoryQuery>
@@ -67,6 +69,7 @@ export const okState = () => {
       environment={environment}
       variables={{}}
       render={({ props }) => {
+        console.log(props);
         return (
           props &&
           props.citiesPagination && (
@@ -86,12 +89,19 @@ export const loadingState = () => {
   return (
     <QueryRenderer<CitiesPaginationStoryQuery>
       query={query}
-      environment={loadingForeverEnvironment()}
-      variables={{ pageNo: 1 }}
+      environment={returnPayloadEnvironment(defaultData)}
+      variables={{}}
       render={({ props }) => {
-        if (!props) {
-          return <CitiesPaginationSkeleton />;
-        }
+        return (
+          props &&
+          props.citiesPagination && (
+            <CitiesPagination
+              page={props.citiesPagination}
+              loadPrevPage={() => {}}
+              loadNextPage={() => {}}
+            />
+          )
+        );
       }}
     />
   );

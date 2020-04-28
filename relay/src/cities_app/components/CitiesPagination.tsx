@@ -2,7 +2,10 @@ import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
-import CitySummary, { CitySummarySkeleton } from "./CitySummary";
+import CitySummary, {
+  CitySummarySkeleton,
+  defaultData as cityDefaultData,
+} from "./CitySummary";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 
 const CitiesList = styled.ol`
@@ -36,7 +39,7 @@ function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
     <Page>
       <CitiesList>
         {nodes &&
-          nodes.map(city => (
+          nodes.map((city) => (
             <li key={city.id}>
               <CitySummary city={city} />
             </li>
@@ -62,8 +65,18 @@ export default createFragmentContainer(CitiesPagination, {
         ...CitySummary_city
       }
     }
-  `
+  `,
 });
+
+export const defaultData = {
+  hasNext: false,
+  hasPrev: false,
+  nodes: [
+    { ...cityDefaultData },
+    { ...cityDefaultData },
+    { ...cityDefaultData },
+  ],
+};
 
 export function CitiesPaginationSkeleton() {
   return (

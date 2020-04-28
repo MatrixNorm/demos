@@ -41,31 +41,40 @@ export const CitySummarySkeleton = styled.section`
   background: silver;
 `;
 
-export default createFragmentContainer(
-  ({ city }: Props) => {
-    return (
-      <CitySummary>
-        <div className="row">
-          <span className="country">{city.country}</span>
-        </div>
-        <div className="row row-name">
-          <span className="name">{city.name}</span>
-        </div>
-        <div className="row">
-          <label className="population-label">pop.</label>
-          <span className="population">{city.population}</span>
-        </div>
-      </CitySummary>
-    );
+const fragments = {
+  city: graphql`
+    fragment CitySummary_city on City {
+      id
+      name
+      country
+      population
+    }
+  `,
+};
+
+export default createFragmentContainer(({ city }: Props) => {
+  return (
+    <CitySummary>
+      <div className="row">
+        <span className="country">{city.country}</span>
+      </div>
+      <div className="row row-name">
+        <span className="name">{city.name}</span>
+      </div>
+      <div className="row">
+        <label className="population-label">pop.</label>
+        <span className="population">{city.population}</span>
+      </div>
+    </CitySummary>
+  );
+}, fragments);
+
+export const defaultData = {
+  city: {
+    __typename: fragments.city.default.type,
+    id: "1",
+    name: "aaaaaa",
+    country: "bbbbbbbb",
+    population: 1000000,
   },
-  {
-    city: graphql`
-      fragment CitySummary_city on City {
-        id
-        name
-        country
-        population
-      }
-    `
-  }
-);
+};

@@ -27,6 +27,7 @@ export default ({ environment }: { environment: IEnvironment }) => {
           render={props => {
             return <SearchParametersPresentational {...props} />;
           }}
+          loading={() => <SearchParametersPresentational />}
         />
       </div>
       <div className="pagination-panel-wrapper">
