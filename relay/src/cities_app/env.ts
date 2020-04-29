@@ -82,5 +82,6 @@ export const returnPayloadEnvironment = (payload: any) => {
   });
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
+  //window.env = environment;
   return environment;
 };
