@@ -9,6 +9,7 @@ import {
   createTestingEnv,
   loadingForeverEnvironment,
   returnPayloadEnvironment,
+  returnAsyncPayloadEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
@@ -163,9 +164,6 @@ export const citySummarySkeleton4 = () => {
             },
           };
           env.commitPayload(operation, data);
-          console.log(env.getStore().getSource()._records);
-          let response = env.lookup(operation.fragment);
-          console.log(response);
           return (
             <LocalQueryRenderer<CitySummaryStoryQuery>
               query={query}
@@ -178,6 +176,55 @@ export const citySummarySkeleton4 = () => {
           );
         }
         return null;
+      }}
+    />
+  );
+};
+
+export const citySummarySkeleton5 = () => {
+  return (
+    <QueryRenderer<CitySummaryStoryQuery>
+      query={query}
+      environment={returnAsyncPayloadEnvironment(
+        {
+          city: {
+            __typename: "City",
+            id: "1",
+            name: "Madrid",
+            country: "Spain",
+            population: 3600000,
+          },
+        },
+        1000
+      )}
+      variables={{ cityId: "1" }}
+      render={({ props }) => {
+        if (props === null) {
+          const env = returnPayloadEnvironment(defaultData);
+          const request = getRequest(query);
+          const operation = createOperationDescriptor(request, { cityId: "1" });
+          let data = {
+            city: {
+              __typename: "City",
+              id: "1",
+              name: "aaaaaa",
+              country: "bbbbbbbb",
+              population: 1000000,
+            },
+          };
+          env.commitPayload(operation, data);
+          return (
+            <LocalQueryRenderer<CitySummaryStoryQuery>
+              query={query}
+              environment={env}
+              variables={{ cityId: "1" }}
+              render={({ props }) => {
+                return props && props.city && <CitySummary city={props.city} />;
+              }}
+            />
+          );
+        }
+        return props && props.city && <CitySummary city={props.city} />;
       }}
     />
   );

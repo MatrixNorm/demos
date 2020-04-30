@@ -77,11 +77,23 @@ export const loadingForeverEnvironment = () => {
 export const returnPayloadEnvironment = (payload: any) => {
   const network = Network.create(() => {
     const resp = { data: payload };
-    console.log(resp);
     return resp;
   });
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
-  //window.env = environment;
+  return environment;
+};
+
+export const returnAsyncPayloadEnvironment = (
+  payload: any,
+  timeout: number
+) => {
+  const network = Network.create(async () => {
+    await new Promise((resolve) => setTimeout(resolve, timeout || 1000));
+    const resp = { data: payload };
+    return resp;
+  });
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
   return environment;
 };
