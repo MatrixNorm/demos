@@ -5,6 +5,7 @@ import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
   returnAsyncPayloadEnvironment,
+  noNetworkEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
 import LoadingContext from "../LoadingContext";
@@ -50,17 +51,11 @@ export const citySummaryLoading = () => {
       variables={{ cityId: "1" }}
       render={({ props }) => {
         if (props === null) {
-          const env = returnPayloadEnvironment(defaultData);
+          const env = noNetworkEnvironment();
           const request = getRequest(query);
           const operation = createOperationDescriptor(request, { cityId: "1" });
           let data = {
-            city: {
-              __typename: "City",
-              id: "1",
-              name: "aaaaaa",
-              country: "bbbbbbbb",
-              population: 1000000,
-            },
+            city: defaultData,
           };
           env.commitPayload(operation, data);
           return (
@@ -93,20 +88,14 @@ export const citySummaryFull = () => {
       query={query}
       environment={returnAsyncPayloadEnvironment(
         {
-          city: {
-            __typename: "City",
-            id: "1",
-            name: "Madrid",
-            country: "Spain",
-            population: 3600000,
-          },
+          city: defaultData,
         },
         1000
       )}
       variables={{ cityId: "1" }}
       render={({ props }) => {
         if (props === null) {
-          const env = returnPayloadEnvironment(defaultData);
+          const env = noNetworkEnvironment();
           const request = getRequest(query);
           const operation = createOperationDescriptor(request, { cityId: "1" });
           let data = {

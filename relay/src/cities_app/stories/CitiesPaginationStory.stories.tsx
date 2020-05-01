@@ -1,12 +1,14 @@
 import * as React from "react";
-import { QueryRenderer, graphql } from "react-relay";
+import { graphql, QueryRenderer, LocalQueryRenderer } from "react-relay";
+import { createOperationDescriptor, getRequest } from "relay-runtime";
 import {
   createTestingEnv,
   loadingForeverEnvironment,
   returnPayloadEnvironment,
+  noNetworkEnvironment
 } from "../env";
-
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
+import LoadingContext from "../LoadingContext";
 
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 import * as t from "../types.codegen";
@@ -89,19 +91,40 @@ export const loadingState = () => {
   return (
     <QueryRenderer<CitiesPaginationStoryQuery>
       query={query}
-      environment={returnPayloadEnvironment(defaultData)}
+      environment={loadingForeverEnvironment()}
       variables={{}}
       render={({ props }) => {
-        return (
-          props &&
-          props.citiesPagination && (
-            <CitiesPagination
-              page={props.citiesPagination}
-              loadPrevPage={() => {}}
-              loadNextPage={() => {}}
+        if (props === null) {
+          const env = noNetworkEnvironment();
+          const request = getRequest(query);
+          const operation = createOperationDescriptor(request, {});
+          let data = {
+            citiesPagination: defaultData,
+          };
+          env.commitPayload(operation, data);
+          return (
+            <LocalQueryRenderer<CitiesPaginationStoryQuery>
+              query={query}
+              environment={env}
+              variables={{}}
+              render={({ props }) => {
+                return (
+                  props &&
+                  props.citiesPagination && (
+                    <LoadingContext.Provider value={true}>
+                      <CitiesPagination
+                        page={props.citiesPagination}
+                        loadPrevPage={() => {}}
+                        loadNextPage={() => {}}
+                      />
+                    </LoadingContext.Provider>
+                  )
+                );
+              }}
             />
-          )
-        );
+          );
+        }
+        return null;
       }}
     />
   );

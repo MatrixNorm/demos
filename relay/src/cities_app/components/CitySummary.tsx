@@ -69,14 +69,6 @@ const CitySummaryLoading = styled(CitySummarySuccess)`
   }
 `;
 
-export const CitySummarySkeleton = styled.section`
-  width: 9em;
-  height: 5em;
-  display: inline-block;
-  padding: 0 1em 0 1em;
-  background: silver;
-`;
-
 export default createFragmentContainer(
   ({ city }: Props) => {
     const isLoading = React.useContext(LoadingContext);
@@ -109,11 +101,9 @@ export default createFragmentContainer(
 );
 
 export const defaultData = {
-  city: {
-    __typename: "City",
-    id: "1",
-    name: "aaaaaa",
-    country: "bbbbbbbb",
-    population: 1000000,
-  },
+  __typename: "City",
+  id: "1",
+  name: "aaaaaa",
+  country: "bbbbbbbb",
+  population: 1000000,
 };

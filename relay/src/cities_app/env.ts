@@ -97,3 +97,12 @@ export const returnAsyncPayloadEnvironment = (
   const environment = new Environment({ network, store });
   return environment;
 };
+
+export const noNetworkEnvironment = () => {
+  const network = Network.create(() => {
+    return { data: {} };
+  });
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};
