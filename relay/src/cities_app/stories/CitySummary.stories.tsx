@@ -1,16 +1,13 @@
 import * as React from "react";
 import { graphql, QueryRenderer, LocalQueryRenderer } from "react-relay";
-import {
-  createOperationDescriptor,
-  getRequest,
-  IEnvironment,
-} from "relay-runtime";
+import { createOperationDescriptor, getRequest } from "relay-runtime";
 import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
   returnAsyncPayloadEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
+import LoadingContext from "../LoadingContext";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };
@@ -72,7 +69,14 @@ export const citySummaryLoading = () => {
               environment={env}
               variables={{ cityId: "1" }}
               render={({ props }) => {
-                return props && props.city && <CitySummary city={props.city} />;
+                return (
+                  props &&
+                  props.city && (
+                    <LoadingContext.Provider value={true}>
+                      <CitySummary city={props.city} />
+                    </LoadingContext.Provider>
+                  )
+                );
               }}
             />
           );
@@ -121,7 +125,14 @@ export const citySummaryFull = () => {
               environment={env}
               variables={{ cityId: "1" }}
               render={({ props }) => {
-                return props && props.city && <CitySummary city={props.city} />;
+                return (
+                  props &&
+                  props.city && (
+                    <LoadingContext.Provider value={true}>
+                      <CitySummary city={props.city} />
+                    </LoadingContext.Provider>
+                  )
+                );
               }}
             />
           );
@@ -131,7 +142,6 @@ export const citySummaryFull = () => {
     />
   );
 };
-
 
 // export const citySummarySkeleton = () => {
 //   const env = returnPayloadEnvironment(defaultData);
