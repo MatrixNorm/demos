@@ -1,6 +1,6 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import LoadingContext from "../LoadingContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
@@ -21,6 +21,7 @@ const CitySummarySuccess = styled.section`
     margin: 0.2em 0 0.2em 0;
   }
   .name {
+    position: relative;
     margin-right: 2px;
     font-weight: bold;
   }
@@ -29,22 +30,42 @@ const CitySummarySuccess = styled.section`
     font-size: 0.85em;
     color: #00bcd4;
   }
+  .population {
+    position: relative;
+  }
   .population-label {
+    position: relative;
     font-size: 0.9em;
     margin-right: 15px;
   }
 `;
 
+const sharedStyle = css`
+  content: "";
+  background: silver;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+`;
+
 const CitySummaryLoading = styled(CitySummarySuccess)`
   .country::after {
-    content: "";
-    background: silver;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    ${sharedStyle}
+  }
+
+  .name::after {
+    ${sharedStyle}
+  }
+
+  .population::after {
+    ${sharedStyle}
+  }
+
+  .population-label::after {
+    ${sharedStyle}
   }
 `;
 
