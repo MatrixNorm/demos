@@ -24,10 +24,9 @@ export default ({ environment }: { environment: IEnvironment }) => {
       <div className="search-params-wrapper">
         <SearchParameters
           environment={environment}
-          render={props => {
+          render={(props) => {
             return <SearchParametersPresentational {...props} />;
           }}
-          loading={() => <SearchParametersPresentational />}
         />
       </div>
       <div className="pagination-panel-wrapper">
@@ -63,7 +62,7 @@ const X = ({ environment }: { environment: IEnvironment }) => {
                 props.uiState?.citySearchParams || {
                   countryNameContains: null,
                   populationGte: null,
-                  populationLte: null
+                  populationLte: null,
                 }
               }
             />

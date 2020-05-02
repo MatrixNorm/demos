@@ -72,7 +72,13 @@ export const citySummaryFull = () => {
       query={query}
       environment={returnAsyncPayloadEnvironment(
         {
-          city: defaultData,
+          city: {
+            __typename: "City",
+            id: "1",
+            name: "Madrid",
+            country: "Spain",
+            population: 3600000,
+          },
         },
         1000
       )}

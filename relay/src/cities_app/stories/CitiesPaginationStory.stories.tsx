@@ -1,16 +1,13 @@
 import * as React from "react";
-import { graphql, QueryRenderer, LocalQueryRenderer } from "react-relay";
-import { createOperationDescriptor, getRequest } from "relay-runtime";
+import { graphql, QueryRenderer } from "react-relay";
 import {
-  createTestingEnv,
   loadingForeverEnvironment,
-  noNetworkEnvironment,
+  returnPayloadEnvironment,
+  returnAsyncPayloadEnvironment,
 } from "../env";
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
 import { renderLoadingPlaceholder } from "../LoadingContext";
-
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
-import * as t from "../types.codegen";
 
 export default { title: "cities_app-demo1/CitiesPagination" };
 
@@ -22,48 +19,42 @@ const query = graphql`
   }
 `;
 
-export const okState = () => {
-  const environment = createTestingEnv({
-    Query: {
-      node() {},
-      citiesPagination(): t.CitiesPagination {
-        let nodes: t.City[] = [
-          {
-            id: "city#1",
-            name: "Madrid",
-            country: "Spain",
-            population: 3600000,
-            lat: 0,
-            lng: 0,
-          },
-          {
-            id: "city#2",
-            name: "Rome",
-            country: "Italy",
-            population: 4600000,
-            lat: 0,
-            lng: 0,
-          },
-          {
-            id: "city#3",
-            name: "Turin",
-            country: "Italy",
-            population: 2300000,
-            lat: 0,
-            lng: 0,
-          },
-        ];
-        return {
-          nodes,
-          hasNext: true,
-          hasPrev: true,
-        };
-      },
-    },
-    Node: {
-      __resolveType() {},
+const demoNodes = [
+  {
+    id: "city#1",
+    name: "Madrid",
+    country: "Spain",
+    population: 3600000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#2",
+    name: "Rome",
+    country: "Italy",
+    population: 4600000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#3",
+    name: "Turin",
+    country: "Italy",
+    population: 2300000,
+    lat: 0,
+    lng: 0,
+  },
+];
+
+export const success = () => {
+  const environment = returnPayloadEnvironment({
+    citiesPagination: {
+      nodes: demoNodes,
+      hasNext: true,
+      hasPrev: true,
     },
   });
+
   return (
     <QueryRenderer<CitiesPaginationStoryQuery>
       query={query}
@@ -86,7 +77,7 @@ export const okState = () => {
   );
 };
 
-export const loadingState = () => {
+export const loading = () => {
   return (
     <QueryRenderer<CitiesPaginationStoryQuery>
       query={query}
@@ -115,6 +106,57 @@ export const loadingState = () => {
           });
         }
         return null;
+      }}
+    />
+  );
+};
+
+export const full = () => {
+  return (
+    <QueryRenderer<CitiesPaginationStoryQuery>
+      query={query}
+      environment={returnAsyncPayloadEnvironment(
+        {
+          citiesPagination: {
+            nodes: demoNodes,
+            hasNext: true,
+            hasPrev: true,
+          },
+        },
+        1000
+      )}
+      variables={{}}
+      render={({ props }) => {
+        if (props === null) {
+          return renderLoadingPlaceholder({
+            query,
+            variables: {},
+            data: {
+              citiesPagination: defaultData,
+            },
+            render: ({ props }: any) => {
+              return (
+                props &&
+                props.citiesPagination && (
+                  <CitiesPagination
+                    page={props.citiesPagination}
+                    loadPrevPage={() => {}}
+                    loadNextPage={() => {}}
+                  />
+                )
+              );
+            },
+          });
+        }
+        return (
+          props.citiesPagination && (
+            <CitiesPagination
+              page={props.citiesPagination}
+              loadPrevPage={() => console.log("prev")}
+              loadNextPage={() => console.log("next")}
+            />
+          )
+        );
       }}
     />
   );
