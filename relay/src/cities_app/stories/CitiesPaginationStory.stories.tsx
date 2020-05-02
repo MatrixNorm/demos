@@ -4,11 +4,10 @@ import { createOperationDescriptor, getRequest } from "relay-runtime";
 import {
   createTestingEnv,
   loadingForeverEnvironment,
-  returnPayloadEnvironment,
-  noNetworkEnvironment
+  noNetworkEnvironment,
 } from "../env";
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
-import LoadingContext from "../LoadingContext";
+import { renderLoadingPlaceholder } from "../LoadingContext";
 
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 import * as t from "../types.codegen";
@@ -95,34 +94,25 @@ export const loadingState = () => {
       variables={{}}
       render={({ props }) => {
         if (props === null) {
-          const env = noNetworkEnvironment();
-          const request = getRequest(query);
-          const operation = createOperationDescriptor(request, {});
-          let data = {
-            citiesPagination: defaultData,
-          };
-          env.commitPayload(operation, data);
-          return (
-            <LocalQueryRenderer<CitiesPaginationStoryQuery>
-              query={query}
-              environment={env}
-              variables={{}}
-              render={({ props }) => {
-                return (
-                  props &&
-                  props.citiesPagination && (
-                    <LoadingContext.Provider value={true}>
-                      <CitiesPagination
-                        page={props.citiesPagination}
-                        loadPrevPage={() => {}}
-                        loadNextPage={() => {}}
-                      />
-                    </LoadingContext.Provider>
-                  )
-                );
-              }}
-            />
-          );
+          return renderLoadingPlaceholder({
+            query,
+            variables: {},
+            data: {
+              citiesPagination: defaultData,
+            },
+            render: ({ props }: any) => {
+              return (
+                props &&
+                props.citiesPagination && (
+                  <CitiesPagination
+                    page={props.citiesPagination}
+                    loadPrevPage={() => {}}
+                    loadNextPage={() => {}}
+                  />
+                )
+              );
+            },
+          });
         }
         return null;
       }}

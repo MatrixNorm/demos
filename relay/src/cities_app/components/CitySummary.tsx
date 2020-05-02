@@ -103,7 +103,7 @@ export default createFragmentContainer(
 export const defaultData = {
   __typename: "City",
   id: "1",
-  name: "aaaaaa",
-  country: "bbbbbbbb",
+  name: "aaaaaaa",
+  country: "bbbbbbbbbbbb",
   population: 1000000,
 };

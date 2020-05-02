@@ -1,14 +1,12 @@
 import * as React from "react";
-import { graphql, QueryRenderer, LocalQueryRenderer } from "react-relay";
-import { createOperationDescriptor, getRequest } from "relay-runtime";
+import { graphql, QueryRenderer } from "react-relay";
 import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
   returnAsyncPayloadEnvironment,
-  noNetworkEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
-import LoadingContext from "../LoadingContext";
+import { renderLoadingPlaceholder } from "../LoadingContext";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };
@@ -51,30 +49,16 @@ export const citySummaryLoading = () => {
       variables={{ cityId: "1" }}
       render={({ props }) => {
         if (props === null) {
-          const env = noNetworkEnvironment();
-          const request = getRequest(query);
-          const operation = createOperationDescriptor(request, { cityId: "1" });
-          let data = {
-            city: defaultData,
-          };
-          env.commitPayload(operation, data);
-          return (
-            <LocalQueryRenderer<CitySummaryStoryQuery>
-              query={query}
-              environment={env}
-              variables={{ cityId: "1" }}
-              render={({ props }) => {
-                return (
-                  props &&
-                  props.city && (
-                    <LoadingContext.Provider value={true}>
-                      <CitySummary city={props.city} />
-                    </LoadingContext.Provider>
-                  )
-                );
-              }}
-            />
-          );
+          return renderLoadingPlaceholder({
+            query,
+            variables: { cityId: "1" },
+            data: {
+              city: defaultData,
+            },
+            render: ({ props }: any) => {
+              return props && props.city && <CitySummary city={props.city} />;
+            },
+          });
         }
         return null;
       }}
@@ -95,36 +79,16 @@ export const citySummaryFull = () => {
       variables={{ cityId: "1" }}
       render={({ props }) => {
         if (props === null) {
-          const env = noNetworkEnvironment();
-          const request = getRequest(query);
-          const operation = createOperationDescriptor(request, { cityId: "1" });
-          let data = {
-            city: {
-              __typename: "City",
-              id: "1",
-              name: "aaaaaa",
-              country: "bbbbbbbb",
-              population: 1000000,
+          return renderLoadingPlaceholder({
+            query,
+            variables: { cityId: "1" },
+            data: {
+              city: defaultData,
             },
-          };
-          env.commitPayload(operation, data);
-          return (
-            <LocalQueryRenderer<CitySummaryStoryQuery>
-              query={query}
-              environment={env}
-              variables={{ cityId: "1" }}
-              render={({ props }) => {
-                return (
-                  props &&
-                  props.city && (
-                    <LoadingContext.Provider value={true}>
-                      <CitySummary city={props.city} />
-                    </LoadingContext.Provider>
-                  )
-                );
-              }}
-            />
-          );
+            render: ({ props }: any) => {
+              return props && props.city && <CitySummary city={props.city} />;
+            },
+          });
         }
         return props && props.city && <CitySummary city={props.city} />;
       }}
