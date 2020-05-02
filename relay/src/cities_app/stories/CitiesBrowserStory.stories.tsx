@@ -64,9 +64,7 @@ export default { title: "cities_app-demo1/CitiesBrowser" };
 // };
 
 export const loading = () => {
-  const environment = loadingForeverEnvironment();
-
-  return <CitiesBrowser environment={environment} />;
+  return <CitiesBrowser environment={loadingForeverEnvironment()} />;
 };
 
 export const full = () => {

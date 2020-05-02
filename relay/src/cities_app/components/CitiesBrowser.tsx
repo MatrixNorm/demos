@@ -3,7 +3,7 @@ import { graphql, LocalQueryRenderer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
 import SearchParameters from "./SearchParameters";
-import CitiesPagination from "./CitiesPaginationRefetchContainer";
+import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 
@@ -30,13 +30,13 @@ export default ({ environment }: { environment: IEnvironment }) => {
         />
       </div>
       <div className="pagination-panel-wrapper">
-        <X environment={environment} />
+        <XXX environment={environment} />
       </div>
     </PanelBlock>
   );
 };
 
-const X = ({ environment }: { environment: IEnvironment }) => {
+const XXX = ({ environment }: { environment: IEnvironment }) => {
   return (
     <LocalQueryRenderer<CitiesBrowserUiQuery>
       query={graphql`
@@ -55,18 +55,16 @@ const X = ({ environment }: { environment: IEnvironment }) => {
       variables={{}}
       render={({ props }) => {
         return (
-          props && (
-            <CitiesPagination
-              environment={environment}
-              searchParams={
-                props.uiState?.citySearchParams || {
-                  countryNameContains: null,
-                  populationGte: null,
-                  populationLte: null,
-                }
+          <CitiesPaginationComponent
+            environment={environment}
+            searchParams={
+              props?.uiState?.citySearchParams || {
+                countryNameContains: null,
+                populationGte: null,
+                populationLte: null,
               }
-            />
-          )
+            }
+          />
         );
       }}
     />
