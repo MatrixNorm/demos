@@ -7,7 +7,7 @@ import {
   getRequest,
   IEnvironment,
 } from "relay-runtime";
-import LoadingIndicator from "../elements/LoadingIndicator";
+import { renderLoadingPlaceholder } from "../LoadingContext";
 
 import { NukeFragRef, NukeNulls } from "../typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
@@ -175,6 +175,18 @@ const SearchParametersFC = createFragmentContainer(
   }
 );
 
+export const defaultData = {
+  searchMetadata: {
+    populationLowerBound: 1000,
+    populationUpperBound: 1000000,
+  },
+  searchParams: {
+    countryNameContains: "",
+    populationGte: 1000,
+    populationLte: 1000000,
+  },
+};
+
 const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -182,14 +194,25 @@ const Container = styled.div`
   justify-content: center;
 `;
 
+const query = graphql`
+  query SearchParametersQuery {
+    citiesMetadata {
+      ...SearchParameters_searchMetadata
+    }
+    uiState {
+      citySearchParams {
+        ...SearchParameters_searchParams
+      }
+    }
+  }
+`;
+
 export default function SearchParametersOuterComponent({
   environment,
   render,
-  loading,
 }: {
   environment: IEnvironment;
   render: RenderCallbackType;
-  loading: () => JSX.Element;
 }) {
   const [reload, setReload] = useState(false);
   return (
@@ -201,18 +224,7 @@ export default function SearchParametersOuterComponent({
         </div>
       ) : (
         <QueryRenderer<SearchParametersQuery>
-          query={graphql`
-            query SearchParametersQuery {
-              citiesMetadata {
-                ...SearchParameters_searchMetadata
-              }
-              uiState {
-                citySearchParams {
-                  ...SearchParameters_searchParams
-                }
-              }
-            }
-          `}
+          query={query}
           environment={environment}
           variables={{}}
           render={({ error, props }) => {
@@ -220,8 +232,31 @@ export default function SearchParametersOuterComponent({
               setReload(true);
               return;
             }
-            if (!props) {
-              return React.createElement(loading, {}, null);
+            if (props === null) {
+              return renderLoadingPlaceholder({
+                query,
+                variables: {},
+                data: {
+                  citiesMetadata: { ...defaultData.searchMetadata },
+                  uiState: {
+                    citySearchParams: { ...defaultData.searchParams },
+                  },
+                },
+                render: ({ props }: any) => {
+                  return (
+                    props &&
+                    props.citiesMetadata &&
+                    props.uiState?.citySearchParams && (
+                      <SearchParametersFC
+                        searchMetadata={props.citiesMetadata}
+                        searchParams={props.uiState.citySearchParams}
+                        environment={environment}
+                        render={render}
+                      />
+                    )
+                  );
+                },
+              });
             }
             if (!props.citiesMetadata) {
               setReload(true);

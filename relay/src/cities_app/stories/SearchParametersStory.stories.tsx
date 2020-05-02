@@ -5,11 +5,9 @@ import {
   loadingForeverEnvironment,
   createRelayEnvironment,
 } from "../env";
-import {
-  SearchParametersPresentational,
-  SearchParametersPresentationalLoading,
-} from "../components/SearchParametersPresentational";
+import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
 import SearchParameters, { EventType } from "../components/SearchParameters";
+import LoadingContext from "../LoadingContext";
 
 export default { title: "cities_app-demo1/SearchParameters" };
 
@@ -42,8 +40,31 @@ export const Presentational = () => {
   );
 };
 
-export const PresentationalSkeleton = () => {
-  return <SearchParametersPresentational />;
+export const PresentationalLoadinfPlaceholder = () => {
+  const searchParams = {
+    countryNameContains: "braz",
+    populationGte: 2000000,
+    populationLte: 6000000,
+    " $refType": mockRefType,
+  };
+  const searchMetadata = {
+    populationLowerBound: 80000,
+    populationUpperBound: 9000000,
+    " $refType": mockRefType,
+  };
+  const dispatch = ([eventType, payload]: EventType) => {
+    console.log(eventType, payload);
+  };
+  return (
+    <LoadingContext.Provider value={true}>
+      <SearchParametersPresentational
+        searchParams={searchParams}
+        searchMetadata={searchMetadata}
+        dispatch={dispatch}
+        showApplyButton={false}
+      />
+    </LoadingContext.Provider>
+  );
 };
 
 export const success = () => {
@@ -68,7 +89,6 @@ export const success = () => {
           render={(args) => {
             return <SearchParametersPresentational {...args} />;
           }}
-          loading={SearchParametersPresentationalLoading}
         />
       </div>
       <br />
@@ -119,7 +139,6 @@ export const noServerData = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );
@@ -143,7 +162,6 @@ export const serverError = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );
@@ -158,7 +176,6 @@ export const loading = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );
@@ -173,7 +190,6 @@ export const full = () => {
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
-        loading={() => <SearchParametersPresentational />}
       />
     </div>
   );

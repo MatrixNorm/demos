@@ -1,9 +1,11 @@
 import * as React from "react";
-import styled from "styled-components";
-import { RenderCallbackArgsType } from "./SearchParameters";
+import styled, { css } from "styled-components";
+import LoadingContext from "../LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
+
+import { RenderCallbackArgsType } from "./SearchParameters";
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {
@@ -37,27 +39,24 @@ const ParameterSectionSuccess = styled.section`
   }
 `;
 
+const sharedStyle = css`
+  content: "";
+  background: silver;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+`;
+
 const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   .label::after {
-    content: "";
-    background: silver;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    ${sharedStyle}
   }
 
   .input::after {
-    content: "";
-    background: silver;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
+    ${sharedStyle}
   }
 
   matrixnorm-range-slider {
@@ -65,23 +64,17 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   }
 `;
 
-export function SearchParametersPresentational(
-  props: RenderCallbackArgsType | {}
-) {
-  const { dispatch, searchParams, searchMetadata, showApplyButton } = {
-    ...{
-      dispatch: () => {},
-      searchParams: null,
-      searchMetadata: null,
-      showApplyButton: null,
-    },
-    ...props,
-  };
+export function SearchParametersPresentational(props: RenderCallbackArgsType) {
+  let isLoading = React.useContext(LoadingContext);
+  let { dispatch, searchParams, searchMetadata, showApplyButton } = props;
 
-  const ParameterSection =
-    Object.keys(props).length > 0
-      ? ParameterSectionSuccess
-      : ParameterSectionSkeleton;
+  let ParameterSection = isLoading
+    ? ParameterSectionSkeleton
+    : ParameterSectionSuccess;
+
+  if (isLoading) {
+    dispatch = () => {};
+  }
 
   return (
     <SearchParametersBlock>
@@ -89,7 +82,7 @@ export function SearchParametersPresentational(
         <div className="label">Country</div>
         <div className="input">
           <TextInput
-            value={searchParams?.countryNameContains || ""}
+            value={searchParams.countryNameContains}
             onChange={(e) =>
               dispatch(["fieldChange", ["countryNameContains", e.target.value]])
             }
@@ -100,10 +93,10 @@ export function SearchParametersPresentational(
         <div className="label">Population</div>
         <div className="input">
           <RangeSlider
-            min={searchMetadata?.populationLowerBound || 0}
-            max={searchMetadata?.populationUpperBound || 100}
-            x1={searchParams?.populationGte || 0}
-            x2={searchParams?.populationLte || 100}
+            min={searchMetadata.populationLowerBound}
+            max={searchMetadata.populationUpperBound}
+            x1={searchParams.populationGte}
+            x2={searchParams.populationLte}
             step={1}
             onChange={(range: any) => {
               dispatch(["fieldChange", ["populationGte", range.lower]]);
