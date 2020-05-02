@@ -14,9 +14,10 @@ import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_sear
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-export type SearchParametersType = NukeNulls<
-  NukeFragRef<SearchParameters_searchParams>
+export type SearchParametersNullableType = NukeFragRef<
+  SearchParameters_searchParams
 >;
+export type SearchParametersType = NukeNulls<SearchParametersNullableType>;
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 export type EventType =

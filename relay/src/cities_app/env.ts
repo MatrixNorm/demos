@@ -25,7 +25,7 @@ export const createRelayEnvironment = (
       { user: db.users["user#1"] },
       variables
     );
-    //console.log({ resp });
+    console.log({ resp });
     return resp;
   });
   const store = new Store(new RecordSource());

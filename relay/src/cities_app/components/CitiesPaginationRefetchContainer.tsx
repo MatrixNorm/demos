@@ -6,8 +6,11 @@ import {
   RelayRefetchProp,
 } from "react-relay";
 import { IEnvironment } from "relay-runtime";
-import CitiesPagination from "./CitiesPagination";
-import { SearchParametersType } from "./SearchParameters";
+import CitiesPagination, {
+  defaultData as citiesPaginationDefaultData,
+} from "./CitiesPagination";
+import { SearchParametersNullableType } from "./SearchParameters";
+import { renderLoadingPlaceholder } from "../LoadingContext";
 
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_cities } from "__relay__/CitiesPaginationRefetchContainer_cities.graphql";
@@ -97,32 +100,46 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
 
 type Props = {
   environment: IEnvironment;
-  searchParams: SearchParametersType;
+  searchParams: SearchParametersNullableType;
 };
 
 export default ({ environment, searchParams }: Props) => {
-  console.log({ searchParams });
+  const query = graphql`
+    query CitiesPaginationRefetchContainerQuery(
+      $pageSize: Int
+      $after: String
+      $before: String
+      $searchParams: CitySearchParamsInput
+    ) {
+      ...CitiesPaginationRefetchContainer_cities
+        @arguments(
+          pageSize: $pageSize
+          after: $after
+          before: $before
+          searchParams: $searchParams
+        )
+    }
+  `;
   return (
     <QueryRenderer<CitiesPaginationRefetchContainerQuery>
-      query={graphql`
-        query CitiesPaginationRefetchContainerQuery(
-          $pageSize: Int
-          $after: String
-          $before: String
-          $searchParams: CitySearchParamsInput
-        ) {
-          ...CitiesPaginationRefetchContainer_cities
-            @arguments(
-              pageSize: $pageSize
-              after: $after
-              before: $before
-              searchParams: $searchParams
-            )
-        }
-      `}
+      query={query}
       environment={environment}
       variables={{ searchParams }}
       render={({ props }) => {
+        if (props === null) {
+          return renderLoadingPlaceholder({
+            query,
+            variables: { searchParams },
+            data: {
+              citiesPagination: { ...citiesPaginationDefaultData },
+            },
+            render: ({ props }: any) => {
+              return (
+                props && <CitiesPaginationRefetchContainer cities={props} />
+              );
+            },
+          });
+        }
         return props && <CitiesPaginationRefetchContainer cities={props} />;
       }}
     />

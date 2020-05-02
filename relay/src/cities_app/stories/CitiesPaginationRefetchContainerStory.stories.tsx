@@ -1,5 +1,5 @@
 import * as React from "react";
-import { createRelayEnvironment } from "../env";
+import { createRelayEnvironment, loadingForeverEnvironment } from "../env";
 import CitiesPagination from "../components/CitiesPaginationRefetchContainer";
 
 export default { title: "cities_app-demo1/CitiesPaginationRefetchContainer" };
@@ -12,7 +12,7 @@ export const Aaa = () => {
       searchParams={{
         countryNameContains: null,
         populationGte: null,
-        populationLte: null
+        populationLte: null,
       }}
     />
   );
@@ -26,7 +26,21 @@ export const Bbb = () => {
       searchParams={{
         countryNameContains: "united",
         populationGte: null,
-        populationLte: null
+        populationLte: null,
+      }}
+    />
+  );
+};
+
+export const loading = () => {
+  const environment = loadingForeverEnvironment();
+  return (
+    <CitiesPagination
+      environment={environment}
+      searchParams={{
+        countryNameContains: null,
+        populationGte: null,
+        populationLte: null,
       }}
     />
   );

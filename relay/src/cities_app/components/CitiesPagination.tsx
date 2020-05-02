@@ -72,5 +72,7 @@ export const defaultData = {
     { ...cityDefaultData, id: "1" },
     { ...cityDefaultData, id: "2" },
     { ...cityDefaultData, id: "3" },
+    { ...cityDefaultData, id: "4" },
+    { ...cityDefaultData, id: "5" },
   ],
 };
