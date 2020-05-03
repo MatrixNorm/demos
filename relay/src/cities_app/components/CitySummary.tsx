@@ -1,7 +1,7 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
-import styled, { css } from "styled-components";
-import LoadingContext from "../LoadingContext";
+import styled from "styled-components";
+import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
 interface Props {
@@ -40,32 +40,21 @@ const CitySummarySuccess = styled.section`
   }
 `;
 
-const sharedStyle = css`
-  content: "";
-  background: silver;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-`;
-
 const CitySummaryLoading = styled(CitySummarySuccess)`
   .country::after {
-    ${sharedStyle}
+    ${placeholderCssMixin}
   }
 
   .name::after {
-    ${sharedStyle}
+    ${placeholderCssMixin}
   }
 
   .population::after {
-    ${sharedStyle}
+    ${placeholderCssMixin}
   }
 
   .population-label::after {
-    ${sharedStyle}
+    ${placeholderCssMixin}
   }
 `;
 

@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled, { css } from "styled-components";
-import LoadingContext from "../LoadingContext";
+import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
@@ -39,24 +39,13 @@ const ParameterSectionSuccess = styled.section`
   }
 `;
 
-const sharedStyle = css`
-  content: "";
-  background: silver;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-`;
-
 const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   .label::after {
-    ${sharedStyle}
+    ${placeholderCssMixin}
   }
 
   .input::after {
-    ${sharedStyle}
+    ${placeholderCssMixin}
   }
 
   matrixnorm-range-slider {

@@ -2,6 +2,7 @@ import * as React from "react";
 import { createContext } from "react";
 import { LocalQueryRenderer } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
+import { css } from "styled-components";
 import { noNetworkEnvironment } from "./env";
 
 const LoadingContext = createContext<Boolean>(false);
@@ -29,3 +30,14 @@ export function renderLoadingPlaceholder({
     </LoadingContext.Provider>
   );
 }
+
+export const placeholderCssMixin = css`
+  content: "";
+  background: silver;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+`;
