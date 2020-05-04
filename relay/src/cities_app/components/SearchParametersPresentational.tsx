@@ -1,5 +1,5 @@
 import * as React from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
@@ -98,8 +98,4 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
       )}
     </SearchParametersBlock>
   );
-}
-
-export function SearchParametersPresentationalLoading() {
-  return <div>loading!!</div>;
 }
