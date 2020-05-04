@@ -40,13 +40,7 @@ const ParameterSectionSuccess = styled.section`
 `;
 
 const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
-  .label::after {
-    ${placeholderCssMixin}
-  }
-
-  .input::after {
-    ${placeholderCssMixin}
-  }
+  ${placeholderCssMixin}
 
   matrixnorm-range-slider {
     visibility: hidden;
@@ -68,8 +62,8 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
   return (
     <SearchParametersBlock>
       <ParameterSection>
-        <div className="label">Country</div>
-        <div className="input">
+        <div className="label placeholder">Country</div>
+        <div className="input placeholder">
           <TextInput
             value={searchParams.countryNameContains}
             onChange={(e) =>
@@ -79,8 +73,8 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
         </div>
       </ParameterSection>
       <ParameterSection>
-        <div className="label">Population</div>
-        <div className="input">
+        <div className="label placeholder">Population</div>
+        <div className="input placeholder">
           <RangeSlider
             min={searchMetadata.populationLowerBound}
             max={searchMetadata.populationUpperBound}

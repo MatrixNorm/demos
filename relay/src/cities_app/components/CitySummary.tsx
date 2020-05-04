@@ -21,41 +21,24 @@ const CitySummarySuccess = styled.section`
     margin: 0.2em 0 0.2em 0;
   }
   .name {
-    position: relative;
     margin-right: 2px;
     font-weight: bold;
   }
   .country {
-    position: relative;
     font-size: 0.85em;
     color: #00bcd4;
   }
-  .population {
-    position: relative;
-  }
   .population-label {
-    position: relative;
     font-size: 0.9em;
     margin-right: 15px;
+  }
+  .placeholder {
+    position: relative;
   }
 `;
 
 const CitySummaryLoading = styled(CitySummarySuccess)`
-  .country::after {
-    ${placeholderCssMixin}
-  }
-
-  .name::after {
-    ${placeholderCssMixin}
-  }
-
-  .population::after {
-    ${placeholderCssMixin}
-  }
-
-  .population-label::after {
-    ${placeholderCssMixin}
-  }
+  ${placeholderCssMixin}
 `;
 
 export default createFragmentContainer(
@@ -65,12 +48,12 @@ export default createFragmentContainer(
     return (
       <CitySummary>
         <div className="row">
-          <span className="country">{city.country}</span>
+          <span className="country placeholder">{city.country}</span>
         </div>
         <div className="row row-name">
-          <span className="name">{city.name}</span>
+          <span className="name placeholder">{city.name}</span>
         </div>
-        <div className="row">
+        <div className="row placeholder">
           <label className="population-label">pop.</label>
           <span className="population">{city.population}</span>
         </div>
