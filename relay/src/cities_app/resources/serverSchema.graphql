@@ -57,6 +57,7 @@ type City implements Node {
   population: Int!
   lat: Float!
   lng: Float!
+  stereotypicalPhotoUrl: String!
 }
 
 type CitiesMetadata {

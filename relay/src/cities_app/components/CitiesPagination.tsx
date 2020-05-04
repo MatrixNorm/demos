@@ -1,3 +1,6 @@
+/**
+ * Single page of pagination.
+ */
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
@@ -15,7 +18,6 @@ const CitiesList = styled.ol`
 `;
 
 const Page = styled.div`
-  display: inline-block;
   .controls-container {
     text-align: center;
   }
@@ -27,9 +29,6 @@ interface Props {
   loadNextPage: (page: CitiesPagination_page) => void;
 }
 
-/**
- * Single page of pagination.
- */
 function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
   const { nodes, hasNext, hasPrev } = page;
   return (

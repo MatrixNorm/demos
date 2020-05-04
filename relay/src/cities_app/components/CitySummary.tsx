@@ -9,9 +9,6 @@ interface Props {
 }
 
 const CitySummarySuccess = styled.section`
-  width: 9em;
-  height: 5em;
-  display: inline-block;
   padding: 0 1em 0 1em;
   .row {
     text-align: right;
@@ -75,7 +72,7 @@ export default createFragmentContainer(
 export const defaultData = {
   __typename: "City",
   id: "1",
-  name: "aaaaaaa",
+  name: "aaaaaaaaa",
   country: "bbbbbbbbbbbb",
   population: 1000000,
 };
