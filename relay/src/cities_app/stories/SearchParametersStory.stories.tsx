@@ -4,6 +4,7 @@ import {
   createTestingEnv,
   loadingForeverEnvironment,
   createRelayEnvironment,
+  returnAsyncPayloadEnvironment,
 } from "../env";
 import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
 import SearchParameters, { EventType } from "../components/SearchParameters";
@@ -124,14 +125,21 @@ export const success = () => {
 };
 
 export const noServerData = () => {
-  const environment = createTestingEnv({
-    Query: {
-      citiesMetadata: () => null,
-    },
-    Node: {
-      __resolveType() {},
-    },
-  });
+  let count = 0;
+  const environment = returnAsyncPayloadEnvironment(() => {
+    if (count < 1) {
+      count++;
+      return {
+        citiesMetadata: null,
+      };
+    }
+    return {
+      citiesMetadata: {
+        populationLowerBound: 100000,
+        populationUpperBound: 1000000,
+      },
+    };
+  }, 1000);
   return (
     <div style={{ width: "200px" }}>
       <SearchParameters

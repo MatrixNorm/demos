@@ -13,7 +13,7 @@ import { SearchParametersNullableType } from "./SearchParameters";
 import { renderLoadingPlaceholder } from "../LoadingContext";
 
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
-import { CitiesPaginationRefetchContainer_cities } from "__relay__/CitiesPaginationRefetchContainer_cities.graphql";
+import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
 
 const loadNextPage = (relay: RelayRefetchProp) => (
@@ -44,15 +44,20 @@ const loadPrevPage = (relay: RelayRefetchProp) => (
 
 const CitiesPaginationRefetchContainer = createRefetchContainer(
   ({
-    cities,
+    root,
     relay,
   }: {
-    cities: CitiesPaginationRefetchContainer_cities;
+    root: CitiesPaginationRefetchContainer_root;
     relay: RelayRefetchProp;
   }) => {
-    return cities.citiesPagination ? (
+    /**
+     * Have to handle case of citiesPagination being null here
+     * instead of parent component that is more natural.
+     * See this issue https://github.com/facebook/relay/issues/2118
+     */
+    return root.citiesPagination ? (
       <CitiesPagination
-        page={cities.citiesPagination}
+        page={root.citiesPagination}
         loadNextPage={loadNextPage(relay)}
         loadPrevPage={loadPrevPage(relay)}
       />
@@ -61,8 +66,9 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
     );
   },
   {
-    cities: graphql`
-      fragment CitiesPaginationRefetchContainer_cities on Query
+    root: graphql`
+      fragment CitiesPaginationRefetchContainer_root on Query
+        @relay(mask: false)
         @argumentDefinitions(
           pageSize: { type: "Int" }
           after: { type: "String" }
@@ -87,7 +93,7 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
       $before: String
       $searchParams: CitySearchParamsInput
     ) {
-      ...CitiesPaginationRefetchContainer_cities
+      ...CitiesPaginationRefetchContainer_root
         @arguments(
           pageSize: $pageSize
           after: $after
@@ -111,7 +117,7 @@ export default ({ environment, searchParams }: Props) => {
       $before: String
       $searchParams: CitySearchParamsInput
     ) {
-      ...CitiesPaginationRefetchContainer_cities
+      ...CitiesPaginationRefetchContainer_root
         @arguments(
           pageSize: $pageSize
           after: $after
@@ -134,13 +140,12 @@ export default ({ environment, searchParams }: Props) => {
               citiesPagination: { ...citiesPaginationDefaultData },
             },
             render: ({ props }: any) => {
-              return (
-                props && <CitiesPaginationRefetchContainer cities={props} />
-              );
+              return props && <CitiesPaginationRefetchContainer root={props} />;
             },
           });
         }
-        return props && <CitiesPaginationRefetchContainer cities={props} />;
+        console.log(props.root);
+        return <CitiesPaginationRefetchContainer root={props} />;
       }}
     />
   );

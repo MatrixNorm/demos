@@ -53,7 +53,7 @@ export const createTestingEnv = (resolvers: any) => {
       {},
       variables
     );
-    //console.log(resp);
+    console.log(resp);
     return resp;
   });
 
@@ -90,7 +90,7 @@ export const returnAsyncPayloadEnvironment = (
 ) => {
   const network = Network.create(async () => {
     await new Promise((resolve) => setTimeout(resolve, timeout || 1000));
-    const resp = { data: payload };
+    const resp = { data: typeof payload === "function" ? payload() : payload };
     return resp;
   });
   const store = new Store(new RecordSource());
