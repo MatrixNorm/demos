@@ -6,7 +6,7 @@ tmpl.innerHTML = `
     }
     #input-container {
       position: relative;
-      height: 20px;
+      height: 14px;
     }
     input[type=range] {
       -webkit-appearance: none;
@@ -40,9 +40,10 @@ tmpl.innerHTML = `
     #lower-input::-webkit-slider-thumb {
       box-shadow: -4000px 0 0 4000px  #ddd;
     }
-    #lower-text {
-      float: left;
+    .range-label {
+      font-size: 0.9em;
     }
+    #lower-text {}
     #upper-text {
       float: right;
     }
@@ -53,8 +54,8 @@ tmpl.innerHTML = `
       <input id="lower-input" type="range" name="lower"/>
     </div>
     <div>
-      <span id="lower-text"></span>
-      <span id="upper-text"></span>
+      <span id="lower-text" class="range-label"></span>
+      <span id="upper-text" class="range-label"></span>
     </div>
   </div>
 `;

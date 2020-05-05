@@ -1,4 +1,5 @@
 import * as React from "react";
+import styled from "styled-components";
 import { LocalQueryRenderer, graphql } from "react-relay";
 import {
   createTestingEnv,
@@ -14,6 +15,12 @@ export default { title: "cities_app-demo1/SearchParameters" };
 
 // https://github.com/facebook/relay/issues/2394
 const mockRefType: any = null;
+
+const Box = styled.div`
+  display: flex;
+  width: 200px;
+  min-height: 200px;
+`;
 
 export const Presentational = () => {
   const searchParams = {
@@ -84,14 +91,14 @@ export const success = () => {
   });
   return (
     <div>
-      <div style={{ width: "200px" }}>
+      <Box>
         <SearchParameters
           environment={environment}
           render={(args) => {
             return <SearchParametersPresentational {...args} />;
           }}
         />
-      </div>
+      </Box>
       <br />
       <LocalQueryRenderer
         query={graphql`
@@ -141,14 +148,14 @@ export const noServerData = () => {
     };
   }, 1000);
   return (
-    <div style={{ width: "200px" }}>
+    <Box>
       <SearchParameters
         environment={environment}
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
       />
-    </div>
+    </Box>
   );
 };
 
@@ -164,41 +171,41 @@ export const serverError = () => {
     },
   });
   return (
-    <div style={{ width: "200px" }}>
+    <Box>
       <SearchParameters
         environment={environment}
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
       />
-    </div>
+    </Box>
   );
 };
 
 export const loading = () => {
   const environment = loadingForeverEnvironment();
   return (
-    <div style={{ width: "200px" }}>
+    <Box>
       <SearchParameters
         environment={environment}
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
       />
-    </div>
+    </Box>
   );
 };
 
 export const full = () => {
   const environment = createRelayEnvironment({ timeout: 1000 });
   return (
-    <div style={{ width: "200px" }}>
+    <Box>
       <SearchParameters
         environment={environment}
         render={(args) => {
           return <SearchParametersPresentational {...args} />;
         }}
       />
-    </div>
+    </Box>
   );
 };

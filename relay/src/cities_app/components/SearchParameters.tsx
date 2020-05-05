@@ -188,13 +188,6 @@ export const defaultData = {
   },
 };
 
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-`;
-
 const query = graphql`
   query SearchParametersQuery {
     citiesMetadata {
@@ -208,6 +201,30 @@ const query = graphql`
   }
 `;
 
+const StyledReload = styled.div`
+  text-align: center;
+  .message {
+    margin-bottom: 1em;
+  }
+`;
+
+function Reload({
+  message,
+  onClick,
+}: {
+  message: string;
+  onClick: () => void;
+}) {
+  return (
+    <StyledReload>
+      <div className="message">{message}</div>
+      <button onClick={onClick} className="button">
+        Reload
+      </button>
+    </StyledReload>
+  );
+}
+
 export default function SearchParametersOuterComponent({
   environment,
   render,
@@ -217,12 +234,12 @@ export default function SearchParametersOuterComponent({
 }) {
   const [reload, setReload] = useState(false);
   return (
-    <Container>
+    <div style={{ display: "flex", "align-items": "center" }}>
       {reload ? (
-        <div>
-          <div>something went wrong</div>
-          <button onClick={() => setReload(false)}>Reload</button>
-        </div>
+        <Reload
+          message="something went wrong"
+          onClick={() => setReload(false)}
+        />
       ) : (
         <QueryRenderer<SearchParametersQuery>
           query={query}
@@ -274,6 +291,6 @@ export default function SearchParametersOuterComponent({
           }}
         />
       )}
-    </Container>
+    </div>
   );
 }
