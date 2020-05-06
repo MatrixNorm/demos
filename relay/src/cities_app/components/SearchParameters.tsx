@@ -1,6 +1,5 @@
 import * as React from "react";
 import { useState } from "react";
-import styled from "styled-components";
 import { graphql, QueryRenderer, createFragmentContainer } from "react-relay";
 import {
   createOperationDescriptor,
@@ -8,6 +7,7 @@ import {
   IEnvironment,
 } from "relay-runtime";
 import { renderLoadingPlaceholder } from "../LoadingContext";
+import { Reload } from "../elements/LoadingError";
 
 import { NukeFragRef, NukeNulls } from "../typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
@@ -200,30 +200,6 @@ const query = graphql`
     }
   }
 `;
-
-const StyledReload = styled.div`
-  text-align: center;
-  .message {
-    margin-bottom: 1em;
-  }
-`;
-
-function Reload({
-  message,
-  onClick,
-}: {
-  message: string;
-  onClick: () => void;
-}) {
-  return (
-    <StyledReload>
-      <div className="message">{message}</div>
-      <button onClick={onClick} className="button">
-        Reload
-      </button>
-    </StyledReload>
-  );
-}
 
 export default function SearchParametersOuterComponent({
   environment,

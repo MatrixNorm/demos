@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import {
   QueryRenderer,
   graphql,
@@ -11,6 +12,7 @@ import CitiesPagination, {
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
 import { renderLoadingPlaceholder } from "../LoadingContext";
+import { Reload } from "../elements/LoadingError";
 
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
@@ -46,23 +48,28 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
   ({
     root,
     relay,
+    reload,
   }: {
     root: CitiesPaginationRefetchContainer_root;
     relay: RelayRefetchProp;
+    reload?: () => void;
   }) => {
     /**
      * Have to handle case of citiesPagination being null here
      * instead of parent component that is more natural.
      * See this issue https://github.com/facebook/relay/issues/2118
      */
-    return root.citiesPagination ? (
-      <CitiesPagination
-        page={root.citiesPagination}
-        loadNextPage={loadNextPage(relay)}
-        loadPrevPage={loadPrevPage(relay)}
-      />
-    ) : (
-      <div>ERROR</div>
+    if (!root.citiesPagination) {
+      reload && reload();
+    }
+    return (
+      root.citiesPagination && (
+        <CitiesPagination
+          page={root.citiesPagination}
+          loadNextPage={loadNextPage(relay)}
+          loadPrevPage={loadPrevPage(relay)}
+        />
+      )
     );
   },
   {
@@ -126,12 +133,22 @@ export default ({ environment, searchParams }: Props) => {
         )
     }
   `;
+  const [reload, setReload] = useState(false);
+  if (reload) {
+    return (
+      <Reload message="something went wrong" onClick={() => setReload(false)} />
+    );
+  }
   return (
     <QueryRenderer<CitiesPaginationRefetchContainerQuery>
       query={query}
       environment={environment}
       variables={{ searchParams }}
-      render={({ props }) => {
+      render={({ props, error }) => {
+        if (error) {
+          setReload(true);
+          return;
+        }
         if (props === null) {
           return renderLoadingPlaceholder({
             query,
@@ -144,8 +161,12 @@ export default ({ environment, searchParams }: Props) => {
             },
           });
         }
-        console.log(props.root);
-        return <CitiesPaginationRefetchContainer root={props} />;
+        return (
+          <CitiesPaginationRefetchContainer
+            root={props}
+            reload={() => setReload(true)}
+          />
+        );
       }}
     />
   );
