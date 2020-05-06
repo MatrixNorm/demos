@@ -85,12 +85,14 @@ export const returnPayloadEnvironment = (payload: any) => {
 };
 
 export const returnAsyncPayloadEnvironment = (
-  payload: any,
+  payloadGenFactory: () => any,
   timeout: number
 ) => {
+  const payloadGen = payloadGenFactory();
   const network = Network.create(async () => {
     await new Promise((resolve) => setTimeout(resolve, timeout || 1000));
-    const resp = { data: typeof payload === "function" ? payload() : payload };
+    const { value } = payloadGen.next();
+    const resp = { data: value };
     return resp;
   });
   const store = new Store(new RecordSource());

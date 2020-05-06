@@ -132,15 +132,11 @@ export const success = () => {
 };
 
 export const noServerData = () => {
-  let count = 0;
-  const environment = returnAsyncPayloadEnvironment(() => {
-    if (count < 1) {
-      count++;
-      return {
-        citiesMetadata: null,
-      };
-    }
-    return {
+  const environment = returnAsyncPayloadEnvironment(function*() {
+    yield {
+      citiesMetadata: null,
+    };
+    yield {
       citiesMetadata: {
         populationLowerBound: 100000,
         populationUpperBound: 1000000,

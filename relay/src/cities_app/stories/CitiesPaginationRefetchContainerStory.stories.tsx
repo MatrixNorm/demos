@@ -3,6 +3,7 @@ import {
   createRelayEnvironment,
   loadingForeverEnvironment,
   returnPayloadEnvironment,
+  returnAsyncPayloadEnvironment,
 } from "../env";
 import CitiesPagination from "../components/CitiesPaginationRefetchContainer";
 
@@ -52,6 +53,39 @@ export const loading = () => {
 
 export const nullResponse = () => {
   const environment = returnPayloadEnvironment({ citiesPagination: null });
+  return (
+    <CitiesPagination
+      environment={environment}
+      searchParams={{
+        countryNameContains: null,
+        populationGte: null,
+        populationLte: null,
+      }}
+    />
+  );
+};
+
+export const nullResponseThenReload = () => {
+  const environment = returnAsyncPayloadEnvironment(function*() {
+    yield {
+      citiesPagination: null,
+    };
+    yield {
+      citiesPagination: {
+        hasNext: false,
+        hasPrev: false,
+        nodes: [
+          { id: "7862", name: "Tokyo", country: "Japan", population: 35676000 },
+          {
+            id: "9792",
+            name: "New York",
+            country: "United States",
+            population: 19354922,
+          },
+        ],
+      },
+    };
+  }, 1000);
   return (
     <CitiesPagination
       environment={environment}

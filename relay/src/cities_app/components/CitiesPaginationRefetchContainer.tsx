@@ -75,7 +75,6 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
   {
     root: graphql`
       fragment CitiesPaginationRefetchContainer_root on Query
-        @relay(mask: false)
         @argumentDefinitions(
           pageSize: { type: "Int" }
           after: { type: "String" }
