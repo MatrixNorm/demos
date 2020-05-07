@@ -9,7 +9,7 @@ const LoadingContext = createContext<Boolean>(false);
 
 export default LoadingContext;
 
-export function renderLoadingPlaceholder({
+export function LoadingPlaceholder({
   query,
   variables,
   data,

@@ -6,7 +6,7 @@ import {
   getRequest,
   IEnvironment,
 } from "relay-runtime";
-import { renderLoadingPlaceholder } from "../LoadingContext";
+import { LoadingPlaceholder } from "../LoadingContext";
 import { Reload } from "../elements/LoadingError";
 
 import { NukeFragRef, NukeNulls } from "../typeUtils";
@@ -210,7 +210,7 @@ export default function SearchParametersOuterComponent({
 }) {
   const [reload, setReload] = useState(false);
   return (
-    <div style={{ display: "flex", "align-items": "center" }}>
+    <div style={{ display: "flex", alignItems: "center" }}>
       {reload ? (
         <Reload
           message="something went wrong"
@@ -227,30 +227,32 @@ export default function SearchParametersOuterComponent({
               return;
             }
             if (props === null) {
-              return renderLoadingPlaceholder({
-                query,
-                variables: {},
-                data: {
-                  citiesMetadata: { ...defaultData.searchMetadata },
-                  uiState: {
-                    citySearchParams: { ...defaultData.searchParams },
-                  },
-                },
-                render: ({ props }: any) => {
-                  return (
-                    props &&
-                    props.citiesMetadata &&
-                    props.uiState?.citySearchParams && (
-                      <SearchParametersFC
-                        searchMetadata={props.citiesMetadata}
-                        searchParams={props.uiState.citySearchParams}
-                        environment={environment}
-                        render={render}
-                      />
-                    )
-                  );
-                },
-              });
+              return (
+                <LoadingPlaceholder
+                  query={query}
+                  variables={{}}
+                  data={{
+                    citiesMetadata: { ...defaultData.searchMetadata },
+                    uiState: {
+                      citySearchParams: { ...defaultData.searchParams },
+                    },
+                  }}
+                  render={({ props }: any) => {
+                    return (
+                      props &&
+                      props.citiesMetadata &&
+                      props.uiState?.citySearchParams && (
+                        <SearchParametersFC
+                          searchMetadata={props.citiesMetadata}
+                          searchParams={props.uiState.citySearchParams}
+                          environment={environment}
+                          render={render}
+                        />
+                      )
+                    );
+                  }}
+                />
+              );
             }
             if (!props.citiesMetadata) {
               setReload(true);

@@ -1,12 +1,13 @@
 import * as React from "react";
 import { graphql, QueryRenderer } from "react-relay";
+import { IEnvironment } from "relay-runtime";
 import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
   returnAsyncPayloadEnvironment,
 } from "../env";
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
-import { renderLoadingPlaceholder } from "../LoadingContext";
+import { LoadingPlaceholder } from "../LoadingContext";
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitiesPagination" };
@@ -18,6 +19,50 @@ const query = graphql`
     }
   }
 `;
+
+const based = (env: IEnvironment) => {
+  return (
+    <QueryRenderer<CitiesPaginationStoryQuery>
+      query={query}
+      environment={env}
+      variables={{}}
+      render={({ props }) => {
+        if (props === null) {
+          return (
+            <LoadingPlaceholder
+              query={query}
+              variables={{}}
+              data={{
+                citiesPagination: defaultData,
+              }}
+              render={({ props }: any) => {
+                return (
+                  props &&
+                  props.citiesPagination && (
+                    <CitiesPagination
+                      page={props.citiesPagination}
+                      loadPrevPage={() => {}}
+                      loadNextPage={() => {}}
+                    />
+                  )
+                );
+              }}
+            />
+          );
+        }
+        return (
+          props.citiesPagination && (
+            <CitiesPagination
+              page={props.citiesPagination}
+              loadPrevPage={() => console.log("prev")}
+              loadNextPage={() => console.log("next")}
+            />
+          )
+        );
+      }}
+    />
+  );
+};
 
 const demoNodes = [
   {
@@ -54,110 +99,23 @@ export const success = () => {
       hasPrev: true,
     },
   });
-
-  return (
-    <QueryRenderer<CitiesPaginationStoryQuery>
-      query={query}
-      environment={environment}
-      variables={{}}
-      render={({ props }) => {
-        console.log(props);
-        return (
-          props &&
-          props.citiesPagination && (
-            <CitiesPagination
-              page={props.citiesPagination}
-              loadPrevPage={() => console.log("prev")}
-              loadNextPage={() => console.log("next")}
-            />
-          )
-        );
-      }}
-    />
-  );
+  return based(environment);
 };
 
 export const loading = () => {
-  return (
-    <QueryRenderer<CitiesPaginationStoryQuery>
-      query={query}
-      environment={loadingForeverEnvironment()}
-      variables={{}}
-      render={({ props }) => {
-        if (props === null) {
-          return renderLoadingPlaceholder({
-            query,
-            variables: {},
-            data: {
-              citiesPagination: defaultData,
-            },
-            render: ({ props }: any) => {
-              return (
-                props &&
-                props.citiesPagination && (
-                  <CitiesPagination
-                    page={props.citiesPagination}
-                    loadPrevPage={() => {}}
-                    loadNextPage={() => {}}
-                  />
-                )
-              );
-            },
-          });
-        }
-        return null;
-      }}
-    />
-  );
+  const environment = loadingForeverEnvironment();
+  return based(environment);
 };
 
 export const full = () => {
-  return (
-    <QueryRenderer<CitiesPaginationStoryQuery>
-      query={query}
-      environment={returnAsyncPayloadEnvironment(
-        {
-          citiesPagination: {
-            nodes: demoNodes,
-            hasNext: true,
-            hasPrev: true,
-          },
-        },
-        1000
-      )}
-      variables={{}}
-      render={({ props }) => {
-        if (props === null) {
-          return renderLoadingPlaceholder({
-            query,
-            variables: {},
-            data: {
-              citiesPagination: defaultData,
-            },
-            render: ({ props }: any) => {
-              return (
-                props &&
-                props.citiesPagination && (
-                  <CitiesPagination
-                    page={props.citiesPagination}
-                    loadPrevPage={() => {}}
-                    loadNextPage={() => {}}
-                  />
-                )
-              );
-            },
-          });
-        }
-        return (
-          props.citiesPagination && (
-            <CitiesPagination
-              page={props.citiesPagination}
-              loadPrevPage={() => console.log("prev")}
-              loadNextPage={() => console.log("next")}
-            />
-          )
-        );
-      }}
-    />
-  );
+  const environment = returnAsyncPayloadEnvironment(function*() {
+    yield {
+      citiesPagination: {
+        nodes: demoNodes,
+        hasNext: true,
+        hasPrev: true,
+      },
+    };
+  }, 1000);
+  return based(environment);
 };

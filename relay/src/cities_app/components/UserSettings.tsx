@@ -19,7 +19,7 @@ export const Section = styled.section`
   display: flex;
   min-height: 30px;
 
-  .editing: {
+  .editing {
     background: red;
   }
 
@@ -145,3 +145,13 @@ export default createFragmentContainer(UserSettingsComponent, {
     }
   `,
 });
+
+export const defaultData = {
+  __typename: "User",
+  id: "1",
+  settings: {
+    citiesPaginationPageSize: 5,
+    foo: "",
+    bar: 1,
+  },
+};

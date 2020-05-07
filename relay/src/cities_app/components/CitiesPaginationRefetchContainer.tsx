@@ -11,7 +11,7 @@ import CitiesPagination, {
   defaultData as citiesPaginationDefaultData,
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
-import { renderLoadingPlaceholder } from "../LoadingContext";
+import { LoadingPlaceholder } from "../LoadingContext";
 import { Reload } from "../elements/LoadingError";
 
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
@@ -149,16 +149,20 @@ export default ({ environment, searchParams }: Props) => {
           return;
         }
         if (props === null) {
-          return renderLoadingPlaceholder({
-            query,
-            variables: { searchParams },
-            data: {
-              citiesPagination: { ...citiesPaginationDefaultData },
-            },
-            render: ({ props }: any) => {
-              return props && <CitiesPaginationRefetchContainer root={props} />;
-            },
-          });
+          return (
+            <LoadingPlaceholder
+              query={query}
+              variables={{ searchParams }}
+              data={{
+                citiesPagination: { ...citiesPaginationDefaultData },
+              }}
+              render={({ props }: any) => {
+                return (
+                  props && <CitiesPaginationRefetchContainer root={props} />
+                );
+              }}
+            />
+          );
         }
         return (
           <CitiesPaginationRefetchContainer
