@@ -14,8 +14,7 @@ export function LoadingPlaceholderQueryRenderer({
   environment,
   variables,
   placeholderData,
-  renderHappyPath,
-  happyPredicate,
+  render,
 }: any) {
   return (
     <QueryRenderer
@@ -23,25 +22,17 @@ export function LoadingPlaceholderQueryRenderer({
       environment={environment}
       variables={variables}
       render={({ props, error }: any) => {
-        // if (error) {
-        //   setReload(true);
-        //   return;
-        // }
-        if (props === null) {
+        if (!error && props === null) {
           return (
             <LoadingPlaceholder
               query={query}
               variables={{}}
               data={placeholderData}
-              render={renderHappyPath}
+              render={render}
             />
           );
         }
-        // if (!happyPredicate(props)) {
-        //   setReload(true);
-        //   return;
-        // }
-        return renderHappyPath(props);
+        return render({ props, error });
       }}
     />
   );
