@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createContext } from "react";
-import { LocalQueryRenderer } from "react-relay";
+import { LocalQueryRenderer, QueryRenderer } from "react-relay";
 import { createOperationDescriptor, getRequest } from "relay-runtime";
 import { css, keyframes } from "styled-components";
 import { noNetworkEnvironment } from "./env";
@@ -9,12 +9,45 @@ const LoadingContext = createContext<Boolean>(false);
 
 export default LoadingContext;
 
-export function LoadingPlaceholder({
+export function LoadingPlaceholderQueryRenderer({
   query,
+  environment,
   variables,
-  data,
-  render,
+  placeholderData,
+  renderHappyPath,
+  happyPredicate,
 }: any) {
+  return (
+    <QueryRenderer
+      query={query}
+      environment={environment}
+      variables={variables}
+      render={({ props, error }: any) => {
+        // if (error) {
+        //   setReload(true);
+        //   return;
+        // }
+        if (props === null) {
+          return (
+            <LoadingPlaceholder
+              query={query}
+              variables={{}}
+              data={placeholderData}
+              render={renderHappyPath}
+            />
+          );
+        }
+        // if (!happyPredicate(props)) {
+        //   setReload(true);
+        //   return;
+        // }
+        return renderHappyPath(props);
+      }}
+    />
+  );
+}
+
+export function LoadingPlaceholder({ query, variables, data, render }: any) {
   const env = noNetworkEnvironment();
   const request = getRequest(query);
   const operation = createOperationDescriptor(request, variables);
