@@ -68,19 +68,14 @@ function SectionComponent({
   );
 }
 
-export default function UserSettingsPure({
-  citiesPaginationPageSize,
-  foo,
-  bar,
-  onSubmit,
-}: any) {
+export default function UserSettingsPure({ fields, onSubmit }: any) {
   const isLoading = React.useContext(LoadingContext);
   const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
   return (
     <UserSettings>
       <SectionComponent
         field={{
-          ...citiesPaginationPageSize,
+          ...fields.citiesPaginationPageSize,
           name: "citiesPaginationPageSize",
         }}
         label="Pagination Page Size"
@@ -89,7 +84,7 @@ export default function UserSettingsPure({
       </SectionComponent>
       <SectionComponent
         field={{
-          ...foo,
+          ...fields.foo,
           name: "citiesPaginationPageSize",
         }}
         label="Foo parameter"
@@ -98,7 +93,7 @@ export default function UserSettingsPure({
       </SectionComponent>
       <SectionComponent
         field={{
-          ...bar,
+          ...fields.bar,
           name: "citiesPaginationPageSize",
         }}
         label="Bar parameter"
@@ -110,7 +105,11 @@ export default function UserSettingsPure({
           <SubmitButton
             onClick={onSubmit}
             test-id="submit-button"
-            className={diff(null) ? "editing" : ""}
+            className={
+              Object.values(fields).some((field: any) => field.isEdited)
+                ? "edited"
+                : ""
+            }
           >
             Sync
           </SubmitButton>
