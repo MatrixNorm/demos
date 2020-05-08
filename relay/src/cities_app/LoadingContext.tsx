@@ -32,6 +32,9 @@ export function LoadingPlaceholderQueryRenderer({
             />
           );
         }
+        if (error) {
+          throw new Error();
+        }
         return render({ props, error });
       }}
     />
