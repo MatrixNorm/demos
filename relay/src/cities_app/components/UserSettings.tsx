@@ -195,20 +195,3 @@ export const defaultData = {
     bar: 1,
   },
 };
-
-{
-  /* <Section
-  test-id="citiesPaginationPageSize-section"
-  className={diff("citiesPaginationPageSize") ? "editing" : ""}
->
-  <div className="setting-name">
-    <span className="setting-name-label placeholder">Pagination Page Size</span>
-  </div>
-  <NumberInput
-    step="1"
-    value={locCache["citiesPaginationPageSize"]}
-    onChange={makeHandler("citiesPaginationPageSize", Number)}
-    test-id="citiesPaginationPageSize-input"
-  />
-</Section>; */
-}
