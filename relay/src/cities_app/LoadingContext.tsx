@@ -1,13 +1,27 @@
 import * as React from "react";
 import { createContext } from "react";
 import { LocalQueryRenderer, QueryRenderer } from "react-relay";
-import { createOperationDescriptor, getRequest } from "relay-runtime";
+import {
+  createOperationDescriptor,
+  Environment,
+  getRequest,
+  Network,
+  RecordSource,
+  Store,
+} from "relay-runtime";
 import { css, keyframes } from "styled-components";
-import { noNetworkEnvironment } from "./env";
 
 const LoadingContext = createContext<Boolean>(false);
-
 export default LoadingContext;
+
+const noNetworkEnvironment = () => {
+  const network = Network.create(() => {
+    return { data: {} };
+  });
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};
 
 export function LoadingPlaceholderQueryRenderer({
   query,

@@ -50,7 +50,7 @@ function SectionComponent({
   return (
     <Section
       test-id={`${field.name}-section`}
-      className={field.isEdited ? "edited" : ""}
+      className={field.isEdited ? "editing" : ""}
     >
       <div className="setting-name">
         <span className="setting-name-label placeholder">{label}</span>
@@ -60,7 +60,7 @@ function SectionComponent({
           return React.cloneElement(child, {
             value: field.value,
             onChange: field.onChange,
-            "test-id": `${field}-input`,
+            "test-id": `${field.name}-input`,
           });
         })}
       </div>
@@ -85,7 +85,7 @@ export default function UserSettingsPure({ fields, onSubmit }: any) {
       <SectionComponent
         field={{
           ...fields.foo,
-          name: "citiesPaginationPageSize",
+          name: "foo",
         }}
         label="Foo parameter"
       >
@@ -94,7 +94,7 @@ export default function UserSettingsPure({ fields, onSubmit }: any) {
       <SectionComponent
         field={{
           ...fields.bar,
-          name: "citiesPaginationPageSize",
+          name: "bar",
         }}
         label="Bar parameter"
       >
@@ -107,7 +107,7 @@ export default function UserSettingsPure({ fields, onSubmit }: any) {
             test-id="submit-button"
             className={
               Object.values(fields).some((field: any) => field.isEdited)
-                ? "edited"
+                ? "editing"
                 : ""
             }
           >
