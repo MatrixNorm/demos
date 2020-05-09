@@ -1,5 +1,5 @@
 import * as React from "react";
-import { graphql, createFragmentContainer } from "react-relay";
+import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation";
 import UserSettingsPresentational from "./UserSettingsPresentational";
 import { useLocalCache } from "../helpers/ComponentLocalCacheHook";
@@ -10,24 +10,16 @@ export type UserSettingsType = UserSettings_user["settings"];
 
 type Props = {
   user: UserSettings_user;
-  relay: any;
+  relay: RelayProp;
 };
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
-  const [locCache, setLocCache, isEdited] = useLocalCache<UserSettingsType>(
-    user.settings
-  );
-  //console.log("UserSettingsComponent", user.settings, locCache);
+  const [locCache, setLocCache, isEdited, getDelta] = useLocalCache<
+    UserSettingsType
+  >(user.settings);
 
   const handleSubmit = () => {
-    const delta: Omit<UpdateUserSettingsInput, "userId"> = {};
-    for (let attr of Object.keys(user.settings)) {
-      //@ts-ignore
-      if (locCache[attr] !== user.settings[attr]) {
-        //@ts-ignore
-        delta[attr] = locCache[attr];
-      }
-    }
+    const delta = getDelta();
     if (Object.values(delta).length > 0) {
       UpdateUserSettingsMutation.commit({
         environment: relay.environment,

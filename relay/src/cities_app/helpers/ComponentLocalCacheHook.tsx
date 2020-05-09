@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from "react";
 type ReturnTuple<T> = [
   T,
   React.Dispatch<React.SetStateAction<T>>,
-  (attr: keyof T | null) => boolean
+  (attr: keyof T | null) => boolean,
+  () => any
 ];
 
 export function useLocalCache<T extends object>(
@@ -29,5 +30,17 @@ export function useLocalCache<T extends object>(
     return JSON.stringify(storeValue) !== JSON.stringify(localValue);
   };
 
-  return [localValue, setLocalValue, isEdited];
+  const getDelta = () => {
+    const delta = {};
+    for (let attr of Object.keys(storeValue)) {
+      //@ts-ignore
+      if (localValue[attr] !== storeValue[attr]) {
+        //@ts-ignore
+        delta[attr] = localValue[attr];
+      }
+    }
+    return delta;
+  };
+
+  return [localValue, setLocalValue, isEdited, getDelta];
 }
