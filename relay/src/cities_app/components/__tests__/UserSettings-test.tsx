@@ -5,7 +5,7 @@ import {
   commitLocalUpdate,
   createOperationDescriptor,
   getRequest,
-  OperationDescriptor
+  OperationDescriptor,
 } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
@@ -42,7 +42,7 @@ describe("???", () => {
   let initialSettings: UserSettingsType = {
     citiesPaginationPageSize: 10,
     foo: "foo_value",
-    bar: 15
+    bar: 15,
   };
   let inputElements: any = {};
   let sectionElements: any = {};
@@ -75,36 +75,36 @@ describe("???", () => {
           return {
             id: "user#1",
             name: "Covid19",
-            settings: initialSettings
+            settings: initialSettings,
           };
-        }
+        },
       });
       return payload;
     });
     inputElements = {
       citiesPaginationPageSize: container.root.findByProps({
-        "test-id": "citiesPaginationPageSize-input"
+        "test-id": "citiesPaginationPageSize-input",
       }),
       foo: container.root.findByProps({
-        "test-id": "foo-input"
+        "test-id": "foo-input",
       }),
       bar: container.root.findByProps({
-        "test-id": "bar-input"
-      })
+        "test-id": "bar-input",
+      }),
     };
     sectionElements = {
       citiesPaginationPageSize: container.root.findByProps({
-        "test-id": "citiesPaginationPageSize-section"
+        "test-id": "citiesPaginationPageSize-section",
       }),
       foo: container.root.findByProps({
-        "test-id": "foo-section"
+        "test-id": "foo-section",
       }),
       bar: container.root.findByProps({
-        "test-id": "bar-section"
-      })
+        "test-id": "bar-section",
+      }),
     };
     submitButton = container.root.findByProps({
-      "test-id": "submit-button"
+      "test-id": "submit-button",
     });
 
     TestRenderer.act(() => {});
@@ -124,7 +124,7 @@ describe("???", () => {
      * that are delivered to component via props. E.g. consider implementation
      * by `setState` hook.
      */
-    commitLocalUpdate(env, store => {
+    commitLocalUpdate(env, (store) => {
       const settings = store
         .get("client:root")
         ?.getLinkedRecord("viewer")
@@ -157,14 +157,14 @@ describe("???", () => {
     expect(submitButton.props.className.includes("editing")).toBe(false);
 
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: changedValue } });
+      input.props.onChange(changedValue);
     });
     expect(input.props.value).toEqual(changedValue);
     expect(section.props.className.includes("editing")).toBe(true);
     expect(submitButton.props.className.includes("editing")).toBe(true);
 
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: initialValue } });
+      input.props.onChange(initialValue);
     });
     expect(input.props.value).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(false);
@@ -205,7 +205,7 @@ describe("???", () => {
     expect(submitButton.props.className.includes("editing")).toBe(false);
     // change component's local state
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: newValue } });
+      input.props.onChange(newValue);
     });
     expect(input.props.value).toEqual(newValue);
     expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
@@ -221,8 +221,8 @@ describe("???", () => {
     expect(mutation.root.variables).toMatchObject({
       input: {
         userId: "user#1",
-        [name]: newValue
-      }
+        [name]: newValue,
+      },
     });
     // optimistic update is applied
     expect(input.props.value).toEqual(newValue);
@@ -238,11 +238,11 @@ describe("???", () => {
               id: "user#1",
               settings: {
                 ...initialSettings,
-                [name]: newValue + 1
-              }
-            }
+                [name]: newValue + 1,
+              },
+            },
           };
-        }
+        },
       });
       return payload;
     });
@@ -291,8 +291,8 @@ describe("???", () => {
     expect(mutation.root.variables).toMatchObject({
       input: {
         userId: "user#1",
-        [name]: newValue
-      }
+        [name]: newValue,
+      },
     });
     // optimistic update is applied
     expect(input.props.value).toEqual(newValue);
@@ -308,11 +308,11 @@ describe("???", () => {
               id: "user#1",
               settings: {
                 ...initialSettings,
-                [name]: newValue + 1
-              }
-            }
+                [name]: newValue + 1,
+              },
+            },
           };
-        }
+        },
       });
       return payload;
     });
@@ -336,7 +336,7 @@ describe("???", () => {
     const input = inputElements.citiesPaginationPageSize;
 
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: newValue } });
+      input.props.onChange(newValue);
     });
     TestRenderer.act(() => {
       submitButton.props.onClick();
@@ -353,11 +353,11 @@ describe("???", () => {
               settings: {
                 ...initialSettings,
                 citiesPaginationPageSize: newValue,
-                bar: initialSettings.bar + 1
-              }
-            }
+                bar: initialSettings.bar + 1,
+              },
+            },
           };
-        }
+        },
       });
       return payload;
     });

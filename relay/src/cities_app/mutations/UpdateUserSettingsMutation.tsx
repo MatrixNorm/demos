@@ -2,7 +2,7 @@ import { commitMutation, graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import {
   UpdateUserSettingsInput,
-  UpdateUserSettingsMutationResponse
+  UpdateUserSettingsMutationResponse,
 } from "__relay__/UpdateUserSettingsMutation.graphql";
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 
@@ -36,17 +36,17 @@ function buildOptimisticResponse(
             input.citiesPaginationPageSize ||
             currentSettings.citiesPaginationPageSize,
           foo: input.foo || currentSettings.foo,
-          bar: input.bar || currentSettings.bar
-        }
-      }
-    }
+          bar: input.bar || currentSettings.bar,
+        },
+      },
+    },
   };
 }
 
 function commit({
   environment,
   input,
-  currentSettings
+  currentSettings,
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
@@ -56,9 +56,9 @@ function commit({
   return commitMutation(environment, {
     mutation,
     variables: {
-      input
+      input,
     },
-    optimisticResponse: buildOptimisticResponse(input, currentSettings)
+    optimisticResponse: buildOptimisticResponse(input, currentSettings),
   });
 }
 
