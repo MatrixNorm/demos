@@ -1,11 +1,20 @@
+import * as React from "react";
 import styled from "styled-components";
 
-export const TextInput = styled.input.attrs(props => ({ type: "text" }))`
+const TextInput_ = (props: any) => {
+  props = { ...props, onChange: (e: any) => e.target.value };
+  return <input type="number" {...props} />;
+};
+export const TextInput = styled(TextInput_)`
   padding: 0;
   margin: 0;
 `;
 
-export const NumberInput = styled.input.attrs(props => ({ type: "number" }))`
+const NumberInput_ = (props: any) => {
+  props = { ...props, onChange: (e: any) => Number(e.target.value) };
+  return <input type="number" {...props} />;
+};
+export const NumberInput = styled(NumberInput_)`
   padding: 0;
   margin: 0;
 `;

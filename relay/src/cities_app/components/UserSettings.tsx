@@ -1,8 +1,8 @@
 import * as React from "react";
-import { useEffect, useRef, useState } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation";
 import UserSettingsPresentational from "./UserSettingsPresentational";
+import { useLocalCache } from "../helpers/ComponentLocalCacheHook";
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 import { UpdateUserSettingsInput } from "__relay__/UpdateUserSettingsMutation.graphql";
 
@@ -14,85 +14,51 @@ type Props = {
 };
 
 export const UserSettingsComponent = ({ user, relay }: Props) => {
-  const [locCache, setLocCache] = useState(user.settings);
+  const [locCache, setLocCache, isEdited] = useLocalCache<UserSettingsType>(
+    user.settings
+  );
   //console.log("UserSettingsComponent", user.settings, locCache);
-  const prevUserSettings = useRef<string | null>(null);
-
-  useEffect(() => {
-    const jsoned = JSON.stringify(user.settings);
-    if (prevUserSettings.current !== jsoned) {
-      if (prevUserSettings.current) {
-        setLocCache(user.settings);
-      }
-      prevUserSettings.current = jsoned;
-    }
-  });
-
-  const diff = (attr: keyof UserSettingsType | null) => {
-    if (attr) {
-      return user.settings[attr] !== locCache[attr];
-    }
-    return (
-      Object.keys(user.settings)
-        //@ts-ignore
-        .map((attr) => user.settings[attr] !== locCache[attr])
-        .some(Boolean)
-    );
-  };
-
-  const makeHandler = (
-    param: keyof UserSettingsType,
-    transform: (_: string) => any = (x) => x
-  ) => {
-    return (e: React.ChangeEvent<HTMLInputElement>) => {
-      let value = transform(e.target.value);
-      setLocCache({
-        ...locCache,
-        [param]: value,
-      });
-    };
-  };
 
   const handleSubmit = () => {
-    const diff: Omit<UpdateUserSettingsInput, "userId"> = {};
+    const delta: Omit<UpdateUserSettingsInput, "userId"> = {};
     for (let attr of Object.keys(user.settings)) {
       //@ts-ignore
       if (locCache[attr] !== user.settings[attr]) {
         //@ts-ignore
-        diff[attr] = locCache[attr];
+        delta[attr] = locCache[attr];
       }
     }
-    const isDiffReal = Object.values(diff).filter(Boolean).length > 0;
-    if (isDiffReal) {
+    if (Object.values(delta).length > 0) {
       UpdateUserSettingsMutation.commit({
         environment: relay.environment,
         input: {
           userId: user.id,
-          ...diff,
+          ...delta,
         },
         currentSettings: user.settings,
       });
     }
   };
 
+  function abc(attr: keyof UserSettingsType) {
+    return {
+      value: locCache[attr],
+      isEdited: isEdited(attr),
+      onChange: (value: any) => {
+        setLocCache({
+          ...locCache,
+          [attr]: value,
+        });
+      },
+    };
+  }
+
   return (
     <UserSettingsPresentational
       fields={{
-        citiesPaginationPageSize: {
-          value: locCache.citiesPaginationPageSize,
-          isEdited: diff("citiesPaginationPageSize"),
-          onChange: makeHandler("citiesPaginationPageSize", Number),
-        },
-        foo: {
-          value: locCache.foo,
-          isEdited: diff("foo"),
-          onChange: makeHandler("foo"),
-        },
-        bar: {
-          value: locCache.bar,
-          isEdited: diff("bar"),
-          onChange: makeHandler("bar", Number),
-        },
+        citiesPaginationPageSize: abc("citiesPaginationPageSize"),
+        foo: abc("foo"),
+        bar: abc("bar"),
       }}
       onSubmit={handleSubmit}
     />
@@ -117,7 +83,7 @@ export const defaultData = {
   id: "1",
   settings: {
     citiesPaginationPageSize: 5,
-    foo: "",
+    foo: "a",
     bar: 1,
   },
 };
