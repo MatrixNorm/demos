@@ -4,7 +4,7 @@ type ReturnTuple<T> = [
   T,
   React.Dispatch<React.SetStateAction<T>>,
   (attr: keyof T | null) => boolean,
-  () => any
+  () => Partial<T>
 ];
 
 export function useLocalCache<T extends object>(
@@ -31,7 +31,7 @@ export function useLocalCache<T extends object>(
   };
 
   const getDelta = () => {
-    const delta = {};
+    const delta: Partial<T> = {};
     for (let attr of Object.keys(storeValue)) {
       //@ts-ignore
       if (localValue[attr] !== storeValue[attr]) {

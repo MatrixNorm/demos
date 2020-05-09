@@ -4,7 +4,6 @@ import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation"
 import UserSettingsPresentational from "./UserSettingsPresentational";
 import { useLocalCache } from "../helpers/ComponentLocalCacheHook";
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
-import { UpdateUserSettingsInput } from "__relay__/UpdateUserSettingsMutation.graphql";
 
 export type UserSettingsType = UserSettings_user["settings"];
 
@@ -20,7 +19,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
 
   const handleSubmit = () => {
     const delta = getDelta();
-    if (Object.values(delta).length > 0) {
+    if (Object.values(delta).map(Boolean).length > 0) {
       UpdateUserSettingsMutation.commit({
         environment: relay.environment,
         input: {
