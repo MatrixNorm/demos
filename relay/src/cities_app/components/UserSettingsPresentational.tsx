@@ -33,17 +33,12 @@ export const UserSettingsLoading = styled(UserSettingsSuccess)`
   ${placeholderCssMixin}
 `;
 
-function SectionComponent({
+function SectionComponent<K extends keyof UserSettingsType>({
   field,
   label,
   children,
 }: {
-  field: {
-    name: keyof UserSettingsType;
-    isEdited: Boolean;
-    value: any;
-    onChange: any;
-  };
+  field: SingleFieldType<UserSettingsType, K, UserSettingsType[K]>;
   label: string;
   children: any;
 }) {
@@ -68,19 +63,19 @@ function SectionComponent({
   );
 }
 
-type XYZ<T extends object, K extends keyof T, V extends T[K]> = {
+type SingleFieldType<T extends object, K extends keyof T, V extends T[K]> = {
   name: K;
   value: V;
   isEdited: Boolean;
   onChange: (_: V) => void;
 };
 
-type ABC = {
-  [K in keyof UserSettingsType]: XYZ<UserSettingsType, K, UserSettingsType[K]>;
+type FieldsConfigType<T extends object> = {
+  [K in keyof T]: SingleFieldType<T, K, T[K]>;
 };
 
 type Props = {
-  fields: ABC;
+  fields: FieldsConfigType<UserSettingsType>;
   onSubmit: any;
 };
 
@@ -90,30 +85,15 @@ export default function UserSettingsPure({ fields, onSubmit }: Props) {
   return (
     <UserSettings>
       <SectionComponent
-        field={{
-          ...fields.citiesPaginationPageSize,
-          name: "citiesPaginationPageSize",
-        }}
+        field={fields.citiesPaginationPageSize}
         label="Pagination Page Size"
       >
         <NumberInput step="1" />
       </SectionComponent>
-      <SectionComponent
-        field={{
-          ...fields.foo,
-          name: "foo",
-        }}
-        label="Foo parameter"
-      >
+      <SectionComponent field={fields.foo} label="Foo parameter">
         <TextInput />
       </SectionComponent>
-      <SectionComponent
-        field={{
-          ...fields.bar,
-          name: "bar",
-        }}
-        label="Bar parameter"
-      >
+      <SectionComponent field={fields.bar} label="Bar parameter">
         <NumberInput step="1" />
       </SectionComponent>
       <div className="button-box">
