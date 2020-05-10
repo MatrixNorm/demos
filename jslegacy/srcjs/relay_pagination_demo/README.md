@@ -1,1 +1,0 @@
-https://github.com/facebook/relay/issues/1983
