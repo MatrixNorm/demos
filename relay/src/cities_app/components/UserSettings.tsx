@@ -35,7 +35,7 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
     return {
       value: locCache[attr],
       isEdited: isEdited(attr),
-      onChange: (value: any) => {
+      onChange: (value: unknown) => {
         setLocCache({
           ...locCache,
           [attr]: value,

@@ -1,13 +1,16 @@
 import * as React from "react";
 import styled from "styled-components";
 
-const TextInput_ = (props: any) => {
-  const { onChange } = props;
-  props = {
+const noop = () => {};
+
+const TextInput_ = (props: { onChange?: (value: string) => void }) => {
+  const { onChange = noop } = props;
+  const newProps = {
     ...props,
-    onChange: (e: any) => onChange(e.target.value),
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      onChange(e.target.value),
   };
-  return <input type="text" {...props} />;
+  return <input type="text" {...newProps} />;
 };
 
 export const TextInput = styled(TextInput_)`
@@ -15,13 +18,17 @@ export const TextInput = styled(TextInput_)`
   margin: 0;
 `;
 
-const NumberInput_ = (props: any) => {
-  const { onChange } = props;
-  props = {
+const NumberInput_ = (props: {
+  step: string;
+  onChange?: (value: number) => void;
+}) => {
+  const { onChange = noop } = props;
+  const newProps = {
     ...props,
-    onChange: (e: any) => onChange(Number(e.target.value)),
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+      onChange(Number(e.target.value)),
   };
-  return <input type="number" {...props} />;
+  return <input type="number" {...newProps} />;
 };
 
 export const NumberInput = styled(NumberInput_)`
