@@ -68,7 +68,23 @@ function SectionComponent({
   );
 }
 
-export default function UserSettingsPure({ fields, onSubmit }: any) {
+type XYZ<T extends object, K extends keyof T, V extends T[K]> = {
+  name: K;
+  value: V;
+  isEdited: Boolean;
+  onChange: (_: V) => void;
+};
+
+type ABC = {
+  [K in keyof UserSettingsType]: XYZ<UserSettingsType, K, UserSettingsType[K]>;
+};
+
+type Props = {
+  fields: ABC;
+  onSubmit: any;
+};
+
+export default function UserSettingsPure({ fields, onSubmit }: Props) {
   const isLoading = React.useContext(LoadingContext);
   const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
   return (

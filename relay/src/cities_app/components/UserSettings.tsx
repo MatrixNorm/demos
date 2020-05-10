@@ -31,11 +31,13 @@ export const UserSettingsComponent = ({ user, relay }: Props) => {
     }
   };
 
-  function abc(attr: keyof UserSettingsType) {
+  function abc<K extends keyof UserSettingsType, V extends UserSettingsType[K]>(
+    attr: K
+  ) {
     return {
       value: locCache[attr],
       isEdited: isEdited(attr),
-      onChange: (value: unknown) => {
+      onChange: (value: V) => {
         setLocCache({
           ...locCache,
           [attr]: value,
