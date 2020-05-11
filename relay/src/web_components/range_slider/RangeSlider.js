@@ -90,9 +90,9 @@ export default class RangeSlider extends HTMLElement {
     this.lowerInput.setAttribute("max", max);
     this.lowerInput.setAttribute("step", step);
     this.lowerInput.value = x1 ? x1 : min;
-     this.lowerInput.addEventListener("change", this.onLowerChange);
+    this.lowerInput.addEventListener("change", this.onLowerChange);
     this.lowerInput.addEventListener("input", this.onLowerInput);
-    this.setLowerText(Number(min));
+    this.setLowerText(this.lowerInput.value);
 
     this.upperInput.setAttribute("min", min);
     this.upperInput.setAttribute("max", max);
@@ -100,7 +100,7 @@ export default class RangeSlider extends HTMLElement {
     this.upperInput.value = x2 ? x2 : max;
     this.upperInput.addEventListener("change", this.onUpperChange);
     this.upperInput.addEventListener("input", this.onUpperInput);
-    this.setUpperText(Number(max));
+    this.setUpperText(this.upperInput.value);
   }
 
   disconnectedCallback() {
@@ -151,12 +151,12 @@ export default class RangeSlider extends HTMLElement {
   setLowerText(value) {
     // https://stackoverflow.com/questions/6134039/format-number-to-always-show-2-decimal-places
     const textEl = this.shadowRoot.getElementById("lower-text");
-    textEl.innerHTML = this.printToPrecision(value);
+    textEl.innerHTML = this.printToPrecision(Number(value));
   }
 
   setUpperText(value) {
     const textEl = this.shadowRoot.getElementById("upper-text");
-    textEl.innerHTML = this.printToPrecision(value);
+    textEl.innerHTML = this.printToPrecision(Number(value));
   }
 
   printToPrecision(number) {
