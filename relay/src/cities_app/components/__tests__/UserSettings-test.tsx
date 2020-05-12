@@ -6,13 +6,16 @@ import {
   createOperationDescriptor,
   getRequest,
   OperationDescriptor,
+  IEnvironment,
+  GraphQLTaggedNode,
 } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
 import UserSettingsComponent from "../UserSettings";
 import { UserSettingsType } from "../UserSettings";
+import { UserSettingsTestQuery } from "__relay__/UserSettingsTestQuery.graphql";
 
-function lookupFromStore(query: any, environment: any) {
+function lookupFromStore(query: GraphQLTaggedNode, environment: any) {
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
   return response.data;
@@ -44,6 +47,7 @@ describe("???", () => {
     foo: "foo_value",
     bar: 15,
   };
+  let FIELD_NAMES = Object.keys(initialSettings);
   let inputElements: any = {};
   let sectionElements: any = {};
   let submitButton: any;
@@ -51,7 +55,7 @@ describe("???", () => {
   beforeEach(() => {
     env = createMockEnvironment();
     container = TestRenderer.create(
-      <QueryRenderer<any>
+      <QueryRenderer<UserSettingsTestQuery>
         query={graphql`
           query UserSettingsTestQuery @relay_test_operation {
             viewer {
@@ -81,28 +85,22 @@ describe("???", () => {
       });
       return payload;
     });
-    inputElements = {
-      citiesPaginationPageSize: container.root.findByProps({
-        "test-id": "citiesPaginationPageSize-input",
-      }),
-      foo: container.root.findByProps({
-        "test-id": "foo-input",
-      }),
-      bar: container.root.findByProps({
-        "test-id": "bar-input",
-      }),
-    };
-    sectionElements = {
-      citiesPaginationPageSize: container.root.findByProps({
-        "test-id": "citiesPaginationPageSize-section",
-      }),
-      foo: container.root.findByProps({
-        "test-id": "foo-section",
-      }),
-      bar: container.root.findByProps({
-        "test-id": "bar-section",
-      }),
-    };
+    inputElements = Object.fromEntries(
+      FIELD_NAMES.map((field) => [
+        field,
+        container.root.findByProps({
+          "test-id": `${field}-input`,
+        }),
+      ])
+    );
+    sectionElements = Object.fromEntries(
+      FIELD_NAMES.map((field) => [
+        field,
+        container.root.findByProps({
+          "test-id": `${field}-section`,
+        }),
+      ])
+    );
     submitButton = container.root.findByProps({
       "test-id": "submit-button",
     });
@@ -111,14 +109,12 @@ describe("???", () => {
   });
 
   test("initial render", () => {
-    expect(inputElements.citiesPaginationPageSize.props.value).toEqual(
-      initialSettings.citiesPaginationPageSize
-    );
-    expect(inputElements.foo.props.value).toEqual(initialSettings.foo);
-    expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
+    for (let field of FIELD_NAMES) {
+      expect(inputElements[field].props.value).toEqual(initialSettings[field]);
+    }
   });
 
-  test("component reacts to update store", () => {
+  test("component reacts to store update", () => {
     /**
      * If component has a local state then it could shadow store updates
      * that are delivered to component via props. E.g. consider implementation
@@ -183,7 +179,7 @@ describe("???", () => {
     locallyChangeSingleInput(
       "foo",
       initialSettings.foo,
-      initialSettings.foo + 1
+      initialSettings.foo + "XYZ"
     );
   });
 
