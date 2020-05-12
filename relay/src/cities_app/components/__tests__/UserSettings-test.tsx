@@ -288,6 +288,7 @@ describe("???", () => {
     // server error
     // XXX ERROR
     env.mock.rejectMostRecentOperation(new Error("boom"));
+    // everything is rolled back
     expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
     TestRenderer.act(() => {});
     expect(input.props.value).toEqual(initialValue);
@@ -295,9 +296,9 @@ describe("???", () => {
     expect(submitButton.props.className.includes("editing")).toBe(false);
   }
 
-  // test("mutate error citiesPaginationPageSize", () => {
-  //   mutateSingleFieldRejected("citiesPaginationPageSize", initialSettings);
-  // });
+  test("mutate error citiesPaginationPageSize", () => {
+    mutateSingleFieldRejected("citiesPaginationPageSize", initialSettings);
+  });
 
   test("props override local state", () => {
     /**
