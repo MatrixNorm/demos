@@ -6,7 +6,6 @@ import {
   createOperationDescriptor,
   getRequest,
   OperationDescriptor,
-  IEnvironment,
   GraphQLTaggedNode,
 } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
@@ -211,8 +210,13 @@ describe("???", () => {
     TestRenderer.act(() => {
       submitButton.props.onClick();
     });
+    // optimistic update is applied
+    expect(input.props.value).toEqual(newValue);
+    expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
+    expect(section.props.className.includes("editing")).toBe(false);
+    expect(submitButton.props.className.includes("editing")).toBe(false);
+    // some data about mutation
     const mutation = env.mock.getMostRecentOperation();
-    // mutation started
     expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
     expect(mutation.root.variables).toMatchObject({
       input: {
@@ -220,11 +224,6 @@ describe("???", () => {
         [name]: newValue,
       },
     });
-    // optimistic update is applied
-    expect(input.props.value).toEqual(newValue);
-    expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
-    expect(section.props.className.includes("editing")).toBe(false);
-    expect(submitButton.props.className.includes("editing")).toBe(false);
     // server response overrides everything
     env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
       let payload = MockPayloadGenerator.generate(operation, {
@@ -249,15 +248,15 @@ describe("???", () => {
     expect(submitButton.props.className.includes("editing")).toBe(false);
   }
 
-  test("mutate citiesPaginationPageSize", () => {
+  test("mutate ok citiesPaginationPageSize", () => {
     mutateSingleFieldResolved("citiesPaginationPageSize", initialSettings);
   });
 
-  test("mutate foo", () => {
+  test("mutate ok foo", () => {
     mutateSingleFieldResolved("foo", initialSettings);
   });
 
-  test("mutate bar", () => {
+  test("mutate ok bar", () => {
     mutateSingleFieldResolved("bar", initialSettings);
   });
 
@@ -271,7 +270,7 @@ describe("???", () => {
     expect(submitButton.props.className.includes("editing")).toBe(false);
     // change component's local state
     TestRenderer.act(() => {
-      input.props.onChange({ target: { value: newValue } });
+      input.props.onChange(newValue);
     });
     expect(input.props.value).toEqual(newValue);
     expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
@@ -281,43 +280,24 @@ describe("???", () => {
     TestRenderer.act(() => {
       submitButton.props.onClick();
     });
-    const mutation = env.mock.getMostRecentOperation();
-    // mutation started
-    expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
-    expect(mutation.root.variables).toMatchObject({
-      input: {
-        userId: "user#1",
-        [name]: newValue,
-      },
-    });
     // optimistic update is applied
     expect(input.props.value).toEqual(newValue);
     expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
-    // server response overrides everything
-    env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-      let payload = MockPayloadGenerator.generate(operation, {
-        UpdateUserSettingsPayload() {
-          return {
-            user: {
-              id: "user#1",
-              settings: {
-                ...initialSettings,
-                [name]: newValue + 1,
-              },
-            },
-          };
-        },
-      });
-      return payload;
-    });
-    expect(lookupSettingFromStore(env)[name]).toEqual(newValue + 1);
+    // server error
+    // XXX ERROR
+    env.mock.rejectMostRecentOperation(new Error("boom"));
+    expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
     TestRenderer.act(() => {});
-    expect(input.props.value).toEqual(newValue + 1);
+    expect(input.props.value).toEqual(initialValue);
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
   }
+
+  // test("mutate error citiesPaginationPageSize", () => {
+  //   mutateSingleFieldRejected("citiesPaginationPageSize", initialSettings);
+  // });
 
   test("props override local state", () => {
     /**
@@ -338,6 +318,11 @@ describe("???", () => {
       submitButton.props.onClick();
     });
 
+    expect(inputElements.citiesPaginationPageSize.props.value).toEqual(
+      newValue
+    );
+    // foo and bar ara unchanged
+    expect(inputElements.foo.props.value).toEqual(initialSettings.foo);
     expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
 
     env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
@@ -349,7 +334,9 @@ describe("???", () => {
               settings: {
                 ...initialSettings,
                 citiesPaginationPageSize: newValue,
-                bar: initialSettings.bar + 1,
+                // server has new values from foo and bar
+                foo: initialSettings.foo + 22,
+                bar: initialSettings.bar + 11,
               },
             },
           };
@@ -358,6 +345,8 @@ describe("???", () => {
       return payload;
     });
     TestRenderer.act(() => {});
-    expect(inputElements.bar.props.value).toEqual(initialSettings.bar + 1);
+    // foo and bar are undated with the latest data from the server
+    expect(inputElements.foo.props.value).toEqual(initialSettings.foo + 22);
+    expect(inputElements.bar.props.value).toEqual(initialSettings.bar + 11);
   });
 });
