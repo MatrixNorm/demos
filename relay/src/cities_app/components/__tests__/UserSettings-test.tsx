@@ -190,7 +190,7 @@ describe("???", () => {
     );
   });
 
-  function mutateSingleFieldResolved(name: string, initialSettings: any) {
+  function mutateSingleFieldSuccess(name: string, initialSettings: any) {
     const initialValue = initialSettings[name];
     const newValue = initialValue + 1;
     const input = inputElements[name];
@@ -249,18 +249,18 @@ describe("???", () => {
   }
 
   test("mutate ok citiesPaginationPageSize", () => {
-    mutateSingleFieldResolved("citiesPaginationPageSize", initialSettings);
+    mutateSingleFieldSuccess("citiesPaginationPageSize", initialSettings);
   });
 
   test("mutate ok foo", () => {
-    mutateSingleFieldResolved("foo", initialSettings);
+    mutateSingleFieldSuccess("foo", initialSettings);
   });
 
   test("mutate ok bar", () => {
-    mutateSingleFieldResolved("bar", initialSettings);
+    mutateSingleFieldSuccess("bar", initialSettings);
   });
 
-  function mutateSingleFieldRejected(name: string, initialSettings: any) {
+  function mutateSingleFieldServerError(name: string, initialSettings: any) {
     const initialValue = initialSettings[name];
     const newValue = initialValue + 1;
     const input = inputElements[name];
@@ -299,7 +299,7 @@ describe("???", () => {
   }
 
   test("mutate error citiesPaginationPageSize", () => {
-    mutateSingleFieldRejected("citiesPaginationPageSize", initialSettings);
+    mutateSingleFieldServerError("citiesPaginationPageSize", initialSettings);
   });
 
   test("props override local state", () => {

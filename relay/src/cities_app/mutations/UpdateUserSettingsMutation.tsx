@@ -59,6 +59,9 @@ function commit({
       input,
     },
     optimisticResponse: buildOptimisticResponse(input, currentSettings),
+    onError: (err) => {
+      console.log(err);
+    },
   });
 }
 
