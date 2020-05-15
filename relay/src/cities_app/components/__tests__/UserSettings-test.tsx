@@ -286,8 +286,10 @@ describe("???", () => {
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
     // server error
-    // XXX ERROR
-    env.mock.rejectMostRecentOperation(new Error("boom"));
+    env.mock.resolveMostRecentOperation({
+      errors: [{ message: "sheise" }],
+      data: { updateUserSettings: null },
+    });
     // everything is rolled back
     expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
     TestRenderer.act(() => {});
