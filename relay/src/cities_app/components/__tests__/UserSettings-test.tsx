@@ -190,8 +190,7 @@ describe("???", () => {
     );
   });
 
-  function mutateSingleFieldSuccess(name: string, initialSettings: any) {
-    const initialValue = initialSettings[name];
+  function mutateSingleFieldPrecondition(name: string, initialValue: any) {
     const newValue = initialValue + 1;
     const input = inputElements[name];
     const section = sectionElements[name];
@@ -215,6 +214,15 @@ describe("???", () => {
     expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
     expect(section.props.className.includes("editing")).toBe(false);
     expect(submitButton.props.className.includes("editing")).toBe(false);
+    return { newValue, input, section };
+  }
+
+  function mutateSingleFieldSuccess(name: string, initialSettings: any) {
+    const initialValue = initialSettings[name];
+    const { newValue, input, section } = mutateSingleFieldPrecondition(
+      name,
+      initialValue
+    );
     // some data about mutation
     const mutation = env.mock.getMostRecentOperation();
     expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
@@ -262,29 +270,10 @@ describe("???", () => {
 
   function mutateSingleFieldServerError(name: string, initialSettings: any) {
     const initialValue = initialSettings[name];
-    const newValue = initialValue + 1;
-    const input = inputElements[name];
-    const section = sectionElements[name];
-
-    expect(section.props.className.includes("editing")).toBe(false);
-    expect(submitButton.props.className.includes("editing")).toBe(false);
-    // change component's local state
-    TestRenderer.act(() => {
-      input.props.onChange(newValue);
-    });
-    expect(input.props.value).toEqual(newValue);
-    expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
-    expect(section.props.className.includes("editing")).toBe(true);
-    expect(submitButton.props.className.includes("editing")).toBe(true);
-    // start mutation
-    TestRenderer.act(() => {
-      submitButton.props.onClick();
-    });
-    // optimistic update is applied
-    expect(input.props.value).toEqual(newValue);
-    expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
-    expect(section.props.className.includes("editing")).toBe(false);
-    expect(submitButton.props.className.includes("editing")).toBe(false);
+    const { input, section } = mutateSingleFieldPrecondition(
+      name,
+      initialValue
+    );
     // server error
     env.mock.resolveMostRecentOperation({
       errors: [{ message: "sheise" }],
@@ -298,8 +287,16 @@ describe("???", () => {
     expect(submitButton.props.className.includes("editing")).toBe(false);
   }
 
-  test("mutate error citiesPaginationPageSize", () => {
+  test("mutate server error citiesPaginationPageSize", () => {
     mutateSingleFieldServerError("citiesPaginationPageSize", initialSettings);
+  });
+
+  test("mutate application error", () => {
+    const name = "citiesPaginationPageSize";
+    const initialValue = initialSettings[name];
+    mutateSingleFieldPrecondition(name, initialValue);
+    // app error
+    env.mock.rejectMostRecentOperation(new Error("you suck"));
   });
 
   test("props override local state", () => {
