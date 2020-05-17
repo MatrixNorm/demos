@@ -4,12 +4,15 @@ import {
   commitLocalUpdate,
   IEnvironment,
   getRequest,
-  createOperationDescriptor
+  createOperationDescriptor,
+  ROOT_ID,
 } from "relay-runtime";
 import styled from "styled-components";
+import { uuidGen } from "../helpers/uuid";
 import { CloseCrossIcon } from "../elements/Icons";
 import { Notifications_notification } from "__relay__/Notifications_notification.graphql";
 import { Notifications_state } from "__relay__/Notifications_state.graphql";
+import { NukeFragRef } from "../helpers/typeUtils";
 
 const NotificationStyled = styled.div`
   display: inline-flex;
@@ -29,7 +32,7 @@ const NotificationStyled = styled.div`
 
 const Notification_ = ({
   notification,
-  relay
+  relay,
 }: {
   notification: Notifications_notification;
   relay: RelayProp;
@@ -53,7 +56,7 @@ export const Notification = createFragmentContainer(Notification_, {
       kind
       text
     }
-  `
+  `,
 });
 
 const NotificationsStyled = styled.ol`
@@ -70,7 +73,7 @@ const Notifications_ = ({ state }: { state: Notifications_state }) => {
   return (
     <NotificationsStyled>
       {state.notifications &&
-        state.notifications.map(notification => (
+        state.notifications.map((notification) => (
           <li key={notification.id} className="list-item">
             <Notification notification={notification} />
           </li>
@@ -87,46 +90,19 @@ export const Notifications = createFragmentContainer(Notifications_, {
         ...Notifications_notification
       }
     }
-  `
+  `,
 });
 
-export const remNotification = (
-  notificationId: string,
-  environment: IEnvironment
-) => {
-  commitLocalUpdate(environment, store => {
-    const root = store.get("client:root");
-    if (!root) return;
-    store.delete(notificationId);
-    const uiStateRecord = root.getLinkedRecord("uiState");
-    if (!uiStateRecord) return;
-    const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
-    if (!notificationRecords) return;
-    const notificationRecords2 = notificationRecords.filter(rp => rp !== null);
-    uiStateRecord.setLinkedRecords(notificationRecords2, "notifications");
-  });
-};
-
-type NotificationDataType = Omit<
-  Notifications_notification,
-  " $refType" | "id"
->;
-
-function uuidGen() {
-  let date = new Date().toISOString();
-  let random = Math.random()
-    .toString()
-    .slice(2);
-  return `client:UINotification-${date}-${random}`;
-}
+type NotificationDataType = Omit<NukeFragRef<Notifications_notification>, "id">;
+const uuid = uuidGen("client:UINotification");
 
 export const addNotification = (
   notification: NotificationDataType,
   environment: IEnvironment
 ): string => {
-  const notificationId = uuidGen();
-  commitLocalUpdate(environment, store => {
-    const root = store.get("client:root");
+  const notificationId = uuid();
+  commitLocalUpdate(environment, (store) => {
+    const root = store.get(ROOT_ID);
     if (!root) return;
     const newNotificationRecord = store.create(
       notificationId,
@@ -137,15 +113,20 @@ export const addNotification = (
     newNotificationRecord.setValue(notification.text, "text");
 
     const uiStateRecord = root.getOrCreateLinkedRecord("uiState", "UIState");
-    const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
-    if (notificationRecords) {
-      uiStateRecord.setLinkedRecords(
-        [newNotificationRecord, ...notificationRecords],
-        "notifications"
-      );
-    } else {
-      uiStateRecord.setLinkedRecords([newNotificationRecord], "notifications");
-    }
+    const notificationRecords =
+      uiStateRecord.getLinkedRecords("notifications") || [];
+    uiStateRecord.setLinkedRecords(
+      [newNotificationRecord, ...notificationRecords],
+      "notifications"
+    );
+    // if (notificationRecords) {
+    //   uiStateRecord.setLinkedRecords(
+    //     [newNotificationRecord, ...notificationRecords],
+    //     "notifications"
+    //   );
+    // } else {
+    //   uiStateRecord.setLinkedRecords([newNotificationRecord], "notifications");
+    // }
 
     const query = graphql`
       query NotificationsUiRetainQuery {
@@ -164,4 +145,23 @@ export const addNotification = (
     environment.retain(operationDescriptor);
   });
   return notificationId;
+};
+
+export const remNotification = (
+  notificationId: string,
+  environment: IEnvironment
+) => {
+  commitLocalUpdate(environment, (store) => {
+    const root = store.get(ROOT_ID);
+    if (!root) return;
+    store.delete(notificationId);
+    const uiStateRecord = root.getLinkedRecord("uiState");
+    if (!uiStateRecord) return;
+    const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
+    if (!notificationRecords) return;
+    const notificationRecords2 = notificationRecords.filter(
+      (rp) => rp !== null
+    );
+    uiStateRecord.setLinkedRecords(notificationRecords2, "notifications");
+  });
 };

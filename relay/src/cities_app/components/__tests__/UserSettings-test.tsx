@@ -46,7 +46,7 @@ describe("???", () => {
     foo: "foo_value",
     bar: 15,
   };
-  let FIELD_NAMES = Object.keys(initialSettings);
+  let FIELD_NAMES = Object.keys(initialSettings) as (keyof UserSettingsType)[];
   let inputElements: any = {};
   let sectionElements: any = {};
   let submitButton: any;

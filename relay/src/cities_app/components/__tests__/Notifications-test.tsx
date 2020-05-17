@@ -7,7 +7,8 @@ import {
   RecordSource,
   Store,
   IEnvironment,
-  OperationDescriptor
+  OperationDescriptor,
+  ROOT_ID,
 } from "relay-runtime";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
@@ -15,7 +16,7 @@ import {
   addNotification,
   remNotification,
   Notification,
-  Notifications
+  Notifications,
 } from "../Notifications";
 
 describe("add, retain, remove", () => {
@@ -26,10 +27,10 @@ describe("add, retain, remove", () => {
 
   beforeEach(() => {
     const initialData = {
-      "client:root": {
-        __id: "client:root",
-        __typename: "__Root"
-      }
+      [ROOT_ID]: {
+        __id: ROOT_ID,
+        __typename: "__Root",
+      },
     };
     const store = new Store(new RecordSource(initialData));
     //@ts-ignore
@@ -106,15 +107,15 @@ describe("render single", () => {
         }}
       />
     );
-    env.mock.resolveMostRecentOperation(operation => {
+    env.mock.resolveMostRecentOperation((operation) => {
       let payload = MockPayloadGenerator.generate(operation, {
         UINotification() {
           return {
             id: "notification#1",
             kind: "INFO",
-            text: "lorem ipsum"
+            text: "lorem ipsum",
           };
-        }
+        },
       });
       return payload;
     });
@@ -145,7 +146,7 @@ describe("render many", () => {
         }}
       />
     );
-    env.mock.resolveMostRecentOperation(operation => {
+    env.mock.resolveMostRecentOperation((operation) => {
       let payload = MockPayloadGenerator.generate(operation, {
         UIState() {
           return {
@@ -153,25 +154,32 @@ describe("render many", () => {
               {
                 id: "notif#1",
                 kind: "INFO",
-                text: "Lorem ipsum"
+                text: "Lorem ipsum",
               },
               {
                 id: "notif#2",
                 kind: "ERROR",
-                text: "This sucks"
+                text: "This sucks",
               },
               {
                 id: "notif#3",
                 kind: "INFO",
-                text: "Everything is tip-top"
-              }
-            ]
+                text: "Everything is tip-top",
+              },
+            ],
           };
-        }
+        },
       });
       return payload;
     });
     const ol = container.root.findByType("ol");
     expect(ol.children.length).toEqual(3);
+    console.log(ol)
+    const store = env.getStore().getSource();
+    const root = store.get(ROOT_ID);
+    if (root) {
+      //const uiStateRecord = root. .getLinkedRecord("uiState");
+      console.dir(root.uiState);
+    }
   });
 });

@@ -4,7 +4,7 @@ import { graphql, QueryRenderer } from "react-relay";
 import {
   Notification,
   Notifications,
-  addNotification
+  addNotification,
 } from "../components/Notifications";
 import { createTestingEnv } from "../env";
 
@@ -17,12 +17,12 @@ export const single = () => {
       let payload = MockPayloadGenerator.generate(operation, {
         UINotification() {
           return {
-            id: "notif#1",
+            id: "notification#1",
             kind: "INFO",
             text:
-              "Updated settings saved without any problems. You can go and f. yourself."
+              "Updated settings saved without any problems. You can go and f. yourself.",
           };
-        }
+        },
       });
       return payload;
     });
@@ -55,32 +55,27 @@ export const multiple = () => {
   setTimeout(() => {
     env.mock.resolveMostRecentOperation((operation: any) => {
       let payload = MockPayloadGenerator.generate(operation, {
-        ID(_, generateId) {
-          return `uuid-${generateId()}`;
-        },
         UIState() {
           return {
+            id: "ui-state",
             notifications: [
+              { id: "notification#1", kind: "INFO", text: "Lorem ipsum" },
+              { id: "notification#2", kind: "ERROR", text: "This sucks" },
               {
+                id: "notification#3",
                 kind: "INFO",
-                text: "Lorem ipsum"
+                text: "Everything is tip-top",
               },
-              {
-                kind: "ERROR",
-                text: "This sucks"
-              },
-              {
-                kind: "INFO",
-                text: "Everything is tip-top"
-              }
-            ]
+            ],
           };
-        }
+        },
       });
       console.log({ operation, payload });
       return payload;
     });
   }, 0);
+  //@ts-ignore
+  window.relayStore = env.getStore().getSource()._records;
   return (
     <QueryRenderer<any>
       query={graphql`
@@ -107,13 +102,13 @@ export const adding = () => {
     Query: {
       node(_: any, { id }: { id: string }) {
         return { id };
-      }
+      },
     },
     Node: {
       __resolveType(node: any) {
         return node.__type || null;
-      }
-    }
+      },
+    },
   });
   //@ts-ignore
   window.relayEnv = environment;
@@ -126,7 +121,7 @@ export const adding = () => {
     addNotification(
       {
         kind: "INFO",
-        text: `Lorem-${counter}`
+        text: `Lorem-${counter}`,
       },
       environment
     );
@@ -169,16 +164,16 @@ export const adding = () => {
 export const adding2 = () => {
   const env = createMockEnvironment();
   setTimeout(() => {
-    env.mock.resolveMostRecentOperation(operation => {
+    env.mock.resolveMostRecentOperation((operation) => {
       let payload = MockPayloadGenerator.generate(operation, {
         ID(_, generateId) {
           return `uuid-${generateId()}`;
         },
         UIState() {
           return {
-            notifications: []
+            notifications: [],
           };
-        }
+        },
       });
       return payload;
     });
@@ -187,7 +182,7 @@ export const adding2 = () => {
     addNotification(
       {
         kind: "INFO",
-        text: "Lorem"
+        text: "Lorem",
       },
       env
     );

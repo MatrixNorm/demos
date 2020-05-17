@@ -9,7 +9,7 @@ import {
 import { LoadingPlaceholder } from "../LoadingContext";
 import { Reload } from "../elements/LoadingError";
 
-import { NukeFragRef, NukeNulls } from "../typeUtils";
+import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";

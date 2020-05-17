@@ -60,7 +60,7 @@ function commit({
     },
     optimisticResponse: buildOptimisticResponse(input, currentSettings),
     onError: (err) => {
-      console.log(err);
+      //handle application error
     },
   });
 }
