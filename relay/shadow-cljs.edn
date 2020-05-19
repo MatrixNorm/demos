@@ -1,13 +1,13 @@
 ;; shadow-cljs configuration
 {:source-paths
- ["babel_gen"]
- :dev-http {8080 "cljs_build"}
+ ["src_cljs" "__gen__/babel_gen"]
+ ;; :dev-http {8080 "cljs_build"}
  :builds
  {:cities-app {:target :browser
                :output-dir "cljs_build/js"
                :modules {:main {:entries [cljs.cities-app.main]}}}
   
   :test {:target    :node-test
-         :output-to "cljs_build/tests/node-tests.js"
+         :output-to "__gen__/cljs_build/node-tests.js"
          :ns-regexp "-test$"
          :autorun   true}}}

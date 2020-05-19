@@ -1,4 +1,3 @@
 src/__relay__
-jsdev/
-babel_gen/
+__gen__/
 cljs_build/js/
