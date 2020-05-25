@@ -6,6 +6,8 @@ type UIState {
   id: ID!
   citySearchParams: UICitySearchParams
   notifications: [UINotification!]
+  userSettingsOptimistic: UserSettings
+  userSettingsDraftDelta: UIUserSettingsDraftDelta
 }
 
 type UICitySearchParams {
@@ -23,4 +25,10 @@ type UINotification implements Node {
 enum UINotificationKind {
   INFO
   ERROR
+}
+
+type UIUserSettingsDraftDelta {
+  citiesPaginationPageSize: Int
+  foo: String
+  bar: Int
 }
