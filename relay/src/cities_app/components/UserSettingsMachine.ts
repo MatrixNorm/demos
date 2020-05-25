@@ -9,27 +9,34 @@
 
 function abc(state, event) {
   if (state.muta === null) {
-    // no mut
-    switch (event.type) {
-      case "edit": {
-        let { fieldName, value } = event.payload;
-        if (value !== state.srv[fieldName]) {
-          state = { ...state, loc: { ...state.loc, fieldName: value } };
-        }
-        return state;
-      }
-      case "submit":
-        // code block
-        break;
-      case "cancel":
-        // code block
-        break;
-      default:
-      // code block
-    }
+    return noMutReducer(state, event);
   } else if (state.mutq === null) {
-    // no queued mut
+    return mutReducer(state, event);
   } else {
-    // queued mut
+    return queMutReducer(state, event);
   }
 }
+
+function noMutReducer(state, event) {
+  switch (event.type) {
+    case "edit": {
+      let { fieldName, value } = event.payload;
+      if (value !== state.srv[fieldName]) {
+        state = { ...state, loc: { ...state.loc, fieldName: value } };
+      }
+      return state;
+    }
+    case "submit":
+      // code block
+      break;
+    case "cancel":
+      // code block
+      break;
+    default:
+    // code block
+  }
+}
+
+function mutReducer(state, event) {}
+
+function queMutReducer(state, event) {}

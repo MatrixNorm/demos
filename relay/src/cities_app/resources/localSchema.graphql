@@ -7,7 +7,9 @@ type UIState {
   citySearchParams: UICitySearchParams
   notifications: [UINotification!]
   userSettingsOptimistic: UserSettings
-  userSettingsDraftDelta: UIUserSettingsDraftDelta
+  userSettingsMutDelta: UIUserSettingsDelta
+  userSettingsMut2Delta: UIUserSettingsDelta
+  userSettingsDraftDelta: UIUserSettingsDelta
 }
 
 type UICitySearchParams {
@@ -27,7 +29,7 @@ enum UINotificationKind {
   ERROR
 }
 
-type UIUserSettingsDraftDelta {
+type UIUserSettingsDelta {
   citiesPaginationPageSize: Int
   foo: String
   bar: Int
