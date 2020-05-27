@@ -3,52 +3,25 @@ import { RequireAtLeastOne } from "../helpers/typeUtils";
 
 type UserSettingsType = UserSettings_user["settings"];
 
-type MachineStateNoMut =
-  | ["noMut", "clean", { srv: UserSettingsType }]
-  | [
-      "noMut",
-      "dirty",
-      { srv: UserSettingsType; loc: RequireAtLeastOne<UserSettingsType> }
-    ];
+type MachineStateIdle = { status: "idle"; srv: UserSettingsType };
 
-type MachineStateMut =
-  | [
-      "mut",
-      "clean",
-      { srv: UserSettingsType; mut: RequireAtLeastOne<UserSettingsType> }
-    ]
-  | [
-      "mut",
-      "dirty",
-      {
-        srv: UserSettingsType;
-        mut: RequireAtLeastOne<UserSettingsType>;
-        loc: RequireAtLeastOne<UserSettingsType>;
-      }
-    ];
+type MachineStateMut = {
+  status: "mut";
+  srv: UserSettingsType;
+  mut: RequireAtLeastOne<UserSettingsType>;
+};
 
-type MachineStateMut2 =
-  | [
-      "mut2",
-      "clean",
-      {
-        srv: UserSettingsType;
-        mut: RequireAtLeastOne<UserSettingsType>;
-        mut2: RequireAtLeastOne<UserSettingsType>;
-      }
-    ]
-  | [
-      "mut2",
-      "dirty",
-      {
-        srv: UserSettingsType;
-        mut: RequireAtLeastOne<UserSettingsType>;
-        mut2: RequireAtLeastOne<UserSettingsType>;
-        loc: RequireAtLeastOne<UserSettingsType>;
-      }
-    ];
+type MachineStateMut2 = {
+  status: "mut2";
+  srv: UserSettingsType;
+  mut: RequireAtLeastOne<UserSettingsType>;
+  mut2: RequireAtLeastOne<UserSettingsType>;
+};
 
-type MachineState = MachineStateNoMut | MachineStateMut | MachineStateMut2;
+type MachineState = {
+  remote: MachineStateIdle | MachineStateMut | MachineStateMut2;
+  local: RequireAtLeastOne<UserSettingsType> | null;
+};
 
 type Event =
   | { type: "edit"; fieldName: keyof UserSettingsType; value: any }
@@ -58,10 +31,10 @@ type Event =
   | { type: "mutFail" };
 
 function next(state: MachineState, event: Event) {
-  const mutState = state[0];
-  switch (mutState) {
-    case "noMut": {
-      return nextNoMut(state, event);
+  switch (state.remote.status) {
+    case "idle": {
+      state;
+      return nextIdle(state.remote, state.local, event);
     }
     case "mut": {
       return nextMut(state, event);
@@ -74,7 +47,11 @@ function next(state: MachineState, event: Event) {
   }
 }
 
-function nextNoMut(state: MachineStateNoMut, event: Event) {}
+function nextIdle(
+  remote: MachineStateIdle,
+  local: RequireAtLeastOne<UserSettingsType> | null,
+  event: Event
+) {}
 
 function nextMut(state: MachineStateMut, event: Event) {}
 
