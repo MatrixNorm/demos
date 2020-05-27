@@ -3,56 +3,60 @@ import { RequireAtLeastOne } from "../helpers/typeUtils";
 
 type UserSettingsType = UserSettings_user["settings"];
 
-type MachineStateIdle = { status: "idle"; srv: UserSettingsType };
-
-type MachineStateMut = {
+type MutZero = {
+  status: "idle";
+};
+type MutOne = {
   status: "mut";
-  srv: UserSettingsType;
-  mut: RequireAtLeastOne<UserSettingsType>;
+  mut: Partial<UserSettingsType>; // active mutation delta
 };
-
-type MachineStateMut2 = {
+type MutTwo = {
   status: "mut2";
-  srv: UserSettingsType;
-  mut: RequireAtLeastOne<UserSettingsType>;
-  mut2: RequireAtLeastOne<UserSettingsType>;
+  mut: Partial<UserSettingsType>;
+  mut2: Partial<UserSettingsType>; // queued mutation delta
 };
 
-type MachineState = {
-  remote: MachineStateIdle | MachineStateMut | MachineStateMut2;
-  local: RequireAtLeastOne<UserSettingsType> | null;
-};
+type MutState = MutZero | MutOne | MutTwo;
+type Edited = Partial<UserSettingsType>;
+
+type StateZeroClean = [MutZero, null];
+type StateZeroDirty = [MutZero, Edited];
+type StateOneClean = [MutOne, null];
+type StateOneDirty = [MutOne, Edited];
+type StateTwoClean = [MutTwo, null];
+type StateTwoDirty = [MutTwo, Edited];
+
+type State =
+  | StateZeroClean
+  | StateZeroDirty
+  | StateOneClean
+  | StateOneDirty
+  | StateTwoClean
+  | StateTwoDirty;
 
 type Event =
   | { type: "edit"; fieldName: keyof UserSettingsType; value: any }
   | { type: "submit" }
   | { type: "cancel" }
-  | { type: "mutSucc" }
+  | { type: "mutSucc"; response: UserSettingsType }
   | { type: "mutFail" };
 
-function next(state: MachineState, event: Event) {
-  switch (state.remote.status) {
-    case "idle": {
-      state;
-      return nextIdle(state.remote, state.local, event);
+type EventEdit = {
+  type: "edit";
+  payload: Partial<UserSettingsType>;
+};
+type EventSubmit = { type: "submit" };
+
+type X = (
+  state: StateZeroClean,
+  event: EventEdit
+) => StateZeroClean | StateZeroDirty;
+
+function reduce(server: UserSettingsType, state: State, event: Event) {
+  const [mut, edited] = state;
+  if (mut.status === "idle" && edited === null) {
+    if (event.type === 'edit') {
+      return 
     }
-    case "mut": {
-      return nextMut(state, event);
-    }
-    case "mut2":
-      return nextMut2(state, event);
-    default:
-      // impossible
-      throw new Error("impossible state is in fact possible");
   }
 }
-
-function nextIdle(
-  remote: MachineStateIdle,
-  local: RequireAtLeastOne<UserSettingsType> | null,
-  event: Event
-) {}
-
-function nextMut(state: MachineStateMut, event: Event) {}
-
-function nextMut2(state: MachineStateMut2, event: Event) {}

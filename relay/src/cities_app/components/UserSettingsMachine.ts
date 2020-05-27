@@ -5,14 +5,12 @@ type UserSettingsType = UserSettings_user["settings"];
 type MachineStateIdle = {
   status: "idle";
   srv: UserSettingsType; // server state
-  //loc: Partial<UserSettingsType> | null; // local draft delta
 };
 
 type MachineStateMut = {
   status: "mut";
   srv: UserSettingsType;
   mut: Partial<UserSettingsType>; // active mutation delta
-  //loc: Partial<UserSettingsType> | null;
 };
 
 type MachineStateMut2 = {
@@ -20,7 +18,6 @@ type MachineStateMut2 = {
   srv: UserSettingsType;
   mut: Partial<UserSettingsType>;
   mut2: Partial<UserSettingsType>; // queued mutation delta
-  //loc: Partial<UserSettingsType> | null;
 };
 
 type MachineState = MachineStateIdle | MachineStateMut | MachineStateMut2;
@@ -43,7 +40,7 @@ function reducer(
       if (state.local === null) {
         return { ...state, local: idleReducerClean(state.remote, event) };
       }
-      return idleReducerDirty(remote, local, event);
+      return idleReducerDirty(state.remote, state.local, event);
     }
     case "mut": {
       //return mutReducer(state, event);
@@ -73,7 +70,9 @@ function idleReducerDirty(
   remote: MachineStateIdle,
   local: Partial<UserSettingsType>,
   event: Event
-): { remote: MachineStateIdle; local: Partial<UserSettingsType> | null } {
+):
+  | { remote: MachineStateIdle; local: Partial<UserSettingsType> | null }
+  | { remote: MachineStateMut; local: null } {
   if (event.type === "edit") {
     let { fieldName, value } = event;
     if (value !== remote.srv[fieldName]) {
