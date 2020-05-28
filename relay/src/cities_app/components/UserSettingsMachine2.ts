@@ -20,14 +20,15 @@ type MutTwo = {
   mut2: Partial<UserSettingsType>; // queued mutation delta
 };
 
-type Edited = Partial<UserSettingsType>;
+type Clean = null;
+type Dirty = RequireAtLeastOne<UserSettingsType>;
 
-type StateZeroClean = [MutZero, null];
-type StateZeroDirty = [MutZero, Edited];
-type StateOneClean = [MutOne, null];
-type StateOneDirty = [MutOne, Edited];
-type StateTwoClean = [MutTwo, null];
-type StateTwoDirty = [MutTwo, Edited];
+type StateZeroClean = [MutZero, Clean];
+type StateZeroDirty = [MutZero, Dirty];
+type StateOneClean = [MutOne, Clean];
+type StateOneDirty = [MutOne, Dirty];
+type StateTwoClean = [MutTwo, Clean];
+type StateTwoDirty = [MutTwo, Dirty];
 
 type State =
   | StateZeroClean
@@ -58,9 +59,9 @@ function transit(state: State, event: Event): State {
   switch (mut.status) {
     case "idle": {
       if (edited === null) {
-        return transitZeroCleanEdit(mut, event);
+        transitZeroClean(mut, event);
       }
-      return transitZeroDirtyEdit(mut, edited, event);
+      transitZeroDirty(mut, edited, event);
     }
     case "mut": {
       if (edited === null) {
@@ -80,16 +81,45 @@ function transit(state: State, event: Event): State {
   }
 }
 
-function transitZeroCleanEdit(
+function transitZeroClean(
   mut: MutZero,
-  event: EventEdit
+  event: Event
 ): StateZeroClean | StateZeroDirty {
-  return [mut, null];
+  switch (event.type) {
+    case "edit":
+      return [mut, { foo: "1" }] as StateZeroDirty;
+    default:
+      return [mut, null] as StateZeroClean;
+  }
 }
 
-function transitZeroDirtyEdit(
-  state: StateZeroClean,
-  event: EventEdit
+function transitZeroDirty(
+  mut: MutZero,
+  edited: Dirty,
+  event: Event
+): StateZeroClean | StateZeroDirty {
+  switch (event.type) {
+    case "edit":
+      return [mut, { foo: "1" }] as StateZeroDirty;
+    case "submit":
+      return transitZeroDirtySubmit(mut, edited, event);
+    default:
+      return [mut, edited] as StateZeroDirty;
+  }
+}
+
+function transitZeroDirtyCancel(
+  state: StateZeroDirty,
+  edited: Dirty,
+  event: EventCancel
+): StateZeroClean {
+  return state;
+}
+
+function transitZeroDirtySubmit(
+  state: StateZeroDirty,
+  edited: Dirty,
+  event: EventSubmit
 ): StateZeroClean | StateZeroDirty {
   return state;
 }
