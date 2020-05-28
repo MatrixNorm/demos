@@ -4,31 +4,31 @@ import { User } from "../types.codegen";
 
 type UserSettingsType = UserSettings_user["settings"];
 
-type MutZero = {
+type MutStateZero = {
   status: "idle";
   srv: UserSettingsType;
 };
-type MutOne = {
+type MutStateOne = {
   status: "mut";
   srv: UserSettingsType;
-  mut: Partial<UserSettingsType>; // active mutation delta
+  mut: RequireAtLeastOne<UserSettingsType>; // active mutation delta
 };
-type MutTwo = {
+type MutStateTwo = {
   status: "mut2";
   srv: UserSettingsType;
-  mut: Partial<UserSettingsType>;
-  mut2: Partial<UserSettingsType>; // queued mutation delta
+  mut: RequireAtLeastOne<UserSettingsType>;
+  mut2: RequireAtLeastOne<UserSettingsType>; // queued mutation delta
 };
 
 type Clean = null;
 type Dirty = RequireAtLeastOne<UserSettingsType>;
 
-type StateZeroClean = [MutZero, Clean];
-type StateZeroDirty = [MutZero, Dirty];
-type StateOneClean = [MutOne, Clean];
-type StateOneDirty = [MutOne, Dirty];
-type StateTwoClean = [MutTwo, Clean];
-type StateTwoDirty = [MutTwo, Dirty];
+type StateZeroClean = [MutStateZero, Clean];
+type StateZeroDirty = [MutStateZero, Dirty];
+type StateOneClean = [MutStateOne, Clean];
+type StateOneDirty = [MutStateOne, Dirty];
+type StateTwoClean = [MutStateTwo, Clean];
+type StateTwoDirty = [MutStateTwo, Dirty];
 
 type State =
   | StateZeroClean
@@ -47,7 +47,7 @@ type Event =
 
 type EventEdit = {
   type: "edit";
-  payload: Partial<UserSettingsType>;
+  payload: RequireAtLeastOne<UserSettingsType>;
 };
 type EventSubmit = { type: "submit" };
 type EventCancel = { type: "cancel" };
@@ -55,25 +55,25 @@ type EventMutSucc = { type: "mutSucc"; response: UserSettingsType };
 type EventMutFail = { type: "mutFail" };
 
 function transit(state: State, event: Event): State {
-  let [mut, edited] = state;
-  switch (mut.status) {
+  let [mutState, edited] = state;
+  switch (mutState.status) {
     case "idle": {
       if (edited === null) {
-        transitZeroClean(mut, event);
+        return fromZeroClean(mutState, event);
       }
-      transitZeroDirty(mut, edited, event);
+      return fromZeroDirty(mutState, edited, event);
     }
     case "mut": {
       if (edited === null) {
-        return transitZeroCleanEdit(mut, event);
+        return fromOneClean(mutState, event);
       }
-      return transitZeroDirtyEdit(mut, edited, event);
+      return fromOneDirty(mutState, edited, event);
     }
     case "mut2": {
       if (edited === null) {
-        return transitZeroCleanEdit(mut, event);
+        return fromTwoClean(mutState, event);
       }
-      return transitZeroDirtyEdit(mut, edited, event);
+      return fromTwoDirty(mutState, edited, event);
     }
     default:
       // impossible
@@ -81,8 +81,8 @@ function transit(state: State, event: Event): State {
   }
 }
 
-function transitZeroClean(
-  mut: MutZero,
+function fromZeroClean(
+  mut: MutStateZero,
   event: Event
 ): StateZeroClean | StateZeroDirty {
   switch (event.type) {
@@ -93,33 +93,60 @@ function transitZeroClean(
   }
 }
 
-function transitZeroDirty(
-  mut: MutZero,
+function fromZeroDirty(
+  mutState: MutStateZero,
   edited: Dirty,
   event: Event
-): StateZeroClean | StateZeroDirty {
+): StateZeroClean | StateZeroDirty | StateOneClean {
   switch (event.type) {
     case "edit":
-      return [mut, { foo: "1" }] as StateZeroDirty;
+      return [mutState, { foo: "1" }] as StateZeroDirty;
+    case "cancel":
+      return [mutState, null] as StateZeroClean;
     case "submit":
-      return transitZeroDirtySubmit(mut, edited, event);
+      return [
+        { status: "mut", srv: mutState.srv, mut: edited },
+        null,
+      ] as StateOneClean;
     default:
-      return [mut, edited] as StateZeroDirty;
+      return [mutState, edited] as StateZeroDirty;
   }
 }
 
-function transitZeroDirtyCancel(
-  state: StateZeroDirty,
-  edited: Dirty,
-  event: EventCancel
-): StateZeroClean {
-  return state;
+function fromOneClean(
+  mutState: MutStateOne,
+  event: Event
+): StateZeroClean | StateZeroDirty | StateOneClean | StateOneDirty {
+  switch (event.type) {
+    case "edit":
+      return [mutState, { foo: "1" }] as StateOneDirty;
+    case "mutSucc":
+      return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
+    case "mutFail":
+      return [
+        { status: "idle", srv: mutState.srv },
+        mutState.mut,
+      ] as StateZeroDirty;
+    default:
+      return [mutState, null] as StateOneClean;
+  }
 }
 
-function transitZeroDirtySubmit(
-  state: StateZeroDirty,
+function fromOneDirty(
+  mutState: MutStateOne,
   edited: Dirty,
-  event: EventSubmit
-): StateZeroClean | StateZeroDirty {
-  return state;
+  event: Event
+): State {
+  switch (event.type) {
+    case "edit":
+      return [mutState, { foo: "1" }] as StateOneDirty;
+    case "cancel":
+      return;
+    case "submit":
+      return;
+    case "mutSucc":
+      return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
+    default:
+      return [mutState, null] as StateOneClean;
+  }
 }
