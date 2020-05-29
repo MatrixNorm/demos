@@ -54,21 +54,6 @@ type EventCancel = { type: "cancel" };
 type EventMutSucc = { type: "mutSucc"; response: UserSettingsType };
 type EventMutFail = { type: "mutFail" };
 
-function calcRealDelta(
-  base: UserSettingsType,
-  possibleDelta: RequireAtLeastOne<UserSettingsType>
-): RequireAtLeastOne<UserSettingsType> | null {
-  const differentEntries = Object.entries(possibleDelta).filter(
-    //@ts-ignore
-    ([k, v]) => base[k] !== v
-  );
-  if (differentEntries.length > 0) {
-    //@ts-ignore
-    return Object.fromEntries(differentEntries);
-  }
-  return null;
-}
-
 function transit(state: State, event: Event): State {
   let [mutState, edited] = state;
   switch (mutState.status) {
@@ -213,3 +198,20 @@ function fromOneDirtyMutSucc(edited: Dirty, event: EventMutSucc) {
   }
   return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
 }
+
+function calcRealDelta(
+  base: UserSettingsType,
+  possibleDelta: RequireAtLeastOne<UserSettingsType>
+): RequireAtLeastOne<UserSettingsType> | null {
+  const differentEntries = Object.entries(possibleDelta).filter(
+    //@ts-ignore
+    ([k, v]) => base[k] !== v
+  );
+  if (differentEntries.length > 0) {
+    //@ts-ignore
+    return Object.fromEntries(differentEntries);
+  }
+  return null;
+}
+
+function writeToDb() {}

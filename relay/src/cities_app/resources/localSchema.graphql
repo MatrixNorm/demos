@@ -6,10 +6,7 @@ type UIState {
   id: ID!
   citySearchParams: UICitySearchParams
   notifications: [UINotification!]
-  userSettingsOptimistic: UserSettings
-  userSettingsMutDelta: UIUserSettingsDelta
-  userSettingsMut2Delta: UIUserSettingsDelta
-  userSettingsDraftDelta: UIUserSettingsDelta
+  userSettings: UIUserSettingsState
 }
 
 type UICitySearchParams {
@@ -27,6 +24,13 @@ type UINotification implements Node {
 enum UINotificationKind {
   INFO
   ERROR
+}
+
+type UIUserSettingsState {
+  mutDelta: UIUserSettingsDelta
+  mut2Delta: UIUserSettingsDelta
+  editedDelta: UIUserSettingsDelta
+  optimistic: UserSettings
 }
 
 type UIUserSettingsDelta {
