@@ -4,16 +4,16 @@ import { User } from "../types.codegen";
 
 type UserSettingsType = UserSettings_user["settings"];
 
-type MutStateZero = {
+type StateZero = {
   status: "idle";
   srv: UserSettingsType;
 };
-type MutStateOne = {
+type StateOne = {
   status: "mut";
   srv: UserSettingsType;
   mut: RequireAtLeastOne<UserSettingsType>; // active mutation delta
 };
-type MutStateTwo = {
+type StateTwo = {
   status: "mut2";
   srv: UserSettingsType;
   mut: RequireAtLeastOne<UserSettingsType>;
@@ -23,12 +23,12 @@ type MutStateTwo = {
 type Clean = null;
 type Dirty = RequireAtLeastOne<UserSettingsType>;
 
-type StateZeroClean = [MutStateZero, Clean];
-type StateZeroDirty = [MutStateZero, Dirty];
-type StateOneClean = [MutStateOne, Clean];
-type StateOneDirty = [MutStateOne, Dirty];
-type StateTwoClean = [MutStateTwo, Clean];
-type StateTwoDirty = [MutStateTwo, Dirty];
+type StateZeroClean = [StateZero, Clean];
+type StateZeroDirty = [StateZero, Dirty];
+type StateOneClean = [StateOne, Clean];
+type StateOneDirty = [StateOne, Dirty];
+type StateTwoClean = [StateTwo, Clean];
+type StateTwoDirty = [StateTwo, Dirty];
 
 type State =
   | StateZeroClean
@@ -97,24 +97,24 @@ function transit(state: State, event: Event): State {
 }
 
 function fromZeroClean(
-  mut: MutStateZero,
+  mutState: StateZero,
   event: Event
 ): StateZeroClean | StateZeroDirty {
   switch (event.type) {
     case "edit": {
-      const delta = calcRealDelta(mut.srv, event.payload);
+      const delta = calcRealDelta(mutState.srv, event.payload);
       if (delta) {
-        return [mut, delta] as StateZeroDirty;
+        return [mutState, delta] as StateZeroDirty;
       }
-      return [mut, null] as StateZeroClean;
+      return [mutState, null] as StateZeroClean;
     }
     default:
-      return [mut, null] as StateZeroClean;
+      return [mutState, null] as StateZeroClean;
   }
 }
 
 function fromZeroDirty(
-  mutState: MutStateZero,
+  mutState: StateZero,
   edited: Dirty,
   event: Event
 ): StateZeroClean | StateZeroDirty | StateOneClean {
@@ -140,12 +140,18 @@ function fromZeroDirty(
 }
 
 function fromOneClean(
-  mutState: MutStateOne,
+  mutState: StateOne,
   event: Event
 ): StateZeroClean | StateZeroDirty | StateOneClean | StateOneDirty {
   switch (event.type) {
-    case "edit":
-      return [mutState, { foo: "1" }] as StateOneDirty;
+    case "edit": {
+      const optimistic = { ...mutState.srv, ...mutState.mut };
+      const delta = calcRealDelta(optimistic, event.payload);
+      if (delta) {
+        return [mutState, delta] as StateOneDirty;
+      }
+      return [mutState, null] as StateOneClean;
+    }
     case "mutSucc":
       return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
     case "mutFail":
@@ -158,21 +164,38 @@ function fromOneClean(
   }
 }
 
-function fromOneDirty(
-  mutState: MutStateOne,
-  edited: Dirty,
-  event: Event
-): State {
+function fromOneDirty(mutState: StateOne, edited: Dirty, event: Event): State {
   switch (event.type) {
-    case "edit":
-      return [mutState, { foo: "1" }] as StateOneDirty;
-    case "cancel":
-      return;
-    case "submit":
-      return;
-    case "mutSucc":
-      return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
-    default:
+    case "edit": {
+      const newEdited = { ...edited, ...event.payload };
+      const optimistic = { ...mutState.srv, ...mutState.mut };
+      const delta = calcRealDelta(optimistic, newEdited);
+      if (delta) {
+        return [mutState, delta] as StateOneDirty;
+      }
       return [mutState, null] as StateOneClean;
+    }
+    case "cancel":
+      return [mutState, null] as StateOneClean;
+    case "submit":
+      return (function(): StateTwoClean {
+        return [
+          {
+            ...mutState,
+            status: "mut2",
+            mut2: edited,
+          },
+          null,
+        ];
+      })();
+    case "mutSucc":
+      return (function(): StateZeroClean | StateZeroDirty {})();
+    case "mutFail":
+      return [
+        { status: "idle", srv: mutState.srv },
+        mutState.mut,
+      ] as StateZeroDirty;
+    default:
+      return [mutState, edited] as StateOneDirty;
   }
 }
