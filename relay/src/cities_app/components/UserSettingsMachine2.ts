@@ -54,6 +54,21 @@ type EventCancel = { type: "cancel" };
 type EventMutSucc = { type: "mutSucc"; response: UserSettingsType };
 type EventMutFail = { type: "mutFail" };
 
+function calcRealDelta(
+  base: UserSettingsType,
+  possibleDelta: RequireAtLeastOne<UserSettingsType>
+): RequireAtLeastOne<UserSettingsType> | null {
+  const differentEntries = Object.entries(possibleDelta).filter(
+    //@ts-ignore
+    ([k, v]) => base[k] !== v
+  );
+  if (differentEntries.length > 0) {
+    //@ts-ignore
+    return Object.fromEntries(differentEntries);
+  }
+  return null;
+}
+
 function transit(state: State, event: Event): State {
   let [mutState, edited] = state;
   switch (mutState.status) {
@@ -86,8 +101,13 @@ function fromZeroClean(
   event: Event
 ): StateZeroClean | StateZeroDirty {
   switch (event.type) {
-    case "edit":
-      return [mut, { foo: "1" }] as StateZeroDirty;
+    case "edit": {
+      const delta = calcRealDelta(mut.srv, event.payload);
+      if (delta) {
+        return [mut, delta] as StateZeroDirty;
+      }
+      return [mut, null] as StateZeroClean;
+    }
     default:
       return [mut, null] as StateZeroClean;
   }
@@ -99,8 +119,14 @@ function fromZeroDirty(
   event: Event
 ): StateZeroClean | StateZeroDirty | StateOneClean {
   switch (event.type) {
-    case "edit":
-      return [mutState, { foo: "1" }] as StateZeroDirty;
+    case "edit": {
+      const newEdited = { ...edited, ...event.payload };
+      const delta = calcRealDelta(mutState.srv, newEdited);
+      if (delta) {
+        return [mutState, delta] as StateZeroDirty;
+      }
+      return [mutState, null] as StateZeroClean;
+    }
     case "cancel":
       return [mutState, null] as StateZeroClean;
     case "submit":
