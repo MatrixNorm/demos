@@ -120,12 +120,7 @@ function fromZeroDirty(
 ): StateZeroClean | StateZeroDirty | StateOneClean {
   switch (event.type) {
     case "edit": {
-      const newEdited = { ...edited, ...event.payload };
-      const delta = calcRealDelta(mutState.srv, newEdited);
-      if (delta) {
-        return [mutState, delta] as StateZeroDirty;
-      }
-      return [mutState, null] as StateZeroClean;
+      return fromZeroDirtyEdit(mutState, edited, event);
     }
     case "cancel":
       return [mutState, null] as StateZeroClean;
@@ -139,18 +134,26 @@ function fromZeroDirty(
   }
 }
 
+function fromZeroDirtyEdit(
+  mutState: StateZero,
+  edited: Dirty,
+  event: EventEdit
+): StateZeroClean | StateZeroDirty {
+  const newEdited = { ...edited, ...event.payload };
+  const delta = calcRealDelta(mutState.srv, newEdited);
+  if (delta) {
+    return [mutState, delta] as StateZeroDirty;
+  }
+  return [mutState, null] as StateZeroClean;
+}
+
 function fromOneClean(
   mutState: StateOne,
   event: Event
 ): StateZeroClean | StateZeroDirty | StateOneClean | StateOneDirty {
   switch (event.type) {
     case "edit": {
-      const optimistic = { ...mutState.srv, ...mutState.mut };
-      const delta = calcRealDelta(optimistic, event.payload);
-      if (delta) {
-        return [mutState, delta] as StateOneDirty;
-      }
-      return [mutState, null] as StateOneClean;
+      return fromOneCleanEdit(mutState, event);
     }
     case "mutSucc":
       return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
@@ -162,6 +165,18 @@ function fromOneClean(
     default:
       return [mutState, null] as StateOneClean;
   }
+}
+
+function fromOneCleanEdit(
+  mutState: StateOne,
+  event: EventEdit
+): StateOneClean | StateOneDirty {
+  const optimistic = { ...mutState.srv, ...mutState.mut };
+  const delta = calcRealDelta(optimistic, event.payload);
+  if (delta) {
+    return [mutState, delta] as StateOneDirty;
+  }
+  return [mutState, null] as StateOneClean;
 }
 
 function fromOneDirty(mutState: StateOne, edited: Dirty, event: Event): State {
