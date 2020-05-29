@@ -113,11 +113,7 @@ function fromZeroClean(
   }
 }
 
-function fromZeroDirty(
-  mutState: StateZero,
-  edited: Dirty,
-  event: Event
-): StateZeroClean | StateZeroDirty | StateOneClean {
+function fromZeroDirty(mutState: StateZero, edited: Dirty, event: Event) {
   switch (event.type) {
     case "edit": {
       return fromZeroDirtyEdit(mutState, edited, event);
@@ -138,7 +134,7 @@ function fromZeroDirtyEdit(
   mutState: StateZero,
   edited: Dirty,
   event: EventEdit
-): StateZeroClean | StateZeroDirty {
+) {
   const newEdited = { ...edited, ...event.payload };
   const delta = calcRealDelta(mutState.srv, newEdited);
   if (delta) {
@@ -147,10 +143,7 @@ function fromZeroDirtyEdit(
   return [mutState, null] as StateZeroClean;
 }
 
-function fromOneClean(
-  mutState: StateOne,
-  event: Event
-): StateZeroClean | StateZeroDirty | StateOneClean | StateOneDirty {
+function fromOneClean(mutState: StateOne, event: Event) {
   switch (event.type) {
     case "edit": {
       return fromOneCleanEdit(mutState, event);
@@ -167,10 +160,7 @@ function fromOneClean(
   }
 }
 
-function fromOneCleanEdit(
-  mutState: StateOne,
-  event: EventEdit
-): StateOneClean | StateOneDirty {
+function fromOneCleanEdit(mutState: StateOne, event: EventEdit) {
   const optimistic = { ...mutState.srv, ...mutState.mut };
   const delta = calcRealDelta(optimistic, event.payload);
   if (delta) {
@@ -179,32 +169,23 @@ function fromOneCleanEdit(
   return [mutState, null] as StateOneClean;
 }
 
-function fromOneDirty(mutState: StateOne, edited: Dirty, event: Event): State {
+function fromOneDirty(mutState: StateOne, edited: Dirty, event: Event) {
   switch (event.type) {
-    case "edit": {
-      const newEdited = { ...edited, ...event.payload };
-      const optimistic = { ...mutState.srv, ...mutState.mut };
-      const delta = calcRealDelta(optimistic, newEdited);
-      if (delta) {
-        return [mutState, delta] as StateOneDirty;
-      }
-      return [mutState, null] as StateOneClean;
-    }
+    case "edit":
+      return fromOneDirtyEdit(mutState, edited, event);
     case "cancel":
       return [mutState, null] as StateOneClean;
     case "submit":
-      return (function(): StateTwoClean {
-        return [
-          {
-            ...mutState,
-            status: "mut2",
-            mut2: edited,
-          },
-          null,
-        ];
-      })();
+      return [
+        {
+          ...mutState,
+          status: "mut2",
+          mut2: edited,
+        },
+        null,
+      ] as StateTwoClean;
     case "mutSucc":
-      return (function(): StateZeroClean | StateZeroDirty {})();
+      return fromOneDirtyMutSucc(edited, event);
     case "mutFail":
       return [
         { status: "idle", srv: mutState.srv },
@@ -213,4 +194,22 @@ function fromOneDirty(mutState: StateOne, edited: Dirty, event: Event): State {
     default:
       return [mutState, edited] as StateOneDirty;
   }
+}
+
+function fromOneDirtyEdit(mutState: StateOne, edited: Dirty, event: EventEdit) {
+  const newEdited = { ...edited, ...event.payload };
+  const optimistic = { ...mutState.srv, ...mutState.mut };
+  const delta = calcRealDelta(optimistic, newEdited);
+  if (delta) {
+    return [mutState, delta] as StateOneDirty;
+  }
+  return [mutState, null] as StateOneClean;
+}
+
+function fromOneDirtyMutSucc(edited: Dirty, event: EventMutSucc) {
+  const delta = calcRealDelta(event.response, edited);
+  if (delta) {
+    return [{ status: "idle", srv: event.response }, delta] as StateZeroDirty;
+  }
+  return [{ status: "idle", srv: event.response }, null] as StateZeroClean;
 }
