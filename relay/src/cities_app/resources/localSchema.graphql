@@ -30,7 +30,6 @@ type UIUserSettingsState {
   mutDelta: UIUserSettingsDelta
   mut2Delta: UIUserSettingsDelta
   editedDelta: UIUserSettingsDelta
-  optimistic: UserSettings
 }
 
 type UIUserSettingsDelta {

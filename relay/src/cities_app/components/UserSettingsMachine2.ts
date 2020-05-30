@@ -1,6 +1,5 @@
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 import { RequireAtLeastOne } from "../helpers/typeUtils";
-import { User } from "../types.codegen";
 
 type UserSettingsType = UserSettings_user["settings"];
 

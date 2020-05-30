@@ -1,119 +1,70 @@
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
+import { RequireAtLeastOne } from "../helpers/typeUtils";
 
 type UserSettingsType = UserSettings_user["settings"];
 
-type MachineStateIdle = {
-  status: "idle";
-  srv: UserSettingsType; // server state
-};
-
-type MachineStateMut = {
-  status: "mut";
-  srv: UserSettingsType;
-  mut: Partial<UserSettingsType>; // active mutation delta
-};
-
-type MachineStateMut2 = {
-  status: "mut2";
-  srv: UserSettingsType;
-  mut: Partial<UserSettingsType>;
-  mut2: Partial<UserSettingsType>; // queued mutation delta
-};
-
-type MachineState = MachineStateIdle | MachineStateMut | MachineStateMut2;
-
-type State = { remote: MachineState; local: Partial<UserSettingsType> | null };
+type State = StateIdle | StateInFlight | StateSecondQueued;
 
 type Event =
-  | { type: "edit"; fieldName: keyof UserSettingsType; value: any }
-  | { type: "submit" }
-  | { type: "cancel" }
-  | { type: "mutSucc"; response: UserSettingsType }
-  | { type: "mutFail" };
+  | EventEdit
+  | EventSubmit
+  | EventCancel
+  | EventMutSucc
+  | EventMutFail;
 
-function reducer(
-  state: State,
-  event: Event
-): State | [State | "startMutation"] {
-  switch (state.remote.status) {
+type StateIdle = {
+  status: "idle";
+  srv: UserSettingsType;
+};
+type StateInFlight = {
+  status: "inFlight";
+  srv: UserSettingsType;
+  inFlight: RequireAtLeastOne<UserSettingsType>; // active mutation delta
+};
+type StateSecondQueued = {
+  status: "secondQueued";
+  srv: UserSettingsType;
+  inFlight: RequireAtLeastOne<UserSettingsType>;
+  queued: RequireAtLeastOne<UserSettingsType>; // queued mutation delta
+};
+
+type EventEdit = {
+  type: "edit";
+  payload: RequireAtLeastOne<UserSettingsType>;
+};
+type EventSubmit = { type: "submit" };
+type EventCancel = { type: "cancel" };
+type EventMutSucc = { type: "mutSucc"; response: UserSettingsType };
+type EventMutFail = { type: "mutFail" };
+
+function transit(state: State, event: Event): State {
+  switch (state.status) {
     case "idle": {
-      if (state.local === null) {
-        return { ...state, local: idleReducerClean(state.remote, event) };
-      }
-      return idleReducerDirty(state.remote, state.local, event);
+      return fromIdle(state, event);
     }
-    case "mut": {
-      //return mutReducer(state, event);
+    case "inFlight": {
+      return fromInFlight(state, event);
     }
-    case "mut2":
-    //return mut2Reducer(state, event);
+    case "secondQueued": {
+      return fromSecondQueued(state, event);
+    }
     default:
       // impossible
       throw new Error("impossible state is in fact possible");
   }
 }
 
-function idleReducerClean(
-  remote: MachineStateIdle,
-  event: Event
-): Partial<UserSettingsType> | null {
-  if (event.type === "edit") {
-    let { fieldName, value } = event;
-    if (value !== remote.srv[fieldName]) {
-      return { [fieldName]: value };
-    }
+function calcRealDelta(
+  base: UserSettingsType,
+  possibleDelta: RequireAtLeastOne<UserSettingsType>
+): RequireAtLeastOne<UserSettingsType> | null {
+  const differentEntries = Object.entries(possibleDelta).filter(
+    //@ts-ignore
+    ([k, v]) => base[k] !== v
+  );
+  if (differentEntries.length > 0) {
+    //@ts-ignore
+    return Object.fromEntries(differentEntries);
   }
   return null;
 }
-
-function idleReducerDirty(
-  remote: MachineStateIdle,
-  local: Partial<UserSettingsType>,
-  event: Event
-):
-  | { remote: MachineStateIdle; local: Partial<UserSettingsType> | null }
-  | { remote: MachineStateMut; local: null } {
-  if (event.type === "edit") {
-    let { fieldName, value } = event;
-    if (value !== remote.srv[fieldName]) {
-      return { remote, local: { [fieldName]: value } };
-    }
-  }
-  return { remote, local: null };
-}
-
-// function mutReducer(
-//   state: MachineStateMut,
-//   event: Event
-// ): MachineStateIdle | MachineStateMut | MachineStateMut2 {
-//   const optimistic = { ...state.srv, ...state.mut };
-//   switch (event.type) {
-//     case "edit": {
-//       let { fieldName, value } = event;
-//       if (value !== optimistic[fieldName]) {
-//         return { ...state, loc: { ...state.loc, [fieldName]: value } };
-//       }
-//       return state;
-//     }
-//     case "submit": {
-//       if (state.loc) {
-//         return { ...state, status: "mut2", mut2: state.loc, loc: null };
-//       }
-//       return state;
-//     }
-//     case "cancel":
-//       return { ...state, loc: null };
-//     case "mutSucc": {
-//       let response = { event };
-//       if (state.loc) {
-//         let diff = state.loc;
-//         return;
-//       }
-//       return { srv: serverResponse, mut: null, mut2: null, loc: null };
-//     }
-//     default:
-//       return state;
-//   }
-// }
-
-// function mut2Reducer(state: MachineStateMut2, event: Event) {}
