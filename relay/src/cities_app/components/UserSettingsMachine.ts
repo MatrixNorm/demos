@@ -2,6 +2,7 @@ import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 import { RequireAtLeastOne } from "../helpers/typeUtils";
 
 type UserSettingsType = UserSettings_user["settings"];
+type Delta = RequireAtLeastOne<UserSettingsType>;
 
 type State = StateIdle | StateInFlight | StateSecondQueued;
 
@@ -19,33 +20,42 @@ type StateIdle = {
 type StateInFlight = {
   status: "inFlight";
   srv: UserSettingsType;
-  inFlight: RequireAtLeastOne<UserSettingsType>; // active mutation delta
+  inFlight: Delta; // active mutation delta
 };
 type StateSecondQueued = {
   status: "secondQueued";
   srv: UserSettingsType;
-  inFlight: RequireAtLeastOne<UserSettingsType>;
-  queued: RequireAtLeastOne<UserSettingsType>; // queued mutation delta
+  inFlight: Delta;
+  queued: Delta; // queued mutation delta
 };
 
 type EventEdit = {
   type: "edit";
-  payload: RequireAtLeastOne<UserSettingsType>;
+  payload: Delta;
 };
 type EventSubmit = { type: "submit" };
 type EventCancel = { type: "cancel" };
 type EventMutSucc = { type: "mutSucc"; response: UserSettingsType };
 type EventMutFail = { type: "mutFail" };
 
-function transit(state: State, event: Event): State {
+function transit(state: State, event: Event, editedDelta: Delta): State {
   switch (state.status) {
     case "idle": {
+      const trueEditedDelta = calcRealDelta(state.srv, editedDelta);
       return fromIdle(state, event);
     }
     case "inFlight": {
+      const trueEditedDelta = calcRealDelta(
+        { ...state.srv, ...state.inFlight },
+        editedDelta
+      );
       return fromInFlight(state, event);
     }
     case "secondQueued": {
+      const trueEditedDelta = calcRealDelta(
+        { ...state.srv, ...state.inFlight, ...state.queued },
+        editedDelta
+      );
       return fromSecondQueued(state, event);
     }
     default:
@@ -54,10 +64,29 @@ function transit(state: State, event: Event): State {
   }
 }
 
+function fromIdle(state: StateIdle, event: Event) {
+  switch (event.type) {
+    case "edit": {
+      return state;
+    }
+    case "cancel":
+      return state;
+    case "submit":
+      return state;
+    default:
+      return state;
+  }
+}
+
+function calcRealDelta(base: UserSettingsType, possibleDelta: null): null;
 function calcRealDelta(
   base: UserSettingsType,
-  possibleDelta: RequireAtLeastOne<UserSettingsType>
-): RequireAtLeastOne<UserSettingsType> | null {
+  possibleDelta: Delta
+): Delta | null;
+function calcRealDelta(base: any, possibleDelta: any) {
+  if (possibleDelta === null) {
+    return null;
+  }
   const differentEntries = Object.entries(possibleDelta).filter(
     //@ts-ignore
     ([k, v]) => base[k] !== v
