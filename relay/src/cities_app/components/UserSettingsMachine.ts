@@ -47,10 +47,6 @@ function transit(
       return fromInFlight(state, event, editDelta);
     }
     case "secondQueued": {
-      const trueEditedDelta = calcRealDelta(
-        { ...state.srv, ...state.inFlight, ...state.queued },
-        editDelta
-      );
       return fromSecondQueued(state, event, editDelta);
     }
     default:
@@ -131,9 +127,9 @@ function fromSecondQueued(
   event: Event,
   editDelta: MaybeDelta
 ): [MutState, MaybeDelta] {
-  const optimistic = { ...mutState.srv, ...mutState.inFlight, ...mutState.queued };
   switch (event.type) {
     case "edit": {
+      const optimistic = { ...mutState.srv, ...mutState.inFlight, ...mutState.queued };
       const trueEditDelta = calcRealDelta(optimistic, {
         ...editDelta,
         ...event.payload,
@@ -143,13 +139,25 @@ function fromSecondQueued(
     case "cancel":
       return [mutState, null];
     case "submit": {
-      const trueEditDelta = calcRealDelta(optimistic, editDelta);
-      if (trueEditDelta) {
-        return [{ ...mutState, queued: trueEditDelta }, null];
+      const newQueued = { ...mutState.queued, ...editDelta };
+      const trueDiff = calcRealDelta(
+        { ...mutState.srv, ...mutState.inFlight },
+        newQueued
+      );
+      if (trueDiff) {
+        return [{ ...mutState, queued: trueDiff }, null];
       }
-      return [mutState, null];
+      return [{ status: "inFlight", srv: mutState.srv, inFlight: mutState.srv }, null];
     }
     case "mutSucc": {
+      // XXX
+      const trueDiff = calcRealDelta(event.response, {
+        ...mutState.queued,
+        ...editDelta,
+      });
+      if (trueDiff) {
+        return [{ status: "inFlight", srv: mutState.srv, inFlight: mutState.srv }, null];
+      }
       return [
         { status: "idle", srv: event.response },
         calcRealDelta(event.response, editDelta),
