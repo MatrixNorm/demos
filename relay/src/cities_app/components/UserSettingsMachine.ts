@@ -66,19 +66,29 @@ function fromIdle(
         ...editDelta,
         ...event.payload,
       });
-      return [mutState, trueEditDelta];
+      return [mutState as MutStateIdle, trueEditDelta];
     }
     case "cancel":
       return [mutState, null];
     case "submit": {
       const trueEditDelta = calcRealDelta(mutState.srv, editDelta);
       if (trueEditDelta) {
-        return [{ ...mutState, status: "inFlight", inFlight: trueEditDelta }, null];
+        return [
+          {
+            ...mutState,
+            status: "inFlight",
+            inFlight: trueEditDelta,
+          } as MutStateInFlight,
+          null,
+        ];
       }
-      return [mutState, null];
+      return [mutState as MutStateIdle, null];
     }
-    default:
+    case "mutSucc":
+    case "mutFail":
       return [mutState, editDelta];
+    default:
+    // XXX
   }
 }
 
@@ -94,31 +104,38 @@ function fromInFlight(
         ...editDelta,
         ...event.payload,
       });
-      return [mutState, trueEditDelta];
+      return [mutState as MutStateInFlight, trueEditDelta];
     }
     case "cancel":
       return [mutState, null];
     case "submit": {
       const trueEditDelta = calcRealDelta(optimistic, editDelta);
       if (trueEditDelta) {
-        return [{ ...mutState, status: "secondQueued", queued: trueEditDelta }, null];
+        return [
+          {
+            ...mutState,
+            status: "secondQueued",
+            queued: trueEditDelta,
+          } as MutStateSecondQueued,
+          null,
+        ];
       }
-      return [mutState, null];
+      return [mutState as MutStateInFlight, null];
     }
     case "mutSucc": {
       return [
-        { status: "idle", srv: event.response },
+        { status: "idle", srv: event.response } as MutStateIdle,
         calcRealDelta(event.response, editDelta),
       ];
     }
     case "mutFail": {
       return [
-        { status: "idle", srv: mutState.srv },
+        { status: "idle", srv: mutState.srv } as MutStateIdle,
         calcRealDelta(mutState.srv, mutState.inFlight),
       ];
     }
     default:
-      return [mutState, editDelta];
+    //
   }
 }
 
@@ -134,10 +151,10 @@ function fromSecondQueued(
         ...editDelta,
         ...event.payload,
       });
-      return [mutState, trueEditDelta];
+      return [mutState as MutStateSecondQueued, trueEditDelta];
     }
     case "cancel":
-      return [mutState, null];
+      return [mutState as MutStateSecondQueued, null];
     case "submit": {
       const newQueued = { ...mutState.queued, ...editDelta };
       const trueDiff = calcRealDelta(
@@ -145,9 +162,16 @@ function fromSecondQueued(
         newQueued
       );
       if (trueDiff) {
-        return [{ ...mutState, queued: trueDiff }, null];
+        return [{ ...mutState, queued: trueDiff } as MutStateSecondQueued, null];
       }
-      return [{ status: "inFlight", srv: mutState.srv, inFlight: mutState.srv }, null];
+      return [
+        {
+          status: "inFlight",
+          srv: mutState.srv,
+          inFlight: mutState.srv,
+        } as MutStateInFlight,
+        null,
+      ];
     }
     case "mutSucc": {
       // XXX
@@ -170,7 +194,7 @@ function fromSecondQueued(
       ];
     }
     default:
-      return [mutState, editDelta];
+    //
   }
 }
 
