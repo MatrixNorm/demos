@@ -1,36 +1,28 @@
-// Consider FSM in typescript
+// Consider following function overloading and implementation.
 
-// Event type
-type Evt = EvtFoo | EvtBar;
-type EvtFoo = { type: "foo"; payload: unknown };
-type EvtBar = { type: "bar"; payload: unknown };
+function foo(param: number): boolean;
+function foo(param: string): string;
 
-// State type
-type State = StateX | StateY;
-type StateX = { status: "x"; data: number };
-type StateY = { status: "y"; data: string };
-
-function transit(s: StateX, e: EvtFoo): StateY;
-function transit(s: StateX, e: EvtBar): StateX;
-function transit(s: StateY, e: EvtFoo): StateX;
-function transit(s: StateY, e: EvtBar): StateY;
-function transit(s: any, e: any) {
-  if (s.status === "x") {
-    if (e.type === "foo") {
-      return { status: "x", data: 7 };
-      //return { status: "y", data: "abc" };
-    }
-    if (e.type === "bar") {
-      return { status: "x", data: 7 };
-    }
+function foo(param) {
+  if (typeof param === "number") {
+    // typescript does not complain that 12 is not boolean
+    return 12;
+  } else if (typeof param === "string") {
+    // typescript does not complain that {} is not string
+    return {};
   }
-  if (s.status === "y") {
-    if (e.type === "foo") {
-      return { status: "x", data: 5 };
-    }
-    if (e.type === "bar") {
-      return { status: "y", data: "xyz" };
-    }
-  }
-  return 1;
 }
+
+/*
+
+Here is how one can interprete it:
+  1. if function foo takes numeric param it should return boolean
+  2. if function foo takes string param it should return string
+  3. another calls should be prohibited
+
+Sure it is possible for type checker to verify 1&2 by analizing function code.
+But typescript does not do this - it only does 3.
+
+Is it possible to acheave in typescript above mentioned behaviour?
+
+*/
