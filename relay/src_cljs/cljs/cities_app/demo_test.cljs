@@ -21,4 +21,5 @@
   (prop/for-all [v (gen/vector gen/int)]
                 (= (sort v) (sort (sort v)))))
 
-; (println (tc/quick-check 100 sort-idempotent-prop))
+(println (+ 1 2))
+;; => 

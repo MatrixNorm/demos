@@ -4,7 +4,7 @@
  ;; :dev-http {8080 "cljs_build"}
  :builds
  {:cities-app {:target :browser
-               :output-dir "cljs_build/js"
+               :output-dir "__gen__/cljs_build/js"
                :modules {:main {:entries [cljs.cities-app.main]}}}
   
   :test {:target    :node-test
