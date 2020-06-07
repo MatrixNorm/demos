@@ -9,7 +9,7 @@
 ;   (is (= 1 1)))
 
 ; (deftest a-failing-test
-;   (do 
+;   (do 6
 ;     (js/console.log ((uuidGen "boss")))
 ;     (is (= 1 2))))
 
@@ -21,5 +21,5 @@
   (prop/for-all [v (gen/vector gen/int)]
                 (= (sort v) (sort (sort v)))))
 
-(println (+ 1 2))
+(gen/sample (gen/vector gen/int))
 ;; => 
