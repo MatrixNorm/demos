@@ -21,5 +21,20 @@
   (prop/for-all [v (gen/vector gen/int)]
                 (= (sort v) (sort (sort v)))))
 
-(gen/sample (gen/vector gen/int))
-;; => 
+(gen/sample (gen/choose 2 15))
+
+(def user-settings-gen
+ (gen/hash-map
+  "citiesPaginationPageSize" (gen/choose 2 15)
+  "foo" gen/string
+  "bar" gen/nat))
+
+(def user-settings-delta-gen 
+  (gen/let [m user-settings-gen
+            k (gen/return (keys m))]
+    (select-keys m k)))
+
+(gen/sample user-settings-delta-gen)
+
+
+
