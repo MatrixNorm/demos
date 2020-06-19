@@ -1,3 +1,20 @@
+type State<T> = StateIdle | StateMutPending<T> | StateMut2Queued<T>;
+type StateIdle = { status: "idle"; context: {} };
+type StateMutPending<T> = { status: "mut-pending"; context: { optUpd: T } };
+type StateMut2Queued<T> = { status: "mut2-queued"; context: { optUpd: T; optUpd2: T } };
+
+type Event<T> = EvEdit<T> | EvStartMut | EvClear | EvMutSucc<T> | EvMutFail;
+type EvEdit<T> = {
+  type: "edit";
+  payload: Partial<T>;
+};
+type EvStartMut = { type: "start-mut" };
+type EvClear = { type: "clear" };
+type EvMutSucc<T> = { type: "mut-succ"; serverValue: T };
+type EvMutFail = { type: "mut-fail" };
+
+type DbType<T> = { sv: T; ed: Partial<T> };
+
 function merge(obX: object, obY: object) {
   return { ...obX, ...obY };
 }
@@ -17,18 +34,20 @@ function diff(possibleDiff: object, base: object) {
   return null;
 }
 
-type FsmState = "idle" | "mut-pending" | "mut2-queued";
-
-export function transit(fsmState, event, context, db) {
-  switch (fsmState) {
+export function transit<T extends object>(
+  state: State<T>,
+  event: Event<T>,
+  db: DbType<T>
+) {
+  switch (state.status) {
     case "idle": {
       return transitFromIdle(event, db);
     }
     case "mut-pending": {
-      return transiFromMutPending(event, context, db);
+      return transiFromMutPending(event, state.context, db);
     }
     case "mut2-queued": {
-      return transitFromMut2Queued(event, context, db);
+      return transitFromMut2Queued(event, state.context, db);
     }
     default:
       // impossible
@@ -36,7 +55,7 @@ export function transit(fsmState, event, context, db) {
   }
 }
 
-function transitFromIdle(event, db) {
+function transitFromIdle<T extends object>(event: Event<T>, db: DbType<T>) {
   switch (event.type) {
     case "clear": {
       return ["idle", {}, [{ "db/ed": null }]];
@@ -60,7 +79,11 @@ function transitFromIdle(event, db) {
   }
 }
 
-function transiFromMutPending(event, context, db) {
+function transiFromMutPending<T extends object>(
+  event: Event<T>,
+  context: StateMutPending<T>["context"],
+  db: any
+) {
   switch (event.type) {
     case "clear": {
       return ["mut-pending", context, [{ "db/ed": null }]];
@@ -95,7 +118,11 @@ function transiFromMutPending(event, context, db) {
   }
 }
 
-function transitFromMut2Queued(event, context, db) {
+function transitFromMut2Queued<T extends object>(
+  event: Event<T>,
+  context: StateMut2Queued<T>["context"],
+  db: any
+) {
   switch (event.type) {
     case "clear": {
       return ["mut-pending", context, [{ "db/ed": null }]];
