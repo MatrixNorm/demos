@@ -1,9 +1,9 @@
-type State<T> = StateIdle | StateMutPending<T> | StateMut2Queued<T>;
+export type State<T> = StateIdle | StateMutPending<T> | StateMut2Queued<T>;
 type StateIdle = { status: "idle"; context: {} };
 type StateMutPending<T> = { status: "mut-pending"; context: { optUpd: T } };
 type StateMut2Queued<T> = { status: "mut2-queued"; context: { optUpd: T; optUpd2: T } };
 
-type Event<T> = EvEdit<T> | EvStartMut | EvClear | EvMutSucc<T> | EvMutFail;
+export type Event<T> = EvEdit<T> | EvStartMut | EvClear | EvMutSucc<T> | EvMutFail;
 type EvEdit<T> = {
   type: "edit";
   payload: Partial<T>;
@@ -15,7 +15,9 @@ type EvMutFail = { type: "mut-fail" };
 
 type DbType<T> = { sv: T; ed: Partial<T> };
 
-function merge(obX: object, obY: object) {
+type ReturnType<T> = [State<T>, any] | null;
+
+function merge<T extends object>(obX: T, obY: T): T {
   return { ...obX, ...obY };
 }
 
@@ -38,7 +40,7 @@ export function transit<T extends object>(
   state: State<T>,
   event: Event<T>,
   db: DbType<T>
-) {
+): ReturnType<T> {
   switch (state.status) {
     case "idle": {
       return transitFromIdle(event, db);
@@ -55,20 +57,25 @@ export function transit<T extends object>(
   }
 }
 
-function transitFromIdle<T extends object>(event: Event<T>, db: DbType<T>) {
+function transitFromIdle<T extends object>(
+  event: Event<T>,
+  db: DbType<T>
+): ReturnType<T> {
   switch (event.type) {
     case "clear": {
-      return ["idle", {}, [{ "db/ed": null }]];
+      return [{ status: "idle", context: {} }, [{ "db/ed": null }]];
     }
     case "edit": {
-      return ["idle", {}, [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }]];
+      return [
+        { status: "idle", context: {} },
+        [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }],
+      ];
     }
     case "start-mut": {
       if (diff(db.ed, db.sv)) {
         const optUpd = merge(db.sv, db.ed);
         return [
-          "mut-pending",
-          { "opt-upd": optUpd },
+          { status: "mut-pending", context: { optUpd } },
           [{ "db/ed": null }, { commitMutation: optUpd }],
         ];
       }
@@ -83,15 +90,14 @@ function transiFromMutPending<T extends object>(
   event: Event<T>,
   context: StateMutPending<T>["context"],
   db: any
-) {
+): ReturnType<T> {
   switch (event.type) {
     case "clear": {
-      return ["mut-pending", context, [{ "db/ed": null }]];
+      return [{ status: "mut-pending", context }, [{ "db/ed": null }]];
     }
     case "edit": {
       return [
-        "mut-pending",
-        context,
+        { status: "mut-pending", context },
         [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }],
       ];
     }
@@ -99,18 +105,20 @@ function transiFromMutPending<T extends object>(
       if (diff(db.ed, db.sv)) {
         const optUpd2 = merge(db.sv, db.ed);
         return [
-          "mut2-queued",
-          { ...context, "opt-upd2": optUpd2 },
+          { status: "mut2-queued", context: { ...context, optUpd2 } },
           [{ "db/ed": null }, { applyUpdate: optUpd2 }],
         ];
       }
       return null;
     }
     case "mut-succ": {
-      return ["idle", {}, []];
+      return [{ status: "idle", context: {} }, []];
     }
     case "mut-fail": {
-      return ["idle", {}, [{ "db/ed": diff(context.optUpd, db.sv) }]];
+      return [
+        { status: "idle", context: {} },
+        [{ "db/ed": diff(context.optUpd, db.sv) }],
+      ];
     }
     default:
       // impossible
@@ -122,15 +130,14 @@ function transitFromMut2Queued<T extends object>(
   event: Event<T>,
   context: StateMut2Queued<T>["context"],
   db: any
-) {
+): ReturnType<T> {
   switch (event.type) {
     case "clear": {
-      return ["mut-pending", context, [{ "db/ed": null }]];
+      return [{ status: "mut-pending", context }, [{ "db/ed": null }]];
     }
     case "edit": {
       return [
-        "mut-pending",
-        context,
+        { status: "mut-pending", context },
         [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }],
       ];
     }
@@ -138,8 +145,7 @@ function transitFromMut2Queued<T extends object>(
       if (diff(db.ed, db.sv)) {
         const optUpd2 = merge(db.sv, db.ed);
         return [
-          "mut2-queued",
-          { ...context, "opt-upd2": optUpd2 },
+          { status: "mut2-queued", context: { ...context, optUpd2 } },
           [
             { "db/ed": null },
             { revertUpdate: context.optUpd2 },
@@ -152,16 +158,21 @@ function transitFromMut2Queued<T extends object>(
     case "mut-succ": {
       if (diff(context.optUpd2, db.sv)) {
         return [
-          "mut-pending",
-          { "opt-upd": merge(db.sv, context.optUpd2) },
+          {
+            status: "mut-pending",
+            context: { optUpd: merge(db.sv, context.optUpd2) },
+          },
           [{ revertUpdate: context.optUpd2 }, { commitMutation: context.optUpd2 }],
         ];
       } else {
-        return ["idle", {}, [{ revertUpdate: context.optUpd2 }]];
+        return [{ status: "idle", context: {} }, [{ revertUpdate: context.optUpd2 }]];
       }
     }
     case "mut-fail": {
-      return ["idle", {}, [{ "db/ed": diff(context.optUpd, db.sv) }]];
+      return [
+        { status: "idle", context: {} },
+        [{ "db/ed": diff(context.optUpd, db.sv) }],
+      ];
     }
     default:
       // impossible
