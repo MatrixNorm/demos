@@ -58,17 +58,17 @@ describe("???", () => {
         query={graphql`
           query UserSettingsTestQuery @relay_test_operation {
             viewer {
-              ...UserSettings_user
+              id
+              settings {
+                ...UserSettings_settings
+              }
             }
           }
         `}
         environment={env}
         variables={{}}
         render={({ props }) => {
-          return (
-            props &&
-            props.viewer && <UserSettingsComponent user={props.viewer} />
-          );
+          return props && props.viewer && <UserSettingsComponent user={props.viewer} />;
         }}
       />
     );
@@ -139,11 +139,7 @@ describe("???", () => {
     expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
   });
 
-  function locallyChangeSingleInput(
-    name: string,
-    initialValue: any,
-    changedValue: any
-  ) {
+  function locallyChangeSingleInput(name: string, initialValue: any, changedValue: any) {
     const input = inputElements[name];
     const section = sectionElements[name];
 
@@ -175,19 +171,11 @@ describe("???", () => {
   });
 
   test("locally change foo", () => {
-    locallyChangeSingleInput(
-      "foo",
-      initialSettings.foo,
-      initialSettings.foo + "XYZ"
-    );
+    locallyChangeSingleInput("foo", initialSettings.foo, initialSettings.foo + "XYZ");
   });
 
   test("locally change bar", () => {
-    locallyChangeSingleInput(
-      "bar",
-      initialSettings.bar,
-      initialSettings.bar + 1
-    );
+    locallyChangeSingleInput("bar", initialSettings.bar, initialSettings.bar + 1);
   });
 
   function mutateSingleFieldPrecondition(name: string, initialValue: any) {
@@ -270,10 +258,7 @@ describe("???", () => {
 
   function mutateSingleFieldServerError(name: string, initialSettings: any) {
     const initialValue = initialSettings[name];
-    const { input, section } = mutateSingleFieldPrecondition(
-      name,
-      initialValue
-    );
+    const { input, section } = mutateSingleFieldPrecondition(name, initialValue);
     // server error
     env.mock.resolveMostRecentOperation({
       errors: [{ message: "sheise" }],
@@ -318,9 +303,7 @@ describe("???", () => {
       submitButton.props.onClick();
     });
 
-    expect(inputElements.citiesPaginationPageSize.props.value).toEqual(
-      newValue
-    );
+    expect(inputElements.citiesPaginationPageSize.props.value).toEqual(newValue);
     // foo and bar ara unchanged
     expect(inputElements.foo.props.value).toEqual(initialSettings.foo);
     expect(inputElements.bar.props.value).toEqual(initialSettings.bar);

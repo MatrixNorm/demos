@@ -1,83 +1,140 @@
 import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
-import UpdateUserSettingsMutation from "../mutations/UpdateUserSettingsMutation";
-import UserSettingsPresentational from "./UserSettingsPresentational";
-import { useLocalCache } from "../helpers/ComponentLocalCacheHook";
+import styled from "styled-components";
+import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
+import { NumberInput, TextInput } from "../elements/Inputs";
+import { SubmitButton } from "../elements/Buttons";
 import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
 
 export type UserSettingsType = UserSettings_user["settings"];
 
-type Props = {
-  user: UserSettings_user;
-  relay: RelayProp;
-};
-
-export const UserSettingsComponent = ({ user, relay }: Props) => {
-  const [locCache, setLocCache, isEdited, getDelta] = useLocalCache<
-    UserSettingsType
-  >(user.settings);
-
-  const handleSubmit = () => {
-    const delta = getDelta();
-    if (Object.values(delta).map(Boolean).length > 0) {
-      UpdateUserSettingsMutation.commit({
-        environment: relay.environment,
-        input: {
-          userId: user.id,
-          ...delta,
-        },
-        currentSettings: user.settings,
-      });
-    }
-  };
-
-  function abc<K extends keyof UserSettingsType, V extends UserSettingsType[K]>(
-    attr: K
-  ) {
-    return {
-      name: attr,
-      value: locCache[attr],
-      isEdited: isEdited(attr),
-      onChange: (value: V) => {
-        setLocCache({
-          ...locCache,
-          [attr]: value,
-        });
-      },
-    };
+export const Section = styled.section`
+  display: flex;
+  min-height: 1.5em;
+  padding: 0.5em 0 0.5em 0;
+  .editing {
+    background: red;
   }
+  .setting-name {
+    flex: auto;
+  }
+`;
 
+export const UserSettingsSuccess = styled.div`
+  .placeholder {
+    position: relative;
+  }
+  display: flex;
+  flex-direction: column;
+  .button-box {
+    text-align: center;
+  }
+`;
+export const UserSettingsLoading = styled(UserSettingsSuccess)`
+  ${placeholderCssMixin}
+`;
+
+function SectionComponent({
+  value,
+  isEdited,
+  name,
+  label,
+  onChange,
+  children,
+}: {
+  value: any;
+  isEdited: boolean;
+  name: string;
+  label: string;
+  onChange: any;
+  children: any;
+}) {
   return (
-    <UserSettingsPresentational
-      fields={{
-        citiesPaginationPageSize: abc("citiesPaginationPageSize"),
-        foo: abc("foo"),
-        bar: abc("bar"),
-      }}
-      onSubmit={handleSubmit}
-    />
+    <Section test-id={`${name}-section`} className={isEdited ? "editing" : ""}>
+      <div className="setting-name">
+        <span className="setting-name-label placeholder">{label}</span>
+      </div>
+      <div className="placeholder">
+        {React.Children.map(children, (child) => {
+          return React.cloneElement(child, {
+            value,
+            onChange,
+            "test-id": `${name}-input`,
+          });
+        })}
+      </div>
+    </Section>
   );
-};
+}
 
-export default createFragmentContainer(UserSettingsComponent, {
-  user: graphql`
-    fragment UserSettings_user on User {
-      id
-      settings {
+export default createFragmentContainer(
+  ({ settings, editDelta, onSubmit, onClear, onEdit }: any) => {
+    const isLoading = React.useContext(LoadingContext);
+    const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
+
+    function xxx(name: string) {
+      let value = (editDelta || {})[name] || settings[name];
+      return {
+        value,
+        isEdited: value != settings[name],
+        name,
+        onChange: (val: any) => onEdit(name, val),
+      };
+    }
+
+    return (
+      <UserSettings>
+        <SectionComponent
+          {...xxx("citiesPaginationPageSize")}
+          label="Pagination Page Size"
+        >
+          <NumberInput step="1" />
+        </SectionComponent>
+        <SectionComponent {...xxx("foo")} label="Foo parameter">
+          <TextInput />
+        </SectionComponent>
+        <SectionComponent {...xxx("bar")} label="Bar parameter">
+          <NumberInput step="1" />
+        </SectionComponent>
+        <div className="button-box">
+          <span className="placeholder">
+            <SubmitButton
+              onClick={onSubmit}
+              test-id="submit-button"
+              className={
+                editDelta && Object.entries(editDelta).length > 0 ? "editing" : ""
+              }
+            >
+              Sync
+            </SubmitButton>
+          </span>
+        </div>
+      </UserSettings>
+    );
+  },
+  {
+    settings: graphql`
+      fragment UserSettings_settings on UserSettings {
         citiesPaginationPageSize
         foo
         bar
       }
-    }
-  `,
-});
+    `,
+    editDelta: graphql`
+      fragment UserSettings_editDelta on UIUserSettingsDelta {
+        citiesPaginationPageSize
+        foo
+        bar
+      }
+    `,
+  }
+);
 
 export const defaultData = {
-  __typename: "User",
-  id: "1",
   settings: {
     citiesPaginationPageSize: 5,
     foo: "a",
     bar: 1,
   },
+  editDelta: null,
 };

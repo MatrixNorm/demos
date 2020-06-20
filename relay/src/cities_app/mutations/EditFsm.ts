@@ -1,9 +1,9 @@
-export type State<T> = StateIdle | StateMutPending<T> | StateMut2Queued<T>;
 type StateIdle = { status: "idle"; context: {} };
 type StateMutPending<T> = { status: "mut-pending"; context: { optUpd: T } };
 type StateMut2Queued<T> = { status: "mut2-queued"; context: { optUpd: T; optUpd2: T } };
 
-export type Event<T> = EvEdit<T> | EvStartMut | EvClear | EvMutSucc<T> | EvMutFail;
+export type State<T> = StateIdle | StateMutPending<T> | StateMut2Queued<T>;
+
 type EvEdit<T> = {
   type: "edit";
   payload: Partial<T>;
@@ -13,11 +13,12 @@ type EvClear = { type: "clear" };
 type EvMutSucc<T> = { type: "mut-succ"; serverValue: T };
 type EvMutFail = { type: "mut-fail" };
 
-type DbType<T> = { sv: T; ed: Partial<T> };
+export type Event<T> = EvEdit<T> | EvStartMut | EvClear | EvMutSucc<T> | EvMutFail;
 
+type DbType<T> = { sv: T; ed: Partial<T> | null };
 type ReturnType<T> = [State<T>, any] | null;
 
-function merge<T extends object>(obX: T, obY: T): T {
+function merge<T extends object>(obX: T, obY: T | Partial<T> | null): T {
   return { ...obX, ...obY };
 }
 
@@ -68,11 +69,11 @@ function transitFromIdle<T extends object>(
     case "edit": {
       return [
         { status: "idle", context: {} },
-        [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }],
+        [{ "db/ed": diff(merge(db.ed || {}, event.payload), db.sv) }],
       ];
     }
     case "start-mut": {
-      if (diff(db.ed, db.sv)) {
+      if (diff(db.ed || {}, db.sv)) {
         const optUpd = merge(db.sv, db.ed);
         return [
           { status: "mut-pending", context: { optUpd } },

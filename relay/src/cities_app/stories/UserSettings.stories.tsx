@@ -10,7 +10,10 @@ const query1 = graphql`
   query UserSettingsStoryQuery($userId: ID!) {
     node(id: $userId) {
       ... on User {
-        ...UserSettings_user
+        id
+        settings {
+          ...UserSettings_settings
+        }
       }
     }
   }
@@ -39,20 +42,20 @@ export const demo1 = () => {
       settings: {
         citiesPaginationPageSize: 10,
         foo: "Hello, Nik",
-        bar: 11
-      }
-    }
+        bar: 11,
+      },
+    },
   };
   const environment = createTestingEnv({
     Query: {
       node(_: any, { id }: { id: string }) {
         return nodes[id];
-      }
+      },
     },
     Node: {
       __resolveType(node: any) {
         return node.__type || null;
-      }
+      },
     },
     Mutation: {
       updateUserSettings(_: any, { input }: any) {
@@ -68,8 +71,8 @@ export const demo1 = () => {
           settingsRef.bar = bar;
         }
         return { user: nodes[userId] };
-      }
-    }
+      },
+    },
   });
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
@@ -117,10 +120,7 @@ export const full = () => {
         environment={environment}
         variables={{ userId: "user#1" }}
         render={({ props }) => {
-          return (
-            props &&
-            props.node && <div>{JSON.stringify(props.node.settings)}</div>
-          );
+          return props && props.node && <div>{JSON.stringify(props.node.settings)}</div>;
         }}
       />
     </>

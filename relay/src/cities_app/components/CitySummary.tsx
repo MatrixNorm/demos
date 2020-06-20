@@ -1,6 +1,7 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
+import { NukeFragRef } from "../helpers/typeUtils";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
@@ -75,4 +76,4 @@ export const defaultData = {
   name: "aaaaaaaaa",
   country: "bbbbbbbbbbbb",
   population: 1000000,
-};
+} as NukeFragRef<CitySummary_city>;
