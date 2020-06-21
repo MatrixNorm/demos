@@ -73,7 +73,7 @@ export default createFragmentContainer(
 export const defaultData = {
   __typename: "City",
   id: "1",
-  name: "aaaaaaaaa",
-  country: "bbbbbbbbbbbb",
+  name: "Oak City",
+  country: "Forestland",
   population: 1000000,
 } as NukeFragRef<CitySummary_city>;

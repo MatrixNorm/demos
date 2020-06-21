@@ -1,12 +1,13 @@
 import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
+import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
-import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
-
-export type UserSettingsType = UserSettings_user["settings"];
+import { NukeFragRef } from "../helpers/typeUtils";
+import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
+import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 
 export const Section = styled.section`
   display: flex;
@@ -67,19 +68,38 @@ function SectionComponent({
   );
 }
 
+type Props = {
+  settings: UserSettings_settings;
+  editDelta: UserSettings_editDelta | null;
+  relay: RelayProp;
+};
+
 export default createFragmentContainer(
-  ({ settings, editDelta, onSubmit, onClear, onEdit }: any) => {
+  ({ settings, editDelta, relay }: Props) => {
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
 
-    function xxx(name: string) {
+    function xxx(name: keyof NukeFragRef<UserSettings_settings>) {
       let value = (editDelta || {})[name] || settings[name];
       return {
         value,
         isEdited: value != settings[name],
         name,
-        onChange: (val: any) => onEdit(name, val),
+        onChange: (val: any) => {
+          UserSettingsUpdateController.handleEvent(
+            { type: "edit", payload: { [name]: val } },
+            relay.environment
+          );
+        },
       };
+    }
+
+    function onSubmit() {
+      UserSettingsUpdateController.handleEvent({ type: "start-mut" }, relay.environment);
+    }
+
+    function onClear() {
+      UserSettingsUpdateController.handleEvent({ type: "clear" }, relay.environment);
     }
 
     return (
@@ -102,6 +122,8 @@ export default createFragmentContainer(
               onClick={onSubmit}
               test-id="submit-button"
               className={
+                // XXX
+                // merge(settings, editDelta) != settings
                 editDelta && Object.entries(editDelta).length > 0 ? "editing" : ""
               }
             >
@@ -135,6 +157,6 @@ export const defaultData = {
     citiesPaginationPageSize: 5,
     foo: "a",
     bar: 1,
-  },
+  } as NukeFragRef<UserSettings_settings>,
   editDelta: null,
 };
