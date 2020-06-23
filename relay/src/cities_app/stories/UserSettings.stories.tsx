@@ -43,7 +43,7 @@ export const demo1 = () => {
     settings: {
       citiesPaginationPageSize: 10,
       foo: "foo value",
-      bar: 11,
+      bar: 99,
     },
   };
   const environment = createTestingEnv({

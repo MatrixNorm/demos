@@ -51,24 +51,23 @@ export function handleEvent(
 ) {
   let sv = queryServerValue(environment);
   let ed = queryEditDelta(environment);
-  console.log({ sv, ed });
+  console.log({ sv, ed, event });
   if (sv === null) return;
   const ret = transit(fsmStateAtom[0], event, { sv, ed });
   if (ret) {
     const [nextFsmState, effects] = ret;
     fsmStateAtom[0] = nextFsmState;
-    processEffects(effects, environment, ed);
+    processEffects(effects, environment);
   }
 }
 
 function processEffects(
   effects: any,
-  environment: IEnvironment,
-  ed: Partial<UserSettings>
+  environment: IEnvironment
 ) {
   for (let eff of effects) {
     if ("db/ed" in eff) {
-      writeEditDeltaToDb(eff["db/ed"], environment, ed);
+      writeEditDeltaToDb(eff["db/ed"], environment);
       continue;
     }
     if ("commitMutation" in eff) {
@@ -88,8 +87,7 @@ function processEffects(
 
 function writeEditDeltaToDb(
   editDelta: Partial<UserSettings>,
-  environment: IEnvironment,
-  ed: Partial<UserSettings>
+  environment: IEnvironment
 ) {
   console.log(editDelta);
   const query = graphql`
@@ -107,7 +105,7 @@ function writeEditDeltaToDb(
   let data = {
     __typename: "__Root",
     uiState: {
-      userSettingsEditDelta: { ...editDelta, ...ed },
+      userSettingsEditDelta: editDelta,
     },
   };
   environment.commitPayload(operationDescriptor, data);
