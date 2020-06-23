@@ -54,6 +54,7 @@ export function handleEvent(
   console.log({ sv, ed, event });
   if (sv === null) return;
   const ret = transit(fsmStateAtom[0], event, { sv, ed });
+  console.log({ ret });
   if (ret) {
     const [nextFsmState, effects] = ret;
     fsmStateAtom[0] = nextFsmState;
@@ -61,34 +62,30 @@ export function handleEvent(
   }
 }
 
-function processEffects(
-  effects: any,
-  environment: IEnvironment
-) {
+function processEffects(effects: any, environment: IEnvironment) {
   for (let eff of effects) {
-    if ("db/ed" in eff) {
-      writeEditDeltaToDb(eff["db/ed"], environment);
-      continue;
-    }
-    if ("commitMutation" in eff) {
-      commitOptimisticMutation(eff["commitMutation"]);
-      continue;
-    }
-    if ("applyUpdate" in eff) {
-      applyOptimisticUpdate(eff["applyUpdate"]);
-      continue;
-    }
-    if ("revertUpdate" in eff) {
-      revertOptimisticUpdate(eff["revertUpdate"]);
-      continue;
+    switch (eff.type) {
+      case "db/ed": {
+        writeEditDeltaToDb(eff.params, environment);
+        break;
+      }
+      case "commitMutation": {
+        commitOptimisticMutation(eff.params, environment);
+        break;
+      }
+      case "applyUpdate": {
+        applyOptimisticUpdate(eff.params, environment);
+        break;
+      }
+      case "revertUpdate": {
+        revertOptimisticUpdate(eff.params, environment);
+        break;
+      }
     }
   }
 }
 
-function writeEditDeltaToDb(
-  editDelta: Partial<UserSettings>,
-  environment: IEnvironment
-) {
+function writeEditDeltaToDb(editDelta: Partial<UserSettings>, environment: IEnvironment) {
   console.log(editDelta);
   const query = graphql`
     query UserSettingsUpdateControllerEditDelta2Query {
@@ -111,6 +108,8 @@ function writeEditDeltaToDb(
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
 }
-function commitOptimisticMutation(optUpd: UserSettings) {}
-function applyOptimisticUpdate(optUpd: UserSettings) {}
-function revertOptimisticUpdate(optUpd: UserSettings) {}
+function commitOptimisticMutation(optUpd: UserSettings, environment: IEnvironment) {
+  console.log(optUpd);
+}
+function applyOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}
+function revertOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}

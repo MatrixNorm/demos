@@ -4,9 +4,7 @@ import {
   UpdateUserSettingsInput,
   UpdateUserSettingsMutationResponse,
 } from "__relay__/UpdateUserSettingsMutation.graphql";
-import { UserSettings_user } from "__relay__/UserSettings_user.graphql";
-
-type UserSettings = UserSettings_user["settings"];
+import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 
 const mutation = graphql`
   mutation UpdateUserSettingsMutation($input: UpdateUserSettingsInput!) {
@@ -25,7 +23,7 @@ const mutation = graphql`
 
 function buildOptimisticResponse(
   input: UpdateUserSettingsInput,
-  currentSettings: UserSettings
+  currentSettings: UserSettings_settings
 ): UpdateUserSettingsMutationResponse {
   return {
     updateUserSettings: {
@@ -33,8 +31,7 @@ function buildOptimisticResponse(
         id: input.userId,
         settings: {
           citiesPaginationPageSize:
-            input.citiesPaginationPageSize ||
-            currentSettings.citiesPaginationPageSize,
+            input.citiesPaginationPageSize || currentSettings.citiesPaginationPageSize,
           foo: input.foo || currentSettings.foo,
           bar: input.bar || currentSettings.bar,
         },
@@ -50,7 +47,7 @@ function commit({
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
-  currentSettings: UserSettings;
+  currentSettings: UserSettings_settings;
 }) {
   // XXX need validation?
   return commitMutation(environment, {

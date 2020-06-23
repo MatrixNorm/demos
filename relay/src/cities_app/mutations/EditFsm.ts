@@ -64,20 +64,24 @@ function transitFromIdle<T extends object>(
 ): ReturnType<T> {
   switch (event.type) {
     case "clear": {
-      return [{ status: "idle", context: {} }, [{ "db/ed": null }]];
+      return [{ status: "idle", context: {} }, [{ type: "db/ed", params: null }]];
     }
     case "edit": {
       return [
         { status: "idle", context: {} },
-        [{ "db/ed": diff(merge(db.ed || {}, event.payload), db.sv) }],
+        [{ type: "db/ed", params: diff(merge(db.ed || {}, event.payload), db.sv) }],
       ];
     }
     case "start-mut": {
-      if (diff(db.ed || {}, db.sv)) {
+      let mutInput = diff(db.ed || {}, db.sv);
+      if (mutInput) {
         const optUpd = merge(db.sv, db.ed);
         return [
           { status: "mut-pending", context: { optUpd } },
-          [{ "db/ed": null }, { commitMutation: optUpd }],
+          [
+            { type: "db/ed", params: null },
+            { type: "commitMutation", params: { optUpd, mutInput } },
+          ],
         ];
       }
       return null;
