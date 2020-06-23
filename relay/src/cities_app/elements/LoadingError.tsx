@@ -13,13 +13,7 @@ const StyledReload = styled.div`
   }
 `;
 
-export function Reload({
-  message,
-  onClick,
-}: {
-  message: string;
-  onClick: () => void;
-}) {
+export function Reload({ message, onClick }: { message: string; onClick: () => void }) {
   return (
     <StyledReload>
       <div className="message">{message}</div>
@@ -30,21 +24,16 @@ export function Reload({
   );
 }
 
-export function withReaload(Component) {
-  return function(props) {
+export function withReaload(Component: any) {
+  return function(props: any) {
     const [reload, setReload] = useState(false);
     if (reload) {
-      return (
-        <Reload
-          message="something went wrong"
-          onClick={() => setReload(false)}
-        />
-      );
+      return <Reload message="something went wrong" onClick={() => setReload(false)} />;
     }
     try {
-      const reactElement = <Component {...props} />;
-      if (reactElement) {
-        return reactElement;
+      const reactElementOrNull = <Component {...props} />;
+      if (reactElementOrNull) {
+        return reactElementOrNull;
       }
       setReload(true);
     } catch {

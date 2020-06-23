@@ -3,7 +3,6 @@ extend type Query {
 }
 
 type UIState {
-  id: ID!
   citySearchParams: UICitySearchParams
   notifications: [UINotification!]
   userSettingsEditDelta: UIUserSettingsDelta

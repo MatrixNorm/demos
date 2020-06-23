@@ -4,8 +4,11 @@ import { LocalQueryRenderer, QueryRenderer } from "react-relay";
 import {
   createOperationDescriptor,
   Environment,
+  IEnvironment,
   getRequest,
+  GraphQLTaggedNode,
   Network,
+  OperationType,
   RecordSource,
   Store,
 } from "relay-runtime";
@@ -14,29 +17,26 @@ import { css, keyframes } from "styled-components";
 const LoadingContext = createContext<Boolean>(false);
 export default LoadingContext;
 
-const noNetworkEnvironment = () => {
-  const network = Network.create(() => {
-    return { data: {} };
-  });
-  const store = new Store(new RecordSource());
-  const environment = new Environment({ network, store });
-  return environment;
-};
-
-export function LoadingPlaceholderQueryRenderer({
+export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
   query,
   environment,
   variables,
   placeholderData,
   render,
-}: any) {
+}: {
+  query: GraphQLTaggedNode;
+  environment: IEnvironment;
+  variables: T["variables"];
+  placeholderData: any;
+  render: ({ props }: { props: T["response"] }) => any;
+}) {
   return (
-    <QueryRenderer
+    <QueryRenderer<T>
       query={query}
       environment={environment}
       variables={variables}
-      render={({ props, error }: any) => {
-        if (!error && props === null) {
+      render={({ props, error }) => {
+        if (!error && !props) {
           return (
             <LoadingPlaceholder
               query={query}
@@ -49,20 +49,42 @@ export function LoadingPlaceholderQueryRenderer({
         if (error) {
           throw new Error();
         }
-        return render({ props, error });
+        if (!props) {
+          return null;
+        }
+        return render({ props });
       }}
     />
   );
 }
 
-export function LoadingPlaceholder({ query, variables, data, render }: any) {
-  const env = noNetworkEnvironment();
+const createDummyEnvironment = () => {
+  const network = Network.create(() => {
+    return { data: {} };
+  });
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};
+
+export function LoadingPlaceholder<T extends OperationType>({
+  query,
+  variables,
+  data,
+  render,
+}: {
+  query: GraphQLTaggedNode;
+  variables: T["variables"];
+  data: any;
+  render: ({ props }: { props: T["response"] }) => any;
+}) {
+  const env = createDummyEnvironment();
   const request = getRequest(query);
   const operation = createOperationDescriptor(request, variables);
   env.commitPayload(operation, data);
   return (
     <LoadingContext.Provider value={true}>
-      <LocalQueryRenderer<any>
+      <LocalQueryRenderer<T>
         query={query}
         environment={env}
         variables={variables}

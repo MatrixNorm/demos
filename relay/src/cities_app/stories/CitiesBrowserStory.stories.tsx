@@ -79,7 +79,6 @@ export const full = () => {
           query CitiesBrowserStoryUiQuery {
             __typename
             uiState {
-              id
               citySearchParams {
                 countryNameContains
                 populationGte

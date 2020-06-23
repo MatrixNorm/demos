@@ -41,9 +41,7 @@ export const single = () => {
       render={({ props }) => {
         return (
           props &&
-          props.notification && (
-            <Notification notification={props.notification} />
-          )
+          props.notification && <Notification notification={props.notification} />
         );
       }}
     />
@@ -57,7 +55,6 @@ export const multiple = () => {
       let payload = MockPayloadGenerator.generate(operation, {
         UIState() {
           return {
-            id: "ui-state",
             notifications: [
               { id: "notification#1", kind: "INFO", text: "Lorem ipsum" },
               { id: "notification#2", kind: "ERROR", text: "This sucks" },
@@ -89,9 +86,7 @@ export const multiple = () => {
       environment={env}
       variables={{}}
       render={({ props }) => {
-        return (
-          props && props.uiState && <Notifications state={props.uiState} />
-        );
+        return props && props.uiState && <Notifications state={props.uiState} />;
       }}
     />
   );

@@ -12,7 +12,7 @@ type Props = {
 
 function SettingsPage({ environment }: Props) {
   return (
-    <LoadingPlaceholderQueryRenderer
+    <LoadingPlaceholderQueryRenderer<SettingsPageQuery>
       query={graphql`
         query SettingsPageQuery {
           viewer {
@@ -31,10 +31,10 @@ function SettingsPage({ environment }: Props) {
       environment={environment}
       variables={{}}
       placeholderData={{
-        viewer: { ...defaultData },
+        viewer: { id: "1", ...defaultData },
         uiState: null,
       }}
-      render={({ props }: any) => {
+      render={({ props }) => {
         return (
           props &&
           props.viewer && (

@@ -86,6 +86,7 @@ export default createFragmentContainer(
         isEdited: value != settings[name],
         name,
         onChange: (val: any) => {
+          console.log(val)
           UserSettingsUpdateController.handleEvent(
             { type: "edit", payload: { [name]: val } },
             relay.environment
