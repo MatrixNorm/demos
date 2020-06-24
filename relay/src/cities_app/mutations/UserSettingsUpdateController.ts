@@ -1,11 +1,18 @@
 import { graphql } from "react-relay";
-import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
+import {
+  commitLocalUpdate,
+  createOperationDescriptor,
+  getRequest,
+  IEnvironment,
+  ROOT_ID,
+} from "relay-runtime";
 import {
   transit,
   Event as EventType,
   State as FsmState,
   Effect as EffectType,
 } from "./EditFsm";
+import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
 
@@ -72,7 +79,7 @@ function processEffects(effects: EffectType<UserSettings>[], environment: IEnvir
         break;
       }
       case "commitMutation": {
-        commitOptimisticMutation(eff.params, environment);
+        commitMutation(eff.params, environment);
         break;
       }
       case "applyUpdate": {
@@ -91,7 +98,19 @@ function writeEditDeltaToDb(
   editDelta: Partial<UserSettings> | null,
   environment: IEnvironment
 ) {
-  console.log(editDelta);
+  if (!editDelta) {
+    commitLocalUpdate(environment, (store) => {
+      store.delete(`${ROOT_ID}:uiState:userSettingsEditDelta`);
+      // const xxx = store
+      //   .get(ROOT_ID)
+      //   ?.getLinkedRecord("uiState")
+      // if (xxx) {
+      //   xxx.setLinkedRecord({}, 'userSettingsEditDelta')
+      // }
+    });
+    return;
+  }
+
   const query = graphql`
     query UserSettingsUpdateControllerEditDelta2Query {
       __typename
@@ -110,11 +129,22 @@ function writeEditDeltaToDb(
       userSettingsEditDelta: editDelta,
     },
   };
+  console.log({ editDelta, data });
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
 }
-function commitOptimisticMutation(optUpd: UserSettings, environment: IEnvironment) {
-  console.log(optUpd);
+
+function commitMutation(
+  { optUpd, mutInput }: { optUpd: UserSettings; mutInput: Partial<UserSettings> },
+  environment: IEnvironment
+) {
+  UpdateUserSettingsMutation.commit({
+    environment,
+    input: mutInput,
+    optimisticResponse: optUpd,
+  });
 }
+
 function applyOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}
+
 function revertOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}

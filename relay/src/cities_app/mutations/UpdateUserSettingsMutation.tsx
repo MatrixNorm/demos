@@ -5,6 +5,9 @@ import {
   UpdateUserSettingsMutationResponse,
 } from "__relay__/UpdateUserSettingsMutation.graphql";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
+import { NukeFragRef } from "../helpers/typeUtils";
+
+type UserSettings = NukeFragRef<UserSettings_settings>;
 
 const mutation = graphql`
   mutation UpdateUserSettingsMutation($input: UpdateUserSettingsInput!) {
@@ -21,33 +24,14 @@ const mutation = graphql`
   }
 `;
 
-function buildOptimisticResponse(
-  input: UpdateUserSettingsInput,
-  currentSettings: UserSettings_settings
-): UpdateUserSettingsMutationResponse {
-  return {
-    updateUserSettings: {
-      user: {
-        id: input.userId,
-        settings: {
-          citiesPaginationPageSize:
-            input.citiesPaginationPageSize || currentSettings.citiesPaginationPageSize,
-          foo: input.foo || currentSettings.foo,
-          bar: input.bar || currentSettings.bar,
-        },
-      },
-    },
-  };
-}
-
 function commit({
   environment,
   input,
-  currentSettings,
+  optimisticResponse,
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
-  currentSettings: UserSettings_settings;
+  optimisticResponse: UserSettings;
 }) {
   // XXX need validation?
   return commitMutation(environment, {
@@ -55,7 +39,7 @@ function commit({
     variables: {
       input,
     },
-    optimisticResponse: buildOptimisticResponse(input, currentSettings),
+    optimisticResponse,
     onError: (err) => {
       //handle application error
     },
@@ -63,3 +47,22 @@ function commit({
 }
 
 export default { commit };
+
+// function buildOptimisticResponse(
+//   input: UpdateUserSettingsInput,
+//   currentSettings: UserSettings_settings
+// ): UpdateUserSettingsMutationResponse {
+//   return {
+//     updateUserSettings: {
+//       user: {
+//         id: input.userId,
+//         settings: {
+//           citiesPaginationPageSize:
+//             input.citiesPaginationPageSize || currentSettings.citiesPaginationPageSize,
+//           foo: input.foo || currentSettings.foo,
+//           bar: input.bar || currentSettings.bar,
+//         },
+//       },
+//     },
+//   };
+// }
