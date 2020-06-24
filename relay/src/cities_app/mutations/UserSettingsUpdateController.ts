@@ -39,10 +39,13 @@ function queryEditDelta(environment: IEnvironment): Partial<UserSettings> | null
   return response?.data?.uiState?.userSettingsEditDelta || null;
 }
 
-function queryServerValue(environment: IEnvironment): UserSettings_settings | null {
+function queryServerValue(
+  environment: IEnvironment
+): { userId: string; settings: UserSettings_settings } | null {
   const query = graphql`
     query UserSettingsUpdateControllerServerValueQuery {
       viewer {
+        id
         settings {
           citiesPaginationPageSize
           foo
@@ -53,8 +56,12 @@ function queryServerValue(environment: IEnvironment): UserSettings_settings | nu
   `;
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
-  // @ts-ignore
-  return response?.data?.viewer?.settings || null;
+  const user = response?.data?.viewer;
+  if (user) {
+    // @ts-ignore
+    return { userId: user.id, settings: user.settings };
+  }
+  return null;
 }
 
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
@@ -62,16 +69,20 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   let ed = queryEditDelta(environment);
   console.log({ sv, ed, event });
   if (sv === null) return;
-  const ret = transit(fsmStateAtom[0], event, { sv, ed });
+  const ret = transit(fsmStateAtom[0], event, { sv: sv.settings, ed });
   console.log({ ret });
   if (ret) {
     const [nextFsmState, effects] = ret;
     fsmStateAtom[0] = nextFsmState;
-    processEffects(effects, environment);
+    processEffects(sv.userId, effects, environment);
   }
 }
 
-function processEffects(effects: EffectType<UserSettings>[], environment: IEnvironment) {
+function processEffects(
+  userId: string,
+  effects: EffectType<UserSettings>[],
+  environment: IEnvironment
+) {
   for (let eff of effects) {
     switch (eff.type) {
       case "db/ed": {
@@ -79,7 +90,7 @@ function processEffects(effects: EffectType<UserSettings>[], environment: IEnvir
         break;
       }
       case "commitMutation": {
-        commitMutation(eff.params, environment);
+        commitMutation(userId, eff.params, environment);
         break;
       }
       case "applyUpdate": {
@@ -135,12 +146,13 @@ function writeEditDeltaToDb(
 }
 
 function commitMutation(
+  userId: string,
   { optUpd, mutInput }: { optUpd: UserSettings; mutInput: Partial<UserSettings> },
   environment: IEnvironment
 ) {
   UpdateUserSettingsMutation.commit({
     environment,
-    input: mutInput,
+    input: { ...mutInput, userId },
     optimisticResponse: optUpd,
   });
 }

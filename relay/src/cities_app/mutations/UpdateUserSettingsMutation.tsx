@@ -15,9 +15,7 @@ const mutation = graphql`
       user {
         id
         settings {
-          citiesPaginationPageSize
-          foo
-          bar
+          ...UserSettings_settings
         }
       }
     }
