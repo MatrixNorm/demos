@@ -15,8 +15,22 @@ type EvMutFail = { type: "mut-fail" };
 
 export type Event<T> = EvEdit<T> | EvStartMut | EvClear | EvMutSucc<T> | EvMutFail;
 
+type EffEdit<T> = { type: "db/ed"; params: Partial<T> | null };
+type EffCommitMutation<T> = {
+  type: "commitMutation";
+  params: { optUpd: T; mutInput: Partial<T> };
+};
+type EffApplyUpdate<T> = { type: "applyUpdate"; params: T };
+type EffRevertUpdate<T> = { type: "revertUpdate"; params: T };
+
+export type Effect<T> =
+  | EffEdit<T>
+  | EffCommitMutation<T>
+  | EffApplyUpdate<T>
+  | EffRevertUpdate<T>;
+
 type DbType<T> = { sv: T; ed: Partial<T> | null };
-type ReturnType<T> = [State<T>, any] | null;
+type ReturnType<T> = [State<T>, Effect<T>[]] | null;
 
 function merge<T extends object>(obX: T, obY: T | Partial<T> | null): T {
   return { ...obX, ...obY };
@@ -98,12 +112,12 @@ function transiFromMutPending<T extends object>(
 ): ReturnType<T> {
   switch (event.type) {
     case "clear": {
-      return [{ status: "mut-pending", context }, [{ "db/ed": null }]];
+      return [{ status: "mut-pending", context }, [{ type: "db/ed", params: null }]];
     }
     case "edit": {
       return [
         { status: "mut-pending", context },
-        [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }],
+        [{ type: "db/ed", params: diff(merge(db.ed, event.payload), db.sv) }],
       ];
     }
     case "start-mut": {
@@ -111,7 +125,10 @@ function transiFromMutPending<T extends object>(
         const optUpd2 = merge(db.sv, db.ed);
         return [
           { status: "mut2-queued", context: { ...context, optUpd2 } },
-          [{ "db/ed": null }, { applyUpdate: optUpd2 }],
+          [
+            { type: "db/ed", params: null },
+            { type: "applyUpdate", params: optUpd2 },
+          ],
         ];
       }
       return null;
@@ -122,7 +139,7 @@ function transiFromMutPending<T extends object>(
     case "mut-fail": {
       return [
         { status: "idle", context: {} },
-        [{ "db/ed": diff(context.optUpd, db.sv) }],
+        [{ type: "db/ed", params: diff(context.optUpd, db.sv) }],
       ];
     }
     default:
@@ -138,12 +155,12 @@ function transitFromMut2Queued<T extends object>(
 ): ReturnType<T> {
   switch (event.type) {
     case "clear": {
-      return [{ status: "mut-pending", context }, [{ "db/ed": null }]];
+      return [{ status: "mut-pending", context }, [{ type: "db/ed", params: null }]];
     }
     case "edit": {
       return [
         { status: "mut-pending", context },
-        [{ "db/ed": diff(merge(db.ed, event.payload), db.sv) }],
+        [{ type: "db/ed", params: diff(merge(db.ed, event.payload), db.sv) }],
       ];
     }
     case "start-mut": {
@@ -152,31 +169,38 @@ function transitFromMut2Queued<T extends object>(
         return [
           { status: "mut2-queued", context: { ...context, optUpd2 } },
           [
-            { "db/ed": null },
-            { revertUpdate: context.optUpd2 },
-            { applyUpdate: optUpd2 },
+            { type: "db/ed", params: null },
+            { type: "revertUpdate", params: context.optUpd2 },
+            { type: "applyUpdate", params: optUpd2 },
           ],
         ];
       }
       return null;
     }
     case "mut-succ": {
-      if (diff(context.optUpd2, db.sv)) {
+      const mutInput = diff(context.optUpd2, db.sv);
+      if (mutInput) {
         return [
           {
             status: "mut-pending",
             context: { optUpd: merge(db.sv, context.optUpd2) },
           },
-          [{ revertUpdate: context.optUpd2 }, { commitMutation: context.optUpd2 }],
+          [
+            { type: "revertUpdate", params: context.optUpd2 },
+            { type: "commitMutation", params: { optUpd: context.optUpd2, mutInput } },
+          ],
         ];
       } else {
-        return [{ status: "idle", context: {} }, [{ revertUpdate: context.optUpd2 }]];
+        return [
+          { status: "idle", context: {} },
+          [{ type: "revertUpdate", params: context.optUpd2 }],
+        ];
       }
     }
     case "mut-fail": {
       return [
         { status: "idle", context: {} },
-        [{ "db/ed": diff(context.optUpd, db.sv) }],
+        [{ type: "db/ed", params: diff(context.optUpd, db.sv) }],
       ];
     }
     default:

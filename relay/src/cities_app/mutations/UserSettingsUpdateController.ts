@@ -1,6 +1,11 @@
 import { graphql } from "react-relay";
 import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
-import { transit, Event as EventType, State as FsmState } from "./EditFsm";
+import {
+  transit,
+  Event as EventType,
+  State as FsmState,
+  Effect as EffectType,
+} from "./EditFsm";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
 
@@ -45,10 +50,7 @@ function queryServerValue(environment: IEnvironment): UserSettings_settings | nu
   return response?.data?.viewer?.settings || null;
 }
 
-export function handleEvent(
-  event: EventType<UserSettings_settings>,
-  environment: IEnvironment
-) {
+export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let sv = queryServerValue(environment);
   let ed = queryEditDelta(environment);
   console.log({ sv, ed, event });
@@ -62,7 +64,7 @@ export function handleEvent(
   }
 }
 
-function processEffects(effects: any, environment: IEnvironment) {
+function processEffects(effects: EffectType<UserSettings>[], environment: IEnvironment) {
   for (let eff of effects) {
     switch (eff.type) {
       case "db/ed": {
@@ -85,7 +87,10 @@ function processEffects(effects: any, environment: IEnvironment) {
   }
 }
 
-function writeEditDeltaToDb(editDelta: Partial<UserSettings>, environment: IEnvironment) {
+function writeEditDeltaToDb(
+  editDelta: Partial<UserSettings> | null,
+  environment: IEnvironment
+) {
   console.log(editDelta);
   const query = graphql`
     query UserSettingsUpdateControllerEditDelta2Query {
