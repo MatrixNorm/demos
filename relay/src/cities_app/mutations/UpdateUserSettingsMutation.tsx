@@ -9,13 +9,16 @@ import { NukeFragRef } from "../helpers/typeUtils";
 
 type UserSettings = NukeFragRef<UserSettings_settings>;
 
+// XXX ...UserSettings_settings fragment and generated types with fragment refs
 const mutation = graphql`
   mutation UpdateUserSettingsMutation($input: UpdateUserSettingsInput!) {
     updateUserSettings(input: $input) {
       user {
         id
         settings {
-          ...UserSettings_settings
+          citiesPaginationPageSize
+          foo
+          bar
         }
       }
     }
@@ -29,15 +32,18 @@ function commit({
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
-  optimisticResponse: UserSettings;
+  optimisticResponse: UpdateUserSettingsMutationResponse;
 }) {
-  // XXX need validation?
+  console.log({ optimisticResponse });
   return commitMutation(environment, {
     mutation,
     variables: {
       input,
     },
     optimisticResponse,
+    onCompleted: (response, errors) => {
+      console.log({ response, errors });
+    },
     onError: (err) => {
       //handle application error
     },

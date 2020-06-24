@@ -36,7 +36,11 @@ function queryEditDelta(environment: IEnvironment): Partial<UserSettings> | null
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
   // @ts-ignore
-  return response?.data?.uiState?.userSettingsEditDelta || null;
+  const delta = response?.data?.uiState?.userSettingsEditDelta;
+  if (delta) {
+    return Object.fromEntries(Object.entries(delta).filter(([_, v]) => v));
+  }
+  return null;
 }
 
 function queryServerValue(
@@ -153,7 +157,14 @@ function commitMutation(
   UpdateUserSettingsMutation.commit({
     environment,
     input: { ...mutInput, userId },
-    optimisticResponse: optUpd,
+    optimisticResponse: {
+      updateUserSettings: {
+        user: {
+          id: userId,
+          settings: optUpd,
+        },
+      },
+    },
   });
 }
 
