@@ -51,22 +51,3 @@ function commit({
 }
 
 export default { commit };
-
-// function buildOptimisticResponse(
-//   input: UpdateUserSettingsInput,
-//   currentSettings: UserSettings_settings
-// ): UpdateUserSettingsMutationResponse {
-//   return {
-//     updateUserSettings: {
-//       user: {
-//         id: input.userId,
-//         settings: {
-//           citiesPaginationPageSize:
-//             input.citiesPaginationPageSize || currentSettings.citiesPaginationPageSize,
-//           foo: input.foo || currentSettings.foo,
-//           bar: input.bar || currentSettings.bar,
-//         },
-//       },
-//     },
-//   };
-// }
