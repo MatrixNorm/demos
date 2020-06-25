@@ -74,7 +74,7 @@ function queryServerValue(
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let sv = queryServerValue(environment);
   let ed = queryEditDelta(environment);
-  //console.log({ sv, ed, event });
+  console.log({ fsmStateAtom, sv, ed, event });
   if (sv === null) return;
   const ret = transit(fsmStateAtom[0], event, { sv: sv.settings, ed });
   //console.log({ ret });
@@ -170,6 +170,9 @@ function commitMutation(
     },
     onFail: () => {
       handleEvent({ type: "mut-fail" }, environment);
+    },
+    onSucc: (serverValue: UserSettings) => {
+      handleEvent({ type: "mut-succ", serverValue }, environment);
     },
   });
 }

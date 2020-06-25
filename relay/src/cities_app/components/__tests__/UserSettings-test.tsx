@@ -146,7 +146,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(false);
   });
 
-  test("edit", () => {
+  test("t1 edit", () => {
     const inp = __a.inp("citiesPaginationPageSize");
 
     TestRenderer.act(() => {
@@ -159,7 +159,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(true);
   });
 
-  test("edit, start mutation", () => {
+  test("t2 edit, start mutation", () => {
     const inp = __a.inp("citiesPaginationPageSize");
     const sec = __a.sec("citiesPaginationPageSize");
     // edit
@@ -178,7 +178,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(false);
   });
 
-  test("edit, start mutation, resolve mutation", () => {
+  test("t3 edit, start mutation, resolve mutation", () => {
     // edit
     TestRenderer.act(() => {
       __a.inp("citiesPaginationPageSize").props.onChange(22);
@@ -211,7 +211,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(false);
   });
 
-  test("edit, start mutation, edit, resolve mutation", () => {
+  test("t4 edit, start mutation, edit, resolve mutation", () => {
     // edit
     TestRenderer.act(() => {
       __a.inp("citiesPaginationPageSize").props.onChange(22);
@@ -252,7 +252,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(true);
   });
 
-  test("edit, start mutation, reject mutation with server error", () => {
+  test("t5 edit, start mutation, reject mutation with server error", () => {
     // edit
     TestRenderer.act(() => {
       __a.inp("citiesPaginationPageSize").props.onChange(22);
@@ -272,7 +272,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(true);
   });
 
-  test("edit, start mutation, reject mutation with app error", () => {
+  test("t6 edit, start mutation, reject mutation with app error", () => {
     // edit
     TestRenderer.act(() => {
       __a.inp("citiesPaginationPageSize").props.onChange(22);
@@ -287,5 +287,50 @@ describe("???", () => {
     expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
     expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
     expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+  });
+
+  test("t7 edit, start mutation, edit, start mutation, resolve mutation", () => {
+    // edit
+    TestRenderer.act(() => {
+      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    });
+    // start mutation
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+    //edit foo
+    TestRenderer.act(() => {
+      __a.inp("foo").props.onChange("local foo");
+    });
+    // edit bar
+    TestRenderer.act(() => {
+      __a.inp("bar").props.onChange(314);
+    });
+    // start second mutation
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+    // resolve first mutation
+    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UpdateUserSettingsPayload() {
+          return {
+            user: {
+              id: "user#19",
+              settings: {
+                ...__initialSettings,
+                citiesPaginationPageSize: 22,
+                foo: "new server foo",
+              },
+            },
+          };
+        },
+      });
+      return payload;
+    });
+    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
+    expect(__a.inp("foo").props.value).toEqual("local foo");
+    expect(__a.inp("bar").props.value).toEqual(314);
+    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
   });
 });

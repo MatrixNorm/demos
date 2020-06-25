@@ -30,13 +30,14 @@ function commit({
   input,
   optimisticResponse,
   onFail,
+  onSucc,
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
   optimisticResponse: UpdateUserSettingsMutationResponse;
   onFail: any;
+  onSucc: any;
 }) {
-  //console.log({ optimisticResponse });
   return commitMutation(environment, {
     mutation,
     variables: {
@@ -47,6 +48,7 @@ function commit({
       if (errors || response.updateUserSettings === null) {
         onFail();
       }
+      onSucc(response.updateUserSettings.user.settings);
     },
     onError: (err) => {
       // app error
