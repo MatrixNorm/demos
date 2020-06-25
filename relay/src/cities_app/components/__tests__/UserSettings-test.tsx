@@ -252,7 +252,7 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(true);
   });
 
-  test("edit, start mutation, reject mutation", () => {
+  test("edit, start mutation, reject mutation with server error", () => {
     // edit
     TestRenderer.act(() => {
       __a.inp("citiesPaginationPageSize").props.onChange(22);
@@ -272,64 +272,20 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("editing")).toBe(true);
   });
 
-  // test("mutate server error citiesPaginationPageSize", () => {
-  //   mutateSingleFieldServerError("citiesPaginationPageSize", initialSettings);
-  // });
-
-  // test("mutate application error", () => {
-  //   const name = "citiesPaginationPageSize";
-  //   const initialValue = initialSettings[name];
-  //   mutateSingleFieldPrecondition(name, initialValue);
-  //   // app error
-  //   env.mock.rejectMostRecentOperation(new Error("you suck"));
-  // });
-
-  // test("props override local state", () => {
-  //   /**
-  //    * Relay store should have priority over component local state.
-  //    * Say we updated field `foo` and issued mutation. Then server responds with
-  //    * updated user settings. But on server setting `bar` (=A) is different from client (=B).
-  //    * (E.g. we could use different device). Then relay store is updated with bar=A, but
-  //    * component local state could still have bar=B. That's wrong.
-  //    */
-  //   const initValue = initialSettings.citiesPaginationPageSize;
-  //   const newValue = initValue + 1;
-  //   const input = inputElements.citiesPaginationPageSize;
-
-  //   TestRenderer.act(() => {
-  //     input.props.onChange(newValue);
-  //   });
-  //   TestRenderer.act(() => {
-  //     submitButton.props.onClick();
-  //   });
-
-  //   expect(inputElements.citiesPaginationPageSize.props.value).toEqual(newValue);
-  //   // foo and bar ara unchanged
-  //   expect(inputElements.foo.props.value).toEqual(initialSettings.foo);
-  //   expect(inputElements.bar.props.value).toEqual(initialSettings.bar);
-
-  //   env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-  //     let payload = MockPayloadGenerator.generate(operation, {
-  //       UpdateUserSettingsPayload() {
-  //         return {
-  //           user: {
-  //             id: "user#1",
-  //             settings: {
-  //               ...initialSettings,
-  //               citiesPaginationPageSize: newValue,
-  //               // server has new values from foo and bar
-  //               foo: initialSettings.foo + 22,
-  //               bar: initialSettings.bar + 11,
-  //             },
-  //           },
-  //         };
-  //       },
-  //     });
-  //     return payload;
-  //   });
-  //   TestRenderer.act(() => {});
-  //   // foo and bar are undated with the latest data from the server
-  //   expect(inputElements.foo.props.value).toEqual(initialSettings.foo + 22);
-  //   expect(inputElements.bar.props.value).toEqual(initialSettings.bar + 11);
-  // });
+  test("edit, start mutation, reject mutation with app error", () => {
+    // edit
+    TestRenderer.act(() => {
+      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    });
+    // start mutation
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+    // resolve mutation
+    __a.env.mock.rejectMostRecentOperation(new Error("wtf"));
+    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
+    expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
+    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
+    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+  });
 });

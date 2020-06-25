@@ -49,7 +49,8 @@ function commit({
       }
     },
     onError: (err) => {
-      //handle application error
+      // app error
+      onFail();
     },
   });
 }
