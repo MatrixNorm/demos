@@ -19,6 +19,9 @@ import { NukeFragRef } from "../helpers/typeUtils";
 type UserSettings = NukeFragRef<UserSettings_settings>;
 
 const fsmStateAtom: FsmState<UserSettings>[] = [{ status: "idle", context: {} }];
+export const resetFsmStateAtom = () => {
+  fsmStateAtom[0] = { status: "idle", context: {} };
+};
 
 function queryEditDelta(environment: IEnvironment): Partial<UserSettings> | null {
   const query = graphql`
@@ -71,10 +74,10 @@ function queryServerValue(
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let sv = queryServerValue(environment);
   let ed = queryEditDelta(environment);
-  console.log({ sv, ed, event });
+  //console.log({ sv, ed, event });
   if (sv === null) return;
   const ret = transit(fsmStateAtom[0], event, { sv: sv.settings, ed });
-  console.log({ ret });
+  //console.log({ ret });
   if (ret) {
     const [nextFsmState, effects] = ret;
     fsmStateAtom[0] = nextFsmState;
@@ -144,7 +147,7 @@ function writeEditDeltaToDb(
       userSettingsEditDelta: editDelta,
     },
   };
-  console.log({ editDelta, data });
+  //console.log({ editDelta, data });
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
 }
@@ -164,6 +167,9 @@ function commitMutation(
           settings: optUpd,
         },
       },
+    },
+    onFail: () => {
+      handleEvent({ type: "mut-fail" }, environment);
     },
   });
 }

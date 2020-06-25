@@ -11,6 +11,7 @@ import {
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
 import UserSettingsComponent from "../UserSettings";
+import * as UserSettingsUpdateController from "../../mutations/UserSettingsUpdateController";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 import { UserSettingsTestQuery } from "__relay__/UserSettingsTestQuery.graphql";
@@ -42,224 +43,234 @@ function lookupUserSettingFromStore(environment: any) {
   return data.viewer.settings;
 }
 
+function render(mocks: any) {
+  let env = createMockEnvironment();
+  let container = TestRenderer.create(
+    <QueryRenderer<UserSettingsTestQuery>
+      query={graphql`
+        query UserSettingsTestQuery @relay_test_operation {
+          viewer {
+            id
+            settings {
+              ...UserSettings_settings
+            }
+          }
+          uiState {
+            userSettingsEditDelta {
+              ...UserSettings_editDelta
+            }
+          }
+        }
+      `}
+      environment={env}
+      variables={{}}
+      render={({ props }) => {
+        return (
+          props &&
+          props.viewer && (
+            <UserSettingsComponent
+              settings={props.viewer.settings}
+              editDelta={props.uiState?.userSettingsEditDelta || null}
+            />
+          )
+        );
+      }}
+    />
+  );
+  env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+    let payload = MockPayloadGenerator.generate(operation, mocks);
+    return payload;
+  });
+  // XXX why is this?
+  TestRenderer.act(() => {});
+
+  return {
+    env,
+    inp(field: keyof UserSettings) {
+      return container.root.findByProps({
+        "test-id": `${field}-input`,
+      });
+    },
+    sec(field: keyof UserSettings) {
+      return container.root.findByProps({
+        "test-id": `${field}-section`,
+      });
+    },
+    subBtn: container.root.findByProps({
+      "test-id": "submit-button",
+    }),
+  };
+}
+
 describe("???", () => {
-  let env: any;
-  let container: any;
-  let initialSettings: UserSettings = {
+  let __initialSettings: UserSettings = {
     citiesPaginationPageSize: 10,
     foo: "foo_value",
     bar: 15,
   };
-  let FIELD_NAMES = Object.keys(initialSettings) as (keyof UserSettings)[];
-
-  let getInputElement = (field: keyof UserSettings) => {
-    return container.root.findByProps({
-      "test-id": `${field}-input`,
-    });
-  };
-  let getSectionElement = (field: keyof UserSettings) => {
-    return container.root.findByProps({
-      "test-id": `${field}-section`,
-    });
-  };
-  let getSubmitButton = () =>
-    container.root.findByProps({
-      "test-id": "submit-button",
-    });
+  let __a: any;
 
   beforeEach(() => {
-    env = createMockEnvironment();
-    container = TestRenderer.create(
-      <QueryRenderer<UserSettingsTestQuery>
-        query={graphql`
-          query UserSettingsTestQuery @relay_test_operation {
-            viewer {
-              id
-              settings {
-                ...UserSettings_settings
-              }
-            }
-            uiState {
-              userSettingsEditDelta {
-                ...UserSettings_editDelta
-              }
-            }
-          }
-        `}
-        environment={env}
-        variables={{}}
-        render={({ props }) => {
-          return (
-            props &&
-            props.viewer && (
-              <UserSettingsComponent
-                settings={props.viewer.settings}
-                editDelta={props.uiState?.userSettingsEditDelta || null}
-              />
-            )
-          );
-        }}
-      />
+    __a = render({
+      User() {
+        return {
+          id: "user#19",
+          name: "coronavirus",
+          settings: __initialSettings,
+        };
+      },
+      UIState() {
+        return { userSettingsEditDelta: null };
+      },
+    });
+  });
+
+  afterEach(() => {
+    UserSettingsUpdateController.resetFsmStateAtom();
+  });
+
+  test("initial render", () => {
+    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(
+      __initialSettings["citiesPaginationPageSize"]
     );
-    env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+    expect(__a.sec("citiesPaginationPageSize").props.className.includes("editing")).toBe(
+      false
+    );
+
+    expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
+    expect(__a.sec("foo").props.className.includes("editing")).toBe(false);
+
+    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
+    expect(__a.sec("bar").props.className.includes("editing")).toBe(false);
+
+    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
+  });
+
+  test("edit", () => {
+    const inp = __a.inp("citiesPaginationPageSize");
+
+    TestRenderer.act(() => {
+      inp.props.onChange(22);
+    });
+    expect(inp.props.value).toEqual(22);
+    expect(__a.sec("citiesPaginationPageSize").props.className.includes("editing")).toBe(
+      true
+    );
+    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+  });
+
+  test("edit, start mutation", () => {
+    const inp = __a.inp("citiesPaginationPageSize");
+    const sec = __a.sec("citiesPaginationPageSize");
+    // edit
+    TestRenderer.act(() => {
+      inp.props.onChange(22);
+    });
+    // start mutation
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+    // optimistic update is applied
+    const mutation = __a.env.mock.getMostRecentOperation();
+    expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
+    expect(inp.props.value).toEqual(22);
+    expect(sec.props.className.includes("editing")).toBe(false);
+    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
+  });
+
+  test("edit, start mutation, resolve mutation", () => {
+    // edit
+    TestRenderer.act(() => {
+      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    });
+    // start mutation
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+    // resolve mutation
+    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
       let payload = MockPayloadGenerator.generate(operation, {
-        User() {
+        UpdateUserSettingsPayload() {
           return {
-            id: "user#19",
-            name: "coronavirus",
-            settings: initialSettings,
+            user: {
+              id: "user#19",
+              settings: {
+                ...__initialSettings,
+                citiesPaginationPageSize: 22,
+                foo: "new server foo",
+              },
+            },
           };
-        },
-        UIState() {
-          return { userSettingsEditDelta: null };
         },
       });
       return payload;
     });
-    // XXX why is this?
-    TestRenderer.act(() => {});
+    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
+    expect(__a.inp("foo").props.value).toEqual("new server foo");
+    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
+    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
   });
 
-  test("initial render", () => {
-    expect(getInputElement("citiesPaginationPageSize").props.value).toEqual(
-      initialSettings["citiesPaginationPageSize"]
-    );
-    expect(getInputElement("foo").props.value).toEqual(initialSettings["foo"]);
-    expect(getInputElement("bar").props.value).toEqual(initialSettings["bar"]);
+  test("edit, start mutation, edit, resolve mutation", () => {
+    // edit
+    TestRenderer.act(() => {
+      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    });
+    // start mutation
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+    //edit foo
+    TestRenderer.act(() => {
+      __a.inp("foo").props.onChange("local foo");
+    });
+    // edit bar
+    TestRenderer.act(() => {
+      __a.inp("bar").props.onChange(314);
+    });
+    // resolve mutation
+    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UpdateUserSettingsPayload() {
+          return {
+            user: {
+              id: "user#19",
+              settings: {
+                ...__initialSettings,
+                citiesPaginationPageSize: 22,
+                foo: "new server foo",
+              },
+            },
+          };
+        },
+      });
+      return payload;
+    });
+    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
+    expect(__a.inp("foo").props.value).toEqual("local foo");
+    expect(__a.inp("bar").props.value).toEqual(314);
+    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
   });
 
-  function locallyChangeSingleInput(name: string, initialValue: any, changedValue: any) {
-    const input = inputElements[name];
-    const section = sectionElements[name];
-
-    expect(input.props.value).toEqual(initialValue);
-    expect(section.props.className.includes("editing")).toBe(false);
-    expect(submitButton.props.className.includes("editing")).toBe(false);
-
+  test("edit, start mutation, reject mutation", () => {
+    // edit
     TestRenderer.act(() => {
-      input.props.onChange(changedValue);
+      __a.inp("citiesPaginationPageSize").props.onChange(22);
     });
-    expect(input.props.value).toEqual(changedValue);
-    expect(section.props.className.includes("editing")).toBe(true);
-    expect(submitButton.props.className.includes("editing")).toBe(true);
-
+    // start mutation
     TestRenderer.act(() => {
-      input.props.onChange(initialValue);
+      __a.subBtn.props.onClick();
     });
-    expect(input.props.value).toEqual(initialValue);
-    expect(section.props.className.includes("editing")).toBe(false);
-    expect(submitButton.props.className.includes("editing")).toBe(false);
-  }
-
-  // test("locally change citiesPaginationPageSize", () => {
-  //   locallyChangeSingleInput(
-  //     "citiesPaginationPageSize",
-  //     initialSettings.citiesPaginationPageSize,
-  //     initialSettings.citiesPaginationPageSize + 1
-  //   );
-  // });
-
-  // test("locally change foo", () => {
-  //   locallyChangeSingleInput("foo", initialSettings.foo, initialSettings.foo + "XYZ");
-  // });
-
-  // test("locally change bar", () => {
-  //   locallyChangeSingleInput("bar", initialSettings.bar, initialSettings.bar + 1);
-  // });
-
-  // function mutateSingleFieldPrecondition(name: string, initialValue: any) {
-  //   const newValue = initialValue + 1;
-  //   const input = inputElements[name];
-  //   const section = sectionElements[name];
-
-  //   expect(section.props.className.includes("editing")).toBe(false);
-  //   expect(submitButton.props.className.includes("editing")).toBe(false);
-  //   // change component's local state
-  //   TestRenderer.act(() => {
-  //     input.props.onChange(newValue);
-  //   });
-  //   expect(input.props.value).toEqual(newValue);
-  //   expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
-  //   expect(section.props.className.includes("editing")).toBe(true);
-  //   expect(submitButton.props.className.includes("editing")).toBe(true);
-  //   // start mutation
-  //   TestRenderer.act(() => {
-  //     submitButton.props.onClick();
-  //   });
-  //   // optimistic update is applied
-  //   expect(input.props.value).toEqual(newValue);
-  //   expect(lookupSettingFromStore(env)[name]).toEqual(newValue);
-  //   expect(section.props.className.includes("editing")).toBe(false);
-  //   expect(submitButton.props.className.includes("editing")).toBe(false);
-  //   return { newValue, input, section };
-  // }
-
-  // function mutateSingleFieldSuccess(name: string, initialSettings: any) {
-  //   const initialValue = initialSettings[name];
-  //   const { newValue, input, section } = mutateSingleFieldPrecondition(
-  //     name,
-  //     initialValue
-  //   );
-  //   // some data about mutation
-  //   const mutation = env.mock.getMostRecentOperation();
-  //   expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
-  //   expect(mutation.root.variables).toMatchObject({
-  //     input: {
-  //       userId: "user#1",
-  //       [name]: newValue,
-  //     },
-  //   });
-  //   // server response overrides everything
-  //   env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-  //     let payload = MockPayloadGenerator.generate(operation, {
-  //       UpdateUserSettingsPayload() {
-  //         return {
-  //           user: {
-  //             id: "user#1",
-  //             settings: {
-  //               ...initialSettings,
-  //               [name]: newValue + 1,
-  //             },
-  //           },
-  //         };
-  //       },
-  //     });
-  //     return payload;
-  //   });
-  //   expect(lookupSettingFromStore(env)[name]).toEqual(newValue + 1);
-  //   TestRenderer.act(() => {});
-  //   expect(input.props.value).toEqual(newValue + 1);
-  //   expect(section.props.className.includes("editing")).toBe(false);
-  //   expect(submitButton.props.className.includes("editing")).toBe(false);
-  // }
-
-  // test("mutate ok citiesPaginationPageSize", () => {
-  //   mutateSingleFieldSuccess("citiesPaginationPageSize", initialSettings);
-  // });
-
-  // test("mutate ok foo", () => {
-  //   mutateSingleFieldSuccess("foo", initialSettings);
-  // });
-
-  // test("mutate ok bar", () => {
-  //   mutateSingleFieldSuccess("bar", initialSettings);
-  // });
-
-  // function mutateSingleFieldServerError(name: string, initialSettings: any) {
-  //   const initialValue = initialSettings[name];
-  //   const { input, section } = mutateSingleFieldPrecondition(name, initialValue);
-  //   // server error
-  //   env.mock.resolveMostRecentOperation({
-  //     errors: [{ message: "sheise" }],
-  //     data: { updateUserSettings: null },
-  //   });
-  //   // everything is rolled back
-  //   expect(lookupSettingFromStore(env)[name]).toEqual(initialValue);
-  //   TestRenderer.act(() => {});
-  //   expect(input.props.value).toEqual(initialValue);
-  //   expect(section.props.className.includes("editing")).toBe(false);
-  //   expect(submitButton.props.className.includes("editing")).toBe(false);
-  // }
+    // resolve mutation
+    __a.env.mock.resolveMostRecentOperation({
+      errors: [{ message: "sheise" }],
+      data: { updateUserSettings: null },
+    });
+    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
+    expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
+    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
+    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+  });
 
   // test("mutate server error citiesPaginationPageSize", () => {
   //   mutateSingleFieldServerError("citiesPaginationPageSize", initialSettings);
