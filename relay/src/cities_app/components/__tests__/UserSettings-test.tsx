@@ -142,6 +142,15 @@ describe("???", () => {
     expect(__a.subBtn.props.className.includes("disabled")).toBe(true);
   }
 
+  const __db = {
+    settingsBeEqual(expectedValue: any) {
+      expect(lookupUserSettingFromStore(__a.env).settings).toMatchObject(expectedValue);
+    },
+    editDeltaBeEqual(expectedValue: any) {
+      expect(lookupUserSettingFromStore(__a.env).editDelta).toEqual(expectedValue);
+    },
+  };
+
   function resolveMutation(settings: UserSettings) {
     __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
       let payload = MockPayloadGenerator.generate(operation, {
@@ -185,7 +194,6 @@ describe("???", () => {
     beEqual("bar", __initialSettings["bar"]);
     beNotEdited("bar");
     submitBeOff();
-    console.log(lookupUserSettingFromStore(__a.env));
   });
 
   test("t1 edit", () => {
@@ -277,21 +285,39 @@ describe("???", () => {
     submitBeOff();
   });
 
-  test("t7 edit, start mutation, edit, start mutation, reject mutation", () => {
+  test("t7 edit, submit, edit, submit, reject mutation", () => {
     edit("citiesPaginationPageSize", 22);
     submit();
+    __db.settingsBeEqual({
+      citiesPaginationPageSize: 22,
+      foo: __initialSettings["foo"],
+      bar: __initialSettings["bar"],
+    });
     edit("foo", "local foo");
     edit("citiesPaginationPageSize", 33);
     submit();
+    // only first submit hits network
+    expect(__a.env.mock.getAllOperations().length).toBe(1);
+    expect(__a.env.mock.getMostRecentOperation().root.variables).toMatchObject({
+      input: { citiesPaginationPageSize: 22, userId: "user#19" },
+    });
+    __db.settingsBeEqual({
+      citiesPaginationPageSize: 33,
+      foo: "local foo",
+      bar: __initialSettings["bar"],
+    });
     // reject first mutation
     __a.env.mock.resolveMostRecentOperation({
       errors: [{ message: "scheisse" }],
       data: { updateUserSettings: null },
     });
     // new mutation is commited
-    expect(__a.env.mock.getMostRecentOperation().root.node.name).toBe(
-      "UpdateUserSettingsMutation"
-    );
+    // expect(__a.env.mock.getMostRecentOperation().root.node.name).toBe(
+    //   "UpdateUserSettingsMutation"
+    // );
+    expect(__a.env.mock.getMostRecentOperation().root.variables).toMatchObject({
+      input: { citiesPaginationPageSize: 33, foo: "local foo", userId: "user#19" },
+    });
     beEqual("citiesPaginationPageSize", 33);
     beEqual("foo", "local foo");
     submitBeOff();
