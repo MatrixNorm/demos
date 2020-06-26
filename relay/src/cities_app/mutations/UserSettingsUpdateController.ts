@@ -74,7 +74,7 @@ function queryServerValue(
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let sv = queryServerValue(environment);
   let ed = queryEditDelta(environment);
-  console.log({ fsmStateAtom, sv, ed, event });
+  //console.log({ fsmStateAtom, sv, ed, event });
   if (sv === null) return;
   const ret = transit(fsmStateAtom[0], event, { sv: sv.settings, ed });
   //console.log({ ret });

@@ -25,6 +25,8 @@ const mutation = graphql`
   }
 `;
 
+//...UserSettings_settings @relay(mask: false)
+
 function commit({
   environment,
   input,
@@ -47,8 +49,9 @@ function commit({
     onCompleted: (response, errors) => {
       if (errors || response.updateUserSettings === null) {
         onFail();
+      } else {
+        onSucc(response.updateUserSettings.user.settings);
       }
-      onSucc(response.updateUserSettings.user.settings);
     },
     onError: (err) => {
       // app error

@@ -110,6 +110,48 @@ describe("???", () => {
   };
   let __a: any;
 
+  function edit(field: keyof UserSettings, value: any) {
+    TestRenderer.act(() => {
+      __a.inp(field).props.onChange(value);
+    });
+  }
+  function submit() {
+    TestRenderer.act(() => {
+      __a.subBtn.props.onClick();
+    });
+  }
+  function beEqual(field: keyof UserSettings, value: any) {
+    expect(__a.inp(field).props.value).toEqual(value);
+  }
+  function beEdited(field: keyof UserSettings) {
+    expect(__a.sec(field).props.className.includes("editing")).toBe(true);
+  }
+  function beNotEdited(field: keyof UserSettings) {
+    expect(__a.sec(field).props.className.includes("editing")).toBe(false);
+  }
+  function submitBeOn() {
+    expect(__a.subBtn.props.className.includes("disabled")).toBe(false);
+  }
+  function submitBeOff() {
+    expect(__a.subBtn.props.className.includes("disabled")).toBe(true);
+  }
+
+  function resolveMutation(settings: UserSettings) {
+    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
+      let payload = MockPayloadGenerator.generate(operation, {
+        UpdateUserSettingsPayload() {
+          return {
+            user: {
+              id: "user#19",
+              settings,
+            },
+          };
+        },
+      });
+      return payload;
+    });
+  }
+
   beforeEach(() => {
     __a = render({
       User() {
@@ -129,208 +171,103 @@ describe("???", () => {
     UserSettingsUpdateController.resetFsmStateAtom();
   });
 
-  test("initial render", () => {
-    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(
-      __initialSettings["citiesPaginationPageSize"]
-    );
-    expect(__a.sec("citiesPaginationPageSize").props.className.includes("editing")).toBe(
-      false
-    );
-
-    expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
-    expect(__a.sec("foo").props.className.includes("editing")).toBe(false);
-
-    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
-    expect(__a.sec("bar").props.className.includes("editing")).toBe(false);
-
-    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
+  test("t0 initial render", () => {
+    beEqual("citiesPaginationPageSize", __initialSettings["citiesPaginationPageSize"]);
+    beNotEdited("citiesPaginationPageSize");
+    beEqual("foo", __initialSettings["foo"]);
+    beNotEdited("foo");
+    beEqual("bar", __initialSettings["bar"]);
+    beNotEdited("bar");
+    submitBeOff();
   });
 
   test("t1 edit", () => {
-    const inp = __a.inp("citiesPaginationPageSize");
-
-    TestRenderer.act(() => {
-      inp.props.onChange(22);
-    });
-    expect(inp.props.value).toEqual(22);
-    expect(__a.sec("citiesPaginationPageSize").props.className.includes("editing")).toBe(
-      true
-    );
-    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+    edit("citiesPaginationPageSize", 22);
+    beEqual("citiesPaginationPageSize", 22);
+    beEdited("citiesPaginationPageSize");
+    submitBeOn();
   });
 
   test("t2 edit, start mutation", () => {
-    const inp = __a.inp("citiesPaginationPageSize");
-    const sec = __a.sec("citiesPaginationPageSize");
-    // edit
-    TestRenderer.act(() => {
-      inp.props.onChange(22);
-    });
-    // start mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
+    edit("citiesPaginationPageSize", 22);
+    submit();
     // optimistic update is applied
     const mutation = __a.env.mock.getMostRecentOperation();
     expect(mutation.root.node.name).toBe("UpdateUserSettingsMutation");
-    expect(inp.props.value).toEqual(22);
-    expect(sec.props.className.includes("editing")).toBe(false);
-    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
+    beEqual("citiesPaginationPageSize", 22);
+    beNotEdited("citiesPaginationPageSize");
+    submitBeOff();
   });
 
   test("t3 edit, start mutation, resolve mutation", () => {
-    // edit
-    TestRenderer.act(() => {
-      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    edit("citiesPaginationPageSize", 22);
+    submit();
+    resolveMutation({
+      ...__initialSettings,
+      citiesPaginationPageSize: 22,
+      foo: "new server foo",
     });
-    // start mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
-    // resolve mutation
-    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-      let payload = MockPayloadGenerator.generate(operation, {
-        UpdateUserSettingsPayload() {
-          return {
-            user: {
-              id: "user#19",
-              settings: {
-                ...__initialSettings,
-                citiesPaginationPageSize: 22,
-                foo: "new server foo",
-              },
-            },
-          };
-        },
-      });
-      return payload;
-    });
-    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
-    expect(__a.inp("foo").props.value).toEqual("new server foo");
-    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
-    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
+    beEqual("citiesPaginationPageSize", 22);
+    beEqual("foo", "new server foo");
+    beEqual("bar", __initialSettings["bar"]);
+    submitBeOff();
   });
 
   test("t4 edit, start mutation, edit, resolve mutation", () => {
-    // edit
-    TestRenderer.act(() => {
-      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    edit("citiesPaginationPageSize", 22);
+    submit();
+    edit("foo", "local foo");
+    edit("bar", 314);
+    resolveMutation({
+      ...__initialSettings,
+      citiesPaginationPageSize: 22,
+      foo: "new server foo",
     });
-    // start mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
-    //edit foo
-    TestRenderer.act(() => {
-      __a.inp("foo").props.onChange("local foo");
-    });
-    // edit bar
-    TestRenderer.act(() => {
-      __a.inp("bar").props.onChange(314);
-    });
-    // resolve mutation
-    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-      let payload = MockPayloadGenerator.generate(operation, {
-        UpdateUserSettingsPayload() {
-          return {
-            user: {
-              id: "user#19",
-              settings: {
-                ...__initialSettings,
-                citiesPaginationPageSize: 22,
-                foo: "new server foo",
-              },
-            },
-          };
-        },
-      });
-      return payload;
-    });
-    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
-    expect(__a.inp("foo").props.value).toEqual("local foo");
-    expect(__a.inp("bar").props.value).toEqual(314);
-    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+    beEqual("citiesPaginationPageSize", 22);
+    beEqual("foo", "local foo");
+    beEqual("bar", 314);
+    submitBeOn();
   });
 
   test("t5 edit, start mutation, reject mutation with server error", () => {
-    // edit
-    TestRenderer.act(() => {
-      __a.inp("citiesPaginationPageSize").props.onChange(22);
-    });
-    // start mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
+    edit("citiesPaginationPageSize", 22);
+    submit();
     // resolve mutation
     __a.env.mock.resolveMostRecentOperation({
       errors: [{ message: "sheise" }],
       data: { updateUserSettings: null },
     });
-    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
-    expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
-    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
-    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+    beEqual("citiesPaginationPageSize", 22);
+    beEqual("foo", __initialSettings["foo"]);
+    beEqual("bar", __initialSettings["bar"]);
+    submitBeOn();
   });
 
   test("t6 edit, start mutation, reject mutation with app error", () => {
-    // edit
-    TestRenderer.act(() => {
-      __a.inp("citiesPaginationPageSize").props.onChange(22);
-    });
-    // start mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
+    edit("citiesPaginationPageSize", 22);
+    submit();
     // resolve mutation
     __a.env.mock.rejectMostRecentOperation(new Error("wtf"));
-    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
-    expect(__a.inp("foo").props.value).toEqual(__initialSettings["foo"]);
-    expect(__a.inp("bar").props.value).toEqual(__initialSettings["bar"]);
-    expect(__a.subBtn.props.className.includes("editing")).toBe(true);
+    beEqual("citiesPaginationPageSize", 22);
+    beEqual("foo", __initialSettings["foo"]);
+    beEqual("bar", __initialSettings["bar"]);
+    submitBeOn();
   });
 
   test("t7 edit, start mutation, edit, start mutation, resolve mutation", () => {
-    // edit
-    TestRenderer.act(() => {
-      __a.inp("citiesPaginationPageSize").props.onChange(22);
+    edit("citiesPaginationPageSize", 22);
+    submit();
+    edit("foo", "local foo");
+    edit("bar", 314);
+    submit();
+    resolveMutation({
+      ...__initialSettings,
+      citiesPaginationPageSize: 22,
+      foo: "new server foo",
     });
-    // start mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
-    //edit foo
-    TestRenderer.act(() => {
-      __a.inp("foo").props.onChange("local foo");
-    });
-    // edit bar
-    TestRenderer.act(() => {
-      __a.inp("bar").props.onChange(314);
-    });
-    // start second mutation
-    TestRenderer.act(() => {
-      __a.subBtn.props.onClick();
-    });
-    // resolve first mutation
-    __a.env.mock.resolveMostRecentOperation((operation: OperationDescriptor) => {
-      let payload = MockPayloadGenerator.generate(operation, {
-        UpdateUserSettingsPayload() {
-          return {
-            user: {
-              id: "user#19",
-              settings: {
-                ...__initialSettings,
-                citiesPaginationPageSize: 22,
-                foo: "new server foo",
-              },
-            },
-          };
-        },
-      });
-      return payload;
-    });
-    expect(__a.inp("citiesPaginationPageSize").props.value).toEqual(22);
-    expect(__a.inp("foo").props.value).toEqual("local foo");
-    expect(__a.inp("bar").props.value).toEqual(314);
-    expect(__a.subBtn.props.className.includes("editing")).toBe(false);
+    beEqual("citiesPaginationPageSize", 22);
+    beEqual("foo", "local foo");
+    beEqual("bar", 314);
+    submitBeOff();
   });
 });

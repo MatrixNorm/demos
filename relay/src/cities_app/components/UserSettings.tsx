@@ -9,6 +9,16 @@ import { NukeFragRef } from "../helpers/typeUtils";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 
+function isTrueDiff(base: object, possibleDiff: object | null) {
+  if (!possibleDiff) return false;
+  let merged = { ...base, ...possibleDiff };
+  for (let key in base) {
+    // @ts-ignore
+    if (base[key] !== merged[key]) return true;
+  }
+  return false;
+}
+
 export const Section = styled.section`
   display: flex;
   min-height: 1.5em;
@@ -122,11 +132,7 @@ export default createFragmentContainer(
             <SubmitButton
               onClick={onSubmit}
               test-id="submit-button"
-              className={
-                // XXX
-                // merge(settings, editDelta) != settings
-                editDelta && Object.entries(editDelta).length > 0 ? "editing" : ""
-              }
+              className={isTrueDiff(settings, editDelta) ? "" : "disabled"}
             >
               Sync
             </SubmitButton>
