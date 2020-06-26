@@ -232,9 +232,8 @@ describe("???", () => {
   test("t5 edit, start mutation, reject mutation with server error", () => {
     edit("citiesPaginationPageSize", 22);
     submit();
-    // resolve mutation
     __a.env.mock.resolveMostRecentOperation({
-      errors: [{ message: "sheise" }],
+      errors: [{ message: "scheisse" }],
       data: { updateUserSettings: null },
     });
     beEqual("citiesPaginationPageSize", 22);
@@ -268,6 +267,26 @@ describe("???", () => {
     beEqual("citiesPaginationPageSize", 22);
     beEqual("foo", "local foo");
     beEqual("bar", 314);
+    submitBeOff();
+  });
+
+  test("t7 edit, start mutation, edit, start mutation, reject mutation", () => {
+    edit("citiesPaginationPageSize", 22);
+    submit();
+    edit("foo", "local foo");
+    edit("citiesPaginationPageSize", 33);
+    submit();
+    // reject first mutation
+    __a.env.mock.resolveMostRecentOperation({
+      errors: [{ message: "scheisse" }],
+      data: { updateUserSettings: null },
+    });
+    // new mutation is commited
+    expect(__a.env.mock.getMostRecentOperation().root.node.name).toBe(
+      "UpdateUserSettingsMutation"
+    );
+    beEqual("citiesPaginationPageSize", 33);
+    beEqual("foo", "local foo");
     submitBeOff();
   });
 });

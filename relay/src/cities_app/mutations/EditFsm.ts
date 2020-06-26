@@ -185,23 +185,23 @@ function transitFromMut2Queued<T extends object>(
             status: "mut-pending",
             context: { optUpd: merge(db.sv, context.optUpd2) },
           },
-          [
-            { type: "revertUpdate", params: context.optUpd2 },
-            { type: "commitMutation", params: { optUpd: context.optUpd2, mutInput } },
-          ],
+          [{ type: "commitMutation", params: { optUpd: context.optUpd2, mutInput } }],
         ];
       } else {
-        return [
-          { status: "idle", context: {} },
-          [{ type: "revertUpdate", params: context.optUpd2 }],
-        ];
+        return [{ status: "idle", context: {} }, []];
       }
     }
     case "mut-fail": {
-      return [
-        { status: "idle", context: {} },
-        [{ type: "db/ed", params: diff(context.optUpd, db.sv) }],
-      ];
+      const optUpd = { ...context.optUpd, ...context.optUpd2 };
+      const mutInput = diff(optUpd, db.sv);
+      if (mutInput) {
+        return [
+          { status: "mut-pending", context: { optUpd } },
+          [{ type: "commitMutation", params: { optUpd, mutInput } }],
+        ];
+      } else {
+        return [{ status: "idle", context: {} }, []];
+      }
     }
     default:
       // impossible
