@@ -16,16 +16,12 @@ const mutation = graphql`
       user {
         id
         settings {
-          citiesPaginationPageSize
-          foo
-          bar
+          ...UserSettings_settings @relay(mask: false)
         }
       }
     }
   }
 `;
-
-//...UserSettings_settings @relay(mask: false)
 
 function commit({
   environment,

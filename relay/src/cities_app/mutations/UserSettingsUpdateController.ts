@@ -177,6 +177,8 @@ function commitMutation(
   });
 }
 
-function applyOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}
+function applyOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {
+  //environment.applyUpdate()
+}
 
 function revertOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}

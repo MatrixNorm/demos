@@ -31,16 +31,22 @@ function lookupUserSettingFromStore(environment: any) {
       query UserSettingsTestLookupQuery {
         viewer {
           settings {
-            citiesPaginationPageSize
-            foo
-            bar
+            ...UserSettings_settings @relay(mask: false)
+          }
+        }
+        uiState {
+          userSettingsEditDelta {
+            ...UserSettings_editDelta @relay(mask: false)
           }
         }
       }
     `,
     environment
   );
-  return data.viewer.settings;
+  return {
+    settings: data.viewer?.settings,
+    editDelta: data.uiState?.userSettingsEditDelta,
+  };
 }
 
 function render(mocks: any) {
@@ -179,6 +185,7 @@ describe("???", () => {
     beEqual("bar", __initialSettings["bar"]);
     beNotEdited("bar");
     submitBeOff();
+    console.log(lookupUserSettingFromStore(__a.env));
   });
 
   test("t1 edit", () => {
