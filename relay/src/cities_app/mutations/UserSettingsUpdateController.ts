@@ -3,8 +3,8 @@ import {
   commitLocalUpdate,
   createOperationDescriptor,
   getRequest,
-  IEnvironment,
   ROOT_ID,
+  IEnvironment,
 } from "relay-runtime";
 import {
   transit,
@@ -17,10 +17,15 @@ import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
 
 type UserSettings = NukeFragRef<UserSettings_settings>;
+type ControllerState = { fsmState: FsmState<UserSettings>; disposeOptUpd2: any };
 
-const fsmStateAtom: FsmState<UserSettings>[] = [{ status: "idle", context: {} }];
-export const resetFsmStateAtom = () => {
-  fsmStateAtom[0] = { status: "idle", context: {} };
+const controllerStateAtom: ControllerState = {
+  fsmState: { status: "idle", context: {} },
+  disposeOptUpd2: null,
+};
+export const resetControllerStateAtom = () => {
+  controllerStateAtom.fsmState = { status: "idle", context: {} };
+  controllerStateAtom.disposeOptUpd2 = null;
 };
 
 function queryEditDelta(environment: IEnvironment): Partial<UserSettings> | null {
@@ -76,11 +81,11 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   let ed = queryEditDelta(environment);
   //console.log({ fsmStateAtom, sv, ed, event });
   if (sv === null) return;
-  const ret = transit(fsmStateAtom[0], event, { sv: sv.settings, ed });
+  const ret = transit(controllerStateAtom.fsmState, event, { sv: sv.settings, ed });
   //console.log({ ret });
   if (ret) {
     const [nextFsmState, effects] = ret;
-    fsmStateAtom[0] = nextFsmState;
+    controllerStateAtom.fsmState = nextFsmState;
     processEffects(sv.userId, effects, environment);
   }
 }
@@ -100,12 +105,12 @@ function processEffects(
         commitMutation(userId, eff.params, environment);
         break;
       }
-      case "applyUpdate": {
-        applyOptimisticUpdate(eff.params, environment);
+      case "applyOptUpd2": {
+        applyOptUpd2(eff.params, environment);
         break;
       }
-      case "revertUpdate": {
-        revertOptimisticUpdate(eff.params, environment);
+      case "revertOptUpd2": {
+        revertOptUpd2();
         break;
       }
     }
@@ -119,12 +124,6 @@ function writeEditDeltaToDb(
   if (!editDelta) {
     commitLocalUpdate(environment, (store) => {
       store.delete(`${ROOT_ID}:uiState:userSettingsEditDelta`);
-      // const xxx = store
-      //   .get(ROOT_ID)
-      //   ?.getLinkedRecord("uiState")
-      // if (xxx) {
-      //   xxx.setLinkedRecord({}, 'userSettingsEditDelta')
-      // }
     });
     return;
   }
@@ -177,8 +176,17 @@ function commitMutation(
   });
 }
 
-function applyOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {
-  //environment.applyUpdate()
+function applyOptUpd2(optUpd: UserSettings, environment: IEnvironment) {
+  const { dispose } = environment.applyUpdate({
+    storeUpdater: (proxyStore) => {
+      const zuck = proxyStore.create("4", "User");
+      zuck.setValue("4", "id");
+      zuck.setValue("zuck", "name");
+    },
+  });
+  controllerStateAtom.disposeOptUpd2 = dispose;
 }
 
-function revertOptimisticUpdate(optUpd: UserSettings, environment: IEnvironment) {}
+function revertOptUpd2() {
+  controllerStateAtom.disposeOptUpd2();
+}

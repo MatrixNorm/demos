@@ -20,14 +20,14 @@ type EffCommitMutation<T> = {
   type: "commitMutation";
   params: { optUpd: T; mutInput: Partial<T> };
 };
-type EffApplyUpdate<T> = { type: "applyUpdate"; params: T };
-type EffRevertUpdate<T> = { type: "revertUpdate"; params: T };
+type EffApplyOptUpd2<T> = { type: "applyOptUpd2"; params: T };
+type EffRevertOptUpd2 = { type: "revertOptUpd2" };
 
 export type Effect<T> =
   | EffEdit<T>
   | EffCommitMutation<T>
-  | EffApplyUpdate<T>
-  | EffRevertUpdate<T>;
+  | EffApplyOptUpd2<T>
+  | EffRevertOptUpd2;
 
 type DbType<T> = { sv: T; ed: Partial<T> | null };
 type ReturnType<T> = [State<T>, Effect<T>[]] | null;
@@ -127,7 +127,7 @@ function transiFromMutPending<T extends object>(
           { status: "mut2-queued", context: { ...context, optUpd2 } },
           [
             { type: "db/ed", params: null },
-            { type: "applyUpdate", params: optUpd2 },
+            { type: "applyOptUpd2", params: optUpd2 },
           ],
         ];
       }
@@ -170,8 +170,8 @@ function transitFromMut2Queued<T extends object>(
           { status: "mut2-queued", context: { ...context, optUpd2 } },
           [
             { type: "db/ed", params: null },
-            { type: "revertUpdate", params: context.optUpd2 },
-            { type: "applyUpdate", params: optUpd2 },
+            { type: "revertOptUpd2" },
+            { type: "applyOptUpd2", params: optUpd2 },
           ],
         ];
       }
@@ -186,15 +186,12 @@ function transitFromMut2Queued<T extends object>(
             context: { optUpd: merge(db.sv, context.optUpd2) },
           },
           [
-            { type: "revertUpdate", params: context.optUpd2 },
+            { type: "revertOptUpd2" },
             { type: "commitMutation", params: { optUpd: context.optUpd2, mutInput } },
           ],
         ];
       } else {
-        return [
-          { status: "idle", context: {} },
-          [{ type: "revertUpdate", params: context.optUpd2 }],
-        ];
+        return [{ status: "idle", context: {} }, [{ type: "revertOptUpd2" }]];
       }
     }
     case "mut-fail": {
@@ -204,15 +201,12 @@ function transitFromMut2Queued<T extends object>(
         return [
           { status: "mut-pending", context: { optUpd } },
           [
-            { type: "revertUpdate", params: context.optUpd2 },
+            { type: "revertOptUpd2" },
             { type: "commitMutation", params: { optUpd, mutInput } },
           ],
         ];
       } else {
-        return [
-          { status: "idle", context: {} },
-          [{ type: "revertUpdate", params: context.optUpd2 }],
-        ];
+        return [{ status: "idle", context: {} }, [{ type: "revertOptUpd2" }]];
       }
     }
     default:

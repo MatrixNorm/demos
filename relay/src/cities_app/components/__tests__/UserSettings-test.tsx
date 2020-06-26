@@ -174,7 +174,7 @@ describe("???", () => {
   });
 
   afterEach(() => {
-    UserSettingsUpdateController.resetFsmStateAtom();
+    UserSettingsUpdateController.resetControllerStateAtom();
   });
 
   test("t0 initial render", () => {
