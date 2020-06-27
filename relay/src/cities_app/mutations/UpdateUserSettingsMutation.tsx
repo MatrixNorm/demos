@@ -43,9 +43,11 @@ function commit({
     },
     optimisticResponse,
     onCompleted: (response, errors) => {
+      console.log(response.updateUserSettings);
       if (errors || response.updateUserSettings === null) {
         onFail();
       } else {
+        console.log(response.updateUserSettings.user);
         onSucc(response.updateUserSettings.user.settings);
       }
     },

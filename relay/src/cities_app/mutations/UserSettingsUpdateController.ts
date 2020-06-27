@@ -79,7 +79,7 @@ function queryServerValue(
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let sv = queryServerValue(environment);
   let ed = queryEditDelta(environment);
-  //console.log({ fsmStateAtom, sv, ed, event });
+  //console.log({ controllerStateAtom, sv, ed, event });
   if (sv === null) return;
   const ret = transit(controllerStateAtom.fsmState, event, { sv: sv.settings, ed });
   //console.log({ ret });
@@ -171,17 +171,25 @@ function commitMutation(
       handleEvent({ type: "mut-fail" }, environment);
     },
     onSucc: (serverValue: UserSettings) => {
+      console.log(serverValue);
       handleEvent({ type: "mut-succ", serverValue }, environment);
     },
   });
 }
 
 function applyOptUpd2(optUpd: UserSettings, environment: IEnvironment) {
+  console.log({ optUpd });
   const { dispose } = environment.applyUpdate({
-    storeUpdater: (proxyStore) => {
-      const zuck = proxyStore.create("4", "User");
-      zuck.setValue("4", "id");
-      zuck.setValue("zuck", "name");
+    storeUpdater: (store) => {
+      const settingsRecord = store
+        .get(ROOT_ID)
+        ?.getLinkedRecord("viewer")
+        ?.getLinkedRecord("settings");
+      if (settingsRecord) {
+        for (let [attr, value] of Object.entries(optUpd)) {
+          settingsRecord.setValue(value, attr);
+        }
+      }
     },
   });
   controllerStateAtom.disposeOptUpd2 = dispose;
