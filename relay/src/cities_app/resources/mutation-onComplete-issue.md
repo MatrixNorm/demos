@@ -1,3 +1,7 @@
+```
+onCompleted: Callback function executed when the request is completed and the in-memory Relay store is updated with the updater function. Takes a response object, which is the "raw" server response, and errors, an array containing any errors from the server.
+```
+
 inititial state
 {base}
 
