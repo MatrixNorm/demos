@@ -26,13 +26,13 @@ const mutation = graphql`
 function commit({
   environment,
   input,
-  optimisticResponse,
+  //optimisticResponse,
   onFail,
   onSucc,
 }: {
   environment: IEnvironment;
   input: UpdateUserSettingsInput;
-  optimisticResponse: UpdateUserSettingsMutationResponse;
+  //optimisticResponse: UpdateUserSettingsMutationResponse;
   onFail: any;
   onSucc: any;
 }) {
@@ -41,7 +41,7 @@ function commit({
     variables: {
       input,
     },
-    optimisticResponse,
+    //optimisticResponse,
     onCompleted: (response, errors) => {
       console.log(response.updateUserSettings);
       if (errors || response.updateUserSettings === null) {

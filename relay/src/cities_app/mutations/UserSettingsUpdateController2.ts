@@ -6,7 +6,7 @@ import {
   ROOT_ID,
   IEnvironment,
 } from "relay-runtime";
-import { transit, Event as EventType, State as FsmStateType } from "./EditFsm2";
+import { reduce, Event as EventType, State as StateType } from "./EditControllerReducer";
 import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
@@ -71,45 +71,13 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   let { userId, sv, ed, od } = queryState(environment);
   //console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
-
-  let ret;
-  if (od === null) {
-    ret = transit({ type: "idle", context: { sv, ed, od } }, event);
-  } else {
-    ret = transit({ type: "active", context: { sv, ed, od } }, event);
-  }
+  let ret = reduce({ sv, ed, od }, event);
   //console.log({ ret });
-  if (ret) {
-    const [nextFsmState, effects] = ret;
-    controllerStateAtom.fsmState = nextFsmState;
-    processEffects(sv.userId, effects, environment);
-  }
-}
-
-function processEffects(
-  userId: string,
-  effects: EffectType<UserSettings>[],
-  environment: IEnvironment
-) {
-  for (let eff of effects) {
-    switch (eff.type) {
-      case "db/ed": {
-        writeEditDeltaToDb(eff.params, environment);
-        break;
-      }
-      case "commitMutation": {
-        commitMutation(userId, eff.params, environment);
-        break;
-      }
-      case "applyOptUpd2": {
-        applyOptUpd2(eff.params, environment);
-        break;
-      }
-      case "revertOptUpd2": {
-        revertOptUpd2();
-        break;
-      }
-    }
+  if (Array.isArray(ret)) {
+    const [nextState, effect] = ret;
+    commitMutation(environment, userId, effect.mutInput);
+  } else {
+    //if (isDifferet.ed)
   }
 }
 
@@ -148,21 +116,13 @@ function writeEditDeltaToDb(
 }
 
 function commitMutation(
+  environment: IEnvironment,
   userId: string,
-  { optUpd, mutInput }: { optUpd: UserSettings; mutInput: Partial<UserSettings> },
-  environment: IEnvironment
+  mutInput: Partial<UserSettings>
 ) {
   UpdateUserSettingsMutation.commit({
     environment,
     input: { ...mutInput, userId },
-    optimisticResponse: {
-      updateUserSettings: {
-        user: {
-          id: userId,
-          settings: optUpd,
-        },
-      },
-    },
     onFail: () => {
       handleEvent({ type: "mut-fail" }, environment);
     },
@@ -171,26 +131,4 @@ function commitMutation(
       handleEvent({ type: "mut-succ", serverValue }, environment);
     },
   });
-}
-
-function applyOptUpd2(optUpd: UserSettings, environment: IEnvironment) {
-  console.log({ optUpd });
-  const { dispose } = environment.applyUpdate({
-    storeUpdater: (store) => {
-      const settingsRecord = store
-        .get(ROOT_ID)
-        ?.getLinkedRecord("viewer")
-        ?.getLinkedRecord("settings");
-      if (settingsRecord) {
-        for (let [attr, value] of Object.entries(optUpd)) {
-          settingsRecord.setValue(value, attr);
-        }
-      }
-    },
-  });
-  controllerStateAtom.disposeOptUpd2 = dispose;
-}
-
-function revertOptUpd2() {
-  controllerStateAtom.disposeOptUpd2();
 }
