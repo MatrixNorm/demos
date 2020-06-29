@@ -8,6 +8,7 @@ import { SubmitButton } from "../elements/Buttons";
 import { NukeFragRef } from "../helpers/typeUtils";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
+import { UserSettings_optimisticDelta } from "__relay__/UserSettings_optimisticDelta.graphql";
 
 function isTrueDiff(base: object, possibleDiff: object | null) {
   if (!possibleDiff) return false;
@@ -81,6 +82,7 @@ function SectionComponent({
 type Props = {
   settings: UserSettings_settings;
   editDelta: UserSettings_editDelta | null;
+  optimisticDelta: UserSettings_optimisticDelta | null;
   relay: RelayProp;
 };
 
@@ -156,6 +158,13 @@ export default createFragmentContainer(
         bar
       }
     `,
+    optimisticDelta: graphql`
+      fragment UserSettings_optimisticDelta on UIUserSettingsDelta {
+        citiesPaginationPageSize
+        foo
+        bar
+      }
+    `,
   }
 );
 
@@ -166,4 +175,5 @@ export const defaultData = {
     bar: 1,
   } as NukeFragRef<UserSettings_settings>,
   editDelta: null,
+  optimisticDelta: null,
 };

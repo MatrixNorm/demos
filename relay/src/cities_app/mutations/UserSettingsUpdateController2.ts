@@ -22,7 +22,7 @@ function queryState(
   od: Partial<UserSettings> | null;
 } {
   const query = graphql`
-    query UserSettingsUpdateControllerEditDeltaQuery {
+    query UserSettingsUpdateController2Query {
       viewer {
         id
         settings {
@@ -31,10 +31,10 @@ function queryState(
       }
       uiState {
         userSettingsEditDelta {
-          ...UserSettings_settings @relay(mask: false)
+          ...UserSettings_editDelta @relay(mask: false)
         }
         userSettingsOptimisticDelta {
-          ...UserSettings_settings @relay(mask: false)
+          ...UserSettings_optimisticDelta @relay(mask: false)
         }
       }
     }
@@ -75,13 +75,16 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   //console.log({ ret });
   if (Array.isArray(ret)) {
     const [nextState, effect] = ret;
+    writeEditDelta(nextState.ed, environment);
+    writeOptimisticDelta(nextState.od, environment);
     commitMutation(environment, userId, effect.mutInput);
   } else {
-    //if (isDifferet.ed)
+    writeEditDelta(ret.ed, environment);
+    writeOptimisticDelta(ret.od, environment);
   }
 }
 
-function writeEditDeltaToDb(
+function writeEditDelta(
   editDelta: Partial<UserSettings> | null,
   environment: IEnvironment
 ) {
@@ -92,8 +95,21 @@ function writeEditDeltaToDb(
     return;
   }
 
+  // commitLocalUpdate(environment, (store) => {
+  //   let uiState = store.get(ROOT_ID)?.getOrCreateLinkedRecord("uiState", "UIState");
+  //   if (uiState) {
+  //     const record = store.create(
+  //       notificationId,
+  //       "UINotification"
+  //     );
+  //     newNotificationRecord.setValue(notificationId, "id");
+  //     newNotificationRecord.setValue(notification.kind, "kind");
+  //     newNotificationRecord.setValue(notification.text, "text");
+  //   }
+  // });
+
   const query = graphql`
-    query UserSettingsUpdateControllerEditDelta2Query {
+    query UserSettingsUpdateController2WriteEditDeltaQuery {
       __typename
       uiState {
         userSettingsEditDelta {
@@ -115,6 +131,40 @@ function writeEditDeltaToDb(
   environment.retain(operationDescriptor);
 }
 
+function writeOptimisticDelta(
+  optimisticDelta: Partial<UserSettings> | null,
+  environment: IEnvironment
+) {
+  if (!optimisticDelta) {
+    commitLocalUpdate(environment, (store) => {
+      store.delete(`${ROOT_ID}:uiState:userSettingsOptimisticDelta`);
+    });
+    return;
+  }
+
+  const query = graphql`
+    query UserSettingsUpdateController2WriteOptimisticDeltaQuery {
+      __typename
+      uiState {
+        userSettingsOptimisticDelta {
+          ...UserSettings_optimisticDelta
+        }
+      }
+    }
+  `;
+  const request = getRequest(query);
+  const operationDescriptor = createOperationDescriptor(request, {});
+  let data = {
+    __typename: "__Root",
+    uiState: {
+      userSettingsOptimisticDelta: optimisticDelta,
+    },
+  };
+  //console.log({ editDelta, data });
+  environment.commitPayload(operationDescriptor, data);
+  environment.retain(operationDescriptor);
+}
+
 function commitMutation(
   environment: IEnvironment,
   userId: string,
@@ -124,11 +174,10 @@ function commitMutation(
     environment,
     input: { ...mutInput, userId },
     onFail: () => {
-      handleEvent({ type: "mut-fail" }, environment);
+      handleEvent({ type: "completed" }, environment);
     },
-    onSucc: (serverValue: UserSettings) => {
-      console.log(serverValue);
-      handleEvent({ type: "mut-succ", serverValue }, environment);
+    onSucc: () => {
+      handleEvent({ type: "completed" }, environment);
     },
   });
 }
