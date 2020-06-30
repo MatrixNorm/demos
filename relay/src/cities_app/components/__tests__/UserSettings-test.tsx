@@ -2,7 +2,6 @@
 import * as React from "react";
 import { graphql, QueryRenderer } from "react-relay";
 import {
-  commitLocalUpdate,
   createOperationDescriptor,
   getRequest,
   OperationDescriptor,
@@ -11,9 +10,7 @@ import {
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
 import UserSettingsComponent from "../UserSettings";
-import * as UserSettingsUpdateController from "../../mutations/UserSettingsUpdateController2";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
-import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 import { UserSettingsTestQuery } from "__relay__/UserSettingsTestQuery.graphql";
 import { NukeFragRef } from "../../helpers/typeUtils";
 
@@ -49,6 +46,7 @@ function lookupUserSettingFromStore(environment: any) {
   return {
     settings: data.viewer?.settings,
     editDelta: data.uiState?.userSettingsEditDelta,
+    optimisticDelta: data.uiState?.userSettingsOptimisticDelta,
   };
 }
 
@@ -159,6 +157,14 @@ describe("???", () => {
         expect(editDelta).toEqual(expectedValue);
       } else {
         expect(editDelta).toEqual(null);
+      }
+    },
+    beOptimisticDeltaEqual(expectedValue: any) {
+      let optimisticDelta = lookupUserSettingFromStore(__a.env).optimisticDelta;
+      if (expectedValue) {
+        expect(optimisticDelta).toEqual(expectedValue);
+      } else {
+        expect(optimisticDelta).toEqual(null);
       }
     },
   };
@@ -301,35 +307,36 @@ describe("???", () => {
 
   test("t7 edit, submit, edit, submit, resolve", () => {
     edit("citiesPaginationPageSize", 22);
-    console.log(11111);
     submit();
-    // mutation started, optUpt applied
-    // beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
-    // db.beSettingsEqual({ ...__initialSettings, citiesPaginationPageSize: 22 });
-    // db.beEditDeltaEqual(null);
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22 });
 
     edit("bar", 314);
-    // beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
-    // db.beSettingsEqual({ ...__initialSettings, citiesPaginationPageSize: 22 });
-    // db.beEditDeltaEqual({ bar: 314 });
-    console.log(22222);
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
+    db.beEditDeltaEqual({ bar: 314 });
+
     submit();
-    // // // queue but not apply second mutation, apply optUpd2
-    // // beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
-    // // db.beSettingsEqual({ citiesPaginationPageSize: 22, bar: 314 });
-    // // db.beEditDeltaEqual(null);
-    console.log(33333);
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22, bar: 314 });
+
     resolveMutation({
       ...__initialSettings,
       citiesPaginationPageSize: 22,
       foo: "new server foo",
     });
-    // db.beSettingsEqual({
-    //   citiesPaginationPageSize: 22,
-    //   foo: "new server foo",
-    //   bar: 314,
-    // });
-    //beOnlyOneMutatation({ foo: "local foo", bar: 314, userId: "user#19" });
+    console.log(lookupUserSettingFromStore(__a.env).optimisticDelta);
+    db.beSettingsEqual({
+      ...__initialSettings,
+      citiesPaginationPageSize: 22,
+      foo: "new server foo",
+    });
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ bar: 314 });
+    // beOnlyOneMutatation({ bar: 314, userId: "user#19" });
     // beEqual("citiesPaginationPageSize", 22);
     // beEqual("foo", "local foo");
     // beEqual("bar", 314);

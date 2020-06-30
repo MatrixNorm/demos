@@ -72,7 +72,7 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
   let ret = reduce({ sv, ed, od }, event);
-  console.log({ ret });
+  console.log(JSON.stringify(ret));
   if (Array.isArray(ret)) {
     const [nextState, effect] = ret;
     writeEditDelta(nextState.ed, environment);
@@ -120,6 +120,7 @@ function writeOptimisticDelta(
   optimisticDelta: Partial<UserSettings> | null,
   environment: IEnvironment
 ) {
+  console.log({ optimisticDelta });
   if (!optimisticDelta) {
     commitLocalUpdate(environment, (store) => {
       store.delete(`${ROOT_ID}:uiState:userSettingsOptimisticDelta`);
