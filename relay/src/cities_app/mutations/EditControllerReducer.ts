@@ -6,8 +6,14 @@ type EvEdit<T> = {
 };
 type EvSubmit = { type: "submit" };
 type EvClear = { type: "clear" };
-type EvCompleted = { type: "completed" };
-export type Event<T extends object> = EvEdit<T> | EvSubmit | EvClear | EvCompleted;
+type EvResolve = { type: "resolve" };
+type EvReject = { type: "reject" };
+export type Event<T extends object> =
+  | EvEdit<T>
+  | EvSubmit
+  | EvClear
+  | EvResolve
+  | EvReject;
 
 type StateIdle<T> = { sv: T; od: null; ed: Partial<T> | null };
 type StateActive<T> = { sv: T; od: Partial<T>; ed: Partial<T> | null };
@@ -50,7 +56,6 @@ function reduceIdle<T extends object>(
       return { ...state, ed: null };
     }
     default:
-      // unreachable
       return state;
   }
 }
@@ -77,7 +82,7 @@ function reduceActive<T extends object>(
       }
       return { ...state, ed: null };
     }
-    case "completed": {
+    case "resolve": {
       let mutInput = trueDelta(od, sv);
       if (mutInput) {
         return [
@@ -87,8 +92,11 @@ function reduceActive<T extends object>(
       }
       return { ...state, od: null };
     }
+    case "reject": {
+      console.log({ od, ed });
+      return { ...state, od: null, ed: { ...od, ...ed } };
+    }
     default:
-      // unreachable
       return state;
   }
 }

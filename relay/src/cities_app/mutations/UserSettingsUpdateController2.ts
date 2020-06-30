@@ -157,10 +157,10 @@ function commitMutation(
     environment,
     input: { ...mutInput, userId },
     onFail: () => {
-      handleEvent({ type: "completed" }, environment);
+      handleEvent({ type: "reject" }, environment);
     },
     onSucc: () => {
-      handleEvent({ type: "completed" }, environment);
+      handleEvent({ type: "resolve" }, environment);
     },
   });
 }

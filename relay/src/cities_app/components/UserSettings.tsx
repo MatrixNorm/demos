@@ -85,9 +85,9 @@ export default createFragmentContainer(
   ({ settings, editDelta, optimisticDelta, relay }: Props) => {
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
+    const optValue = { ...settings, ...optimisticDelta };
 
     function xxx(name: keyof NukeFragRef<UserSettings_settings>) {
-      const optValue = { ...settings, ...optimisticDelta };
       let value = (editDelta || {})[name] || optValue[name];
       return {
         value,
@@ -130,7 +130,7 @@ export default createFragmentContainer(
             <SubmitButton
               onClick={onSubmit}
               test-id="submit-button"
-              className={isTrueDelta(editDelta, settings) ? "" : "disabled"}
+              className={isTrueDelta(editDelta, optValue) ? "" : "disabled"}
             >
               Sync
             </SubmitButton>

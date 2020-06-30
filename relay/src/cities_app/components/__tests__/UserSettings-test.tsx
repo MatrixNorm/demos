@@ -279,7 +279,6 @@ describe("???", () => {
       errors: [{ message: "scheisse" }],
       data: { updateUserSettings: null },
     });
-    console.log(__a.env.mock.getAllOperations().length)
     beNoMutatations();
     db.beEditDeltaEqual({ citiesPaginationPageSize: 22 });
     beEqual("citiesPaginationPageSize", 22);
