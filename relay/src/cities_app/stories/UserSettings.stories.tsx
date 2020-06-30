@@ -18,6 +18,9 @@ const query1 = graphql`
       userSettingsEditDelta {
         ...UserSettings_editDelta
       }
+      userSettingsOptimisticDelta {
+        ...UserSettings_optimisticDelta
+      }
     }
   }
 `;
@@ -84,6 +87,7 @@ export const demo1 = () => {
               <UserSettings
                 settings={props.viewer.settings}
                 editDelta={props.uiState?.userSettingsEditDelta || null}
+                optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
               />
             )
           );

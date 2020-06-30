@@ -1,7 +1,8 @@
 import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
-import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
+import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController2";
+import { isTrueDelta } from "../helpers/object";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
@@ -10,15 +11,9 @@ import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 import { UserSettings_optimisticDelta } from "__relay__/UserSettings_optimisticDelta.graphql";
 
-function isTrueDiff(base: object, possibleDiff: object | null) {
-  if (!possibleDiff) return false;
-  let merged = { ...base, ...possibleDiff };
-  for (let key in base) {
-    // @ts-ignore
-    if (base[key] !== merged[key]) return true;
-  }
-  return false;
-}
+let x: Partial<UserSettings_settings> = {
+  citiesPaginationPageSize: 22,
+};
 
 export const Section = styled.section`
   display: flex;
@@ -87,15 +82,16 @@ type Props = {
 };
 
 export default createFragmentContainer(
-  ({ settings, editDelta, relay }: Props) => {
+  ({ settings, editDelta, optimisticDelta, relay }: Props) => {
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
 
     function xxx(name: keyof NukeFragRef<UserSettings_settings>) {
-      let value = (editDelta || {})[name] || settings[name];
+      const optValue = { ...settings, ...optimisticDelta };
+      let value = (editDelta || {})[name] || optValue[name];
       return {
         value,
-        isEdited: value != settings[name],
+        isEdited: value != optValue[name],
         name,
         onChange: (val: any) => {
           //console.log(val)
@@ -108,7 +104,7 @@ export default createFragmentContainer(
     }
 
     function onSubmit() {
-      UserSettingsUpdateController.handleEvent({ type: "start-mut" }, relay.environment);
+      UserSettingsUpdateController.handleEvent({ type: "submit" }, relay.environment);
     }
 
     function onClear() {
@@ -134,7 +130,7 @@ export default createFragmentContainer(
             <SubmitButton
               onClick={onSubmit}
               test-id="submit-button"
-              className={isTrueDiff(settings, editDelta) ? "" : "disabled"}
+              className={isTrueDelta(editDelta, settings) ? "" : "disabled"}
             >
               Sync
             </SubmitButton>

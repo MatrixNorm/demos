@@ -11,7 +11,7 @@ import {
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import * as TestRenderer from "react-test-renderer";
 import UserSettingsComponent from "../UserSettings";
-import * as UserSettingsUpdateController from "../../mutations/UserSettingsUpdateController";
+import * as UserSettingsUpdateController from "../../mutations/UserSettingsUpdateController2";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 import { UserSettingsTestQuery } from "__relay__/UserSettingsTestQuery.graphql";
@@ -37,6 +37,9 @@ function lookupUserSettingFromStore(environment: any) {
         uiState {
           userSettingsEditDelta {
             ...UserSettings_editDelta @relay(mask: false)
+          }
+          userSettingsOptimisticDelta {
+            ...UserSettings_optimisticDelta @relay(mask: false)
           }
         }
       }
@@ -65,6 +68,9 @@ function render(mocks: any) {
             userSettingsEditDelta {
               ...UserSettings_editDelta
             }
+            userSettingsOptimisticDelta {
+              ...UserSettings_optimisticDelta
+            }
           }
         }
       `}
@@ -77,6 +83,7 @@ function render(mocks: any) {
             <UserSettingsComponent
               settings={props.viewer.settings}
               editDelta={props.uiState?.userSettingsEditDelta || null}
+              optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
             />
           )
         );
@@ -192,13 +199,9 @@ describe("???", () => {
         };
       },
       UIState() {
-        return { userSettingsEditDelta: null };
+        return { userSettingsEditDelta: null, userSettingsOptimisticDelta: null };
       },
     });
-  });
-
-  afterEach(() => {
-    UserSettingsUpdateController.resetControllerStateAtom();
   });
 
   test("t0 initial render", () => {
@@ -276,6 +279,7 @@ describe("???", () => {
       errors: [{ message: "scheisse" }],
       data: { updateUserSettings: null },
     });
+    console.log(__a.env.mock.getAllOperations().length)
     beNoMutatations();
     db.beEditDeltaEqual({ citiesPaginationPageSize: 22 });
     beEqual("citiesPaginationPageSize", 22);

@@ -6,7 +6,7 @@ import {
   ROOT_ID,
   IEnvironment,
 } from "relay-runtime";
-import { reduce, Event as EventType, State as StateType } from "./EditControllerReducer";
+import { reduce, Event as EventType } from "./EditControllerReducer";
 import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
@@ -52,7 +52,7 @@ function queryState(
   // @ts-ignore
   let od = response.data?.uiState?.userSettingsOptimisticDelta || null;
   if (od) {
-    od = Object.fromEntries(Object.entries(ed).filter(([_, v]) => v));
+    od = Object.fromEntries(Object.entries(od).filter(([_, v]) => v));
     if (od.length === 0) {
       od = null;
     }
@@ -69,10 +69,10 @@ function queryState(
 
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let { userId, sv, ed, od } = queryState(environment);
-  //console.log({ userId, sv, ed, od, event });
+  console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
   let ret = reduce({ sv, ed, od }, event);
-  //console.log({ ret });
+  console.log({ ret });
   if (Array.isArray(ret)) {
     const [nextState, effect] = ret;
     writeEditDelta(nextState.ed, environment);
@@ -94,20 +94,6 @@ function writeEditDelta(
     });
     return;
   }
-
-  // commitLocalUpdate(environment, (store) => {
-  //   let uiState = store.get(ROOT_ID)?.getOrCreateLinkedRecord("uiState", "UIState");
-  //   if (uiState) {
-  //     const record = store.create(
-  //       notificationId,
-  //       "UINotification"
-  //     );
-  //     newNotificationRecord.setValue(notificationId, "id");
-  //     newNotificationRecord.setValue(notification.kind, "kind");
-  //     newNotificationRecord.setValue(notification.text, "text");
-  //   }
-  // });
-
   const query = graphql`
     query UserSettingsUpdateController2WriteEditDeltaQuery {
       __typename
@@ -126,7 +112,6 @@ function writeEditDelta(
       userSettingsEditDelta: editDelta,
     },
   };
-  //console.log({ editDelta, data });
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
 }
@@ -141,7 +126,6 @@ function writeOptimisticDelta(
     });
     return;
   }
-
   const query = graphql`
     query UserSettingsUpdateController2WriteOptimisticDeltaQuery {
       __typename
@@ -160,7 +144,6 @@ function writeOptimisticDelta(
       userSettingsOptimisticDelta: optimisticDelta,
     },
   };
-  //console.log({ editDelta, data });
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
 }

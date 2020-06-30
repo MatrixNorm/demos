@@ -1,3 +1,5 @@
+import { trueDelta } from "../helpers/object";
+
 type EvEdit<T> = {
   type: "edit";
   payload: Partial<T>;
@@ -14,24 +16,6 @@ export type State<T extends object> = StateIdle<T> | StateActive<T>;
 export type ReturnType<T extends object> =
   | State<T>
   | [State<T>, { type: "commitMutation"; mutInput: Partial<T> }];
-
-function trueDelta<T extends object>(
-  delta: Partial<T> | null,
-  base: T
-): Partial<T> | null {
-  if (delta === null) {
-    return null;
-  }
-  const differentEntries = Object.entries(delta).filter(
-    //@ts-ignore
-    ([k, v]) => base[k] !== v
-  );
-  if (differentEntries.length > 0) {
-    //@ts-ignore
-    return Object.fromEntries(differentEntries);
-  }
-  return null;
-}
 
 export function reduce<T extends object>(
   state: State<T>,
