@@ -1,7 +1,7 @@
 import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
-import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController2";
+import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
 import { isTrueDelta, stripEmptyProps } from "../helpers/object";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
