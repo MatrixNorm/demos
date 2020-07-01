@@ -69,10 +69,10 @@ function queryState(
 
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let { userId, sv, ed, od } = queryState(environment);
-  console.log({ userId, sv, ed, od, event });
+  //console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
   let ret = reduce({ sv, ed, od }, event);
-  console.log(JSON.stringify(ret));
+  //console.log(JSON.stringify(ret));
   if (Array.isArray(ret)) {
     const [nextState, effect] = ret;
     writeEditDelta(nextState.ed, environment);
@@ -94,6 +94,7 @@ function writeEditDelta(
     });
     return;
   }
+
   const query = graphql`
     query UserSettingsUpdateController2WriteEditDeltaQuery {
       __typename
@@ -127,6 +128,7 @@ function writeOptimisticDelta(
     });
     return;
   }
+
   const query = graphql`
     query UserSettingsUpdateController2WriteOptimisticDeltaQuery {
       __typename
@@ -147,6 +149,18 @@ function writeOptimisticDelta(
   };
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
+
+  commitLocalUpdate(environment, (store) => {
+    const userSettingsOptimisticDelta = store
+      .get(ROOT_ID)
+      ?.getOrCreateLinkedRecord("uiState", "UIState")
+      ?.getOrCreateLinkedRecord("userSettingsOptimisticDelta", "UIUserSettingsDelta");
+    if (userSettingsOptimisticDelta) {
+      for (let key of ["citiesPaginationPageSize", "foo", "bar"]) {
+        userSettingsOptimisticDelta.setValue(optimisticDelta[key], key);
+      }
+    }
+  });
 }
 
 function commitMutation(
