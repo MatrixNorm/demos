@@ -78,7 +78,7 @@ function reduceActive<T extends object>(
     case "submit": {
       let mutInput = trueDelta(ed, { ...sv, ...od });
       if (mutInput) {
-        return { ...state, od: mutInput, ed: null };
+        return { ...state, od: { ...od, ...mutInput }, ed: null };
       }
       return { ...state, ed: null };
     }

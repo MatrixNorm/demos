@@ -37,3 +37,10 @@ export function trueDelta<T extends object>(
   }
   return null;
 }
+
+export function stripEmptyProps<T extends object>(
+  obj: Partial<T> | null
+): Partial<T> | null {
+  if (!obj) return null;
+  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v)) as Partial<T>;
+}

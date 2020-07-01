@@ -116,9 +116,10 @@ function render(mocks: any) {
 describe("???", () => {
   let __initialSettings: UserSettings = {
     citiesPaginationPageSize: 10,
-    foo: "foo_value",
+    foo: "__foo__",
     bar: 15,
   };
+  let __userId = "user#19";
   let __a: any;
 
   function edit(field: keyof UserSettings, value: any) {
@@ -185,7 +186,7 @@ describe("???", () => {
         UpdateUserSettingsPayload() {
           return {
             user: {
-              id: "user#19",
+              id: __userId,
               settings,
             },
           };
@@ -199,7 +200,7 @@ describe("???", () => {
     __a = render({
       User() {
         return {
-          id: "user#19",
+          id: __userId,
           name: "coronavirus",
           settings: __initialSettings,
         };
@@ -230,7 +231,7 @@ describe("???", () => {
   test("t2: edit, submit", () => {
     edit("citiesPaginationPageSize", 22);
     submit();
-    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: __userId });
     db.beEditDeltaEqual(null);
     beEqual("citiesPaginationPageSize", 22);
     beNotEdited("citiesPaginationPageSize");
@@ -308,77 +309,75 @@ describe("???", () => {
   test("t7 edit, submit, edit, submit, resolve", () => {
     edit("citiesPaginationPageSize", 22);
     submit();
-    // beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
-    // db.beSettingsEqual(__initialSettings);
-    // db.beEditDeltaEqual(null);
-    // db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22 });
-    // console.log(lookupUserSettingFromStore(__a.env).optimisticDelta)
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: __userId });
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22 });
+
     edit("bar", 314);
-    // beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
-    // db.beEditDeltaEqual({ bar: 314 });
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
+    db.beEditDeltaEqual({ bar: 314 });
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22 });
 
     submit();
-    // beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
-    // db.beSettingsEqual(__initialSettings);
-    // db.beEditDeltaEqual(null);
-    // db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22, bar: 314 });
-    // console.log(lookupUserSettingFromStore(__a.env).optimisticDelta)
-    console.log(111111111);
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: "user#19" });
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22, bar: 314 });
+
     resolveMutation({
       ...__initialSettings,
       citiesPaginationPageSize: 22,
       foo: "new server foo",
     });
-    console.log(lookupUserSettingFromStore(__a.env).optimisticDelta);
-    // db.beSettingsEqual({
-    //   ...__initialSettings,
-    //   citiesPaginationPageSize: 22,
-    //   foo: "new server foo",
-    // });
-    //db.beEditDeltaEqual(null);
-    //db.beOptimisticDeltaEqual({ bar: 314 });
-    // beOnlyOneMutatation({ bar: 314, userId: "user#19" });
-    // beEqual("citiesPaginationPageSize", 22);
-    // beEqual("foo", "local foo");
-    // beEqual("bar", 314);
-    // submitBeOff();
+    beOnlyOneMutatation({ bar: 314, userId: "user#19" });
+    db.beSettingsEqual({
+      ...__initialSettings,
+      citiesPaginationPageSize: 22,
+      foo: "new server foo",
+    });
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ bar: 314 });
+    beEqual("citiesPaginationPageSize", 22);
+    beEqual("foo", "new server foo");
+    beEqual("bar", 314);
+    submitBeOff();
   });
 
-  test("t8 edit, submit, edit, submit, reject mutation", () => {
+  test("t8 edit, submit, edit, submit, reject", () => {
     edit("citiesPaginationPageSize", 22);
     submit();
-    // __db.settingsBeEqual({
-    //   citiesPaginationPageSize: 22,
-    //   foo: __initialSettings["foo"],
-    //   bar: __initialSettings["bar"],
-    // });
+
     edit("foo", "local foo");
     edit("citiesPaginationPageSize", 33);
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: __userId });
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual({ foo: "local foo", citiesPaginationPageSize: 33 });
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 22 });
+    beEqual("citiesPaginationPageSize", 33);
+    beEqual("foo", "local foo");
+    beEqual("bar", __initialSettings["bar"]);
+    submitBeOn();
+
     submit();
-    // only first submit hits network
-    // expect(__a.env.mock.getAllOperations().length).toBe(1);
-    // expect(__a.env.mock.getMostRecentOperation().root.variables).toMatchObject({
-    //   input: { citiesPaginationPageSize: 22, userId: "user#19" },
-    // });
-    // // __db.settingsBeEqual({
-    //   citiesPaginationPageSize: 33,
-    //   foo: "local foo",
-    //   bar: __initialSettings["bar"],
-    // });
-    // // reject first mutation
-    // __a.env.mock.resolveMostRecentOperation({
-    //   errors: [{ message: "scheisse" }],
-    //   data: { updateUserSettings: null },
-    // });
-    // new mutation is commited
-    // expect(__a.env.mock.getMostRecentOperation().root.node.name).toBe(
-    //   "UpdateUserSettingsMutation"
-    // );
-    // expect(__a.env.mock.getMostRecentOperation().root.variables).toMatchObject({
-    //   input: { citiesPaginationPageSize: 33, foo: "local foo", userId: "user#19" },
-    // });
-    // beEqual("citiesPaginationPageSize", 33);
-    // beEqual("foo", "local foo");
-    // submitBeOff();
+    beOnlyOneMutatation({ citiesPaginationPageSize: 22, userId: __userId });
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual(null);
+    db.beOptimisticDeltaEqual({ citiesPaginationPageSize: 33, foo: "local foo" });
+    submitBeOff();
+
+    // reject first mutation
+    __a.env.mock.resolveMostRecentOperation({
+      errors: [{ message: "scheisse" }],
+      data: { updateUserSettings: null },
+    });
+    beNoMutatations();
+    db.beSettingsEqual(__initialSettings);
+    db.beEditDeltaEqual({ citiesPaginationPageSize: 33, foo: "local foo" });
+    db.beOptimisticDeltaEqual(null);
+    beEqual("citiesPaginationPageSize", 33);
+    beEqual("foo", "local foo");
+    beEqual("bar", __initialSettings["bar"]);
+    submitBeOn();
   });
 });

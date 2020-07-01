@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
 import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController2";
-import { isTrueDelta } from "../helpers/object";
+import { isTrueDelta, stripEmptyProps } from "../helpers/object";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
@@ -85,7 +85,7 @@ export default createFragmentContainer(
   ({ settings, editDelta, optimisticDelta, relay }: Props) => {
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
-    const optValue = { ...settings, ...optimisticDelta };
+    const optValue = { ...settings, ...stripEmptyProps(optimisticDelta) };
 
     function xxx(name: keyof NukeFragRef<UserSettings_settings>) {
       let value = (editDelta || {})[name] || optValue[name];
