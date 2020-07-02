@@ -39,21 +39,32 @@ export const createRelayEnvironment = (
   return environment;
 };
 
-export const createTestingEnv = (resolvers: any) => {
+export const createTestingEnv = (resolvers: object) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
     resolvers: resolvers,
   });
 
   const network = Network.create((operation, variables) => {
-    const resp = graphqlSync(
-      executableSchema,
-      operation.text,
-      {},
-      {},
-      variables
-    );
-    console.log(resp);
+    const resp = graphqlSync(executableSchema, operation.text, {}, {}, variables);
+    return resp;
+  });
+
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};
+
+export const createAsyncTestingEnv = (timeout: number, resolvers: object) => {
+  const executableSchema = makeExecutableSchema({
+    typeDefs: serverSchemaTxt,
+    resolvers: resolvers,
+  });
+
+  const network = Network.create(async (operation, variables) => {
+    await new Promise((resolve) => setTimeout(resolve, timeout));
+    const resp = await graphql(executableSchema, operation.text, {}, {}, variables);
+    console.log({ resp });
     return resp;
   });
 

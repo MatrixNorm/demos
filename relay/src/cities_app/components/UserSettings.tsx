@@ -11,10 +11,6 @@ import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettings_editDelta } from "__relay__/UserSettings_editDelta.graphql";
 import { UserSettings_optimisticDelta } from "__relay__/UserSettings_optimisticDelta.graphql";
 
-let x: Partial<UserSettings_settings> = {
-  citiesPaginationPageSize: 22,
-};
-
 export const Section = styled.section`
   display: flex;
   min-height: 1.5em;
@@ -94,7 +90,6 @@ export default createFragmentContainer(
         isEdited: value != optValue[name],
         name,
         onChange: (val: any) => {
-          //console.log(val)
           UserSettingsUpdateController.handleEvent(
             { type: "edit", payload: { [name]: val } },
             relay.environment

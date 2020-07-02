@@ -1,9 +1,9 @@
 import * as React from "react";
-import { QueryRenderer, graphql } from "react-relay";
+import { graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import UserSettings, { defaultData } from "../components/UserSettings";
-import { Reload, withReaload } from "../elements/LoadingError";
-import { LoadingPlaceholder, LoadingPlaceholderQueryRenderer } from "../LoadingContext";
+import { withReaload } from "../elements/LoadingError";
+import { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
 import { SettingsPageQuery } from "__relay__/SettingsPageQuery.graphql";
 
 type Props = {
@@ -25,6 +25,9 @@ function SettingsPage({ environment }: Props) {
             userSettingsEditDelta {
               ...UserSettings_editDelta
             }
+            userSettingsOptimisticDelta {
+              ...UserSettings_optimisticDelta
+            }
           }
         }
       `}
@@ -41,6 +44,7 @@ function SettingsPage({ environment }: Props) {
             <UserSettings
               settings={props.viewer.settings}
               editDelta={props.uiState?.userSettingsEditDelta || null}
+              optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
             />
           )
         );

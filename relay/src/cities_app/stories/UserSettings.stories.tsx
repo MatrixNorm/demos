@@ -1,12 +1,12 @@
 import * as React from "react";
 import { QueryRenderer, graphql } from "react-relay";
-import { createTestingEnv, createRelayEnvironment } from "../env";
+import { createAsyncTestingEnv } from "../env";
 import UserSettings from "../components/UserSettings";
 import { UserSettingsStoryQuery } from "__relay__/UserSettingsStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/UserSettings" };
 
-const query1 = graphql`
+const query = graphql`
   query UserSettingsStoryQuery {
     viewer {
       id
@@ -25,19 +25,6 @@ const query1 = graphql`
   }
 `;
 
-const query2 = graphql`
-  query UserSettingsStory2Query {
-    viewer {
-      id
-      settings {
-        citiesPaginationPageSize
-        foo
-        bar
-      }
-    }
-  }
-`;
-
 export const demo1 = () => {
   let user = {
     id: "user#777",
@@ -49,7 +36,7 @@ export const demo1 = () => {
       bar: 99,
     },
   };
-  const environment = createTestingEnv({
+  const environment = createAsyncTestingEnv(1000, {
     Query: {
       viewer() {
         return user;
@@ -57,17 +44,13 @@ export const demo1 = () => {
     },
     Mutation: {
       updateUserSettings(_: any, { input }: any) {
-        let { citiesPaginationPageSize, foo, bar } = input;
-
-        if (citiesPaginationPageSize) {
-          user.settings.citiesPaginationPageSize = citiesPaginationPageSize;
+        for (let field of ["citiesPaginationPageSize", "foo", "bar"]) {
+          if (input[field]) {
+            // @ts-ignore
+            user.settings[field] = input[field];
+          }
         }
-        if (foo) {
-          user.settings.foo = foo;
-        }
-        if (bar) {
-          user.settings.bar = bar;
-        }
+        user.settings["foo"] = "new foo";
         return { user };
       },
     },
@@ -75,61 +58,22 @@ export const demo1 = () => {
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
   return (
-    <>
-      <QueryRenderer<UserSettingsStoryQuery>
-        query={query1}
-        environment={environment}
-        variables={{}}
-        render={({ props }) => {
-          return (
-            props &&
-            props.viewer && (
-              <UserSettings
-                settings={props.viewer.settings}
-                editDelta={props.uiState?.userSettingsEditDelta || null}
-                optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
-              />
-            )
-          );
-        }}
-      />
-      {/* <QueryRenderer<any>
-        query={query2}
-        environment={environment}
-        variables={{ userId: "user#777" }}
-        render={({ props }) => {
-          return (
-            props &&
-            props.node && <pre>{JSON.stringify(props.node.settings, null, 2)}</pre>
-          );
-        }}
-      /> */}
-    </>
+    <QueryRenderer<UserSettingsStoryQuery>
+      query={query}
+      environment={environment}
+      variables={{}}
+      render={({ props }) => {
+        return (
+          props &&
+          props.viewer && (
+            <UserSettings
+              settings={props.viewer.settings}
+              editDelta={props.uiState?.userSettingsEditDelta || null}
+              optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
+            />
+          )
+        );
+      }}
+    />
   );
 };
-
-// export const full = () => {
-//   const environment = createRelayEnvironment();
-//   //@ts-ignore
-//   window.relayStore = environment.getStore().getSource()._records;
-//   return (
-//     <>
-//       <QueryRenderer<UserSettingsStoryQuery>
-//         query={query1}
-//         environment={environment}
-//         variables={{ userId: "user#1" }}
-//         render={({ props }) => {
-//           return props && props.node && <UserSettings user={props.node} />;
-//         }}
-//       />
-//       <QueryRenderer<any>
-//         query={query2}
-//         environment={environment}
-//         variables={{ userId: "user#1" }}
-//         render={({ props }) => {
-//           return props && props.node && <div>{JSON.stringify(props.node.settings)}</div>;
-//         }}
-//       />
-//     </>
-//   );
-// };
