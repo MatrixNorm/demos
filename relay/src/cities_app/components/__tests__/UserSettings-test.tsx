@@ -288,6 +288,7 @@ describe("???", () => {
     });
     beNoMutatations();
     db.beEditDeltaEqual({ citiesPaginationPageSize: 22 });
+    db.beOptimisticDeltaEqual(null);
     beEqual("citiesPaginationPageSize", 22);
     beEqual("foo", __initialSettings["foo"]);
     beEqual("bar", __initialSettings["bar"]);

@@ -145,8 +145,8 @@ function Abc({ server }: any) {
   console.log(7777, { requests });
   return (
     <div>
-      {requests.map((r: any) => (
-        <div>
+      {requests.map((r: any, i: number) => (
+        <div key={i}>
           <div>{r.data.operation.name}</div>
           <div>{JSON.stringify(r.data.variables)}</div>
           <div>

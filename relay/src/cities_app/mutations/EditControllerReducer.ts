@@ -93,7 +93,6 @@ function reduceActive<T extends object>(
       return { ...state, od: null };
     }
     case "reject": {
-      console.log({ od, ed });
       return { ...state, od: null, ed: { ...od, ...ed } };
     }
     default:
