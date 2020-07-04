@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState, useEffect } from "react";
 import { QueryRenderer, graphql } from "react-relay";
-import { createAsyncTestingEnv, XXX, Server } from "../env";
+import { createAsyncTestingEnv, createFakeServerEnvironment } from "../env";
 import UserSettings from "../components/UserSettings";
 import { UserSettingsStoryQuery } from "__relay__/UserSettingsStoryQuery.graphql";
 
@@ -80,7 +80,6 @@ export const demo1 = () => {
 };
 
 export const demo2 = () => {
-  console.log("!!!!!!!!!!!!!!!!!!");
   let user = {
     id: "user#777",
     __type: "User",
@@ -91,7 +90,7 @@ export const demo2 = () => {
       bar: 99,
     },
   };
-  const server = new Server({
+  const { server, environment } = createFakeServerEnvironment({
     Query: {
       viewer() {
         return user;
@@ -109,7 +108,6 @@ export const demo2 = () => {
       },
     },
   });
-  const environment = XXX(server);
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
   return (
@@ -139,7 +137,7 @@ export const demo2 = () => {
 function Abc({ server }: any) {
   const [requests, setRequests] = useState(server.getRequests());
   useEffect(() => {
-    server.subscribe((requests) => {
+    server.subscribe((requests: any) => {
       console.log(333, { requests });
       setRequests([...requests]);
     });
@@ -147,7 +145,7 @@ function Abc({ server }: any) {
   console.log(7777, { requests });
   return (
     <div>
-      {requests.map((r) => (
+      {requests.map((r: any) => (
         <div>
           <div>{r.data.operation.name}</div>
           <div>{JSON.stringify(r.data.variables)}</div>

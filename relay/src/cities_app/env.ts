@@ -120,24 +120,27 @@ export const noNetworkEnvironment = () => {
   return environment;
 };
 
-export const XXX = (server: { request: any }) => {
+export const createFakeServerEnvironment = (resolvers: object) => {
+  const server = new Server(resolvers);
   const network = Network.create(async (operation, variables) => {
-    console.log(operation);
     const resp = await server.request({ operation, variables });
-    console.log({ resp });
     return resp;
   });
-
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
-  return environment;
+  return { environment, server };
 };
 
 export class Server {
-  constructor(resolvers: any) {
-    this._isInitial = true;
-    this._requests = [];
-    this._observer = null;
+  isInitial: Boolean;
+  requests: any[];
+  observer: any;
+  executableSchema: any;
+
+  constructor(resolvers: object) {
+    this.isInitial = true;
+    this.requests = [];
+    this.observer = null;
     this.executableSchema = makeExecutableSchema({
       typeDefs: serverSchemaTxt,
       resolvers,
@@ -145,25 +148,24 @@ export class Server {
   }
 
   getRequests() {
-    return this._requests;
+    return this.requests;
   }
 
   subscribe(observer: any) {
-    this._observer = observer;
+    this.observer = observer;
   }
 
-  request({ operation, variables }) {
-    if (this._isInitial) {
-      this._isInitial = false;
+  request({ operation, variables }: any) {
+    if (this.isInitial) {
+      this.isInitial = false;
       return graphqlSync(this.executableSchema, operation.text, {}, {}, variables);
     }
     return new Promise((resolve, reject) => {
-      let arrayIndex = this._requests.length;
+      let arrayIndex = this.requests.length;
 
-      function resolveRequest() {
-        console.log(this);
-        this._requests.splice(arrayIndex, 1);
-        this._observer && this._observer(this._requests);
+      const resolveRequest = () => {
+        this.requests.splice(arrayIndex, 1);
+        this.observer && this.observer(this.requests);
         let response = graphqlSync(
           this.executableSchema,
           operation.text,
@@ -172,20 +174,19 @@ export class Server {
           variables
         );
         resolve(response);
-      }
+      };
 
-      function rejectRequest() {
-        this._requests.splice(arrayIndex, 1);
-        this._observer && this._observer(this._requests);
+      const rejectRequest = () => {
+        this.requests.splice(arrayIndex, 1);
+        this.observer && this.observer(this.requests);
         reject("sheisse");
-      }
-      this._requests.push({
+      };
+      this.requests.push({
         data: { operation, variables },
-        resolveRequest: resolveRequest.bind(this),
-        rejectRequest: rejectRequest.bind(this),
+        resolveRequest,
+        rejectRequest,
       });
-      this._observer && this._observer(this._requests);
-      console.log(this._requests);
+      this.observer && this.observer(this.requests);
     });
   }
 }
