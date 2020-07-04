@@ -39,5 +39,6 @@ export function withReaload(Component: any) {
     } catch {
       setReload(true);
     }
+    return null;
   };
 }

@@ -1,11 +1,14 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
 import { QueryRenderer, graphql } from "react-relay";
 import { createAsyncTestingEnv, createFakeServerEnvironment } from "../env";
 import UserSettings from "../components/UserSettings";
+import RequestViewer from "./RequestViewer";
 import { UserSettingsStoryQuery } from "__relay__/UserSettingsStoryQuery.graphql";
 
-export default { title: "cities_app-demo1/UserSettings" };
+export default {
+  title: "cities_app-demo1/UserSettings",
+  excludeStories: ["createResolvers"],
+};
 
 const query = graphql`
   query UserSettingsStoryQuery {
@@ -26,8 +29,7 @@ const query = graphql`
   }
 `;
 
-export const demo1 = () => {
-  console.log("!!!!!!!!!!!!!!!!!!");
+export function createResolvers() {
   let user = {
     id: "user#777",
     __type: "User",
@@ -38,7 +40,7 @@ export const demo1 = () => {
       bar: 99,
     },
   };
-  const environment = createAsyncTestingEnv(100, {
+  return {
     Query: {
       viewer() {
         return user;
@@ -55,7 +57,11 @@ export const demo1 = () => {
         return { user };
       },
     },
-  });
+  };
+}
+
+export const demo1 = () => {
+  const environment = createAsyncTestingEnv(100, createResolvers());
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
   return (
@@ -80,34 +86,7 @@ export const demo1 = () => {
 };
 
 export const demo2 = () => {
-  let user = {
-    id: "user#777",
-    __type: "User",
-    name: "Nik",
-    settings: {
-      citiesPaginationPageSize: 10,
-      foo: "foo value",
-      bar: 99,
-    },
-  };
-  const { server, environment } = createFakeServerEnvironment({
-    Query: {
-      viewer() {
-        return user;
-      },
-    },
-    Mutation: {
-      updateUserSettings(_: any, { input }: any) {
-        for (let field of ["citiesPaginationPageSize", "foo", "bar"]) {
-          if (input[field]) {
-            // @ts-ignore
-            user.settings[field] = input[field];
-          }
-        }
-        return { user };
-      },
-    },
-  });
+  const { server, environment } = createFakeServerEnvironment(createResolvers());
   //@ts-ignore
   window.relayStore = environment.getStore().getSource()._records;
   return (
@@ -129,32 +108,7 @@ export const demo2 = () => {
           );
         }}
       />
-      <Abc server={server} />
+      <RequestViewer server={server} />
     </>
   );
 };
-
-function Abc({ server }: any) {
-  const [requests, setRequests] = useState(server.getRequests());
-  useEffect(() => {
-    server.subscribe((requests: any) => {
-      console.log(333, { requests });
-      setRequests([...requests]);
-    });
-  }, []);
-  console.log(7777, { requests });
-  return (
-    <div>
-      {requests.map((r: any, i: number) => (
-        <div key={i}>
-          <div>{r.data.operation.name}</div>
-          <div>{JSON.stringify(r.data.variables)}</div>
-          <div>
-            <button onClick={r.resolveRequest}>resolve</button>
-            <button onClick={r.rejectRequest}>reject</button>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
