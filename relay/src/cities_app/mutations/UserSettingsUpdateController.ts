@@ -164,6 +164,7 @@ function commitMutation(
   userId: string,
   mutInput: Partial<UserSettings>
 ) {
+  console.log({ mutInput });
   UpdateUserSettingsMutation.commit({
     environment,
     input: { ...mutInput, userId },

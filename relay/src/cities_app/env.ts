@@ -14,7 +14,7 @@ const serverSchema = makeExecutableSchema({
 });
 
 export const createRelayEnvironment = (
-  { timeout }: { timeout: number } = { timeout: 500 }
+  { timeout }: { timeout: number } = { timeout: 5000 }
 ) => {
   const network = Network.create(async (operation, variables) => {
     await new Promise((resolve) => setTimeout(resolve, timeout));
@@ -25,7 +25,6 @@ export const createRelayEnvironment = (
       { user: db.users["user#1"] },
       variables
     );
-    console.log({ resp });
     return resp;
   });
   const store = new Store(new RecordSource());
@@ -42,7 +41,7 @@ export const createRelayEnvironment = (
 export const createTestingEnv = (resolvers: object) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
-    resolvers: resolvers,
+    resolvers,
   });
 
   const network = Network.create((operation, variables) => {
@@ -58,10 +57,11 @@ export const createTestingEnv = (resolvers: object) => {
 export const createAsyncTestingEnv = (timeout: number, resolvers: object) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
-    resolvers: resolvers,
+    resolvers,
   });
 
   const network = Network.create(async (operation, variables) => {
+    console.log(operation);
     await new Promise((resolve) => setTimeout(resolve, timeout));
     const resp = await graphql(executableSchema, operation.text, {}, {}, variables);
     console.log({ resp });
@@ -119,3 +119,73 @@ export const noNetworkEnvironment = () => {
   const environment = new Environment({ network, store });
   return environment;
 };
+
+export const XXX = (server: { request: any }) => {
+  const network = Network.create(async (operation, variables) => {
+    console.log(operation);
+    const resp = await server.request({ operation, variables });
+    console.log({ resp });
+    return resp;
+  });
+
+  const store = new Store(new RecordSource());
+  const environment = new Environment({ network, store });
+  return environment;
+};
+
+export class Server {
+  constructor(resolvers: any) {
+    this._isInitial = true;
+    this._requests = [];
+    this._observer = null;
+    this.executableSchema = makeExecutableSchema({
+      typeDefs: serverSchemaTxt,
+      resolvers,
+    });
+  }
+
+  getRequests() {
+    return this._requests;
+  }
+
+  subscribe(observer: any) {
+    this._observer = observer;
+  }
+
+  request({ operation, variables }) {
+    if (this._isInitial) {
+      this._isInitial = false;
+      return graphqlSync(this.executableSchema, operation.text, {}, {}, variables);
+    }
+    return new Promise((resolve, reject) => {
+      let arrayIndex = this._requests.length;
+
+      function resolveRequest() {
+        console.log(this);
+        this._requests.splice(arrayIndex, 1);
+        this._observer && this._observer(this._requests);
+        let response = graphqlSync(
+          this.executableSchema,
+          operation.text,
+          {},
+          {},
+          variables
+        );
+        resolve(response);
+      }
+
+      function rejectRequest() {
+        this._requests.splice(arrayIndex, 1);
+        this._observer && this._observer(this._requests);
+        reject("sheisse");
+      }
+      this._requests.push({
+        data: { operation, variables },
+        resolveRequest: resolveRequest.bind(this),
+        rejectRequest: rejectRequest.bind(this),
+      });
+      this._observer && this._observer(this._requests);
+      console.log(this._requests);
+    });
+  }
+}
