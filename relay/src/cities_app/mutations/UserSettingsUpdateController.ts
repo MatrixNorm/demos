@@ -9,8 +9,10 @@ import {
 import { reduce, Event as EventType } from "./EditControllerReducer";
 import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { retainRecord } from "../helpers/relayStore";
+import { stripEmptyProps } from "../helpers/object";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
-import { NukeFragRef } from "../helpers/typeUtils";
+import { UserSettingsUpdateControllerQueryResponse } from "__relay__/UserSettingsUpdateControllerQuery.graphql";
+import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 
 type UserSettings = NukeFragRef<UserSettings_settings>;
 
@@ -19,11 +21,11 @@ function queryState(
 ): {
   userId: string | null;
   sv: UserSettings | null;
-  ed: Partial<UserSettings> | null;
-  od: Partial<UserSettings> | null;
+  ed: NukeNulls<Partial<UserSettings>> | null;
+  od: NukeNulls<Partial<UserSettings>> | null;
 } {
   const query = graphql`
-    query UserSettingsUpdateController2Query {
+    query UserSettingsUpdateControllerQuery {
       viewer {
         id
         settings {
@@ -42,29 +44,12 @@ function queryState(
   `;
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
-  // @ts-ignore
-  let ed = response.data?.uiState?.userSettingsEditDelta || null;
-  if (ed) {
-    ed = Object.fromEntries(Object.entries(ed).filter(([_, v]) => v));
-    if (ed.length === 0) {
-      ed = null;
-    }
-  }
-  // @ts-ignore
-  let od = response.data?.uiState?.userSettingsOptimisticDelta || null;
-  if (od) {
-    od = Object.fromEntries(Object.entries(od).filter(([_, v]) => v));
-    if (od.length === 0) {
-      od = null;
-    }
-  }
+  const data = response.data as UserSettingsUpdateControllerQueryResponse;
   return {
-    // @ts-ignore
-    userId: response.data?.viewer?.id || null,
-    // @ts-ignore
-    sv: response.data?.viewer?.settings || null,
-    ed,
-    od,
+    userId: data?.viewer?.id || null,
+    sv: data?.viewer?.settings || null,
+    ed: stripEmptyProps(data?.uiState?.userSettingsEditDelta || null),
+    od: stripEmptyProps(data?.uiState?.userSettingsOptimisticDelta || null),
   };
 }
 
@@ -86,7 +71,7 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
 }
 
 function writeEditDelta(
-  editDelta: Partial<UserSettings> | null,
+  editDelta: NukeNulls<Partial<UserSettings>> | null,
   settings: Readonly<UserSettings>,
   environment: IEnvironment
 ) {
@@ -109,7 +94,7 @@ function writeEditDelta(
   });
   retainRecord(
     graphql`
-      query UserSettingsUpdateController2RetainEditDeltaQuery {
+      query UserSettingsUpdateControllerRetainEditDeltaQuery {
         __typename
         uiState {
           userSettingsEditDelta {
@@ -123,7 +108,7 @@ function writeEditDelta(
 }
 
 function writeOptimisticDelta(
-  optimisticDelta: Partial<UserSettings> | null,
+  optimisticDelta: NukeNulls<Partial<UserSettings>> | null,
   settings: Readonly<UserSettings>,
   environment: IEnvironment
 ) {
@@ -146,7 +131,7 @@ function writeOptimisticDelta(
   });
   retainRecord(
     graphql`
-      query UserSettingsUpdateController2RetainOptimisticDeltaQuery {
+      query UserSettingsUpdateControllerRetainOptimisticDeltaQuery {
         __typename
         uiState {
           userSettingsOptimisticDelta {
@@ -164,7 +149,6 @@ function commitMutation(
   userId: string,
   mutInput: Partial<UserSettings>
 ) {
-  console.log({ mutInput });
   UpdateUserSettingsMutation.commit({
     environment,
     input: { ...mutInput, userId },

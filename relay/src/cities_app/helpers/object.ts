@@ -1,3 +1,5 @@
+import { NukeNulls } from "./typeUtils";
+
 /**
  *
  * @param delta
@@ -40,7 +42,8 @@ export function trueDelta<T extends object>(
 
 export function stripEmptyProps<T extends object>(
   obj: Partial<T> | null
-): Partial<T> | null {
+): NukeNulls<Partial<T>> | null {
   if (!obj) return null;
-  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v)) as Partial<T>;
+  let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
+  return Object.entries(compacted).length > 0 ? (compacted as NukeNulls<Partial<T>>) : null;
 }
