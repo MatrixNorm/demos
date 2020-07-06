@@ -15,14 +15,15 @@ import { UserSettingsUpdateControllerQueryResponse } from "__relay__/UserSetting
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 
 type UserSettings = NukeFragRef<UserSettings_settings>;
+type UserSettingsDelta = NukeNulls<Partial<UserSettings>> | null;
 
 function queryState(
   environment: IEnvironment
 ): {
   userId: string | null;
   sv: UserSettings | null;
-  ed: NukeNulls<Partial<UserSettings>> | null;
-  od: NukeNulls<Partial<UserSettings>> | null;
+  ed: UserSettingsDelta;
+  od: UserSettingsDelta;
 } {
   const query = graphql`
     query UserSettingsUpdateControllerQuery {
@@ -71,7 +72,7 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
 }
 
 function writeEditDelta(
-  editDelta: NukeNulls<Partial<UserSettings>> | null,
+  editDelta: UserSettingsDelta,
   settings: Readonly<UserSettings>,
   environment: IEnvironment
 ) {
@@ -108,7 +109,7 @@ function writeEditDelta(
 }
 
 function writeOptimisticDelta(
-  optimisticDelta: NukeNulls<Partial<UserSettings>> | null,
+  optimisticDelta: UserSettingsDelta,
   settings: Readonly<UserSettings>,
   environment: IEnvironment
 ) {

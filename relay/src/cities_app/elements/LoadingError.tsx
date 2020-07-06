@@ -36,7 +36,7 @@ export function withReaload(Component: any) {
         return reactElementOrNull;
       }
       setReload(true);
-    } catch {
+    } catch (err) {
       setReload(true);
     }
     return null;

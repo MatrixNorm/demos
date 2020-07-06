@@ -6,6 +6,7 @@ import { makeExecutableSchema } from "graphql-tools";
 // @ts-ignore
 import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
 import { serverResolvers } from "./resolvers/index";
+import { Server } from "./resolvers/server";
 import * as db from "./resolvers/database";
 
 const serverSchema = makeExecutableSchema({
@@ -130,63 +131,3 @@ export const createFakeServerEnvironment = (resolvers: object) => {
   const environment = new Environment({ network, store });
   return { environment, server };
 };
-
-export class Server {
-  isInitial: Boolean;
-  requests: any[];
-  observer: any;
-  executableSchema: any;
-
-  constructor(resolvers: object) {
-    this.isInitial = true;
-    this.requests = [];
-    this.observer = null;
-    this.executableSchema = makeExecutableSchema({
-      typeDefs: serverSchemaTxt,
-      resolvers,
-    });
-  }
-
-  getRequests() {
-    return this.requests;
-  }
-
-  subscribe(observer: any) {
-    this.observer = observer;
-  }
-
-  request({ operation, variables }: any) {
-    if (this.isInitial) {
-      this.isInitial = false;
-      return graphqlSync(this.executableSchema, operation.text, {}, {}, variables);
-    }
-    return new Promise((resolve, reject) => {
-      let arrayIndex = this.requests.length;
-
-      const resolveRequest = () => {
-        this.requests.splice(arrayIndex, 1);
-        this.observer && this.observer(this.requests);
-        let response = graphqlSync(
-          this.executableSchema,
-          operation.text,
-          {},
-          {},
-          variables
-        );
-        resolve(response);
-      };
-
-      const rejectRequest = () => {
-        this.requests.splice(arrayIndex, 1);
-        this.observer && this.observer(this.requests);
-        reject("sheisse");
-      };
-      this.requests.push({
-        data: { operation, variables },
-        resolveRequest,
-        rejectRequest,
-      });
-      this.observer && this.observer(this.requests);
-    });
-  }
-}

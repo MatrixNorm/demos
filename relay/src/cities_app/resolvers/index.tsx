@@ -15,7 +15,7 @@ export const serverResolvers = {
         return db.users[id];
       }
       if (id.startsWith("city")) {
-        return db.cities.find(c => c.id === id);
+        return db.cities.find((c) => c.id === id);
       }
       return { id };
     },
@@ -27,7 +27,7 @@ export const serverResolvers = {
       return citiesPagination(
         db.cities,
         args,
-        context.user.settings?.citiesPaginationPageSize || 3
+        context?.user?.settings?.citiesPaginationPageSize || 3
       );
     },
     citiesMetadata: () => {
@@ -36,14 +36,14 @@ export const serverResolvers = {
         latLowerBound: 11.97,
         latUpperBound: 67.53,
         lngLowerBound: 9.47,
-        lngUpperBound: 78.25
+        lngUpperBound: 78.25,
       };
     },
     countries: (_: any, { searchString }: t.QueryCountriesArgs) => {
       return db.countries
-        .filter(c => c.toLowerCase().includes(searchString))
+        .filter((c) => c.toLowerCase().includes(searchString))
         .slice(0, 8);
-    }
+    },
   },
   Node: {
     __resolveType(node: t.Node) {
@@ -54,7 +54,7 @@ export const serverResolvers = {
         return "City";
       }
       return null;
-    }
+    },
   },
-  Mutation: Mutts
+  Mutation: Mutts,
 };
