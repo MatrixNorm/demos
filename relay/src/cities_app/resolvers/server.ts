@@ -1,13 +1,21 @@
 // @ts-ignore
-import { graphql, graphqlSync } from "graphql";
+import { graphqlSync } from "graphql";
 // @ts-ignore
 import { makeExecutableSchema } from "graphql-tools";
 // @ts-ignore
 import serverSchemaTxt from "raw-loader!../resources/serverSchema.graphql";
+import { RequestParameters, Variables } from "relay-runtime";
+
+type Request = {
+  id: number;
+  data: { operation: RequestParameters; variables: Variables };
+  resolveRequest: () => void;
+  rejectRequest: () => void;
+};
 
 export class Server {
   isInitial: Boolean;
-  requests: any[];
+  requests: Request[];
   observer: any;
   executableSchema: any;
   reqIdCounter: number;
@@ -31,11 +39,17 @@ export class Server {
     this.observer = observer;
   }
 
-  request({ operation, variables }: any) {
-    if (this.isInitial) {
-      this.isInitial = false;
-      return graphqlSync(this.executableSchema, operation.text, {}, {}, variables);
-    }
+  request({
+    operation,
+    variables,
+  }: {
+    operation: RequestParameters;
+    variables: Variables;
+  }) {
+    // if (this.isInitial) {
+    //   this.isInitial = false;
+    //   return graphqlSync(this.executableSchema, operation.text, {}, {}, variables);
+    // }
     return new Promise((resolve, reject) => {
       let reqId = this.reqIdCounter;
       this.reqIdCounter++;
