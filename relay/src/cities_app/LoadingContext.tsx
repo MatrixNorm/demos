@@ -47,7 +47,7 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
           );
         }
         if (error) {
-          throw new Error();
+          throw new Error("something went wrong");
         }
         if (!props) {
           return null;

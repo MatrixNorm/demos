@@ -42,3 +42,32 @@ export function withReaload(Component: any) {
     return null;
   };
 }
+
+export class LoadingErrorBoundary extends React.Component {
+  constructor(props: any) {
+    super(props);
+    this.state = { error: false };
+  }
+
+  componentDidCatch(error: any) {
+    this.setState({
+      error: true,
+    });
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <Reload
+          message="something went wrong"
+          onClick={() =>
+            this.setState({
+              error: false,
+            })
+          }
+        />
+      );
+    }
+    return this.props.children;
+  }
+}

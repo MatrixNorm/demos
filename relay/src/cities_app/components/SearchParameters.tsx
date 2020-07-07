@@ -7,7 +7,7 @@ import {
   IEnvironment,
 } from "relay-runtime";
 import { LoadingPlaceholder } from "../LoadingContext";
-import { Reload } from "../elements/LoadingError";
+import { Reload } from "../elements/LoadingErrorBoundary";
 
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
