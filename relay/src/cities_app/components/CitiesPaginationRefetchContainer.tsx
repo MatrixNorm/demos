@@ -1,18 +1,11 @@
 import * as React from "react";
-import { useState } from "react";
-import {
-  QueryRenderer,
-  graphql,
-  createRefetchContainer,
-  RelayRefetchProp,
-} from "react-relay";
+import { graphql, createRefetchContainer, RelayRefetchProp } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import CitiesPagination, {
   defaultData as citiesPaginationDefaultData,
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
 import { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
-import { LoadingErrorBoundary } from "../elements/LoadingErrorBoundary";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
@@ -51,14 +44,6 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
     root: CitiesPaginationRefetchContainer_root;
     relay: RelayRefetchProp;
   }) => {
-    // /**
-    //  * Have to handle case of citiesPagination being null here
-    //  * instead of parent component that is more natural.
-    //  * See this issue https://github.com/facebook/relay/issues/2118
-    //  */
-    // // if (!root.citiesPagination) {
-    // //   reload && reload();
-    // // }
     return (
       root.citiesPagination && (
         <CitiesPagination
@@ -112,36 +97,34 @@ type Props = {
   searchParams: SearchParametersNullableType;
 };
 
-export default function ({ environment, searchParams }: Props) {
+export default function({ environment, searchParams }: Props) {
   return (
-    <LoadingErrorBoundary>
-      <LoadingPlaceholderQueryRenderer<CitiesPaginationRefetchContainerQuery>
-        query={graphql`
-          query CitiesPaginationRefetchContainerQuery(
-            $pageSize: Int
-            $after: String
-            $before: String
-            $searchParams: CitySearchParamsInput
-          ) {
-            ...CitiesPaginationRefetchContainer_root
-              @arguments(
-                pageSize: $pageSize
-                after: $after
-                before: $before
-                searchParams: $searchParams
-              )
-          }
-        `}
-        environment={environment}
-        variables={{ searchParams }}
-        placeholderData={{
-          citiesPagination: { ...citiesPaginationDefaultData },
-        }}
-        render={({ props }) => {
-          return <CitiesPaginationRefetchContainer root={props} />;
-        }}
-      />
-    </LoadingErrorBoundary>
+    <LoadingPlaceholderQueryRenderer<CitiesPaginationRefetchContainerQuery>
+      query={graphql`
+        query CitiesPaginationRefetchContainerQuery(
+          $pageSize: Int
+          $after: String
+          $before: String
+          $searchParams: CitySearchParamsInput
+        ) {
+          ...CitiesPaginationRefetchContainer_root
+            @arguments(
+              pageSize: $pageSize
+              after: $after
+              before: $before
+              searchParams: $searchParams
+            )
+        }
+      `}
+      environment={environment}
+      variables={{ searchParams }}
+      placeholderData={{
+        citiesPagination: { ...citiesPaginationDefaultData },
+      }}
+      render={({ props }) => {
+        return <CitiesPaginationRefetchContainer root={props} />;
+      }}
+    />
   );
 }
 

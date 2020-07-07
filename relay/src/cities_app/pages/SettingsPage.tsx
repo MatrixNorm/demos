@@ -12,45 +12,43 @@ type Props = {
 
 export default function SettingsPage({ environment }: Props) {
   return (
-    <LoadingErrorBoundary>
-      <LoadingPlaceholderQueryRenderer<SettingsPageQuery>
-        query={graphql`
-          query SettingsPageQuery {
-            viewer {
-              id
-              settings {
-                ...UserSettings_settings
-              }
-            }
-            uiState {
-              userSettingsEditDelta {
-                ...UserSettings_editDelta
-              }
-              userSettingsOptimisticDelta {
-                ...UserSettings_optimisticDelta
-              }
+    <LoadingPlaceholderQueryRenderer<SettingsPageQuery>
+      query={graphql`
+        query SettingsPageQuery {
+          viewer {
+            id
+            settings {
+              ...UserSettings_settings
             }
           }
-        `}
-        environment={environment}
-        variables={{}}
-        placeholderData={{
-          viewer: { id: "1", ...defaultData },
-          uiState: null,
-        }}
-        render={({ props }) => {
-          return (
-            props &&
-            props.viewer && (
-              <UserSettings
-                settings={props.viewer.settings}
-                editDelta={props.uiState?.userSettingsEditDelta || null}
-                optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
-              />
-            )
-          );
-        }}
-      />
-    </LoadingErrorBoundary>
+          uiState {
+            userSettingsEditDelta {
+              ...UserSettings_editDelta
+            }
+            userSettingsOptimisticDelta {
+              ...UserSettings_optimisticDelta
+            }
+          }
+        }
+      `}
+      environment={environment}
+      variables={{}}
+      placeholderData={{
+        viewer: { id: "1", ...defaultData },
+        uiState: null,
+      }}
+      render={({ props }) => {
+        return (
+          props &&
+          props.viewer && (
+            <UserSettings
+              settings={props.viewer.settings}
+              editDelta={props.uiState?.userSettingsEditDelta || null}
+              optimisticDelta={props.uiState?.userSettingsOptimisticDelta || null}
+            />
+          )
+        );
+      }}
+    />
   );
 }
