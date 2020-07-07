@@ -12,9 +12,7 @@ import CitiesPagination, {
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
 import { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
-import { LoadingPlaceholder } from "../LoadingContext";
 import { LoadingErrorBoundary } from "../elements/LoadingErrorBoundary";
-
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
@@ -49,20 +47,18 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
   ({
     root,
     relay,
-  }: //reload,
-  {
+  }: {
     root: CitiesPaginationRefetchContainer_root;
     relay: RelayRefetchProp;
-    //reload?: () => void;
   }) => {
-    /**
-     * Have to handle case of citiesPagination being null here
-     * instead of parent component that is more natural.
-     * See this issue https://github.com/facebook/relay/issues/2118
-     */
-    // if (!root.citiesPagination) {
-    //   reload && reload();
-    // }
+    // /**
+    //  * Have to handle case of citiesPagination being null here
+    //  * instead of parent component that is more natural.
+    //  * See this issue https://github.com/facebook/relay/issues/2118
+    //  */
+    // // if (!root.citiesPagination) {
+    // //   reload && reload();
+    // // }
     return (
       root.citiesPagination && (
         <CitiesPagination
@@ -116,7 +112,7 @@ type Props = {
   searchParams: SearchParametersNullableType;
 };
 
-export default function XYZ({ environment, searchParams }: Props) {
+export default function ({ environment, searchParams }: Props) {
   return (
     <LoadingErrorBoundary>
       <LoadingPlaceholderQueryRenderer<CitiesPaginationRefetchContainerQuery>
