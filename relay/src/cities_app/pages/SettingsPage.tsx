@@ -2,7 +2,6 @@ import * as React from "react";
 import { graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import UserSettings, { defaultData } from "../components/UserSettings";
-import { LoadingErrorBoundary } from "../elements/LoadingErrorBoundary";
 import { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
 import { SettingsPageQuery } from "__relay__/SettingsPageQuery.graphql";
 
