@@ -30,13 +30,34 @@ export default ({ environment }: { environment: IEnvironment }) => {
         />
       </div>
       <div className="pagination-panel-wrapper">
-        <XXX environment={environment} />
+        <XXX environment={environment}>
+          {({ props }: { props: CitiesBrowserUiQuery["response"] | null }) => {
+            return (
+              <CitiesPaginationComponent
+                environment={environment}
+                searchParams={
+                  props?.uiState?.citySearchParams || {
+                    countryNameContains: null,
+                    populationGte: null,
+                    populationLte: null,
+                  }
+                }
+              />
+            );
+          }}
+        </XXX>
       </div>
     </PanelBlock>
   );
 };
 
-const XXX = ({ environment }: { environment: IEnvironment }) => {
+const XXX = ({
+  environment,
+  children,
+}: {
+  environment: IEnvironment;
+  children: ({ props }: { props: CitiesBrowserUiQuery["response"] | null }) => any;
+}) => {
   return (
     <LocalQueryRenderer<CitiesBrowserUiQuery>
       query={graphql`
@@ -53,20 +74,7 @@ const XXX = ({ environment }: { environment: IEnvironment }) => {
       `}
       environment={environment}
       variables={{}}
-      render={({ props }) => {
-        return (
-          <CitiesPaginationComponent
-            environment={environment}
-            searchParams={
-              props?.uiState?.citySearchParams || {
-                countryNameContains: null,
-                populationGte: null,
-                populationLte: null,
-              }
-            }
-          />
-        );
-      }}
+      render={children}
     />
   );
 };
