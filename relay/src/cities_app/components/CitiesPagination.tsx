@@ -6,7 +6,20 @@ import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
 import CitySummary, { defaultData as cityDefaultData } from "./CitySummary";
+import LoadingContext from "../LoadingContext";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
+
+type Args = {
+  page: CitiesPagination_page;
+  loadPrevPage: (page: CitiesPagination_page) => void;
+  loadNextPage: (page: CitiesPagination_page) => void;
+};
+
+type Props = Args & {
+  render?: RenderCallbackType;
+};
+
+type RenderCallbackType = (args: Args, isLoading: boolean) => JSX.Element;
 
 const CitiesList = styled.ol`
   list-style: none;
@@ -23,13 +36,10 @@ const Page = styled.div`
   }
 `;
 
-interface Props {
-  page: CitiesPagination_page;
-  loadPrevPage: (page: CitiesPagination_page) => void;
-  loadNextPage: (page: CitiesPagination_page) => void;
-}
-
-function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
+const defaultRender: RenderCallbackType = (
+  { page, loadPrevPage, loadNextPage },
+  isLoading
+) => {
   const { nodes, hasNext, hasPrev } = page;
   return (
     <Page>
@@ -49,20 +59,26 @@ function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
       </div>
     </Page>
   );
-}
+};
 
-export default createFragmentContainer(CitiesPagination, {
-  page: graphql`
-    fragment CitiesPagination_page on CitiesPagination {
-      hasNext
-      hasPrev
-      nodes {
-        id
-        ...CitySummary_city
+export default createFragmentContainer(
+  ({ page, loadPrevPage, loadNextPage, render }: Props) => {
+    const isLoading = React.useContext(LoadingContext);
+    return (render || defaultRender)({ page, loadPrevPage, loadNextPage }, isLoading);
+  },
+  {
+    page: graphql`
+      fragment CitiesPagination_page on CitiesPagination {
+        hasNext
+        hasPrev
+        nodes {
+          id
+          ...CitySummary_city
+        }
       }
-    }
-  `,
-});
+    `,
+  }
+);
 
 export const defaultData = {
   hasNext: false,

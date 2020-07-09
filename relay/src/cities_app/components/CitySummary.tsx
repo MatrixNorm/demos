@@ -5,9 +5,15 @@ import { NukeFragRef } from "../helpers/typeUtils";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
-interface Props {
+type Args = {
   city: CitySummary_city;
-}
+};
+
+type Props = Args & {
+  render?: RenderCallbackType;
+};
+
+type RenderCallbackType = (args: Args, isLoading: boolean) => JSX.Element;
 
 const CitySummarySuccess = styled.section`
   padding: 0 1em 0 1em;
@@ -39,24 +45,28 @@ const CitySummaryLoading = styled(CitySummarySuccess)`
   ${placeholderCssMixin}
 `;
 
+const defaultRender: RenderCallbackType = ({ city }, isLoading) => {
+  const CitySummary = isLoading ? CitySummaryLoading : CitySummarySuccess;
+  return (
+    <CitySummary>
+      <div className="row">
+        <span className="country placeholder">{city.country}</span>
+      </div>
+      <div className="row row-name">
+        <span className="name placeholder">{city.name}</span>
+      </div>
+      <div className="row placeholder">
+        <label className="population-label">pop.</label>
+        <span className="population">{city.population}</span>
+      </div>
+    </CitySummary>
+  );
+};
+
 export default createFragmentContainer(
-  ({ city }: Props) => {
+  ({ city, render }: Props) => {
     const isLoading = React.useContext(LoadingContext);
-    const CitySummary = isLoading ? CitySummaryLoading : CitySummarySuccess;
-    return (
-      <CitySummary>
-        <div className="row">
-          <span className="country placeholder">{city.country}</span>
-        </div>
-        <div className="row row-name">
-          <span className="name placeholder">{city.name}</span>
-        </div>
-        <div className="row placeholder">
-          <label className="population-label">pop.</label>
-          <span className="population">{city.population}</span>
-        </div>
-      </CitySummary>
-    );
+    return (render || defaultRender)({ city }, isLoading);
   },
   {
     city: graphql`

@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
-import SearchParameters from "./SearchParameters";
+import SearchParameters, { SearchParametersNullableType } from "./SearchParameters";
 import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
@@ -30,22 +30,7 @@ export default ({ environment }: { environment: IEnvironment }) => {
         />
       </div>
       <div className="pagination-panel-wrapper">
-        <XXX environment={environment}>
-          {({ props }: { props: CitiesBrowserUiQuery["response"] | null }) => {
-            return (
-              <CitiesPaginationComponent
-                environment={environment}
-                searchParams={
-                  props?.uiState?.citySearchParams || {
-                    countryNameContains: null,
-                    populationGte: null,
-                    populationLte: null,
-                  }
-                }
-              />
-            );
-          }}
-        </XXX>
+        <XXX environment={environment} render={renderCitiesPaginationComponent} />
       </div>
     </PanelBlock>
   );
@@ -53,10 +38,10 @@ export default ({ environment }: { environment: IEnvironment }) => {
 
 const XXX = ({
   environment,
-  children,
+  render,
 }: {
   environment: IEnvironment;
-  children: ({ props }: { props: CitiesBrowserUiQuery["response"] | null }) => any;
+  render: (sp: SearchParametersNullableType, environment: IEnvironment) => JSX.Element;
 }) => {
   return (
     <LocalQueryRenderer<CitiesBrowserUiQuery>
@@ -74,7 +59,23 @@ const XXX = ({
       `}
       environment={environment}
       variables={{}}
-      render={children}
+      render={({ props }) => {
+        return render(
+          props?.uiState?.citySearchParams || {
+            countryNameContains: null,
+            populationGte: null,
+            populationLte: null,
+          },
+          environment
+        );
+      }}
     />
   );
 };
+
+function renderCitiesPaginationComponent(
+  sp: SearchParametersNullableType,
+  environment: IEnvironment
+) {
+  return <CitiesPaginationComponent environment={environment} searchParams={sp} />;
+}
