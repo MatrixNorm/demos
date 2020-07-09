@@ -5,15 +5,15 @@ import { NukeFragRef } from "../helpers/typeUtils";
 import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
-type Args = {
+type Frags = {
   city: CitySummary_city;
 };
 
-type Props = Args & {
+type Props = Frags & {
   render?: RenderCallbackType;
 };
 
-type RenderCallbackType = (args: Args, isLoading: boolean) => JSX.Element;
+type RenderCallbackType = (frags: Frags, isLoading: boolean) => JSX.Element;
 
 const CitySummarySuccess = styled.section`
   padding: 0 1em 0 1em;

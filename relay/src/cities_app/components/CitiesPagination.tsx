@@ -9,17 +9,17 @@ import CitySummary, { defaultData as cityDefaultData } from "./CitySummary";
 import LoadingContext from "../LoadingContext";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 
-type Args = {
+type Frags = {
   page: CitiesPagination_page;
   loadPrevPage: (page: CitiesPagination_page) => void;
   loadNextPage: (page: CitiesPagination_page) => void;
 };
 
-type Props = Args & {
+type Props = Frags & {
   render?: RenderCallbackType;
 };
 
-type RenderCallbackType = (args: Args, isLoading: boolean) => JSX.Element;
+type RenderCallbackType = (frags: Frags, isLoading: boolean) => JSX.Element;
 
 const CitiesList = styled.ol`
   list-style: none;

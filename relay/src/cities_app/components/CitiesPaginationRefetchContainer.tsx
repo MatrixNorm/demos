@@ -5,21 +5,30 @@ import CitiesPagination, {
   defaultData as citiesPaginationDefaultData,
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
-import LoadingContext, { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
+import { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
 
-type Args = {
+type Frags = {
   root: CitiesPaginationRefetchContainer_root;
   relay: RelayRefetchProp;
 };
 
-type Props = Args & {
+type Props = Frags & {
   render?: RenderCallbackType;
 };
 
-type RenderCallbackType = (args: Args, isLoading: boolean) => JSX.Element;
+type RenderCallbackType = (
+  frags: Frags,
+  {
+    next,
+    prev,
+  }: {
+    next: (currentPage: CitiesPagination_page) => void;
+    prev: (currentPage: CitiesPagination_page) => void;
+  }
+) => JSX.Element;
 
 const loadNextPage = (relay: RelayRefetchProp) => (
   currentPage: CitiesPagination_page
@@ -49,26 +58,15 @@ const loadPrevPage = (relay: RelayRefetchProp) => (
 
 const CitiesPaginationRefetchContainer = createRefetchContainer(
   ({ root, relay, render }: Props) => {
-    const isLoading = React.useContext(LoadingContext);
-    return (
-      root.citiesPagination &&
-      (render ? (
-        render(
-          {
-            page: root.citiesPagination,
-            loadNextPage: loadNextPage(relay),
-            loadPrevPage: loadPrevPage(relay),
-          },
-          isLoading
-        )
-      ) : (
-        <CitiesPagination
-          page={root.citiesPagination}
-          loadNextPage={loadNextPage(relay)}
-          loadPrevPage={loadPrevPage(relay)}
-        />
-      ))
-    );
+    return render
+      ? render({ root, relay }, { next: loadNextPage(relay), prev: loadPrevPage(relay) })
+      : root.citiesPagination && (
+          <CitiesPagination
+            page={root.citiesPagination}
+            loadNextPage={loadNextPage(relay)}
+            loadPrevPage={loadPrevPage(relay)}
+          />
+        );
   },
   {
     root: graphql`
