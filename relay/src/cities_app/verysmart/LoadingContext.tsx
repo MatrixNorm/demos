@@ -13,7 +13,7 @@ import {
   Store,
 } from "relay-runtime";
 import { css, keyframes } from "styled-components";
-import { LoadingErrorBoundary } from "./elements/LoadingErrorBoundary";
+import { LoadingErrorBoundary } from "./LoadingErrorBoundary";
 
 const LoadingContext = createContext<Boolean>(false);
 export default LoadingContext;

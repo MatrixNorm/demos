@@ -6,7 +6,7 @@ import {
   returnAsyncPayloadEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
-import { LoadingPlaceholder } from "../LoadingContext";
+import { LoadingPlaceholder } from "../verysmart/LoadingContext";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };

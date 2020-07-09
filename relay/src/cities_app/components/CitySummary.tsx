@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import { NukeFragRef } from "../helpers/typeUtils";
-import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
+import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
 interface Props {
@@ -41,6 +41,10 @@ const CitySummaryLoading = styled(CitySummarySuccess)`
 
 export default createFragmentContainer(
   ({ city }: Props) => {
+    // const renderCallback = React.useContext(RenderCallbackContext)["CitySummary_city"];
+    // if (renderCallback) {
+    //   return renderCallback({ city });
+    // }
     const isLoading = React.useContext(LoadingContext);
     const CitySummary = isLoading ? CitySummaryLoading : CitySummarySuccess;
     return (

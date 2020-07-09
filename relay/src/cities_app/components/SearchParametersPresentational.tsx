@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import LoadingContext, { placeholderCssMixin } from "../LoadingContext";
+import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";

@@ -9,7 +9,7 @@ import {
 } from "../env";
 import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
 import SearchParameters, { EventType } from "../components/SearchParameters";
-import LoadingContext from "../LoadingContext";
+import LoadingContext from "../verysmart/LoadingContext";
 
 export default { title: "cities_app-demo1/SearchParameters" };
 

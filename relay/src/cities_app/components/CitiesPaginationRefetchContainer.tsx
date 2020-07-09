@@ -5,7 +5,7 @@ import CitiesPagination, {
   defaultData as citiesPaginationDefaultData,
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
-import { LoadingPlaceholderQueryRenderer } from "../LoadingContext";
+import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
@@ -127,56 +127,3 @@ export default function({ environment, searchParams }: Props) {
     />
   );
 }
-
-// export default ({ environment, searchParams }: Props) => {
-//   const query = graphql`
-//     query CitiesPaginationRefetchContainerQuery(
-//       $pageSize: Int
-//       $after: String
-//       $before: String
-//       $searchParams: CitySearchParamsInput
-//     ) {
-//       ...CitiesPaginationRefetchContainer_root
-//         @arguments(
-//           pageSize: $pageSize
-//           after: $after
-//           before: $before
-//           searchParams: $searchParams
-//         )
-//     }
-//   `;
-//   const [reload, setReload] = useState(false);
-//   if (reload) {
-//     return <Reload message="something went wrong" onClick={() => setReload(false)} />;
-//   }
-//   return (
-//     <QueryRenderer<CitiesPaginationRefetchContainerQuery>
-//       query={query}
-//       environment={environment}
-//       variables={{ searchParams }}
-//       render={({ props, error }) => {
-//         if (error) {
-//           setReload(true);
-//           return;
-//         }
-//         if (props === null) {
-//           return (
-//             <LoadingPlaceholder
-//               query={query}
-//               variables={{ searchParams }}
-//               data={{
-//                 citiesPagination: { ...citiesPaginationDefaultData },
-//               }}
-//               render={({ props }: any) => {
-//                 return props && <CitiesPaginationRefetchContainer root={props} />;
-//               }}
-//             />
-//           );
-//         }
-//         return (
-//           <CitiesPaginationRefetchContainer root={props} reload={() => setReload(true)} />
-//         );
-//       }}
-//     />
-//   );
-// };

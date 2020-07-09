@@ -7,7 +7,7 @@ import {
   returnAsyncPayloadEnvironment,
 } from "../env";
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
-import { LoadingPlaceholder } from "../LoadingContext";
+import { LoadingPlaceholder } from "../verysmart/LoadingContext";
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitiesPagination" };
