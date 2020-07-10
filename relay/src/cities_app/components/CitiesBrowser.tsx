@@ -122,38 +122,3 @@ function render__CitySummary_city({ city }: { city: CitySummary_city }) {
     </CitySummary>
   );
 }
-
-const XXX = ({ environment }: { environment: IEnvironment }) => {
-  return (
-    <LocalQueryRenderer<CitiesBrowserUiQuery>
-      query={graphql`
-        query CitiesBrowserUiQuery {
-          __typename
-          uiState {
-            citySearchParams {
-              countryNameContains
-              populationGte
-              populationLte
-            }
-          }
-        }
-      `}
-      environment={environment}
-      variables={{}}
-      render={({ props }) => {
-        return (
-          <CitiesPaginationComponent
-            environment={environment}
-            searchParams={
-              props?.uiState?.citySearchParams || {
-                countryNameContains: null,
-                populationGte: null,
-                populationLte: null,
-              }
-            }
-          />
-        );
-      }}
-    />
-  );
-};
