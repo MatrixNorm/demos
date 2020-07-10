@@ -1,12 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
 import { graphql, QueryRenderer, createFragmentContainer } from "react-relay";
-import {
-  createOperationDescriptor,
-  getRequest,
-  IEnvironment,
-} from "relay-runtime";
-import { LoadingPlaceholder } from "../verysmart/LoadingContext";
+import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
+import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import { Reload } from "../verysmart/LoadingErrorBoundary";
 
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
@@ -14,9 +10,7 @@ import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_sear
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-export type SearchParametersNullableType = NukeFragRef<
-  SearchParameters_searchParams
->;
+export type SearchParametersNullableType = NukeFragRef<SearchParameters_searchParams>;
 export type SearchParametersType = NukeNulls<SearchParametersNullableType>;
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
@@ -76,10 +70,8 @@ function presentationalTransformation(
 ): SearchParametersType {
   return {
     countryNameContains: searchParams.countryNameContains || "",
-    populationGte:
-      searchParams.populationGte || searchMetadata.populationLowerBound,
-    populationLte:
-      searchParams.populationLte || searchMetadata.populationUpperBound,
+    populationGte: searchParams.populationGte || searchMetadata.populationLowerBound,
+    populationLte: searchParams.populationLte || searchMetadata.populationUpperBound,
   };
 }
 
@@ -89,11 +81,7 @@ type HookProps = {
   environment: IEnvironment;
 };
 
-function useSearchParameters({
-  searchParams,
-  searchMetadata,
-  environment,
-}: HookProps) {
+function useSearchParameters({ searchParams, searchMetadata, environment }: HookProps) {
   const [localSearchParams, setLocalSearchParams] = useState<
     NukeFragRef<SearchParameters_searchParams>
   >(searchParams);
@@ -135,11 +123,7 @@ type PropsFC = {
 
 const SearchParametersFC = createFragmentContainer(
   function(props: PropsFC) {
-    const {
-      dispatch,
-      displayableSearchParams,
-      localDiff,
-    } = useSearchParameters({
+    const { dispatch, displayableSearchParams, localDiff } = useSearchParameters({
       searchParams: {
         ...{
           countryNameContains: null,
@@ -188,19 +172,6 @@ export const defaultData = {
   },
 };
 
-const query = graphql`
-  query SearchParametersQuery {
-    citiesMetadata {
-      ...SearchParameters_searchMetadata
-    }
-    uiState {
-      citySearchParams {
-        ...SearchParameters_searchParams
-      }
-    }
-  }
-`;
-
 export default function SearchParametersOuterComponent({
   environment,
   render,
@@ -208,67 +179,41 @@ export default function SearchParametersOuterComponent({
   environment: IEnvironment;
   render: RenderCallbackType;
 }) {
-  const [reload, setReload] = useState(false);
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
-      {reload ? (
-        <Reload
-          message="something went wrong"
-          onClick={() => setReload(false)}
-        />
-      ) : (
-        <QueryRenderer<SearchParametersQuery>
-          query={query}
-          environment={environment}
-          variables={{}}
-          render={({ error, props }) => {
-            if (error) {
-              setReload(true);
-              return;
+    <LoadingPlaceholderQueryRenderer<SearchParametersQuery>
+      query={graphql`
+        query SearchParametersQuery {
+          citiesMetadata {
+            ...SearchParameters_searchMetadata
+          }
+          uiState {
+            citySearchParams {
+              ...SearchParameters_searchParams
             }
-            if (props === null) {
-              return (
-                <LoadingPlaceholder
-                  query={query}
-                  variables={{}}
-                  data={{
-                    citiesMetadata: { ...defaultData.searchMetadata },
-                    uiState: {
-                      citySearchParams: { ...defaultData.searchParams },
-                    },
-                  }}
-                  render={({ props }: any) => {
-                    return (
-                      props &&
-                      props.citiesMetadata &&
-                      props.uiState?.citySearchParams && (
-                        <SearchParametersFC
-                          searchMetadata={props.citiesMetadata}
-                          searchParams={props.uiState.citySearchParams}
-                          environment={environment}
-                          render={render}
-                        />
-                      )
-                    );
-                  }}
-                />
-              );
-            }
-            if (!props.citiesMetadata) {
-              setReload(true);
-              return;
-            }
-            return (
-              <SearchParametersFC
-                searchMetadata={props.citiesMetadata}
-                searchParams={props.uiState?.citySearchParams || null}
-                environment={environment}
-                render={render}
-              />
-            );
-          }}
-        />
-      )}
-    </div>
+          }
+        }
+      `}
+      environment={environment}
+      variables={{}}
+      placeholderData={{
+        citiesMetadata: { ...defaultData.searchMetadata },
+        uiState: {
+          citySearchParams: { ...defaultData.searchParams },
+        },
+      }}
+      render={({ props }) => {
+        return (
+          props &&
+          props.citiesMetadata && (
+            <SearchParametersFC
+              searchMetadata={props.citiesMetadata}
+              searchParams={props.uiState?.citySearchParams || null}
+              environment={environment}
+              render={render}
+            />
+          )
+        );
+      }}
+    />
   );
 }
