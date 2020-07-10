@@ -11,6 +11,11 @@ export default function RequestViewer({ server }: { server: Server }) {
   }, []);
   return (
     <div>
+      <input
+        type="checkbox"
+        checked={state.controlled}
+        onChange={() => server.setControlled(!state.controlled)}
+      />
       {state.requests.map((r) => (
         <div key={r.id}>
           <div>{r.data.operation.name}</div>

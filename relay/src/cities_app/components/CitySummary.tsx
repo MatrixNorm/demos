@@ -43,6 +43,7 @@ const CitySummaryLoading = styled(CitySummarySuccess)`
 export default createFragmentContainer(
   ({ city }: Props) => {
     const renderCallback = React.useContext(RenderCallbackContext)["CitySummary_city"];
+    console.log(renderCallback, city)
     if (renderCallback) {
       return renderCallback({ city });
     }
