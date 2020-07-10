@@ -1,9 +1,8 @@
 import * as React from "react";
 import { useState } from "react";
-import { graphql, QueryRenderer, createFragmentContainer } from "react-relay";
+import { graphql, createFragmentContainer } from "react-relay";
 import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
-import { Reload } from "../verysmart/LoadingErrorBoundary";
 
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
