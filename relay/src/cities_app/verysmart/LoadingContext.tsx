@@ -15,7 +15,7 @@ import {
 import { css, keyframes } from "styled-components";
 import { LoadingErrorBoundary } from "./LoadingErrorBoundary";
 
-const LoadingContext = createContext<Boolean>(false);
+const LoadingContext = createContext<boolean>(false);
 export default LoadingContext;
 
 export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
