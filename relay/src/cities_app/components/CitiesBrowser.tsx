@@ -36,7 +36,36 @@ export default ({ environment }: { environment: IEnvironment }) => {
         <RenderCallbackContext.Provider
           value={{ CitySummary_city: render__CitySummary_city }}
         >
-          <XXX environment={environment} />
+          <LocalQueryRenderer<CitiesBrowserUiQuery>
+            query={graphql`
+              query CitiesBrowserUiQuery {
+                __typename
+                uiState {
+                  citySearchParams {
+                    countryNameContains
+                    populationGte
+                    populationLte
+                  }
+                }
+              }
+            `}
+            environment={environment}
+            variables={{}}
+            render={({ props }) => {
+              return (
+                <CitiesPaginationComponent
+                  environment={environment}
+                  searchParams={
+                    props?.uiState?.citySearchParams || {
+                      countryNameContains: null,
+                      populationGte: null,
+                      populationLte: null,
+                    }
+                  }
+                />
+              );
+            }}
+          />
         </RenderCallbackContext.Provider>
       </div>
     </PanelBlock>
@@ -79,7 +108,9 @@ function render__CitySummary_city({ city }: { city: CitySummary_city }) {
   return (
     <CitySummary>
       <div className="row">
-        <a className="country placeholder" href="#">{city.country}</a>
+        <a className="country placeholder" href="#">
+          {city.country}
+        </a>
       </div>
       <div className="row row-name">
         <span className="name placeholder">{city.name}</span>
