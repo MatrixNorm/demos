@@ -2,6 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
+import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
@@ -27,9 +28,9 @@ export type EventType =
 export type RenderCallbackArgsType = {
   dispatch: (event: EventType) => void;
   searchParams: SearchParametersType;
-  localSearchParams: SearchParametersNullableType;
   searchMetadata: SearchMetadataType;
   showApplyButton: Boolean;
+  url: string;
 };
 export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
@@ -60,6 +61,15 @@ function commitSearchParamsInRelayStore(
   relayEnv.retain(operationDescriptor);
 }
 
+function queryURL(searchParams: SearchParametersNullableType) {
+  let obj = new URLSearchParams("");
+  for (let k in searchParams) {
+    // @ts-ignore
+    searchParams[k] && obj.append(k, searchParams[k]);
+  }
+  return obj.toString();
+}
+
 /**
  * Transformation that maps null into appropriate value for display in input element.
  * E.g. empty string for text input or lower bound for range input, etc.
@@ -85,6 +95,7 @@ function useSearchParameters({ searchParams, searchMetadata, environment }: Hook
   const [localSearchParams, setLocalSearchParams] = useState<
     SearchParametersNullableType
   >(searchParams);
+  const { url } = useRouteMatch();
 
   function dispatch(event: EventType) {
     if (event[0] === "fieldChange") {
@@ -95,10 +106,10 @@ function useSearchParameters({ searchParams, searchMetadata, environment }: Hook
       }));
       return;
     }
-    if (event[0] === "applyChange") {
-      commitSearchParamsInRelayStore(localSearchParams, environment);
-      return;
-    }
+    // if (event[0] === "applyChange") {
+    //   commitSearchParamsInRelayStore(localSearchParams, environment);
+    //   return;
+    // }
   }
 
   const localDiff = Object.keys(searchParams)
@@ -111,7 +122,12 @@ function useSearchParameters({ searchParams, searchMetadata, environment }: Hook
     searchMetadata
   );
 
-  return { dispatch, displayableSearchParams, localDiff, localSearchParams };
+  return {
+    dispatch,
+    displayableSearchParams,
+    localDiff,
+    url: `${url}?${queryURL(localSearchParams)}`,
+  };
 }
 
 type PropsFC = {
@@ -123,12 +139,7 @@ type PropsFC = {
 
 const SearchParametersFC = createFragmentContainer(
   function(props: PropsFC) {
-    const {
-      dispatch,
-      displayableSearchParams,
-      localDiff,
-      localSearchParams,
-    } = useSearchParameters({
+    const { dispatch, displayableSearchParams, localDiff, url } = useSearchParameters({
       searchParams: {
         ...{
           countryNameContains: null,
@@ -144,9 +155,9 @@ const SearchParametersFC = createFragmentContainer(
     return props.render({
       dispatch,
       searchParams: displayableSearchParams,
-      localSearchParams,
       searchMetadata: props.searchMetadata,
       showApplyButton: localDiff,
+      url,
     });
   },
   {

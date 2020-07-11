@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect } from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
@@ -11,10 +12,6 @@ import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
-function useURLQuery() {
-  return new URLSearchParams(useLocation().search);
-}
-
 const PanelBlock = styled.div`
   display: flex;
   .search-params-wrapper {
@@ -26,9 +23,63 @@ const PanelBlock = styled.div`
   }
 `;
 
+function commitSearchParamsInRelayStore(
+  searchParams: NukeFragRef<SearchParameters_searchParams>,
+  relayEnv: IEnvironment
+) {
+  console.log(searchParams);
+  commitLocalUpdate(environment, (store) => {
+    const searchParamsRecord = store
+      .get(ROOT_ID)
+      ?.getOrCreateLinkedRecord("uiState", "UIState")
+      ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
+    if (searchParamsRecord) {
+      for (let key of Object.keys(settings) as (keyof UserSettings)[]) {
+        delta.setValue(editDelta[key], key);
+      }
+    }
+  });
+  // const query = graphql`
+  //   query SearchParametersUiQuery {
+  //     __typename
+  //     uiState {
+  //       citySearchParams {
+  //         ...SearchParameters_searchParams
+  //       }
+  //     }
+  //   }
+  // `;
+  // const request = getRequest(query);
+  // const operationDescriptor = createOperationDescriptor(request, {});
+  // let data = {
+  //   __typename: "__Root",
+  //   uiState: {
+  //     id: "client:UIState",
+  //     citySearchParams: { ...searchParams },
+  //   },
+  // };
+  // relayEnv.commitPayload(operationDescriptor, data);
+  // relayEnv.retain(operationDescriptor);
+}
+
 export default ({ environment }: { environment: IEnvironment }) => {
-  const urlQuery = useURLQuery();
-  console.log(urlQuery);
+  const location = useLocation();
+  console.log(location);
+
+  useEffect(
+    function() {
+      let qp = new URLSearchParams(location.search);
+      let searchParams: any = {};
+      if (qp.has("countryNameContains")) {
+        searchParams["countryNameContains"] = qp.get("countryNameContains");
+      }
+      if (Object.keys(searchParams).length > 0) {
+        commitSearchParamsInRelayStore(searchParams, environment);
+      }
+    },
+    [location]
+  );
+
   return (
     <PanelBlock>
       <div className="search-params-wrapper">

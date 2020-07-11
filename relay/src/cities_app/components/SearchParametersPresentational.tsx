@@ -1,6 +1,6 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Link, useRouteMatch } from "react-router-dom";
+import { Link } from "react-router-dom";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
@@ -44,32 +44,13 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   }
 `;
 
-function queryURL(searchParams: RenderCallbackArgsType["localSearchParams"]) {
-  let obj = new URLSearchParams("");
-  for (let k in searchParams) {
-    // @ts-ignore
-    searchParams[k] && obj.append(k, searchParams[k]);
-  }
-  return obj.toString();
-}
-
 export function SearchParametersPresentational(props: RenderCallbackArgsType) {
-  let { url } = useRouteMatch();
   let isLoading = React.useContext(LoadingContext);
-  let {
-    dispatch,
-    searchParams,
-    localSearchParams,
-    searchMetadata,
-    showApplyButton,
-  } = props;
-  console.log(queryURL(localSearchParams));
+  let { dispatch, searchParams, url, searchMetadata, showApplyButton } = props;
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
-
   if (isLoading) {
     dispatch = () => {};
   }
-
   return (
     <SearchParametersBlock>
       <ParameterSection>
@@ -100,7 +81,7 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
           />
         </div>
       </ParameterSection>
-      <Link to={`${url}?${queryURL(localSearchParams)}`}>apply</Link>
+      <Link to={url}>apply</Link>
       {showApplyButton && (
         <div className="submit-button-box">
           <SubmitButton onClick={() => dispatch && dispatch(["applyChange"])}>
