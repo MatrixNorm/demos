@@ -2,6 +2,7 @@ import * as React from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
+import { useLocation } from "react-router-dom";
 import SearchParameters from "./SearchParameters";
 import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
@@ -9,6 +10,10 @@ import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
+
+function useURLQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 const PanelBlock = styled.div`
   display: flex;
@@ -22,6 +27,8 @@ const PanelBlock = styled.div`
 `;
 
 export default ({ environment }: { environment: IEnvironment }) => {
+  const urlQuery = useURLQuery();
+  console.log(urlQuery);
   return (
     <PanelBlock>
       <div className="search-params-wrapper">
@@ -33,9 +40,7 @@ export default ({ environment }: { environment: IEnvironment }) => {
         />
       </div>
       <div className="pagination-panel-wrapper">
-        <RenderCallbackContext.Provider
-          value={{ CitySummary_city: render__CitySummary_city }}
-        >
+        <RenderCallbackContext.Provider value={{ CitySummary: renderCitySummary }}>
           <LocalQueryRenderer<CitiesBrowserUiQuery>
             query={graphql`
               query CitiesBrowserUiQuery {
@@ -102,7 +107,7 @@ const CitySummaryLoading = styled(CitySummarySuccess)`
   ${placeholderCssMixin}
 `;
 
-function render__CitySummary_city({ city }: { city: CitySummary_city }) {
+function renderCitySummary({ city }: { city: CitySummary_city }) {
   const isLoading = React.useContext(LoadingContext);
   const CitySummary = isLoading ? CitySummaryLoading : CitySummarySuccess;
   return (

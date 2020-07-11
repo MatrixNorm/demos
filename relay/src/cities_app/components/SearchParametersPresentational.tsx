@@ -1,10 +1,10 @@
 import * as React from "react";
 import styled from "styled-components";
+import { Link, useRouteMatch } from "react-router-dom";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
-
 import { RenderCallbackArgsType } from "./SearchParameters";
 
 const SearchParametersBlock = styled.div`
@@ -21,19 +21,16 @@ const ParameterSectionSuccess = styled.section`
   input {
     width: calc(100% - 4px);
   }
-
   matrixnorm-range-slider {
     position: relative;
     left: -2px;
   }
-
   .label {
     display: inline-block;
     font-size: 0.9em;
     margin-bottom: 0.5em;
     position: relative;
   }
-
   .input {
     position: relative;
   }
@@ -47,13 +44,27 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   }
 `;
 
-export function SearchParametersPresentational(props: RenderCallbackArgsType) {
-  let isLoading = React.useContext(LoadingContext);
-  let { dispatch, searchParams, searchMetadata, showApplyButton } = props;
+function queryURL(searchParams: RenderCallbackArgsType["localSearchParams"]) {
+  let obj = new URLSearchParams("");
+  for (let k in searchParams) {
+    // @ts-ignore
+    searchParams[k] && obj.append(k, searchParams[k]);
+  }
+  return obj.toString();
+}
 
-  let ParameterSection = isLoading
-    ? ParameterSectionSkeleton
-    : ParameterSectionSuccess;
+export function SearchParametersPresentational(props: RenderCallbackArgsType) {
+  let { url } = useRouteMatch();
+  let isLoading = React.useContext(LoadingContext);
+  let {
+    dispatch,
+    searchParams,
+    localSearchParams,
+    searchMetadata,
+    showApplyButton,
+  } = props;
+  console.log(queryURL(localSearchParams));
+  let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
 
   if (isLoading) {
     dispatch = () => {};
@@ -66,9 +77,9 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
         <div className="input placeholder">
           <TextInput
             value={searchParams.countryNameContains}
-            onChange={(e) =>
-              dispatch(["fieldChange", ["countryNameContains", e.target.value]])
-            }
+            onChange={(value) => {
+              dispatch(["fieldChange", ["countryNameContains", value]]);
+            }}
           />
         </div>
       </ParameterSection>
@@ -82,13 +93,14 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
             x2={searchParams.populationLte}
             step={1}
             onChange={(range: any) => {
+              console.log(range);
               dispatch(["fieldChange", ["populationGte", range.lower]]);
-
               dispatch(["fieldChange", ["populationLte", range.upper]]);
             }}
           />
         </div>
       </ParameterSection>
+      <Link to={`${url}?${queryURL(localSearchParams)}`}>apply</Link>
       {showApplyButton && (
         <div className="submit-button-box">
           <SubmitButton onClick={() => dispatch && dispatch(["applyChange"])}>

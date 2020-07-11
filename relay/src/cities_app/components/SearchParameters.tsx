@@ -27,6 +27,7 @@ export type EventType =
 export type RenderCallbackArgsType = {
   dispatch: (event: EventType) => void;
   searchParams: SearchParametersType;
+  localSearchParams: SearchParametersNullableType;
   searchMetadata: SearchMetadataType;
   showApplyButton: Boolean;
 };
@@ -82,7 +83,7 @@ type HookProps = {
 
 function useSearchParameters({ searchParams, searchMetadata, environment }: HookProps) {
   const [localSearchParams, setLocalSearchParams] = useState<
-    NukeFragRef<SearchParameters_searchParams>
+    SearchParametersNullableType
   >(searchParams);
 
   function dispatch(event: EventType) {
@@ -110,7 +111,7 @@ function useSearchParameters({ searchParams, searchMetadata, environment }: Hook
     searchMetadata
   );
 
-  return { dispatch, displayableSearchParams, localDiff };
+  return { dispatch, displayableSearchParams, localDiff, localSearchParams };
 }
 
 type PropsFC = {
@@ -122,7 +123,12 @@ type PropsFC = {
 
 const SearchParametersFC = createFragmentContainer(
   function(props: PropsFC) {
-    const { dispatch, displayableSearchParams, localDiff } = useSearchParameters({
+    const {
+      dispatch,
+      displayableSearchParams,
+      localDiff,
+      localSearchParams,
+    } = useSearchParameters({
       searchParams: {
         ...{
           countryNameContains: null,
@@ -138,6 +144,7 @@ const SearchParametersFC = createFragmentContainer(
     return props.render({
       dispatch,
       searchParams: displayableSearchParams,
+      localSearchParams,
       searchMetadata: props.searchMetadata,
       showApplyButton: localDiff,
     });
@@ -171,7 +178,7 @@ export const defaultData = {
   },
 };
 
-export default function SearchParametersOuterComponent({
+export default function({
   environment,
   render,
 }: {
