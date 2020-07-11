@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
-import { IEnvironment } from "relay-runtime";
+import { commitLocalUpdate, IEnvironment, ROOT_ID } from "relay-runtime";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
 import SearchParameters from "./SearchParameters";
@@ -9,6 +9,7 @@ import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
+import { retainRecord } from "../helpers/relayStore";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
@@ -25,7 +26,7 @@ const PanelBlock = styled.div`
 
 function commitSearchParamsInRelayStore(
   searchParams: NukeFragRef<SearchParameters_searchParams>,
-  relayEnv: IEnvironment
+  environment: IEnvironment
 ) {
   console.log(searchParams);
   commitLocalUpdate(environment, (store) => {
@@ -34,32 +35,28 @@ function commitSearchParamsInRelayStore(
       ?.getOrCreateLinkedRecord("uiState", "UIState")
       ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
     if (searchParamsRecord) {
-      for (let key of Object.keys(settings) as (keyof UserSettings)[]) {
-        delta.setValue(editDelta[key], key);
+      for (let key of [
+        "countryNameContains",
+        "populationGte",
+        "populationLte",
+      ] as (keyof UserSettings)[]) {
+        searchParamsRecord.setValue(searchParams[key], key);
       }
     }
   });
-  // const query = graphql`
-  //   query SearchParametersUiQuery {
-  //     __typename
-  //     uiState {
-  //       citySearchParams {
-  //         ...SearchParameters_searchParams
-  //       }
-  //     }
-  //   }
-  // `;
-  // const request = getRequest(query);
-  // const operationDescriptor = createOperationDescriptor(request, {});
-  // let data = {
-  //   __typename: "__Root",
-  //   uiState: {
-  //     id: "client:UIState",
-  //     citySearchParams: { ...searchParams },
-  //   },
-  // };
-  // relayEnv.commitPayload(operationDescriptor, data);
-  // relayEnv.retain(operationDescriptor);
+  retainRecord(
+    graphql`
+      query SearchParametersUiQuery {
+        __typename
+        uiState {
+          citySearchParams {
+            ...SearchParameters_searchParams
+          }
+        }
+      }
+    `,
+    environment
+  );
 }
 
 export default ({ environment }: { environment: IEnvironment }) => {
