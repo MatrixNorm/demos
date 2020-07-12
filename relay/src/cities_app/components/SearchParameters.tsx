@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { graphql, createFragmentContainer } from "react-relay";
-import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
+import { IEnvironment } from "relay-runtime";
 import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 
@@ -10,58 +10,25 @@ import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_sear
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-export type SearchParametersNullableType = NukeFragRef<SearchParameters_searchParams>;
-export type SearchParametersType = NukeNulls<SearchParametersNullableType>;
+export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
+export type SearchParametersPresentationalType = NukeNulls<SearchParametersType>;
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 export type EventType =
-  | [
-      "fieldChange",
-      (
-        | ["countryNameContains", string]
-        | ["populationGte", number]
-        | ["populationLte", number]
-      )
-    ]
-  | ["applyChange"];
+  | ["countryNameContains", string]
+  | ["populationGte", number]
+  | ["populationLte", number];
 
 export type RenderCallbackArgsType = {
   dispatch: (event: EventType) => void;
-  searchParams: SearchParametersType;
+  searchParams: SearchParametersPresentationalType;
   searchMetadata: SearchMetadataType;
   showApplyButton: Boolean;
   url: string;
 };
 export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
-function commitSearchParamsInRelayStore(
-  searchParams: NukeFragRef<SearchParameters_searchParams>,
-  relayEnv: IEnvironment
-) {
-  const query = graphql`
-    query SearchParametersUiQuery {
-      __typename
-      uiState {
-        citySearchParams {
-          ...SearchParameters_searchParams
-        }
-      }
-    }
-  `;
-  const request = getRequest(query);
-  const operationDescriptor = createOperationDescriptor(request, {});
-  let data = {
-    __typename: "__Root",
-    uiState: {
-      id: "client:UIState",
-      citySearchParams: { ...searchParams },
-    },
-  };
-  relayEnv.commitPayload(operationDescriptor, data);
-  relayEnv.retain(operationDescriptor);
-}
-
-function queryURL(searchParams: SearchParametersNullableType) {
+function queryURL(searchParams: SearchParametersType) {
   let obj = new URLSearchParams("");
   for (let k in searchParams) {
     // @ts-ignore
@@ -75,9 +42,9 @@ function queryURL(searchParams: SearchParametersNullableType) {
  * E.g. empty string for text input or lower bound for range input, etc.
  */
 function presentationalTransformation(
-  searchParams: NukeFragRef<SearchParameters_searchParams>,
+  searchParams: SearchParametersType,
   searchMetadata: SearchMetadataType
-): SearchParametersType {
+): SearchParametersPresentationalType {
   return {
     countryNameContains: searchParams.countryNameContains || "",
     populationGte: searchParams.populationGte || searchMetadata.populationLowerBound,
@@ -87,29 +54,22 @@ function presentationalTransformation(
 
 type HookProps = {
   searchMetadata: SearchMetadataType;
-  searchParams: NukeFragRef<SearchParameters_searchParams>;
+  searchParams: SearchParametersType;
   environment: IEnvironment;
 };
 
-function useSearchParameters({ searchParams, searchMetadata, environment }: HookProps) {
-  const [localSearchParams, setLocalSearchParams] = useState<
-    SearchParametersNullableType
-  >(searchParams);
+function useSearchParameters({ searchParams, searchMetadata }: HookProps) {
+  const [localSearchParams, setLocalSearchParams] = useState<SearchParametersType>(
+    searchParams
+  );
   const { url } = useRouteMatch();
 
   function dispatch(event: EventType) {
-    if (event[0] === "fieldChange") {
-      let [fieldName, fieldValue] = event[1];
-      setLocalSearchParams((prevState) => ({
-        ...prevState,
-        [fieldName]: fieldValue,
-      }));
-      return;
-    }
-    // if (event[0] === "applyChange") {
-    //   commitSearchParamsInRelayStore(localSearchParams, environment);
-    //   return;
-    // }
+    let [fieldName, fieldValue] = event;
+    setLocalSearchParams((prevState) => ({
+      ...prevState,
+      [fieldName]: fieldValue,
+    }));
   }
 
   const localDiff = Object.keys(searchParams)

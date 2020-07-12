@@ -4,7 +4,7 @@ import { graphql, LocalQueryRenderer } from "react-relay";
 import { commitLocalUpdate, IEnvironment, ROOT_ID } from "relay-runtime";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
-import SearchParameters from "./SearchParameters";
+import SearchParameters, { SearchParametersPresentationalType } from "./SearchParameters";
 import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
@@ -24,8 +24,36 @@ const PanelBlock = styled.div`
   }
 `;
 
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+
+function extractSearchParametersFromUrlQueryString(
+  urlQueryString: string
+): Partial<SearchParametersPresentationalType> | null {
+  let qp = new URLSearchParams(urlQueryString);
+  let searchParams: Partial<Writeable<SearchParametersPresentationalType>> = {};
+  if (qp.has("countryNameContains")) {
+    searchParams["countryNameContains"] = qp.get("countryNameContains") || undefined;
+  }
+  if (qp.has("populationGte")) {
+    let value = Number(qp.get("populationGte"));
+    if (value) {
+      searchParams["populationGte"] = value;
+    }
+  }
+  if (qp.has("populationLte")) {
+    let value = Number(qp.get("populationLte"));
+    if (value) {
+      searchParams["populationLte"] = value;
+    }
+  }
+  if (Object.keys(searchParams).length > 0) {
+    return searchParams;
+  }
+  return null;
+}
+
 function commitSearchParamsInRelayStore(
-  searchParams: NukeFragRef<SearchParameters_searchParams>,
+  searchParams: Partial<SearchParametersPresentationalType>,
   environment: IEnvironment
 ) {
   console.log(searchParams);
@@ -39,7 +67,7 @@ function commitSearchParamsInRelayStore(
         "countryNameContains",
         "populationGte",
         "populationLte",
-      ] as (keyof UserSettings)[]) {
+      ] as (keyof SearchParametersPresentationalType)[]) {
         searchParamsRecord.setValue(searchParams[key], key);
       }
     }
@@ -65,12 +93,8 @@ export default ({ environment }: { environment: IEnvironment }) => {
 
   useEffect(
     function() {
-      let qp = new URLSearchParams(location.search);
-      let searchParams: any = {};
-      if (qp.has("countryNameContains")) {
-        searchParams["countryNameContains"] = qp.get("countryNameContains");
-      }
-      if (Object.keys(searchParams).length > 0) {
+      let searchParams = extractSearchParametersFromUrlQueryString(location.search);
+      if (searchParams) {
         commitSearchParamsInRelayStore(searchParams, environment);
       }
     },

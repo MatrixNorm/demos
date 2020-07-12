@@ -59,7 +59,7 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
           <TextInput
             value={searchParams.countryNameContains}
             onChange={(value) => {
-              dispatch(["fieldChange", ["countryNameContains", value]]);
+              dispatch(["countryNameContains", value]);
             }}
           />
         </div>
@@ -75,17 +75,16 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
             step={1}
             onChange={(range: any) => {
               console.log(range);
-              dispatch(["fieldChange", ["populationGte", range.lower]]);
-              dispatch(["fieldChange", ["populationLte", range.upper]]);
+              dispatch(["populationGte", range.lower]);
+              dispatch(["populationLte", range.upper]);
             }}
           />
         </div>
       </ParameterSection>
-      <Link to={url}>apply</Link>
       {showApplyButton && (
         <div className="submit-button-box">
-          <SubmitButton onClick={() => dispatch && dispatch(["applyChange"])}>
-            Apply
+          <SubmitButton>
+            <Link to={url}>apply</Link>
           </SubmitButton>
         </div>
       )}
