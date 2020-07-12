@@ -4,6 +4,7 @@ import { graphql, createFragmentContainer } from "react-relay";
 import { commitLocalUpdate, IEnvironment, ROOT_ID } from "relay-runtime";
 import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
+import { toQueryURL } from "../helpers/object";
 import { retainRecord } from "../helpers/relayStore";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
@@ -133,15 +134,6 @@ export default function({
   );
 }
 
-function queryURL(searchParams: SearchParametersType) {
-  let obj = new URLSearchParams("");
-  for (let k in searchParams) {
-    // @ts-ignore
-    searchParams[k] && obj.append(k, searchParams[k]);
-  }
-  return obj.toString();
-}
-
 /**
  * Transformation that maps null into appropriate value for display in input element.
  * E.g. empty string for text input or lower bound for range input, etc.
@@ -157,13 +149,13 @@ function presentationalTransformation(
   };
 }
 
-type HookProps = {
+function useSearchParameters({
+  searchParams,
+  searchMetadata,
+}: {
   searchMetadata: SearchMetadataType;
   searchParams: SearchParametersType;
-  environment: IEnvironment;
-};
-
-function useSearchParameters({ searchParams, searchMetadata }: HookProps) {
+}) {
   const [localSearchParams, setLocalSearchParams] = useState<SearchParametersType>(
     searchParams
   );
@@ -191,7 +183,7 @@ function useSearchParameters({ searchParams, searchMetadata }: HookProps) {
     dispatch,
     displayableSearchParams,
     localDiff,
-    url: `${url}?${queryURL(localSearchParams)}`,
+    url: `${url}?${toQueryURL(localSearchParams)}`,
   };
 }
 

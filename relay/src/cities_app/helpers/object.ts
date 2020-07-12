@@ -45,5 +45,15 @@ export function stripEmptyProps<T extends object>(
 ): NukeNulls<Partial<T>> | null {
   if (!obj) return null;
   let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
-  return Object.entries(compacted).length > 0 ? (compacted as NukeNulls<Partial<T>>) : null;
+  return Object.entries(compacted).length > 0
+    ? (compacted as NukeNulls<Partial<T>>)
+    : null;
+}
+
+export function toQueryURL<T extends object>(obj: T) {
+  let qp = new URLSearchParams("");
+  for (let k in obj) {
+    obj[k] && qp.append(k, String(obj[k]));
+  }
+  return qp.toString();
 }
