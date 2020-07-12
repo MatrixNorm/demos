@@ -62,87 +62,80 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   //console.log(JSON.stringify(ret));
   if (Array.isArray(ret)) {
     const [nextState, effect] = ret;
-    writeEditDelta(nextState.ed, nextState.sv, environment);
-    writeOptimisticDelta(nextState.od, nextState.sv, environment);
+    writeEditDelta(nextState.ed, environment);
+    writeOptimisticDelta(nextState.od, environment);
     commitMutation(environment, userId, effect.mutInput);
   } else {
-    writeEditDelta(ret.ed, ret.sv, environment);
-    writeOptimisticDelta(ret.od, ret.sv, environment);
+    writeEditDelta(ret.ed, environment);
+    writeOptimisticDelta(ret.od, environment);
   }
 }
 
-function writeEditDelta(
-  editDelta: UserSettingsDelta,
-  settings: Readonly<UserSettings>,
-  environment: IEnvironment
-) {
-  if (!editDelta) {
-    commitLocalUpdate(environment, (store) => {
-      store.delete(`${ROOT_ID}:uiState:userSettingsEditDelta`);
-    });
-    return;
-  }
+function writeEditDelta(editDelta: UserSettingsDelta, environment: IEnvironment) {
   commitLocalUpdate(environment, (store) => {
-    const delta = store
-      .get(ROOT_ID)
-      ?.getOrCreateLinkedRecord("uiState", "UIState")
-      ?.getOrCreateLinkedRecord("userSettingsEditDelta", "UIUserSettingsDelta");
-    if (delta) {
-      for (let key of Object.keys(settings) as (keyof UserSettings)[]) {
-        delta.setValue(editDelta[key], key);
-      }
-    }
+    store.delete(`${ROOT_ID}:uiState:userSettingsEditDelta`);
   });
-  retainRecord(
-    graphql`
-      query UserSettingsUpdateControllerRetainEditDeltaQuery {
-        __typename
-        uiState {
-          userSettingsEditDelta {
-            ...UserSettings_editDelta
-          }
+  if (editDelta) {
+    commitLocalUpdate(environment, (store) => {
+      const delta = store
+        .get(ROOT_ID)
+        ?.getOrCreateLinkedRecord("uiState", "UIState")
+        ?.getOrCreateLinkedRecord("userSettingsEditDelta", "UIUserSettingsDelta");
+      if (delta) {
+        for (let key in editDelta) {
+          delta.setValue(editDelta[key as keyof UserSettingsDelta], key);
         }
       }
-    `,
-    environment
-  );
+    });
+    retainRecord(
+      graphql`
+        query UserSettingsUpdateControllerRetainEditDeltaQuery {
+          __typename
+          uiState {
+            userSettingsEditDelta {
+              ...UserSettings_editDelta
+            }
+          }
+        }
+      `,
+      environment
+    );
+  }
 }
 
 function writeOptimisticDelta(
   optimisticDelta: UserSettingsDelta,
-  settings: Readonly<UserSettings>,
   environment: IEnvironment
 ) {
-  if (!optimisticDelta) {
-    commitLocalUpdate(environment, (store) => {
-      store.delete(`${ROOT_ID}:uiState:userSettingsOptimisticDelta`);
-    });
-    return;
-  }
   commitLocalUpdate(environment, (store) => {
-    const delta = store
-      .get(ROOT_ID)
-      ?.getOrCreateLinkedRecord("uiState", "UIState")
-      ?.getOrCreateLinkedRecord("userSettingsOptimisticDelta", "UIUserSettingsDelta");
-    if (delta) {
-      for (let key of Object.keys(settings) as (keyof UserSettings)[]) {
-        delta.setValue(optimisticDelta[key], key);
-      }
-    }
+    store.delete(`${ROOT_ID}:uiState:userSettingsOptimisticDelta`);
   });
-  retainRecord(
-    graphql`
-      query UserSettingsUpdateControllerRetainOptimisticDeltaQuery {
-        __typename
-        uiState {
-          userSettingsOptimisticDelta {
-            ...UserSettings_optimisticDelta
-          }
+  if (optimisticDelta) {
+    commitLocalUpdate(environment, (store) => {
+      const delta = store
+        .get(ROOT_ID)
+        ?.getOrCreateLinkedRecord("uiState", "UIState")
+        ?.getOrCreateLinkedRecord("userSettingsOptimisticDelta", "UIUserSettingsDelta");
+      if (delta) {
+        for (let key in optimisticDelta) {
+          delta.setValue(optimisticDelta[key as keyof UserSettingsDelta], key);
         }
       }
-    `,
-    environment
-  );
+    });
+    retainRecord(
+      graphql`
+        query UserSettingsUpdateControllerRetainOptimisticDeltaQuery {
+          __typename
+          uiState {
+            userSettingsOptimisticDelta {
+              ...UserSettings_optimisticDelta
+            }
+          }
+        }
+      `,
+      environment
+    );
+  }
 }
 
 function commitMutation(

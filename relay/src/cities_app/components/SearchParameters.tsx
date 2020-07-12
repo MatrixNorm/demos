@@ -199,40 +199,36 @@ export function commitSearchParamsInRelayStore(
   searchParams: Partial<SearchParametersNonNullType> | null,
   environment: IEnvironment
 ) {
-  if (!searchParams) {
-    commitLocalUpdate(environment, (store) => {
-      store.delete(`${ROOT_ID}:uiState:citySearchParams`);
-    });
-    return;
-  }
   commitLocalUpdate(environment, (store) => {
-    const searchParamsRecord = store
-      .get(ROOT_ID)
-      ?.getOrCreateLinkedRecord("uiState", "UIState")
-      ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
-    if (searchParamsRecord) {
-      // XXX DRY
-      const searchParamsFields = [
-        "countryNameContains",
-        "populationGte",
-        "populationLte",
-      ];
-      for (let key of searchParamsFields as (keyof SearchParametersNonNullType)[]) {
-        searchParamsRecord.setValue(searchParams[key], key);
-      }
-    }
+    store.delete(`${ROOT_ID}:uiState:citySearchParams`);
   });
-  retainRecord(
-    graphql`
-      query SearchParametersRetainQuery {
-        __typename
-        uiState {
-          citySearchParams {
-            ...SearchParameters_searchParams
-          }
+  if (searchParams) {
+    commitLocalUpdate(environment, (store) => {
+      const searchParamsRecord = store
+        .get(ROOT_ID)
+        ?.getOrCreateLinkedRecord("uiState", "UIState")
+        ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
+      if (searchParamsRecord) {
+        for (let key in searchParams) {
+          searchParamsRecord.setValue(
+            searchParams[key as keyof SearchParametersNonNullType],
+            key
+          );
         }
       }
-    `,
-    environment
-  );
+    });
+    retainRecord(
+      graphql`
+        query SearchParametersRetainQuery {
+          __typename
+          uiState {
+            citySearchParams {
+              ...SearchParameters_searchParams
+            }
+          }
+        }
+      `,
+      environment
+    );
+  }
 }
