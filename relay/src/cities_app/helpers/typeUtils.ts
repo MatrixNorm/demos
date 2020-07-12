@@ -4,6 +4,8 @@ export type NukeNulls<T> = {
   [P in keyof T]: NonNullable<T[P]>;
 };
 
+export type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+
 // https://github.com/facebook/relay/issues/2394
 const mockRefType: any = null;
 

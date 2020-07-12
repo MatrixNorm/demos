@@ -1,15 +1,19 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
-import { commitLocalUpdate, IEnvironment, ROOT_ID } from "relay-runtime";
+import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
 import { useLocation } from "react-router-dom";
-import SearchParameters, { SearchParametersPresentationalType } from "./SearchParameters";
+import SearchParameters, {
+  commitSearchParamsInRelayStore,
+  SearchParametersNonNullType,
+} from "./SearchParameters";
 import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
-import { retainRecord } from "../helpers/relayStore";
+
+import { Writeable } from "../helpers/typeUtils";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
@@ -24,13 +28,11 @@ const PanelBlock = styled.div`
   }
 `;
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
-
 function extractSearchParametersFromUrlQueryString(
   urlQueryString: string
-): Partial<SearchParametersPresentationalType> | null {
+): Partial<SearchParametersNonNullType> | null {
   let qp = new URLSearchParams(urlQueryString);
-  let searchParams: Partial<Writeable<SearchParametersPresentationalType>> = {};
+  let searchParams: Writeable<Partial<SearchParametersNonNullType>> = {};
   if (qp.has("countryNameContains")) {
     searchParams["countryNameContains"] = qp.get("countryNameContains") || undefined;
   }
@@ -52,41 +54,6 @@ function extractSearchParametersFromUrlQueryString(
   return null;
 }
 
-function commitSearchParamsInRelayStore(
-  searchParams: Partial<SearchParametersPresentationalType>,
-  environment: IEnvironment
-) {
-  console.log(searchParams);
-  commitLocalUpdate(environment, (store) => {
-    const searchParamsRecord = store
-      .get(ROOT_ID)
-      ?.getOrCreateLinkedRecord("uiState", "UIState")
-      ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
-    if (searchParamsRecord) {
-      for (let key of [
-        "countryNameContains",
-        "populationGte",
-        "populationLte",
-      ] as (keyof SearchParametersPresentationalType)[]) {
-        searchParamsRecord.setValue(searchParams[key], key);
-      }
-    }
-  });
-  retainRecord(
-    graphql`
-      query SearchParametersUiQuery {
-        __typename
-        uiState {
-          citySearchParams {
-            ...SearchParameters_searchParams
-          }
-        }
-      }
-    `,
-    environment
-  );
-}
-
 export default ({ environment }: { environment: IEnvironment }) => {
   const location = useLocation();
   console.log(location);
@@ -94,9 +61,7 @@ export default ({ environment }: { environment: IEnvironment }) => {
   useEffect(
     function() {
       let searchParams = extractSearchParametersFromUrlQueryString(location.search);
-      if (searchParams) {
-        commitSearchParamsInRelayStore(searchParams, environment);
-      }
+      commitSearchParamsInRelayStore(searchParams, environment);
     },
     [location]
   );
