@@ -1,3 +1,5 @@
+import * as t from "io-ts";
+import { Either } from "fp-ts/lib/Either";
 import * as React from "react";
 import { useEffect } from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
@@ -31,8 +33,14 @@ const PanelBlock = styled.div`
 function extractSearchParametersFromUrlQueryString(
   urlQueryString: string
 ): Partial<SearchParametersNonNullType> | null {
+  const SP = t.partial({
+    countryNameContains: t.string,
+    populationGte: t.number,
+    populationLte: t.number,
+  });
   let qp = new URLSearchParams(urlQueryString);
   let searchParams: Writeable<Partial<SearchParametersNonNullType>> = {};
+  console.log(urlQueryString, qp);
   if (qp.has("countryNameContains")) {
     searchParams["countryNameContains"] = qp.get("countryNameContains") || undefined;
   }
