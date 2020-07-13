@@ -1,11 +1,9 @@
-import * as t from "io-ts";
-import { Either } from "fp-ts/lib/Either";
 import * as React from "react";
 import { useEffect } from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation, useRouteMatch } from "react-router-dom";
 import SearchParameters, {
   commitSearchParamsInRelayStore,
   SearchParametersNonNullType,
@@ -14,7 +12,6 @@ import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
-
 import { Writeable } from "../helpers/typeUtils";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
@@ -30,19 +27,19 @@ const PanelBlock = styled.div`
   }
 `;
 
+/**
+ * XXX io-ts
+ */
 function extractSearchParametersFromUrlQueryString(
   urlQueryString: string
 ): Partial<SearchParametersNonNullType> | null {
-  const SP = t.partial({
-    countryNameContains: t.string,
-    populationGte: t.number,
-    populationLte: t.number,
-  });
   let qp = new URLSearchParams(urlQueryString);
   let searchParams: Writeable<Partial<SearchParametersNonNullType>> = {};
-  console.log(urlQueryString, qp);
   if (qp.has("countryNameContains")) {
-    searchParams["countryNameContains"] = qp.get("countryNameContains") || undefined;
+    let value = qp.get("countryNameContains");
+    if (value) {
+      searchParams["countryNameContains"] = value;
+    }
   }
   if (qp.has("populationGte")) {
     let value = Number(qp.get("populationGte"));
@@ -64,15 +61,17 @@ function extractSearchParametersFromUrlQueryString(
 
 export default ({ environment }: { environment: IEnvironment }) => {
   const location = useLocation();
-  console.log(location);
 
-  useEffect(
-    function() {
-      let searchParams = extractSearchParametersFromUrlQueryString(location.search);
-      commitSearchParamsInRelayStore(searchParams, environment);
-    },
-    [location]
-  );
+  let searchParams = extractSearchParametersFromUrlQueryString(location.search);
+  commitSearchParamsInRelayStore(searchParams, environment);
+
+  // useEffect(
+  //   function() {
+  //     let searchParams = extractSearchParametersFromUrlQueryString(location.search);
+  //     commitSearchParamsInRelayStore(searchParams, environment);
+  //   },
+  //   [location]
+  // );
 
   return (
     <PanelBlock>
@@ -153,14 +152,18 @@ const CitySummaryLoading = styled(CitySummarySuccess)`
 `;
 
 function renderCitySummary({ city }: { city: CitySummary_city }) {
+  const { url } = useRouteMatch();
   const isLoading = React.useContext(LoadingContext);
   const CitySummary = isLoading ? CitySummaryLoading : CitySummarySuccess;
   return (
     <CitySummary>
       <div className="row">
-        <a className="country placeholder" href="#">
+        <Link
+          className="country placeholder"
+          to={`${url}?countryNameContains=${city.country}`}
+        >
           {city.country}
-        </a>
+        </Link>
       </div>
       <div className="row row-name">
         <span className="name placeholder">{city.name}</span>

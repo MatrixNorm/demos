@@ -47,9 +47,7 @@ const SearchParametersFC = createFragmentContainer(
         },
         ...(props.searchParams || {}),
       },
-
       searchMetadata: props.searchMetadata,
-      environment: props.environment,
     });
     return props.render({
       dispatch,
@@ -159,6 +157,7 @@ function useSearchParameters({
   const [localSearchParams, setLocalSearchParams] = useState<SearchParametersType>(
     searchParams
   );
+  console.log(searchParams, localSearchParams);
   const { url } = useRouteMatch();
 
   function dispatch(event: EventType) {
@@ -178,7 +177,6 @@ function useSearchParameters({
     localSearchParams,
     searchMetadata
   );
-
   return {
     dispatch,
     displayableSearchParams,
