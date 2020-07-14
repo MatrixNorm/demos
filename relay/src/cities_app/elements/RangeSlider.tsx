@@ -13,7 +13,7 @@ type Props = {
   step: number;
   x1: number;
   x2: number;
-  onChange: any;
+  onChange: ({ lower, upper }: { lower: number; upper: number }) => void;
 };
 
 export default function({ min, max, step, x1, x2, onChange }: Props) {
@@ -32,6 +32,13 @@ export default function({ min, max, step, x1, x2, onChange }: Props) {
       removeEventListener("range-update", listener);
     };
   }, []);
+
+  useEffect(() => {
+    if (!sliderEl.current) return;
+    // @ts-ignore
+    sliderEl.current.setX([x1, x2]);
+  }, [JSON.stringify([x1, x2])]);
+
   // https://github.com/microsoft/TypeScript/issues/4648
   return React.createElement("matrixnorm-range-slider", {
     ref: sliderEl,

@@ -9,7 +9,8 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "__relay__/*": ["src/__relay__/*"]
+      "__relay__/*": ["src/__relay__/*"],
+      "projroot/*": ["src/projroot/*"]
     }
   },
   "exclude": ["node_modules"]

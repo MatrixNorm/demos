@@ -73,11 +73,7 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
             x1={searchParams.populationGte}
             x2={searchParams.populationLte}
             step={1}
-            onChange={(range: any) => {
-              console.log(range);
-              dispatch(["populationGte", range.lower]);
-              dispatch(["populationLte", range.upper]);
-            }}
+            onChange={(range) => dispatch(["population", range])}
           />
         </div>
       </ParameterSection>

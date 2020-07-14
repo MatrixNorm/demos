@@ -17,8 +17,7 @@ export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 export type EventType =
   | ["countryNameContains", string]
-  | ["populationGte", number]
-  | ["populationLte", number];
+  | ["population", { lower: number; upper: number }];
 
 export type RenderCallbackArgsType = {
   dispatch: (event: EventType) => void;
@@ -154,13 +153,28 @@ function useSearchParameters({
   searchMetadata: SearchMetadataType;
   searchParams: SearchParametersType;
 }) {
+  const [prevSearchParams, setPrevSearchParams] = useState<SearchParametersType | null>(
+    null
+  );
   const [localSearchParams, setLocalSearchParams] = useState<SearchParametersType>(
     searchParams
   );
-  console.log(searchParams, localSearchParams);
   const { url } = useRouteMatch();
 
+  if (JSON.stringify(searchParams) !== JSON.stringify(prevSearchParams)) {
+    setPrevSearchParams(searchParams);
+    setLocalSearchParams(searchParams);
+  }
+
   function dispatch(event: EventType) {
+    if (event[0] === "population") {
+      setLocalSearchParams((prevState) => ({
+        ...prevState,
+        populationGte: event[1].lower,
+        populationLte: event[1].upper,
+      }));
+      return;
+    }
     let [fieldName, fieldValue] = event;
     setLocalSearchParams((prevState) => ({
       ...prevState,

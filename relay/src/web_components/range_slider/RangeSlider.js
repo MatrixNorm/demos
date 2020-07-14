@@ -89,18 +89,16 @@ export default class RangeSlider extends HTMLElement {
     this.lowerInput.setAttribute("min", min);
     this.lowerInput.setAttribute("max", max);
     this.lowerInput.setAttribute("step", step);
-    this.lowerInput.value = x1 ? x1 : min;
     this.lowerInput.addEventListener("change", this.onLowerChange);
     this.lowerInput.addEventListener("input", this.onLowerInput);
-    this.setLowerText(this.lowerInput.value);
 
     this.upperInput.setAttribute("min", min);
     this.upperInput.setAttribute("max", max);
     this.upperInput.setAttribute("step", step);
-    this.upperInput.value = x2 ? x2 : max;
     this.upperInput.addEventListener("change", this.onUpperChange);
     this.upperInput.addEventListener("input", this.onUpperInput);
-    this.setUpperText(this.upperInput.value);
+
+    this.setX([x1, x2]);
   }
 
   disconnectedCallback() {
@@ -108,6 +106,13 @@ export default class RangeSlider extends HTMLElement {
     this.upperInput.removeEventListener("input", this.onUpperInput);
     this.lowerInput.removeEventListener("change", this.onLowerChange);
     this.lowerInput.removeEventListener("input", this.onLowerInput);
+  }
+
+  setX([x1, x2]) {
+    this.lowerInput.value = x1 ? x1 : this.lowerInput.getAttribute("min");
+    this.setLowerText(this.lowerInput.value);
+    this.upperInput.value = x2 ? x2 : this.upperInput.getAttribute("max");
+    this.setUpperText(this.upperInput.value);
   }
 
   onUpperInput(evt) {
