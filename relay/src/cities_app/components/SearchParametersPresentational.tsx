@@ -1,6 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
+import * as SPC from "../mutations/SearchParametersController";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
@@ -45,12 +46,10 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export function SearchParametersPresentational(props: RenderCallbackArgsType) {
+  console.log({ props });
   let isLoading = React.useContext(LoadingContext);
-  let { dispatch, searchParams, url, searchMetadata, showApplyButton } = props;
+  let { searchParams, url, searchMetadata, showApplyButton } = props;
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
-  if (isLoading) {
-    dispatch = () => {};
-  }
   return (
     <SearchParametersBlock>
       <ParameterSection>
@@ -59,7 +58,7 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
           <TextInput
             value={searchParams.countryNameContains}
             onChange={(value) => {
-              dispatch(["countryNameContains", value]);
+              SPC.handleEvent({ type: "edit", payload: { countryNameContains: value } });
             }}
           />
         </div>
@@ -73,7 +72,12 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
             x1={searchParams.populationGte}
             x2={searchParams.populationLte}
             step={1}
-            onChange={(range) => dispatch(["population", range])}
+            onChange={(range) =>
+              SPC.handleEvent({
+                type: "edit",
+                payload: { populationGte: range.lower, populationLte: range.upper },
+              })
+            }
           />
         </div>
       </ParameterSection>

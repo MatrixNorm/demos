@@ -1,18 +1,14 @@
 import * as React from "react";
-import { useEffect } from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import styled from "styled-components";
 import { Link, useLocation, useRouteMatch } from "react-router-dom";
-import SearchParameters, {
-  commitSearchParamsInRelayStore,
-  SearchParametersNonNullType,
-} from "./SearchParameters";
 import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
+import SearchParameters from "./SearchParameters";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
+import * as SearchParametersController from "../mutations/SearchParametersController";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
-import { Writeable } from "../helpers/typeUtils";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
@@ -27,51 +23,13 @@ const PanelBlock = styled.div`
   }
 `;
 
-/**
- * XXX io-ts
- */
-function extractSearchParametersFromUrlQueryString(
-  urlQueryString: string
-): Partial<SearchParametersNonNullType> | null {
-  let qp = new URLSearchParams(urlQueryString);
-  let searchParams: Writeable<Partial<SearchParametersNonNullType>> = {};
-  if (qp.has("countryNameContains")) {
-    let value = qp.get("countryNameContains");
-    if (value) {
-      searchParams["countryNameContains"] = value;
-    }
-  }
-  if (qp.has("populationGte")) {
-    let value = Number(qp.get("populationGte"));
-    if (value) {
-      searchParams["populationGte"] = value;
-    }
-  }
-  if (qp.has("populationLte")) {
-    let value = Number(qp.get("populationLte"));
-    if (value) {
-      searchParams["populationLte"] = value;
-    }
-  }
-  if (Object.keys(searchParams).length > 0) {
-    return searchParams;
-  }
-  return null;
-}
-
 export default ({ environment }: { environment: IEnvironment }) => {
   const location = useLocation();
 
-  let searchParams = extractSearchParametersFromUrlQueryString(location.search);
-  commitSearchParamsInRelayStore(searchParams, environment);
-
-  // useEffect(
-  //   function() {
-  //     let searchParams = extractSearchParametersFromUrlQueryString(location.search);
-  //     commitSearchParamsInRelayStore(searchParams, environment);
-  //   },
-  //   [location]
-  // );
+  SearchParametersController.handleEvent({
+    type: "routeEnter",
+    urlSearchString: location.search,
+  });
 
   return (
     <PanelBlock>

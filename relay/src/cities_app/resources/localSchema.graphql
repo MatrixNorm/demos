@@ -4,6 +4,7 @@ extend type Query {
 
 type UIState {
   citySearchParams: UICitySearchParams
+  citySearchParamsEditDelta: UICitySearchParams
   notifications: [UINotification!]
   userSettingsEditDelta: UIUserSettingsDelta
   userSettingsOptimisticDelta: UIUserSettingsDelta
