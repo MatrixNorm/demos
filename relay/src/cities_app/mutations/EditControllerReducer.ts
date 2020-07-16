@@ -1,5 +1,12 @@
 import { trueDelta } from "../helpers/object";
 
+export type Event<T extends object> =
+  | EvEdit<T>
+  | EvSubmit
+  | EvClear
+  | EvResolve
+  | EvReject;
+
 type EvEdit<T> = {
   type: "edit";
   payload: Partial<T>;
@@ -8,16 +15,11 @@ type EvSubmit = { type: "submit" };
 type EvClear = { type: "clear" };
 type EvResolve = { type: "resolve" };
 type EvReject = { type: "reject" };
-export type Event<T extends object> =
-  | EvEdit<T>
-  | EvSubmit
-  | EvClear
-  | EvResolve
-  | EvReject;
+
+export type State<T extends object> = StateIdle<T> | StateActive<T>;
 
 type StateIdle<T> = { sv: T; od: null; ed: Partial<T> | null };
 type StateActive<T> = { sv: T; od: Partial<T>; ed: Partial<T> | null };
-export type State<T extends object> = StateIdle<T> | StateActive<T>;
 
 export type ReturnType<T extends object> =
   | State<T>

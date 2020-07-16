@@ -17,7 +17,7 @@ import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 type UserSettings = NukeFragRef<UserSettings_settings>;
 type UserSettingsDelta = NukeNulls<Partial<UserSettings>> | null;
 
-function queryState(
+function lookupState(
   environment: IEnvironment
 ): {
   userId: string | null;
@@ -55,7 +55,7 @@ function queryState(
 }
 
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
-  let { userId, sv, ed, od } = queryState(environment);
+  let { userId, sv, ed, od } = lookupState(environment);
   //console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
   let ret = reduce({ sv, ed, od }, event);

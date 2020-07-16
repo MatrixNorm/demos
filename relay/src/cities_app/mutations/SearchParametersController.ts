@@ -1,15 +1,51 @@
 import { graphql } from "react-relay";
-import { commitLocalUpdate, IEnvironment, ROOT_ID } from "relay-runtime";
+import { commitLocalUpdate, createOperationDescriptor, getRequest, IEnvironment, ROOT_ID } from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
+import { stripEmptyProps } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
+import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-type SearchParameters = NukeFragRef<SearchParameters_editDelta>;
-type SearchParametersDelta = NukeNulls<Partial<SearchParameters>> | null;
+type SearchParametersNullable = NukeFragRef<SearchParameters_editDelta>;
+type SearchParameters = NukeNulls<Partial<SearchParametersNullable>> | null;
 
 type Event = EditEvent | EnterRouteEvent;
-type EditEvent = { type: "edit", payload: SearchParametersDelta };
+type EditEvent = { type: "edit", payload: SearchParameters };
 type EnterRouteEvent = { type: "routeEnter", urlSearchString: string };
+
+type State = {
+  searchParams: SearchParameters;
+  editDelta: SearchParameters;
+}
+
+function lookupState(
+  environment: IEnvironment
+): State {
+  const query = graphql`
+    query SearchParametersControllerQuery {
+      __typename
+      uiState {
+        citySearchParams {
+          ...SearchParameters_searchParams @relay(mask: false)          
+        }
+        citySearchParamsEditDelta {
+          ...SearchParameters_editDelta @relay(mask: false)
+        }
+      }      
+    }
+  `;
+  const operation = createOperationDescriptor(getRequest(query), {});
+  const response = environment.lookup(operation.fragment);
+  const data = response.data as SearchParametersControllerQueryResponse;
+  return {
+    searchParams: stripEmptyProps(data?.uiState?.citySearchParams || null),
+    editDelta: stripEmptyProps(data?.uiState?.citySearchParamsEditDelta || null),
+  };
+}
+
+function reduce({searchParams, editDelta}: State): void {
+
+}
 
 export function handleEvent(event: Event, environment: IEnvironment) {
   switch (event.type) {
