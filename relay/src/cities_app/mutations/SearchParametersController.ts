@@ -8,12 +8,11 @@ import {
 } from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
-import { stripEmptyProps } from "../helpers/object";
-import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
+import { stripEmptyProps, Stripped } from "../helpers/object";
+import { NukeFragRef, Writeable } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-type SearchParametersNullable = NukeFragRef<SearchParameters_editDelta>;
-type SearchParameters = NukeNulls<Partial<SearchParametersNullable>> | null;
+type SearchParameters = Stripped<NukeFragRef<SearchParameters_editDelta>>;
 
 type Event = EditEvent | EnterRouteEvent;
 type EditEvent = { type: "edit"; payload: SearchParameters };
@@ -46,8 +45,8 @@ function lookupState(environment: IEnvironment): State {
   const response = environment.lookup(operation.fragment);
   const data = response.data as SearchParametersControllerQueryResponse;
   return {
-    searchParams: stripEmptyProps(data?.uiState?.citySearchParams || null),
-    editDelta: stripEmptyProps(data?.uiState?.citySearchParamsEditDelta || null),
+    searchParams: stripEmptyProps(data?.uiState?.citySearchParams),
+    editDelta: stripEmptyProps(data?.uiState?.citySearchParamsEditDelta),
   };
 }
 
@@ -61,7 +60,7 @@ function reduce(state: State, event: Event): Effect[] {
       let searchParams = extractSearchParametersFromUrl(event.urlSearchString);
       return [
         { type: "writeSearchParams", value: searchParams },
-        { type: "writeEditDelta", value: null },
+        { type: "writeEditDelta", value: stripEmptyProps<SearchParameters>(null) },
       ];
     }
     default:
@@ -120,11 +119,9 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
 /**
  * XXX io-ts
  */
-function extractSearchParametersFromUrl(
-  urlSearchString: string
-): Partial<SearchParameters> | null {
+function extractSearchParametersFromUrl(urlSearchString: string): SearchParameters {
   let qp = new URLSearchParams(urlSearchString);
-  let searchParams: Writeable<Partial<SearchParameters>> = {};
+  let searchParams = {} as Writeable<SearchParameters>;
   if (qp.has("countryNameContains")) {
     let value = qp.get("countryNameContains");
     if (value) {
@@ -144,7 +141,7 @@ function extractSearchParametersFromUrl(
     }
   }
   if (Object.keys(searchParams).length > 0) {
-    return searchParams;
+    return stripEmptyProps(searchParams);
   }
-  return null;
+  return stripEmptyProps<SearchParameters>(null);
 }

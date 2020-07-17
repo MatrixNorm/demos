@@ -1,5 +1,30 @@
 import { NukeNulls } from "./typeUtils";
 
+declare const stripped: unique symbol;
+export type Stripped<T extends object> = T & { [stripped]: true };
+
+export function stripEmptyProps<T extends object>(
+  obj: T | null | undefined
+): Stripped<T> {
+  if (!obj) {
+    return {} as Stripped<T>;
+  }
+  let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
+  return compacted as Stripped<T>;
+}
+
+export function stripEmptyProps2<T extends object>(obj: T): Partial<NukeNulls<T>> {
+  let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
+  return compacted as Partial<NukeNulls<T>>;
+}
+
+export function merge<T extends NukeNulls<object>>(
+  target: Partial<T>,
+  delta: Partial<T>
+) {
+  let compactedDelta = stripEmptyProps(delta);
+}
+
 /**
  *
  * @param delta
@@ -38,16 +63,6 @@ export function trueDelta<T extends object>(
     return Object.fromEntries(differentEntries);
   }
   return null;
-}
-
-export function stripEmptyProps<T extends object>(
-  obj: Partial<T> | null
-): NukeNulls<Partial<T>> | null {
-  if (!obj) return null;
-  let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
-  return Object.entries(compacted).length > 0
-    ? (compacted as NukeNulls<Partial<T>>)
-    : null;
 }
 
 export function toQueryURL<T extends object>(obj: T) {
