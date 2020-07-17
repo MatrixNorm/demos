@@ -1,5 +1,11 @@
 import { graphql } from "react-relay";
-import { commitLocalUpdate, createOperationDescriptor, getRequest, IEnvironment, ROOT_ID } from "relay-runtime";
+import {
+  commitLocalUpdate,
+  createOperationDescriptor,
+  getRequest,
+  IEnvironment,
+  ROOT_ID,
+} from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
 import { stripEmptyProps } from "../helpers/object";
@@ -10,28 +16,30 @@ type SearchParametersNullable = NukeFragRef<SearchParameters_editDelta>;
 type SearchParameters = NukeNulls<Partial<SearchParametersNullable>> | null;
 
 type Event = EditEvent | EnterRouteEvent;
-type EditEvent = { type: "edit", payload: SearchParameters };
-type EnterRouteEvent = { type: "routeEnter", urlSearchString: string };
+type EditEvent = { type: "edit"; payload: SearchParameters };
+type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type State = {
   searchParams: SearchParameters;
   editDelta: SearchParameters;
-}
+};
 
-function lookupState(
-  environment: IEnvironment
-): State {
+type Effect =
+  | { type: "writeSearchParams"; value: SearchParameters }
+  | { type: "writeEditDelta"; value: SearchParameters };
+
+function lookupState(environment: IEnvironment): State {
   const query = graphql`
     query SearchParametersControllerQuery {
       __typename
       uiState {
         citySearchParams {
-          ...SearchParameters_searchParams @relay(mask: false)          
+          ...SearchParameters_searchParams @relay(mask: false)
         }
         citySearchParamsEditDelta {
           ...SearchParameters_editDelta @relay(mask: false)
         }
-      }      
+      }
     }
   `;
   const operation = createOperationDescriptor(getRequest(query), {});
@@ -43,29 +51,40 @@ function lookupState(
   };
 }
 
-function reduce({searchParams, editDelta}: State): void {
-
+function reduce(state: State, event: Event): Effect[] {
+  switch (event.type) {
+    case "edit": {
+      let editDelta = { ...state.editDelta, ...event.payload };
+      return [{ type: "writeEditDelta", value: editDelta }];
+    }
+    case "routeEnter": {
+      let searchParams = extractSearchParametersFromUrl(event.urlSearchString);
+      return [
+        { type: "writeSearchParams", value: searchParams },
+        { type: "writeEditDelta", value: null },
+      ];
+    }
+    default:
+      return [];
+  }
 }
 
 export function handleEvent(event: Event, environment: IEnvironment) {
-  switch (event.type) {
-    case "edit": {
-      return handleEdit(event.payload, environment)
+  const state = lookupState(environment);
+  const effects = reduce(state, event);
+  effects.forEach((eff) => {
+    if (eff.type === "writeSearchParams") {
+      writeSearchParams(eff.value, environment);
     }
-    case "routeEnter": {
-      return handleRouteEnter(event.urlSearchString, environment)
+    if (eff.type === "writeEditDelta") {
+      writeEditDelta(eff.value, environment);
     }
+  });
 }
 
-function handleEdit(delta: SearchParametersDelta, environment: IEnvironment) {
+function writeEditDelta(delta: SearchParameters, environment: IEnvironment) {}
 
-}
-
-function handleRouteEnter(
-  urlSearchString: string,
-  environment: IEnvironment
-) {
-  const searchParams = extractSearchParametersFromUrl(urlSearchString)
+function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
   commitLocalUpdate(environment, (store) => {
     store.delete(`${ROOT_ID}:uiState:citySearchParams`);
     store.delete(`${ROOT_ID}:uiState:citySearchParamsEditDelta`);
@@ -78,10 +97,7 @@ function handleRouteEnter(
         ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
       if (searchParamsRecord) {
         for (let key in searchParams) {
-          searchParamsRecord.setValue(
-            searchParams[key as keyof SearchParametersNonNullType],
-            key
-          );
+          searchParamsRecord.setValue(searchParams[key as keyof SearchParameters], key);
         }
       }
     });
@@ -106,9 +122,9 @@ function handleRouteEnter(
  */
 function extractSearchParametersFromUrl(
   urlSearchString: string
-): Partial<SearchParametersNonNullType> | null {
+): Partial<SearchParameters> | null {
   let qp = new URLSearchParams(urlSearchString);
-  let searchParams: Writeable<Partial<SearchParametersNonNullType>> = {};
+  let searchParams: Writeable<Partial<SearchParameters>> = {};
   if (qp.has("countryNameContains")) {
     let value = qp.get("countryNameContains");
     if (value) {
