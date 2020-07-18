@@ -7,12 +7,12 @@ import {
   ROOT_ID,
 } from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
-import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
+import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { stripEmptyProps, Compacted } from "../helpers/object";
 import { NukeFragRef, Writeable } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-type SearchParameters = Compacted<NukeFragRef<SearchParameters_editDelta>>;
+export type SearchParameters = Compacted<NukeFragRef<SearchParameters_searchParams>>;
 
 type Event = EditEvent | EnterRouteEvent;
 type EditEvent = { type: "edit"; payload: SearchParameters };

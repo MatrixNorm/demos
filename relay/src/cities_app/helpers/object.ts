@@ -1,7 +1,9 @@
 import { NukeNulls } from "./typeUtils";
 
 declare const __compacted__: unique symbol;
-export type Compacted<T extends object> = NukeNulls<T> & { [__compacted__]: true };
+export type Compacted<T extends object> = Partial<NukeNulls<T>> & {
+  [__compacted__]: true;
+};
 
 export function stripEmptyProps<T extends object>(
   obj: T | null | undefined

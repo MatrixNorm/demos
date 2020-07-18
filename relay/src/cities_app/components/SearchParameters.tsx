@@ -4,6 +4,7 @@ import { IEnvironment } from "relay-runtime";
 import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
+import * as SPController from "../mutations/SearchParametersController";
 import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import { toQueryURL, stripEmptyProps } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
@@ -16,13 +17,6 @@ export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
 export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
-export type RenderCallbackArgsType = {
-  environment: IEnvironment;
-  searchParams: SearchParametersNonNullType;
-  searchMetadata: SearchMetadataType;
-  url: string | null;
-};
-
 type Props = {
   searchMetadata: SearchParameters_searchMetadata;
   searchParams: SearchParameters_searchParams | null;
@@ -32,6 +26,7 @@ type Props = {
 
 const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
+    const { url } = useRouteMatch();
     const searchParams = stripEmptyProps(props.searchParams);
     const editDelta = stripEmptyProps(props.editDelta);
     const defaultSearchParams = {
@@ -44,8 +39,21 @@ const SearchParametersFC = createFragmentContainer(
     if (renderCallback) {
       return renderCallback(props);
     }
+
+    function onEdit(delta: Partial<SearchParametersType>) {
+      SPController.handleEvent(
+        { type: "edit", payload: stripEmptyProps(delta) },
+        props.environment
+      );
+    }
+
     return (
-      <SearchParametersPresentational searchParams={x} searchMetadata={searchMetadata} />
+      <SearchParametersPresentational
+        searchParams={x}
+        searchMetadata={props.searchMetadata}
+        onEdit={onEdit}
+        url={`${url}?${toQueryURL(editDelta)}`}
+      />
     );
   },
   {
@@ -85,7 +93,7 @@ export const defaultData = {
   editDelta: null,
 };
 
-export default function(environment: IEnvironment) {
+export default function({ environment }: { environment: IEnvironment }) {
   return (
     <LoadingPlaceholderQueryRenderer<SearchParametersQuery>
       query={graphql`

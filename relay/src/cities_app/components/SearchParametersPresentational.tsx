@@ -1,12 +1,13 @@
 import * as React from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import * as SPC from "../mutations/SearchParametersController";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
-import { RenderCallbackArgsType } from "./SearchParameters";
+import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
+import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
+import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {
@@ -45,10 +46,21 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   }
 `;
 
-export function SearchParametersPresentational(props: RenderCallbackArgsType) {
+export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
+export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
+export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
+
+export type Props = {
+  onEdit: (delta: Partial<SearchParametersType>) => void;
+  searchParams: SearchParametersNonNullType;
+  searchMetadata: SearchMetadataType;
+  url: string | null;
+};
+
+export function SearchParametersPresentational(props: Props) {
   console.log({ props });
   let isLoading = React.useContext(LoadingContext);
-  let { searchParams, url, searchMetadata, environment } = props;
+  let { searchParams, url, searchMetadata, onEdit } = props;
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
   return (
     <SearchParametersBlock>
@@ -57,12 +69,7 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
         <div className="input placeholder">
           <TextInput
             value={searchParams.countryNameContains}
-            onChange={(value) => {
-              SPC.handleEvent(
-                { type: "edit", payload: { countryNameContains: value } },
-                environment
-              );
-            }}
+            onChange={(value) => onEdit({ countryNameContains: value })}
           />
         </div>
       </ParameterSection>
@@ -76,13 +83,7 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
             x2={searchParams.populationLte}
             step={1}
             onChange={(range) =>
-              SPC.handleEvent(
-                {
-                  type: "edit",
-                  payload: { populationGte: range.lower, populationLte: range.upper },
-                },
-                environment
-              )
+              onEdit({ populationGte: range.lower, populationLte: range.upper })
             }
           />
         </div>

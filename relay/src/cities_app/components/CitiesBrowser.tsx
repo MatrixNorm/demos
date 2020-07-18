@@ -26,20 +26,18 @@ const PanelBlock = styled.div`
 export default ({ environment }: { environment: IEnvironment }) => {
   const location = useLocation();
 
-  SearchParametersController.handleEvent({
-    type: "routeEnter",
-    urlSearchString: location.search,
-  });
+  SearchParametersController.handleEvent(
+    {
+      type: "routeEnter",
+      urlSearchString: location.search,
+    },
+    environment
+  );
 
   return (
     <PanelBlock>
       <div className="search-params-wrapper">
-        <SearchParameters
-          environment={environment}
-          render={(props) => {
-            return <SearchParametersPresentational {...props} />;
-          }}
-        />
+        <SearchParameters environment={environment} />
       </div>
       <div className="pagination-panel-wrapper">
         <RenderCallbackContext.Provider value={{ CitySummary: renderCitySummary }}>
