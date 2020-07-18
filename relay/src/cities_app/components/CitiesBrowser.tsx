@@ -5,7 +5,6 @@ import styled from "styled-components";
 import { Link, useLocation, useRouteMatch } from "react-router-dom";
 import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import SearchParameters from "./SearchParameters";
-import { SearchParametersPresentational } from "./SearchParametersPresentational";
 import * as SearchParametersController from "../mutations/SearchParametersController";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";

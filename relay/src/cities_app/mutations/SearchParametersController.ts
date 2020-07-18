@@ -81,22 +81,19 @@ export function handleEvent(event: Event, environment: IEnvironment) {
   });
 }
 
-function writeEditDelta(delta: SearchParameters, environment: IEnvironment) {}
-
-function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
+function writeEditDelta(delta: SearchParameters, environment: IEnvironment) {
   commitLocalUpdate(environment, (store) => {
     store.delete(`${ROOT_ID}:uiState:citySearchParams`);
-    store.delete(`${ROOT_ID}:uiState:citySearchParamsEditDelta`);
   });
-  if (searchParams) {
+  if (delta) {
     commitLocalUpdate(environment, (store) => {
-      const searchParamsRecord = store
+      const record = store
         .get(ROOT_ID)
         ?.getOrCreateLinkedRecord("uiState", "UIState")
         ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
-      if (searchParamsRecord) {
-        for (let key in searchParams) {
-          searchParamsRecord.setValue(searchParams[key as keyof SearchParameters], key);
+      if (record) {
+        for (let key in delta) {
+          record.setValue(delta[key as keyof SearchParameters], key);
         }
       }
     });
@@ -116,8 +113,40 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
   }
 }
 
+function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
+  commitLocalUpdate(environment, (store) => {
+    store.delete(`${ROOT_ID}:uiState:citySearchParams`);
+  });
+  if (searchParams) {
+    commitLocalUpdate(environment, (store) => {
+      const searchParamsRecord = store
+        .get(ROOT_ID)
+        ?.getOrCreateLinkedRecord("uiState", "UIState")
+        ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
+      if (searchParamsRecord) {
+        for (let key in searchParams) {
+          searchParamsRecord.setValue(searchParams[key as keyof SearchParameters], key);
+        }
+      }
+    });
+    retainRecord(
+      graphql`
+        query SearchParametersControllerSearchParametersRetainQuery {
+          __typename
+          uiState {
+            citySearchParams {
+              ...SearchParameters_searchParams
+            }
+          }
+        }
+      `,
+      environment
+    );
+  }
+}
+
 /**
- * XXX io-ts
+ * XXX io-ts ???
  */
 function extractSearchParametersFromUrl(urlSearchString: string): SearchParameters {
   let qp = new URLSearchParams(urlSearchString);

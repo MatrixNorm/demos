@@ -29,16 +29,12 @@ const SearchParametersFC = createFragmentContainer(
     const { url } = useRouteMatch();
     const searchParams = stripEmptyProps(props.searchParams);
     const editDelta = stripEmptyProps(props.editDelta);
+
     const defaultSearchParams = {
       countryNameContains: "",
       populationGte: props.searchMetadata.populationLowerBound,
       populationLte: props.searchMetadata.populationUpperBound,
     };
-    const x = { ...defaultSearchParams, ...searchParams, ...editDelta };
-    const renderCallback = React.useContext(RenderCallbackContext)["SearchParameters"];
-    if (renderCallback) {
-      return renderCallback(props);
-    }
 
     function onEdit(delta: Partial<SearchParametersType>) {
       SPController.handleEvent(
@@ -47,14 +43,19 @@ const SearchParametersFC = createFragmentContainer(
       );
     }
 
-    return (
-      <SearchParametersPresentational
-        searchParams={x}
-        searchMetadata={props.searchMetadata}
-        onEdit={onEdit}
-        url={`${url}?${toQueryURL(editDelta)}`}
-      />
-    );
+    const args = {
+      searchParams: { ...defaultSearchParams, ...searchParams, ...editDelta },
+      searchMetadata: props.searchMetadata,
+      onEdit,
+      url: `${url}?${toQueryURL(editDelta)}`,
+    };
+
+    const renderCallback = React.useContext(RenderCallbackContext)["SearchParameters"];
+    if (renderCallback) {
+      return renderCallback(args);
+    }
+
+    return <SearchParametersPresentational {...args} />;
   },
   {
     searchMetadata: graphql`
