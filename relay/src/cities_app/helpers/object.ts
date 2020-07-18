@@ -1,16 +1,16 @@
 import { NukeNulls } from "./typeUtils";
 
-declare const stripped: unique symbol;
-export type Stripped<T extends object> = T & { [stripped]: true };
+declare const __compacted__: unique symbol;
+export type Compacted<T extends object> = NukeNulls<T> & { [__compacted__]: true };
 
 export function stripEmptyProps<T extends object>(
   obj: T | null | undefined
-): Stripped<T> {
+): Compacted<T> {
   if (!obj) {
-    return {} as Stripped<T>;
+    return {} as Compacted<T>;
   }
   let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
-  return compacted as Stripped<T>;
+  return compacted as Compacted<T>;
 }
 
 export function stripEmptyProps2<T extends object>(obj: T): Partial<NukeNulls<T>> {
