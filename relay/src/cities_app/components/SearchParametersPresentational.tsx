@@ -48,7 +48,7 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 export function SearchParametersPresentational(props: RenderCallbackArgsType) {
   console.log({ props });
   let isLoading = React.useContext(LoadingContext);
-  let { searchParams, url, searchMetadata, showApplyButton } = props;
+  let { searchParams, url, searchMetadata, environment } = props;
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
   return (
     <SearchParametersBlock>
@@ -58,7 +58,10 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
           <TextInput
             value={searchParams.countryNameContains}
             onChange={(value) => {
-              SPC.handleEvent({ type: "edit", payload: { countryNameContains: value } });
+              SPC.handleEvent(
+                { type: "edit", payload: { countryNameContains: value } },
+                environment
+              );
             }}
           />
         </div>
@@ -73,15 +76,18 @@ export function SearchParametersPresentational(props: RenderCallbackArgsType) {
             x2={searchParams.populationLte}
             step={1}
             onChange={(range) =>
-              SPC.handleEvent({
-                type: "edit",
-                payload: { populationGte: range.lower, populationLte: range.upper },
-              })
+              SPC.handleEvent(
+                {
+                  type: "edit",
+                  payload: { populationGte: range.lower, populationLte: range.upper },
+                },
+                environment
+              )
             }
           />
         </div>
       </ParameterSection>
-      {showApplyButton && (
+      {url && (
         <div className="submit-button-box">
           <SubmitButton>
             <Link to={url}>apply</Link>

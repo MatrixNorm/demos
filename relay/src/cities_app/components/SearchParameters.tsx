@@ -3,7 +3,9 @@ import { graphql, createFragmentContainer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
-import { toQueryURL } from "../helpers/object";
+import RenderCallbackContext from "../verysmart/RenderCallbackContext";
+import { SearchParametersPresentational } from "./SearchParametersPresentational";
+import { toQueryURL, stripEmptyProps } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
@@ -14,38 +16,37 @@ export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
 export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
-export type EventType =
-  | ["countryNameContains", string]
-  | ["population", { lower: number; upper: number }];
-
 export type RenderCallbackArgsType = {
-  dispatch: (event: EventType) => void;
+  environment: IEnvironment;
   searchParams: SearchParametersNonNullType;
   searchMetadata: SearchMetadataType;
-  showApplyButton: Boolean;
-  url: string;
+  url: string | null;
 };
-export type RenderCallbackType = (args: RenderCallbackArgsType) => any;
 
 type Props = {
   searchMetadata: SearchParameters_searchMetadata;
   searchParams: SearchParameters_searchParams | null;
   editDelta: SearchParameters_editDelta | null;
   environment: IEnvironment;
-  render: RenderCallbackType;
 };
 
-type EditDelta = Partial<SearchParametersNonNullType>;
-
 const SearchParametersFC = createFragmentContainer(
-  function(props: Props) {
+  (props: Props) => {
+    const searchParams = stripEmptyProps(props.searchParams);
+    const editDelta = stripEmptyProps(props.editDelta);
     const defaultSearchParams = {
       countryNameContains: "",
       populationGte: props.searchMetadata.populationLowerBound,
       populationLte: props.searchMetadata.populationUpperBound,
     };
-    
-    return null
+    const x = { ...defaultSearchParams, ...searchParams, ...editDelta };
+    const renderCallback = React.useContext(RenderCallbackContext)["SearchParameters"];
+    if (renderCallback) {
+      return renderCallback(props);
+    }
+    return (
+      <SearchParametersPresentational searchParams={x} searchMetadata={searchMetadata} />
+    );
   },
   {
     searchMetadata: graphql`
@@ -75,21 +76,16 @@ export const defaultData = {
   searchMetadata: {
     populationLowerBound: 1000,
     populationUpperBound: 1000000,
-  },
+  } as SearchParameters_searchMetadata,
   searchParams: {
     countryNameContains: "",
     populationGte: 1000,
     populationLte: 1000000,
-  },
+  } as SearchParameters_searchParams,
+  editDelta: null,
 };
 
-export default function({
-  environment,
-  render,
-}: {
-  environment: IEnvironment;
-  render: RenderCallbackType;
-}) {
+export default function(environment: IEnvironment) {
   return (
     <LoadingPlaceholderQueryRenderer<SearchParametersQuery>
       query={graphql`
@@ -124,7 +120,6 @@ export default function({
               searchParams={props.uiState?.citySearchParams || null}
               editDelta={props.uiState?.citySearchParamsEditDelta || null}
               environment={environment}
-              render={render}
             />
           )
         );
