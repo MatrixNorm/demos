@@ -7,7 +7,6 @@ import {
 } from "relay-runtime";
 
 export function retainRecord(query: GraphQLTaggedNode, environment: IEnvironment) {
-  console.log(query);
   const request = getRequest(query);
   const operationDescriptor = createOperationDescriptor(request, {});
   environment.retain(operationDescriptor);

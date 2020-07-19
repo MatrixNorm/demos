@@ -6,25 +6,15 @@ export type Compacted<T extends object> = Partial<NukeNulls<T>> & {
 };
 
 export function stripEmptyProps<T extends object>(
-  obj: T | null | undefined
+  obj: T | Partial<T> | null | undefined
 ): Compacted<T> {
   if (!obj) {
     return {} as Compacted<T>;
   }
-  let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
+  let compacted = Object.fromEntries(
+    Object.entries(obj).filter(([_, v]) => v !== null && v !== undefined)
+  );
   return compacted as Compacted<T>;
-}
-
-export function stripEmptyProps2<T extends object>(obj: T): Partial<NukeNulls<T>> {
-  let compacted = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v));
-  return compacted as Partial<NukeNulls<T>>;
-}
-
-export function merge<T extends NukeNulls<object>>(
-  target: Partial<T>,
-  delta: Partial<T>
-) {
-  let compactedDelta = stripEmptyProps(delta);
 }
 
 /**

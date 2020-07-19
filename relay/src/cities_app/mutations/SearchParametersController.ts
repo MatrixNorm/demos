@@ -27,21 +27,22 @@ type Effect =
   | { type: "writeSearchParams"; value: SearchParameters }
   | { type: "writeEditDelta"; value: SearchParameters };
 
-function lookupState(environment: IEnvironment): State {
-  const query = graphql`
-    query SearchParametersControllerQuery {
-      __typename
-      uiState {
-        citySearchParams {
-          ...SearchParameters_searchParams @relay(mask: false)
-        }
-        citySearchParamsEditDelta {
-          ...SearchParameters_editDelta @relay(mask: false)
-        }
+const QUERY = graphql`
+  query SearchParametersControllerQuery {
+    __typename
+    uiState {
+      citySearchParams {
+        ...SearchParameters_searchParams @relay(mask: false)
+      }
+      citySearchParamsEditDelta {
+        ...SearchParameters_editDelta @relay(mask: false)
       }
     }
-  `;
-  const operation = createOperationDescriptor(getRequest(query), {});
+  }
+`;
+
+function lookupState(environment: IEnvironment): State {
+  const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
   const data = response.data as SearchParametersControllerQueryResponse;
   return {
@@ -54,6 +55,9 @@ function reduce(state: State, event: Event): Effect[] {
   switch (event.type) {
     case "edit": {
       let editDelta = { ...state.editDelta, ...event.payload };
+      if (!editDelta.countryNameContains) {
+        delete editDelta["countryNameContains"];
+      }
       return [{ type: "writeEditDelta", value: editDelta }];
     }
     case "routeEnter": {
@@ -83,33 +87,21 @@ export function handleEvent(event: Event, environment: IEnvironment) {
 
 function writeEditDelta(delta: SearchParameters, environment: IEnvironment) {
   commitLocalUpdate(environment, (store) => {
-    store.delete(`${ROOT_ID}:uiState:citySearchParams`);
+    store.delete(`${ROOT_ID}:uiState:citySearchParamsEditDelta`);
   });
-  if (delta) {
+  if (Object.keys(delta).length > 0) {
     commitLocalUpdate(environment, (store) => {
       const record = store
         .get(ROOT_ID)
         ?.getOrCreateLinkedRecord("uiState", "UIState")
-        ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
+        ?.getOrCreateLinkedRecord("citySearchParamsEditDelta", "UICitySearchParams");
       if (record) {
         for (let key in delta) {
           record.setValue(delta[key as keyof SearchParameters], key);
         }
       }
     });
-    retainRecord(
-      graphql`
-        query SearchParametersControllerRetainQuery {
-          __typename
-          uiState {
-            citySearchParams {
-              ...SearchParameters_searchParams
-            }
-          }
-        }
-      `,
-      environment
-    );
+    retainRecord(QUERY, environment);
   }
 }
 
@@ -117,31 +109,19 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
   commitLocalUpdate(environment, (store) => {
     store.delete(`${ROOT_ID}:uiState:citySearchParams`);
   });
-  if (searchParams) {
+  if (Object.keys(searchParams).length > 0) {
     commitLocalUpdate(environment, (store) => {
-      const searchParamsRecord = store
+      const record = store
         .get(ROOT_ID)
         ?.getOrCreateLinkedRecord("uiState", "UIState")
         ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
-      if (searchParamsRecord) {
+      if (record) {
         for (let key in searchParams) {
-          searchParamsRecord.setValue(searchParams[key as keyof SearchParameters], key);
+          record.setValue(searchParams[key as keyof SearchParameters], key);
         }
       }
     });
-    retainRecord(
-      graphql`
-        query SearchParametersControllerSearchParametersRetainQuery {
-          __typename
-          uiState {
-            citySearchParams {
-              ...SearchParameters_searchParams
-            }
-          }
-        }
-      `,
-      environment
-    );
+    retainRecord(QUERY, environment);
   }
 }
 

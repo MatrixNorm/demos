@@ -5,17 +5,15 @@ import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import * as SPController from "../mutations/SearchParametersController";
-import { SearchParametersPresentational } from "./SearchParametersPresentational";
+import {
+  SearchParametersPresentational,
+  SearchParametersType,
+} from "./SearchParametersPresentational";
 import { toQueryURL, stripEmptyProps } from "../helpers/object";
-import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
-
-export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
-export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
-export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 type Props = {
   searchMetadata: SearchParameters_searchMetadata;
@@ -27,8 +25,9 @@ type Props = {
 const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
     const { url } = useRouteMatch();
-    const searchParams = stripEmptyProps(props.searchParams);
-    const editDelta = stripEmptyProps(props.editDelta);
+
+    const searchParamsCompacted = stripEmptyProps(props.searchParams);
+    const editDeltaCompacted = stripEmptyProps(props.editDelta);
 
     const defaultSearchParams = {
       countryNameContains: "",
@@ -44,10 +43,17 @@ const SearchParametersFC = createFragmentContainer(
     }
 
     const args = {
-      searchParams: { ...defaultSearchParams, ...searchParams, ...editDelta },
+      searchParams: {
+        ...defaultSearchParams,
+        ...searchParamsCompacted,
+        ...editDeltaCompacted,
+      },
       searchMetadata: props.searchMetadata,
       onEdit,
-      url: `${url}?${toQueryURL(editDelta)}`,
+      url:
+        Object.keys(editDeltaCompacted).length > 0
+          ? `${url}?${toQueryURL({ ...searchParamsCompacted, ...editDeltaCompacted })}`
+          : null,
     };
 
     const renderCallback = React.useContext(RenderCallbackContext)["SearchParameters"];
@@ -121,16 +127,16 @@ export default function({ environment }: { environment: IEnvironment }) {
         },
       }}
       render={({ props }) => {
+        if (!props.citiesMetadata) {
+          throw Error("No search metadata");
+        }
         return (
-          props &&
-          props.citiesMetadata && (
-            <SearchParametersFC
-              searchMetadata={props.citiesMetadata}
-              searchParams={props.uiState?.citySearchParams || null}
-              editDelta={props.uiState?.citySearchParamsEditDelta || null}
-              environment={environment}
-            />
-          )
+          <SearchParametersFC
+            searchMetadata={props.citiesMetadata}
+            searchParams={props.uiState?.citySearchParams || null}
+            editDelta={props.uiState?.citySearchParamsEditDelta || null}
+            environment={environment}
+          />
         );
       }}
     />

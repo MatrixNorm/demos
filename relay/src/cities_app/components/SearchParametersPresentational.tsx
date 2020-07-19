@@ -9,6 +9,10 @@ import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
+export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
+export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
+export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
+
 const SearchParametersBlock = styled.div`
   .submit-button-box {
     display: flex;
@@ -46,10 +50,6 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
   }
 `;
 
-export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
-export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
-export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
-
 export type Props = {
   onEdit: (delta: Partial<SearchParametersType>) => void;
   searchParams: SearchParametersNonNullType;
@@ -58,7 +58,6 @@ export type Props = {
 };
 
 export function SearchParametersPresentational(props: Props) {
-  console.log({ props });
   let isLoading = React.useContext(LoadingContext);
   let { searchParams, url, searchMetadata, onEdit } = props;
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;

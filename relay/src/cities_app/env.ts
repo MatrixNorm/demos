@@ -104,6 +104,7 @@ export const returnAsyncPayloadEnvironment = (
   const network = Network.create(async () => {
     await new Promise((resolve) => setTimeout(resolve, timeout || 1000));
     const { value } = payloadGen.next();
+    console.log(value)
     const resp = { data: value };
     return resp;
   });

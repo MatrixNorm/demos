@@ -1,81 +1,25 @@
 import * as React from "react";
-import styled from "styled-components";
-import { LocalQueryRenderer, graphql } from "react-relay";
+// @ts-ignore
+import StoryRouter from "storybook-react-router";
 import {
   createTestingEnv,
   loadingForeverEnvironment,
   createRelayEnvironment,
   returnAsyncPayloadEnvironment,
 } from "../env";
-import { SearchParametersPresentational } from "../components/SearchParametersPresentational";
-import SearchParameters, { EventType } from "../components/SearchParameters";
-import LoadingContext from "../verysmart/LoadingContext";
+import SearchParameters from "../components/SearchParameters";
 
-export default { title: "cities_app-demo1/SearchParameters" };
-
-// https://github.com/facebook/relay/issues/2394
-const mockRefType: any = null;
-
-const Box = styled.div`
-  display: flex;
-  width: 200px;
-  min-height: 200px;
-`;
-
-export const Presentational = () => {
-  const searchParams = {
-    countryNameContains: "braz",
-    populationGte: 2000000,
-    populationLte: 6000000,
-    " $refType": mockRefType,
-  };
-  const searchMetadata = {
-    populationLowerBound: 80000,
-    populationUpperBound: 9000000,
-    " $refType": mockRefType,
-  };
-  const dispatch = ([eventType, payload]: EventType) => {
-    console.log(eventType, payload);
-  };
-
-  return (
-    <SearchParametersPresentational
-      searchParams={searchParams}
-      searchMetadata={searchMetadata}
-      dispatch={dispatch}
-      showApplyButton={true}
-    />
-  );
+export default {
+  title: "cities_app-demo1/SearchParameters",
+  decorators: [
+    (storyFn: unknown) => {
+      let router = StoryRouter();
+      return router(storyFn);
+    },
+  ],
 };
 
-export const PresentationalLoadinfPlaceholder = () => {
-  const searchParams = {
-    countryNameContains: "braz",
-    populationGte: 2000000,
-    populationLte: 6000000,
-    " $refType": mockRefType,
-  };
-  const searchMetadata = {
-    populationLowerBound: 80000,
-    populationUpperBound: 9000000,
-    " $refType": mockRefType,
-  };
-  const dispatch = ([eventType, payload]: EventType) => {
-    console.log(eventType, payload);
-  };
-  return (
-    <LoadingContext.Provider value={true}>
-      <SearchParametersPresentational
-        searchParams={searchParams}
-        searchMetadata={searchMetadata}
-        dispatch={dispatch}
-        showApplyButton={false}
-      />
-    </LoadingContext.Provider>
-  );
-};
-
-export const success = () => {
+export const loaded = () => {
   const environment = createTestingEnv({
     Query: {
       citiesMetadata: () => {
@@ -89,46 +33,12 @@ export const success = () => {
       __resolveType() {},
     },
   });
-  return (
-    <div>
-      <Box>
-        <SearchParameters
-          environment={environment}
-          render={(args) => {
-            return <SearchParametersPresentational {...args} />;
-          }}
-        />
-      </Box>
-      <br />
-      <LocalQueryRenderer
-        query={graphql`
-          query SearchParametersStoryUiQuery {
-            __typename
-            uiState {
-              citySearchParams {
-                countryNameContains
-                populationGte
-                populationLte
-              }
-            }
-          }
-        `}
-        environment={environment}
-        variables={{}}
-        render={({ props }: { props: any }) => {
-          return (
-            props && (
-              <div>
-                {props.uiState
-                  ? JSON.stringify(props.uiState.citySearchParams)
-                  : JSON.stringify({})}
-              </div>
-            )
-          );
-        }}
-      />
-    </div>
-  );
+  return <SearchParameters environment={environment} />;
+};
+
+export const loading = () => {
+  const environment = loadingForeverEnvironment();
+  return <SearchParameters environment={environment} />;
 };
 
 export const noServerData = () => {
@@ -143,16 +53,7 @@ export const noServerData = () => {
       },
     };
   }, 1000);
-  return (
-    <Box>
-      <SearchParameters
-        environment={environment}
-        render={(args) => {
-          return <SearchParametersPresentational {...args} />;
-        }}
-      />
-    </Box>
-  );
+  return <SearchParameters environment={environment} />;
 };
 
 export const serverError = () => {
@@ -166,42 +67,10 @@ export const serverError = () => {
       __resolveType() {},
     },
   });
-  return (
-    <Box>
-      <SearchParameters
-        environment={environment}
-        render={(args) => {
-          return <SearchParametersPresentational {...args} />;
-        }}
-      />
-    </Box>
-  );
-};
-
-export const loading = () => {
-  const environment = loadingForeverEnvironment();
-  return (
-    <Box>
-      <SearchParameters
-        environment={environment}
-        render={(args) => {
-          return <SearchParametersPresentational {...args} />;
-        }}
-      />
-    </Box>
-  );
+  return <SearchParameters environment={environment} />;
 };
 
 export const full = () => {
   const environment = createRelayEnvironment({ timeout: 1000 });
-  return (
-    <Box>
-      <SearchParameters
-        environment={environment}
-        render={(args) => {
-          return <SearchParametersPresentational {...args} />;
-        }}
-      />
-    </Box>
-  );
+  return <SearchParameters environment={environment} />;
 };
