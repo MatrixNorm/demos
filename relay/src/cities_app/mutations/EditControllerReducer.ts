@@ -1,103 +1,31 @@
-import { trueDelta } from "../helpers/object";
+import { trueDelta, Compacted } from "../helpers/object";
+
+type State<T extends object> =
+  | {
+      status: "idle";
+      value: T;
+      rollback: null;
+      editDelta: Compacted<T>;
+    }
+  | { status: "inFlight"; value: T; rollback: T; editDelta: Compacted<T> }
+  | { status: "hasQueued"; value: T; rollback: T; editDelta: Compacted<T> };
 
 export type Event<T extends object> =
   | EvEdit<T>
-  | EvSubmit
-  | EvClear
-  | EvResolve
-  | EvReject;
+  | EvClearEdit
+  | EvSubmitMutation
+  | EvDoneOkMutation
+  | EvDoneErrMutation;
 
-type EvEdit<T> = {
+type EvEdit<T extends object> = {
   type: "edit";
-  payload: Partial<T>;
+  payload: Compacted<T>;
 };
-type EvSubmit = { type: "submit" };
-type EvClear = { type: "clear" };
-type EvResolve = { type: "resolve" };
-type EvReject = { type: "reject" };
-
-export type State<T extends object> = StateIdle<T> | StateActive<T>;
-
-type StateIdle<T> = { sv: T; od: null; ed: Partial<T> | null };
-type StateActive<T> = { sv: T; od: Partial<T>; ed: Partial<T> | null };
+type EvClearEdit = { type: "clearEdit" };
+type EvSubmitMutation = { type: "submitMutation" };
+type EvDoneOkMutation = { type: "doneOkMutation" };
+type EvDoneErrMutation = { type: "doneErr<utation" };
 
 export type ReturnType<T extends object> =
   | State<T>
-  | [State<T>, { type: "commitMutation"; mutInput: Partial<T> }];
-
-export function reduce<T extends object>(
-  state: State<T>,
-  event: Event<T>
-): ReturnType<T> {
-  if (state.od === null) {
-    return reduceIdle(event, state);
-  }
-  return reduceActive(event, state);
-}
-
-function reduceIdle<T extends object>(
-  event: Event<T>,
-  state: StateIdle<T>
-): ReturnType<T> {
-  const { sv, ed } = state;
-  switch (event.type) {
-    case "clear": {
-      return { ...state, ed: null };
-    }
-    case "edit": {
-      return { ...state, ed: trueDelta({ ...ed, ...event.payload }, sv) };
-    }
-    case "submit": {
-      let mutInput = trueDelta(ed, sv);
-      if (mutInput) {
-        return [
-          { ...state, od: mutInput, ed: null },
-          { type: "commitMutation", mutInput },
-        ];
-      }
-      return { ...state, ed: null };
-    }
-    default:
-      return state;
-  }
-}
-
-function reduceActive<T extends object>(
-  event: Event<T>,
-  state: StateActive<T>
-): ReturnType<T> {
-  const { sv, ed, od } = state;
-  switch (event.type) {
-    case "clear": {
-      return { ...state, ed: null };
-    }
-    case "edit": {
-      return {
-        ...state,
-        ed: trueDelta({ ...ed, ...event.payload }, { ...sv, ...od }),
-      };
-    }
-    case "submit": {
-      let mutInput = trueDelta(ed, { ...sv, ...od });
-      if (mutInput) {
-        return { ...state, od: { ...od, ...mutInput }, ed: null };
-      }
-      return { ...state, ed: null };
-    }
-    case "resolve": {
-      let mutInput = trueDelta(od, sv);
-      if (mutInput) {
-        return [
-          { ...state, od: mutInput },
-          { type: "commitMutation", mutInput },
-        ];
-      }
-      return { ...state, od: null };
-    }
-    case "reject": {
-      return { ...state, od: null, ed: { ...od, ...ed } };
-    }
-    default:
-      return state;
-  }
-}
+  | [State<T>, { type: "commitMutation"; mutInput: Compacted<T> }];
