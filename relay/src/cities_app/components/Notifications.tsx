@@ -1,18 +1,10 @@
 import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
-import {
-  commitLocalUpdate,
-  IEnvironment,
-  getRequest,
-  createOperationDescriptor,
-  ROOT_ID,
-} from "relay-runtime";
 import styled from "styled-components";
-import { uuidGen } from "../helpers/uuid";
+import * as NC from "../mutations/NotificationsController";
 import { CloseCrossIcon } from "../elements/Icons";
 import { Notifications_notification } from "__relay__/Notifications_notification.graphql";
 import { Notifications_state } from "__relay__/Notifications_state.graphql";
-import { NukeFragRef } from "../helpers/typeUtils";
 
 const NotificationStyled = styled.div`
   display: inline-flex;
@@ -42,7 +34,7 @@ const Notification_ = ({
     <NotificationStyled>
       <CloseCrossIcon
         className="button-close"
-        onClick={() => remNotification(id, relay.environment)}
+        onClick={() => NC.remNotification(id, relay.environment)}
       />
       <div className="text">{text}</div>
     </NotificationStyled>
@@ -92,76 +84,3 @@ export const Notifications = createFragmentContainer(Notifications_, {
     }
   `,
 });
-
-type NotificationDataType = Omit<NukeFragRef<Notifications_notification>, "id">;
-const uuid = uuidGen("client:UINotification");
-
-export const addNotification = (
-  notification: NotificationDataType,
-  environment: IEnvironment
-): string => {
-  const notificationId = uuid();
-  commitLocalUpdate(environment, (store) => {
-    const root = store.get(ROOT_ID);
-    if (!root) return;
-    const newNotificationRecord = store.create(
-      notificationId,
-      "UINotification"
-    );
-    newNotificationRecord.setValue(notificationId, "id");
-    newNotificationRecord.setValue(notification.kind, "kind");
-    newNotificationRecord.setValue(notification.text, "text");
-
-    const uiStateRecord = root.getOrCreateLinkedRecord("uiState", "UIState");
-    const notificationRecords =
-      uiStateRecord.getLinkedRecords("notifications") || [];
-    uiStateRecord.setLinkedRecords(
-      [newNotificationRecord, ...notificationRecords],
-      "notifications"
-    );
-    // if (notificationRecords) {
-    //   uiStateRecord.setLinkedRecords(
-    //     [newNotificationRecord, ...notificationRecords],
-    //     "notifications"
-    //   );
-    // } else {
-    //   uiStateRecord.setLinkedRecords([newNotificationRecord], "notifications");
-    // }
-
-    const query = graphql`
-      query NotificationsUiRetainQuery {
-        __typename
-        uiState {
-          notifications {
-            id
-            kind
-            text
-          }
-        }
-      }
-    `;
-    const request = getRequest(query);
-    const operationDescriptor = createOperationDescriptor(request, {});
-    environment.retain(operationDescriptor);
-  });
-  return notificationId;
-};
-
-export const remNotification = (
-  notificationId: string,
-  environment: IEnvironment
-) => {
-  commitLocalUpdate(environment, (store) => {
-    const root = store.get(ROOT_ID);
-    if (!root) return;
-    store.delete(notificationId);
-    const uiStateRecord = root.getLinkedRecord("uiState");
-    if (!uiStateRecord) return;
-    const notificationRecords = uiStateRecord.getLinkedRecords("notifications");
-    if (!notificationRecords) return;
-    const notificationRecords2 = notificationRecords.filter(
-      (rp) => rp !== null
-    );
-    uiStateRecord.setLinkedRecords(notificationRecords2, "notifications");
-  });
-};
