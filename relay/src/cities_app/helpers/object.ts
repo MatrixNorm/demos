@@ -25,6 +25,12 @@ export function compactObject<T extends object>(
   return compacted as Compacted<T>;
 }
 
+/**
+ * delta = {x:1, y:2}
+ * basis = {x:7, y:2, z:9}
+ * trueDelta({delta, basis}) === {x:1}
+ *
+ */
 export function trueDelta<T extends object>({
   delta,
   basis,
@@ -46,6 +52,16 @@ export function trueDelta<T extends object>({
   return null;
 }
 
+/**
+ * delta = {x:1, y:2}
+ * basis = {x:7, y:2, z:9}
+ * isTrueDelta({delta, basis}) === true
+ *
+ * delta = {x:1, y:2}
+ * basis = {x:1, y:2, z:9}
+ * isTrueDelta({delta, basis}) === false
+ *
+ */
 export function isTrueDelta<T extends object>({
   delta,
   basis,
@@ -59,6 +75,23 @@ export function isTrueDelta<T extends object>({
     if (basis[key] !== delta[key]) return true;
   }
   return false;
+}
+
+/**
+ * objects shallow equality test
+ *
+ */
+export function shallowEqual<T extends object>(
+  x: T | Partial<T>,
+  y: T | Partial<T>
+): boolean {
+  for (let key in x) {
+    if (x[key] !== y[key]) return false;
+  }
+  for (let key in y) {
+    if (x[key] !== y[key]) return false;
+  }
+  return true;
 }
 
 export function toQueryURL<T extends object>(obj: T) {
