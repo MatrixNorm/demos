@@ -1,4 +1,4 @@
-import { shallowEqual, trueDelta, compactObject, Compacted } from "../helpers/object";
+import { compact, merge, shallowEqual, trueDelta, Compacted } from "../helpers/object";
 
 type State<T extends object> = StateIdle<T> | StateInFlight<T> | StateHasQueued<T>;
 
@@ -70,14 +70,14 @@ function reduceIdle<T extends object>(
       return {
         ...state,
         editDelta: trueDelta({
-          delta: { ...state.editDelta, ...event.payload },
+          delta: merge(state.editDelta, event.payload),
           basis: state.value,
         }),
       };
     }
     case "submitMutation": {
       const mutInput = trueDelta({ delta: state.editDelta, basis: state.value });
-      const optimisticValue = { ...state.value, ...state.editDelta };
+      const optimisticValue = merge(state.value, state.editDelta);
       if (mutInput) {
         return {
           state: {

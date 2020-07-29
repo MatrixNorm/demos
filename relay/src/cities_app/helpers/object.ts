@@ -2,10 +2,8 @@
  * opaque type to guarantee there is no `undefined` values in an object
  */
 
-declare const __compacted__: unique symbol;
-export type Compacted<T extends object> = Partial<T> & {
-  [__compacted__]: true;
-};
+type __Compacted__ = "__Compacted__";
+export type Compacted<T extends object> = Partial<T> & __Compacted__;
 
 /**
  * value of `undefined` is treated as absent key
@@ -13,8 +11,8 @@ export type Compacted<T extends object> = Partial<T> & {
  * how to treat value of `null` is upto consuming application,
  *
  */
-export function compactObject<T extends object>(
-  obj: T | Partial<T> | null | undefined
+export function compact<T extends object>(
+  obj: Partial<T> | null | undefined
 ): Compacted<T> {
   if (!obj) {
     return {} as Compacted<T>;
@@ -22,7 +20,21 @@ export function compactObject<T extends object>(
   let compacted = Object.fromEntries(
     Object.entries(obj).filter(([_, v]) => v !== undefined)
   );
+  // @ts-ignore
   return compacted as Compacted<T>;
+}
+
+export function merge<T extends object>(
+  left: Compacted<T> | null,
+  right: Compacted<T> | null
+): Compacted<T>;
+export function merge<T extends object>(
+  left: Partial<T> | null,
+  right: Compacted<T> | null
+): Partial<T>;
+export function merge(left: any, right: any): any {
+  // @ts-ignore
+  return { ...left, ...right };
 }
 
 /**
