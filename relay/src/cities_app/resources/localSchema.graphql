@@ -7,7 +7,7 @@ type UIState {
   citySearchParamsEditDelta: UICitySearchParams
   notifications: [UINotification!]
   userSettingsEditDelta: UIUserSettingsDelta
-  userSettingsOptimisticDelta: UIUserSettingsDelta
+  userSettingsRollbackValue: UserSettings
 }
 
 type UICitySearchParams {

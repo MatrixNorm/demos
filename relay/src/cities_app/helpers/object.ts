@@ -12,7 +12,7 @@ export type Compacted<T extends object> = Partial<T> & __Compacted__;
  *
  */
 export function compact<T extends object>(
-  obj: Partial<T> | null | undefined
+  obj: T | Partial<T> | null | undefined
 ): Compacted<T> {
   if (!obj) {
     return {} as Compacted<T>;
@@ -28,6 +28,7 @@ export function merge<T extends object>(
   left: Compacted<T> | null,
   right: Compacted<T> | null
 ): Compacted<T>;
+export function merge<T extends object>(left: T, right: Compacted<T> | null): T;
 export function merge<T extends object>(
   left: Partial<T> | null,
   right: Compacted<T> | null

@@ -9,7 +9,7 @@ import {
 import { reduce, Event as EventType } from "./EditControllerReducer";
 import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { retainRecord } from "../helpers/relayStore";
-import { stripEmptyProps } from "../helpers/object";
+import { compact, Compacted } from "../helpers/object";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettingsUpdateControllerQueryResponse } from "__relay__/UserSettingsUpdateControllerQuery.graphql";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";

@@ -1,4 +1,4 @@
-import { compact, merge, shallowEqual, trueDelta, Compacted } from "../helpers/object";
+import { compact, merge, trueDelta, Compacted } from "../helpers/object";
 
 type State<T extends object> = StateIdle<T> | StateInFlight<T> | StateHasQueued<T>;
 
@@ -47,7 +47,10 @@ type Effect<T extends object> =
   | { type: "commitMutation"; mutInput: Compacted<T> }
   | { type: "mutationFail" };
 
-function reduce<T extends object>(state: State<T>, event: Event<T>): ReducerReturn<T> {
+export function reduce<T extends object>(
+  state: State<T>,
+  event: Event<T>
+): ReducerReturn<T> {
   switch (state.status) {
     case "idle": {
       return reduceIdle(state, event);
@@ -56,7 +59,7 @@ function reduce<T extends object>(state: State<T>, event: Event<T>): ReducerRetu
       return reduceInFlight(state, event);
     }
     case "hasQueued": {
-      return null;
+      return reduceHasQueued(state, event);
     }
   }
 }
@@ -105,7 +108,7 @@ function reduceInFlight<T extends object>(
       return {
         ...state,
         editDelta: trueDelta({
-          delta: { ...state.editDelta, ...event.payload },
+          delta: merge(state.editDelta, event.payload),
           basis: state.value,
         }),
       };
@@ -125,7 +128,7 @@ function reduceInFlight<T extends object>(
           value: state.rollback,
           rollback: null,
           editDelta: trueDelta({
-            delta: { ...state.value, ...state.editDelta },
+            delta: compact(merge(state.value, state.editDelta)),
             basis: state.rollback,
           }),
         },
@@ -134,7 +137,7 @@ function reduceInFlight<T extends object>(
     }
     case "submitMutation": {
       const mutInput = trueDelta({ delta: state.editDelta, basis: state.value });
-      const optimisticValue = { ...state.value, ...state.editDelta };
+      const optimisticValue = merge(state.value, state.editDelta);
       if (mutInput) {
         return {
           ...state,
@@ -160,14 +163,14 @@ function reduceHasQueued<T extends object>(
       return {
         ...state,
         editDelta: trueDelta({
-          delta: { ...state.editDelta, ...event.payload },
+          delta: merge(state.editDelta, event.payload),
           basis: state.value,
         }),
       };
     }
     case "doneOkMutation": {
       const mutInput = trueDelta({
-        delta: compactObject(state.queued),
+        delta: compact(state.queued),
         basis: state.value,
       });
       if (mutInput) {
@@ -189,14 +192,14 @@ function reduceHasQueued<T extends object>(
       };
     }
     case "doneErrMutation": {
-      let x = { ...state.queued, ...state.editDelta };
+      let x = merge(state.queued, state.editDelta);
       return {
         state: {
           status: "idle",
           value: state.rollback,
           rollback: null,
           editDelta: trueDelta({
-            delta: { ...state.queued, ...state.editDelta },
+            delta: compact(merge(state.queued, state.editDelta)),
             basis: state.rollback,
           }),
         },
@@ -205,7 +208,7 @@ function reduceHasQueued<T extends object>(
     }
     case "submitMutation": {
       const mutInput = trueDelta({ delta: state.editDelta, basis: state.value });
-      const optimisticValue = { ...state.value, ...state.editDelta };
+      const optimisticValue = merge(state.value, state.editDelta);
       if (mutInput) {
         return {
           ...state,
