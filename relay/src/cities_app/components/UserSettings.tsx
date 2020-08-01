@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
 import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
-import { isTrueDelta, compact, merge } from "../helpers/object";
+import { isTrueDelta, compact, merge, purgeNulls } from "../helpers/object";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
@@ -33,6 +33,7 @@ export const UserSettingsSuccess = styled.div`
     text-align: center;
   }
 `;
+
 export const UserSettingsLoading = styled(UserSettingsSuccess)`
   ${placeholderCssMixin}
 `;
@@ -71,56 +72,64 @@ function SectionComponent({
 }
 
 type Props = {
-  settings: NukeFragRef<UserSettings_settings>;
+  settings: UserSettings_settings;
   editDelta: UserSettings_editDelta | null;
-  optimisticDelta: NukeFragRef<UserSettings_optimisticDelta> | null;
+  optimisticDelta: UserSettings_optimisticDelta | null;
   relay: RelayProp;
 };
 
 export default createFragmentContainer(
-  ({ settings, editDelta, optimisticDelta, relay }: Props) => {
+  (props: Props) => {
+    const { settings, editDelta, optimisticDelta } = props as NukeFragRef<Props>;
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
 
-    const editDeltaCompacted = compact(editDelta);
-    const optimisticDeltaCompacted = compact(optimisticDelta);
+    const editDeltaCompacted = purgeNulls(compact(editDelta));
+    const optimisticDeltaCompacted = purgeNulls(compact(optimisticDelta));
     const optValue = merge(settings, optimisticDeltaCompacted);
+    const finalValue = merge(optValue, editDeltaCompacted);
 
-    function xxx(name: keyof NukeFragRef<UserSettings_settings>) {
-      let value = (editDelta || {})[name] || optValue[name];
+    function sectionData(name: keyof NukeFragRef<UserSettings_settings>) {
+      let value = finalValue[name];
       return {
         value,
-        isEdited: value != optValue[name],
+        isEdited: value !== optValue[name],
         name,
         onChange: (val: any) => {
           UserSettingsUpdateController.handleEvent(
             { type: "edit", payload: compact({ [name]: val }) },
-            relay.environment
+            props.relay.environment
           );
         },
       };
     }
 
     function onSubmit() {
-      UserSettingsUpdateController.handleEvent({ type: "submit" }, relay.environment);
+      UserSettingsUpdateController.handleEvent(
+        { type: "submit" },
+        props.relay.environment
+      );
     }
 
     function onClear() {
-      UserSettingsUpdateController.handleEvent({ type: "clear" }, relay.environment);
+      UserSettingsUpdateController.handleEvent(
+        { type: "clear" },
+        props.relay.environment
+      );
     }
 
     return (
       <UserSettings>
         <SectionComponent
-          {...xxx("citiesPaginationPageSize")}
+          {...sectionData("citiesPaginationPageSize")}
           label="Pagination Page Size"
         >
           <NumberInput step="1" />
         </SectionComponent>
-        <SectionComponent {...xxx("foo")} label="Foo parameter">
+        <SectionComponent {...sectionData("foo")} label="Foo parameter">
           <TextInput />
         </SectionComponent>
-        <SectionComponent {...xxx("bar")} label="Bar parameter">
+        <SectionComponent {...sectionData("bar")} label="Bar parameter">
           <NumberInput step="1" />
         </SectionComponent>
         <div className="button-box">
@@ -166,6 +175,7 @@ export default createFragmentContainer(
   }
 );
 
+// XXX generate by compiler
 export const defaultData = {
   settings: {
     citiesPaginationPageSize: 5,

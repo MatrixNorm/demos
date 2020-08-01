@@ -38,6 +38,7 @@ function reduceIdle<T extends object>(
   event: Event<T>,
   state: StateIdle<T>
 ): ReturnType<T> {
+  console.log({ state });
   const { sv, ed } = state;
   switch (event.type) {
     case "clear": {

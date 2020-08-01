@@ -22,8 +22,8 @@ function lookupState(
 ): {
   userId: string | null;
   sv: UserSettings | null;
-  ed: Compacted<UserSettings>;
-  od: Compacted<UserSettings>;
+  ed: Compacted<UserSettings> | null;
+  od: Compacted<UserSettings> | null;
 } {
   const query = graphql`
     query UserSettingsUpdateControllerQuery {
@@ -46,18 +46,19 @@ function lookupState(
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
   const data = response.data as UserSettingsUpdateControllerQueryResponse;
-  let x = compact(data?.uiState?.userSettingsEditDelta || null);
+  const ed = purgeNulls(compact(data?.uiState?.userSettingsEditDelta || null));
+  const od = purgeNulls(compact(data?.uiState?.userSettingsOptimisticDelta || null));
   return {
     userId: data?.viewer?.id || null,
     sv: data?.viewer?.settings || null,
-    ed: purgeNulls(compact(data?.uiState?.userSettingsEditDelta || null)),
-    od: purgeNulls(compact(data?.uiState?.userSettingsOptimisticDelta || null)),
+    ed: Object.keys(ed).length > 0 ? ed : null,
+    od: Object.keys(od).length > 0 ? od : null,
   };
 }
 
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let { userId, sv, ed, od } = lookupState(environment);
-  //console.log({ userId, sv, ed, od, event });
+  console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
   let ret = reduce({ sv, ed, od }, event);
   //console.log(JSON.stringify(ret));

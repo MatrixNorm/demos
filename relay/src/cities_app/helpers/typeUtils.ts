@@ -1,4 +1,8 @@
-export type NukeFragRef<T> = Omit<T, " $refType">;
+export type NukeFragRef<T> = T extends object
+  ? {
+      [P in Exclude<keyof T, " $fragmentRefs" | " $refType">]: NukeFragRef<T[P]>;
+    }
+  : T;
 
 export type NukeNulls<T> = {
   [P in keyof T]: NonNullable<T[P]>;
