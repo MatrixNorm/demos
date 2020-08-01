@@ -9,21 +9,21 @@ import {
 import { reduce, Event as EventType } from "./EditControllerReducer";
 import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { retainRecord } from "../helpers/relayStore";
-import { stripEmptyProps } from "../helpers/object";
+import { compact, Compacted, purgeNulls } from "../helpers/object";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettingsUpdateControllerQueryResponse } from "__relay__/UserSettingsUpdateControllerQuery.graphql";
-import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
+import { NukeFragRef } from "../helpers/typeUtils";
+import UserSettings from "../components/UserSettings";
 
 type UserSettings = NukeFragRef<UserSettings_settings>;
-type UserSettingsDelta = NukeNulls<Partial<UserSettings>> | null;
 
 function lookupState(
   environment: IEnvironment
 ): {
   userId: string | null;
   sv: UserSettings | null;
-  ed: UserSettingsDelta;
-  od: UserSettingsDelta;
+  ed: Compacted<UserSettings>;
+  od: Compacted<UserSettings>;
 } {
   const query = graphql`
     query UserSettingsUpdateControllerQuery {
@@ -46,11 +46,12 @@ function lookupState(
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
   const data = response.data as UserSettingsUpdateControllerQueryResponse;
+  let x = compact(data?.uiState?.userSettingsEditDelta || null);
   return {
     userId: data?.viewer?.id || null,
     sv: data?.viewer?.settings || null,
-    ed: stripEmptyProps(data?.uiState?.userSettingsEditDelta || null),
-    od: stripEmptyProps(data?.uiState?.userSettingsOptimisticDelta || null),
+    ed: purgeNulls(compact(data?.uiState?.userSettingsEditDelta || null)),
+    od: purgeNulls(compact(data?.uiState?.userSettingsOptimisticDelta || null)),
   };
 }
 
@@ -71,7 +72,10 @@ export function handleEvent(event: EventType<UserSettings>, environment: IEnviro
   }
 }
 
-function writeEditDelta(editDelta: UserSettingsDelta, environment: IEnvironment) {
+function writeEditDelta(
+  editDelta: Compacted<UserSettings> | null,
+  environment: IEnvironment
+) {
   commitLocalUpdate(environment, (store) => {
     store.delete(`${ROOT_ID}:uiState:userSettingsEditDelta`);
   });
@@ -83,7 +87,7 @@ function writeEditDelta(editDelta: UserSettingsDelta, environment: IEnvironment)
         ?.getOrCreateLinkedRecord("userSettingsEditDelta", "UIUserSettingsDelta");
       if (delta) {
         for (let key in editDelta) {
-          delta.setValue(editDelta[key as keyof UserSettingsDelta], key);
+          delta.setValue(editDelta[key as keyof UserSettings], key);
         }
       }
     });
@@ -104,7 +108,7 @@ function writeEditDelta(editDelta: UserSettingsDelta, environment: IEnvironment)
 }
 
 function writeOptimisticDelta(
-  optimisticDelta: UserSettingsDelta,
+  optimisticDelta: Compacted<UserSettings> | null,
   environment: IEnvironment
 ) {
   commitLocalUpdate(environment, (store) => {
@@ -118,7 +122,7 @@ function writeOptimisticDelta(
         ?.getOrCreateLinkedRecord("userSettingsOptimisticDelta", "UIUserSettingsDelta");
       if (delta) {
         for (let key in optimisticDelta) {
-          delta.setValue(optimisticDelta[key as keyof UserSettingsDelta], key);
+          delta.setValue(optimisticDelta[key as keyof UserSettings], key);
         }
       }
     });
@@ -141,11 +145,11 @@ function writeOptimisticDelta(
 function commitMutation(
   environment: IEnvironment,
   userId: string,
-  mutInput: Partial<UserSettings>
+  mutInput: Compacted<UserSettings>
 ) {
   UpdateUserSettingsMutation.commit({
     environment,
-    input: { ...mutInput, userId },
+    input: { ...(mutInput as UserSettings), userId },
     onFail: () => {
       handleEvent({ type: "reject" }, environment);
     },

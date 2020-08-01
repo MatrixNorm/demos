@@ -1,4 +1,4 @@
-import { trueDelta } from "../helpers/object";
+import { trueDelta, Compacted, merge } from "../helpers/object";
 
 export type Event<T extends object> =
   | EvEdit<T>
@@ -7,9 +7,9 @@ export type Event<T extends object> =
   | EvResolve
   | EvReject;
 
-type EvEdit<T> = {
+type EvEdit<T extends object> = {
   type: "edit";
-  payload: Partial<T>;
+  payload: Compacted<T>;
 };
 type EvSubmit = { type: "submit" };
 type EvClear = { type: "clear" };
@@ -17,13 +17,12 @@ type EvResolve = { type: "resolve" };
 type EvReject = { type: "reject" };
 
 export type State<T extends object> = StateIdle<T> | StateActive<T>;
-
-type StateIdle<T> = { sv: T; od: null; ed: Partial<T> | null };
-type StateActive<T> = { sv: T; od: Partial<T>; ed: Partial<T> | null };
+type StateIdle<T extends object> = { sv: T; od: null; ed: Compacted<T> | null };
+type StateActive<T extends object> = { sv: T; od: Compacted<T>; ed: Compacted<T> | null };
 
 export type ReturnType<T extends object> =
   | State<T>
-  | [State<T>, { type: "commitMutation"; mutInput: Partial<T> }];
+  | [State<T>, { type: "commitMutation"; mutInput: Compacted<T> }];
 
 export function reduce<T extends object>(
   state: State<T>,
@@ -45,10 +44,13 @@ function reduceIdle<T extends object>(
       return { ...state, ed: null };
     }
     case "edit": {
-      return { ...state, ed: trueDelta({ ...ed, ...event.payload }, sv) };
+      return {
+        ...state,
+        ed: trueDelta({ delta: merge(ed, event.payload), basis: sv }),
+      };
     }
     case "submit": {
-      let mutInput = trueDelta(ed, sv);
+      let mutInput = trueDelta({ delta: ed, basis: sv });
       if (mutInput) {
         return [
           { ...state, od: mutInput, ed: null },
@@ -74,18 +76,18 @@ function reduceActive<T extends object>(
     case "edit": {
       return {
         ...state,
-        ed: trueDelta({ ...ed, ...event.payload }, { ...sv, ...od }),
+        ed: trueDelta({ delta: merge(ed, event.payload), basis: merge(sv, od) }),
       };
     }
     case "submit": {
-      let mutInput = trueDelta(ed, { ...sv, ...od });
+      let mutInput = trueDelta({ delta: ed, basis: merge(sv, od) });
       if (mutInput) {
-        return { ...state, od: { ...od, ...mutInput }, ed: null };
+        return { ...state, od: merge(od, mutInput), ed: null };
       }
       return { ...state, ed: null };
     }
     case "resolve": {
-      let mutInput = trueDelta(od, sv);
+      let mutInput = trueDelta({ delta: od, basis: sv });
       if (mutInput) {
         return [
           { ...state, od: mutInput },
@@ -95,7 +97,7 @@ function reduceActive<T extends object>(
       return { ...state, od: null };
     }
     case "reject": {
-      return { ...state, od: null, ed: { ...od, ...ed } };
+      return { ...state, od: null, ed: merge(od, ed) };
     }
     default:
       return state;

@@ -4,10 +4,6 @@ import {
   UpdateUserSettingsInput,
   UpdateUserSettingsMutationResponse,
 } from "__relay__/UpdateUserSettingsMutation.graphql";
-import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
-import { NukeFragRef } from "../helpers/typeUtils";
-
-type UserSettings = NukeFragRef<UserSettings_settings>;
 
 const mutation = graphql`
   mutation UpdateUserSettingsMutation($input: UpdateUserSettingsInput!) {

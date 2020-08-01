@@ -40,7 +40,7 @@ export const addNotification = (
     // }
 
     const query = graphql`
-      query NotificationsUiRetainQuery {
+      query NotificationsControllerRetainQuery {
         __typename
         uiState {
           notifications {

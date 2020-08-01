@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
 import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
-import { isTrueDelta, stripEmptyProps } from "../helpers/object";
+import { isTrueDelta, compact, merge } from "../helpers/object";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
@@ -71,9 +71,9 @@ function SectionComponent({
 }
 
 type Props = {
-  settings: UserSettings_settings;
+  settings: NukeFragRef<UserSettings_settings>;
   editDelta: UserSettings_editDelta | null;
-  optimisticDelta: UserSettings_optimisticDelta | null;
+  optimisticDelta: NukeFragRef<UserSettings_optimisticDelta> | null;
   relay: RelayProp;
 };
 
@@ -81,7 +81,10 @@ export default createFragmentContainer(
   ({ settings, editDelta, optimisticDelta, relay }: Props) => {
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
-    const optValue = { ...settings, ...stripEmptyProps(optimisticDelta) };
+
+    const editDeltaCompacted = compact(editDelta);
+    const optimisticDeltaCompacted = compact(optimisticDelta);
+    const optValue = merge(settings, optimisticDeltaCompacted);
 
     function xxx(name: keyof NukeFragRef<UserSettings_settings>) {
       let value = (editDelta || {})[name] || optValue[name];
@@ -91,7 +94,7 @@ export default createFragmentContainer(
         name,
         onChange: (val: any) => {
           UserSettingsUpdateController.handleEvent(
-            { type: "edit", payload: { [name]: val } },
+            { type: "edit", payload: compact({ [name]: val }) },
             relay.environment
           );
         },
@@ -125,7 +128,11 @@ export default createFragmentContainer(
             <SubmitButton
               onClick={onSubmit}
               test-id="submit-button"
-              className={isTrueDelta(editDelta, optValue) ? "" : "disabled"}
+              className={
+                isTrueDelta({ delta: editDeltaCompacted, basis: optValue })
+                  ? ""
+                  : "disabled"
+              }
             >
               Sync
             </SubmitButton>
