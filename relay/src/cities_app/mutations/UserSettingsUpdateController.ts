@@ -58,7 +58,7 @@ function lookupState(
 
 export function handleEvent(event: EventType<UserSettings>, environment: IEnvironment) {
   let { userId, sv, ed, od } = lookupState(environment);
-  console.log({ userId, sv, ed, od, event });
+  //console.log({ userId, sv, ed, od, event });
   if (sv === null || userId === null) return;
   let ret = reduce({ sv, ed, od }, event);
   //console.log(JSON.stringify(ret));
