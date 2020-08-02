@@ -29,7 +29,9 @@ type Effect =
 
 const QUERY = graphql`
   query SearchParametersControllerQuery {
-    __typename
+    ... on Query {
+      __typename
+    }
     uiState {
       citySearchParams {
         ...SearchParameters_searchParams @relay(mask: false)

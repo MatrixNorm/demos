@@ -43,7 +43,9 @@ export default ({ environment }: { environment: IEnvironment }) => {
           <LocalQueryRenderer<CitiesBrowserUiQuery>
             query={graphql`
               query CitiesBrowserUiQuery {
-                __typename
+                ... on Query {
+                  __typename
+                }
                 uiState {
                   citySearchParams {
                     countryNameContains

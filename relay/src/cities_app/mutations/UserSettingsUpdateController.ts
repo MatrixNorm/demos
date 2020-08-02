@@ -95,7 +95,9 @@ function writeEditDelta(
     retainRecord(
       graphql`
         query UserSettingsUpdateControllerRetainEditDeltaQuery {
-          __typename
+          ... on Query {
+            __typename
+          }
           uiState {
             userSettingsEditDelta {
               ...UserSettings_editDelta
@@ -130,7 +132,9 @@ function writeOptimisticDelta(
     retainRecord(
       graphql`
         query UserSettingsUpdateControllerRetainOptimisticDeltaQuery {
-          __typename
+          ... on Query {
+            __typename
+          }
           uiState {
             userSettingsOptimisticDelta {
               ...UserSettings_optimisticDelta

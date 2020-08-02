@@ -81,6 +81,7 @@ type Props = {
 export default createFragmentContainer(
   (props: Props) => {
     const { settings, editDelta, optimisticDelta } = props as NukeFragRef<Props>;
+    console.log(settings, editDelta)
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
 

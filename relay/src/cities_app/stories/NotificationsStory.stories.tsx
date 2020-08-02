@@ -77,7 +77,9 @@ export const multiple = () => {
     <QueryRenderer<any>
       query={graphql`
         query NotificationsStoryManyQuery @relay_test_operation {
-          __typename
+          ... on Query {
+            __typename
+          }
           uiState {
             ...Notifications_state
           }
@@ -131,7 +133,9 @@ export const adding = () => {
     <QueryRenderer<any>
       query={graphql`
         query NotificationsStoryAddingQuery {
-          __typename
+          ... on Query {
+            __typename
+          }
           uiState {
             ...Notifications_state
           }
@@ -191,7 +195,9 @@ export const adding2 = () => {
     <QueryRenderer<any>
       query={graphql`
         query NotificationsStoryAdding2Query {
-          __typename
+          ... on Query {
+            __typename
+          }
           uiState {
             ...Notifications_state
           }

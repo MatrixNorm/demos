@@ -38,7 +38,9 @@ describe("add, retain, remove", () => {
     notificationId = addNotification({ kind: "INFO", text: "lalala" }, env);
     const query = graphql`
       query NotificationsTestAddRetainRemoveQuery {
-        __typename
+        ... on Query {
+          __typename
+        }
         uiState {
           notifications {
             id
@@ -90,6 +92,9 @@ describe("render single", () => {
       <QueryRenderer<any>
         query={graphql`
           query NotificationsTestRenderSingleQuery @relay_test_operation {
+            ... on Query {
+              __typename
+            }
             notification: node(id: "notification#1") {
               ...Notifications_notification
             }
@@ -100,9 +105,7 @@ describe("render single", () => {
         render={({ props }) => {
           return (
             props &&
-            props.notification && (
-              <Notification notification={props.notification} />
-            )
+            props.notification && <Notification notification={props.notification} />
           );
         }}
       />
@@ -131,7 +134,9 @@ describe("render many", () => {
       <QueryRenderer<any>
         query={graphql`
           query NotificationsTestRenderManyQuery @relay_test_operation {
-            __typename
+            ... on Query {
+              __typename
+            }
             uiState {
               ...Notifications_state
             }
@@ -140,9 +145,7 @@ describe("render many", () => {
         environment={env}
         variables={{}}
         render={({ props }) => {
-          return (
-            props && props.uiState && <Notifications state={props.uiState} />
-          );
+          return props && props.uiState && <Notifications state={props.uiState} />;
         }}
       />
     );
@@ -174,7 +177,7 @@ describe("render many", () => {
     });
     const ol = container.root.findByType("ol");
     expect(ol.children.length).toEqual(3);
-    console.log(ol)
+    console.log(ol);
     const store = env.getStore().getSource();
     const root = store.get(ROOT_ID);
     if (root) {
