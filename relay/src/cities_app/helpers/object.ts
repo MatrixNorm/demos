@@ -1,16 +1,15 @@
 import { NukeNulls } from "./typeUtils";
 
 /**
- * opaque type to guarantee there is no `undefined` values in an object
+ * opaque type to guarantee there is no `undefined`
+ * and `null` values in an object
  */
 
 type __Compacted__ = "__Compacted__";
-export type Compacted<T extends object> = Partial<T> & __Compacted__;
+export type Compacted<T extends object> = Partial<NukeNulls<T>> & __Compacted__;
 
 /**
- * value of `undefined` is treated as absent key
- *
- * how to treat value of `null` is upto consuming application,
+ * values of `undefined` and `null` are treated as absent value
  *
  */
 export function compact<T extends object>(
@@ -20,23 +19,20 @@ export function compact<T extends object>(
     return {} as Compacted<T>;
   }
   let compacted = Object.fromEntries(
-    Object.entries(obj).filter(([_, v]) => v !== undefined)
+    Object.entries(obj).filter(([_, v]) => v !== undefined && v !== null)
   );
   // @ts-ignore
   return compacted as Compacted<T>;
-}
-
-export function purgeNulls<T extends object>(obj: Compacted<T>): Compacted<NukeNulls<T>> {
-  let purged = Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== null));
-  // @ts-ignore
-  return purged as Compacted<NukeNulls<T>>;
 }
 
 export function merge<T extends object>(
   left: Compacted<T> | null,
   right: Compacted<T> | null
 ): Compacted<T>;
-export function merge<T extends object>(left: T, right: Compacted<T> | null): T;
+export function merge<T extends object>(
+  left: NukeNulls<T>,
+  right: Compacted<T> | null
+): NukeNulls<T>;
 export function merge<T extends object>(
   left: Partial<T> | null,
   right: Compacted<T> | null

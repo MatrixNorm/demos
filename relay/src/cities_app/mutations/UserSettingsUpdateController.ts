@@ -9,7 +9,7 @@ import {
 import { reduce, Event as EventType } from "./EditControllerReducer";
 import UpdateUserSettingsMutation from "./UpdateUserSettingsMutation";
 import { retainRecord } from "../helpers/relayStore";
-import { compact, Compacted, purgeNulls } from "../helpers/object";
+import { compact, Compacted } from "../helpers/object";
 import { UserSettings_settings } from "__relay__/UserSettings_settings.graphql";
 import { UserSettingsUpdateControllerQueryResponse } from "__relay__/UserSettingsUpdateControllerQuery.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
@@ -46,8 +46,8 @@ function lookupState(
   const operation = createOperationDescriptor(getRequest(query), {});
   const response = environment.lookup(operation.fragment);
   const data = response.data as UserSettingsUpdateControllerQueryResponse;
-  const ed = purgeNulls(compact(data?.uiState?.userSettingsEditDelta || null));
-  const od = purgeNulls(compact(data?.uiState?.userSettingsOptimisticDelta || null));
+  const ed = compact(data?.uiState?.userSettingsEditDelta || null);
+  const od = compact(data?.uiState?.userSettingsOptimisticDelta || null);
   return {
     userId: data?.viewer?.id || null,
     sv: data?.viewer?.settings || null,

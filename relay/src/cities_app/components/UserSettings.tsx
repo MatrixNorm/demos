@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
 import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
-import { isTrueDelta, compact, merge, purgeNulls } from "../helpers/object";
+import { isTrueDelta, compact, merge } from "../helpers/object";
 import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
@@ -81,12 +81,12 @@ type Props = {
 export default createFragmentContainer(
   (props: Props) => {
     const { settings, editDelta, optimisticDelta } = props as NukeFragRef<Props>;
-    console.log(settings, editDelta)
+    //console.log(settings, editDelta);
     const isLoading = React.useContext(LoadingContext);
     const UserSettings = isLoading ? UserSettingsLoading : UserSettingsSuccess;
 
-    const editDeltaCompacted = purgeNulls(compact(editDelta));
-    const optimisticDeltaCompacted = purgeNulls(compact(optimisticDelta));
+    const editDeltaCompacted = compact(editDelta);
+    const optimisticDeltaCompacted = compact(optimisticDelta);
     const optValue = merge(settings, optimisticDeltaCompacted);
     const finalValue = merge(optValue, editDeltaCompacted);
 

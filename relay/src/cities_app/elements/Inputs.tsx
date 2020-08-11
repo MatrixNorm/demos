@@ -23,9 +23,10 @@ const NumberInput_ = (props: {
   value?: number;
   onChange?: (value: number) => void;
 }) => {
-  const { onChange = noop } = props;
+  const { onChange = noop, value = 0 } = props;
   const newProps = {
     ...props,
+    value,
     onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
       onChange(Number(e.target.value)),
   };
