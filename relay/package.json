@@ -29,6 +29,7 @@
     "react-dom": "^16.8.4",
     "react-relay": "^10.0.1",
     "react-router-dom": "^5.1.2",
+    "react-transition-group": "^4.4.1",
     "relay-compiler": "^10.0.1",
     "relay-runtime": "^10.0.1",
     "relay-test-utils": "^10.0.1",

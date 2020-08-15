@@ -26,7 +26,7 @@ const baseBuild = ({ buildId }) => env => {
     },
     mode: mode,
     devServer: {
-      //contentBase: [`./src/${buildId}`],
+      contentBase: [`./src/${buildId}`],
       publicPath: "/",
       //historyApiFallback: true,
       //watchContentBase: true
