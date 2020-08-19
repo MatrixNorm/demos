@@ -24,6 +24,7 @@ const PanelBlock = styled.div`
 
 export default ({ environment }: { environment: IEnvironment }) => {
   const location = useLocation();
+  console.log(location);
 
   SearchParametersController.handleEvent(
     {

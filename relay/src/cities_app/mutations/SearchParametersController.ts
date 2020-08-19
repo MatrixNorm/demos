@@ -8,7 +8,7 @@ import {
 } from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { stripEmptyProps, Compacted } from "../helpers/object";
+import { compact, Compacted, merge } from "../helpers/object";
 import { NukeFragRef, Writeable } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
@@ -48,15 +48,15 @@ function lookupState(environment: IEnvironment): State {
   const response = environment.lookup(operation.fragment);
   const data = response.data as SearchParametersControllerQueryResponse;
   return {
-    searchParams: stripEmptyProps(data?.uiState?.citySearchParams),
-    editDelta: stripEmptyProps(data?.uiState?.citySearchParamsEditDelta),
+    searchParams: compact(data?.uiState?.citySearchParams),
+    editDelta: compact(data?.uiState?.citySearchParamsEditDelta),
   };
 }
 
 function reduce(state: State, event: Event): Effect[] {
   switch (event.type) {
     case "edit": {
-      let editDelta = { ...state.editDelta, ...event.payload };
+      let editDelta = merge(state.editDelta, event.payload);
       if (!editDelta.countryNameContains) {
         delete editDelta["countryNameContains"];
       }
@@ -66,7 +66,7 @@ function reduce(state: State, event: Event): Effect[] {
       let searchParams = extractSearchParametersFromUrl(event.urlSearchString);
       return [
         { type: "writeSearchParams", value: searchParams },
-        { type: "writeEditDelta", value: stripEmptyProps<SearchParameters>(null) },
+        { type: "writeEditDelta", value: compact<SearchParameters>(null) },
       ];
     }
     default:
@@ -152,7 +152,7 @@ function extractSearchParametersFromUrl(urlSearchString: string): SearchParamete
     }
   }
   if (Object.keys(searchParams).length > 0) {
-    return stripEmptyProps(searchParams);
+    return compact(searchParams);
   }
-  return stripEmptyProps<SearchParameters>(null);
+  return compact<SearchParameters>(null);
 }

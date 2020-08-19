@@ -1,6 +1,7 @@
 import * as React from "react";
-import { Switch, Route, Link } from "react-router-dom";
+import { Switch, Route, Link, useLocation } from "react-router-dom";
 import { IEnvironment } from "relay-runtime";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 import CitiesBrowser from "./components/CitiesBrowser";
 import SettingsPage from "./pages/SettingsPage";
 

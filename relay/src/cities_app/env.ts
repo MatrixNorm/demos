@@ -9,6 +9,10 @@ import { serverResolvers } from "./resolvers/index";
 import { Server } from "./resolvers/server";
 import * as db from "./resolvers/database";
 
+function waitFor(timeout: number) {
+  return new Promise((resolve) => setTimeout(resolve, timeout));
+}
+
 const serverSchema = makeExecutableSchema({
   typeDefs: serverSchemaTxt,
   resolvers: serverResolvers,
@@ -18,10 +22,10 @@ export const createRelayEnvironment = (
   { timeout }: { timeout: number } = { timeout: 5000 }
 ) => {
   const network = Network.create(async (operation, variables) => {
-    await new Promise((resolve) => setTimeout(resolve, timeout));
+    await waitFor(timeout);
     const resp = await graphql(
       serverSchema,
-      operation.text,
+      operation.text || "",
       {},
       { user: db.users["user#1"] },
       variables
@@ -35,18 +39,17 @@ export const createRelayEnvironment = (
     // @ts-ignore
     console.log(environment.getStore().getSource()._records);
   };
-
   return environment;
 };
 
-export const createTestingEnv = (resolvers: object) => {
+export const createTestingEnv = (resolvers: any) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
     resolvers,
   });
 
   const network = Network.create((operation, variables) => {
-    const resp = graphqlSync(executableSchema, operation.text, {}, {}, variables);
+    const resp = graphqlSync(executableSchema, operation.text || "", {}, {}, variables);
     return resp;
   });
 
@@ -55,17 +58,15 @@ export const createTestingEnv = (resolvers: object) => {
   return environment;
 };
 
-export const createAsyncTestingEnv = (timeout: number, resolvers: object) => {
+export const createAsyncTestingEnv = (timeout: number, resolvers: any) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
     resolvers,
   });
 
   const network = Network.create(async (operation, variables) => {
-    console.log(operation);
-    await new Promise((resolve) => setTimeout(resolve, timeout));
-    const resp = await graphql(executableSchema, operation.text, {}, {}, variables);
-    console.log({ resp });
+    await await waitFor(timeout);
+    const resp = await graphql(executableSchema, operation.text || "", {}, {}, variables);
     return resp;
   });
 
@@ -77,10 +78,9 @@ export const createAsyncTestingEnv = (timeout: number, resolvers: object) => {
 export const loadingForeverEnvironment = () => {
   const network = Network.create(async () => {
     while (true) {
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await await waitFor(1000);
     }
   });
-
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
   return environment;
@@ -96,15 +96,14 @@ export const returnPayloadEnvironment = (payload: any) => {
   return environment;
 };
 
-export const returnAsyncPayloadEnvironment = (
+export const returnPayloadAsyncEnvironment = (
   payloadGenFactory: () => any,
   timeout: number
 ) => {
   const payloadGen = payloadGenFactory();
   const network = Network.create(async () => {
-    await new Promise((resolve) => setTimeout(resolve, timeout || 1000));
+    await await waitFor(timeout || 1000);
     const { value } = payloadGen.next();
-    console.log(value);
     const resp = { data: value };
     return resp;
   });

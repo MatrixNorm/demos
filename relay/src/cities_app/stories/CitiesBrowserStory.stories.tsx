@@ -1,9 +1,20 @@
 import * as React from "react";
 import { graphql, LocalQueryRenderer } from "react-relay";
+// @ts-ignore
+import StoryRouter from "storybook-react-router";
 import { createRelayEnvironment, loadingForeverEnvironment } from "../env";
 import CitiesBrowser from "../components/CitiesBrowser";
 
-export default { title: "cities_app-demo1/CitiesBrowser" };
+export default {
+  title: "cities_app-demo1/CitiesBrowser",
+  decorators: [
+    (storyFn: unknown) => {
+      let router = StoryRouter();
+      console.log(router);
+      return router(storyFn);
+    },
+  ],
+};
 
 // const makeEnv = () => {
 //   return createTestingEnv({

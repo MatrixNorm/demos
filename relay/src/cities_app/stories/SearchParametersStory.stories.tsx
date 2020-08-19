@@ -60,6 +60,7 @@ export const serverError = () => {
   const environment = createTestingEnv({
     Query: {
       citiesMetadata: () => {
+        console.log("sheisse")
         throw new Error("sheisse");
       },
     },

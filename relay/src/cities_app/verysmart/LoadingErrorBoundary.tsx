@@ -49,10 +49,13 @@ export class LoadingErrorBoundary extends React.Component {
     this.state = { error: false };
   }
 
+  static getDerivedStateFromError(error: any) {
+    // Update state so the next render will show the fallback UI.
+    return { error: true };
+  }
+
   componentDidCatch(error: any) {
-    this.setState({
-      error: true,
-    });
+    console.log("ERROR: ", error);
   }
 
   render() {

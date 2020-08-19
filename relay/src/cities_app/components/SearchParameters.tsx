@@ -9,7 +9,7 @@ import {
   SearchParametersPresentational,
   SearchParametersType,
 } from "./SearchParametersPresentational";
-import { toQueryURL, stripEmptyProps } from "../helpers/object";
+import { toQueryURL, compact } from "../helpers/object";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
@@ -26,8 +26,8 @@ const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
     const { url } = useRouteMatch();
 
-    const searchParamsCompacted = stripEmptyProps(props.searchParams);
-    const editDeltaCompacted = stripEmptyProps(props.editDelta);
+    const searchParamsCompacted = compact(props.searchParams);
+    const editDeltaCompacted = compact(props.editDelta);
 
     const defaultSearchParams = {
       countryNameContains: "",
@@ -37,7 +37,7 @@ const SearchParametersFC = createFragmentContainer(
 
     function onEdit(delta: Partial<SearchParametersType>) {
       SPController.handleEvent(
-        { type: "edit", payload: stripEmptyProps(delta) },
+        { type: "edit", payload: compact(delta) },
         props.environment
       );
     }
