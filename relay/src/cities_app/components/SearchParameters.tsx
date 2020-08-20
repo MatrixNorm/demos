@@ -3,6 +3,7 @@ import { graphql, createFragmentContainer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
+import { ReloadMessage } from "../verysmart/ReloadContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import * as SPController from "../mutations/SearchParametersController";
 import {
@@ -128,7 +129,7 @@ export default function({ environment }: { environment: IEnvironment }) {
       }}
       render={({ props }) => {
         if (!props.citiesMetadata) {
-          throw Error("No search metadata");
+          return <ReloadMessage message="Something went wrong. Try to reload." />;
         }
         return (
           <SearchParametersFC

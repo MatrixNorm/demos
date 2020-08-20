@@ -13,7 +13,7 @@ import {
   Store,
 } from "relay-runtime";
 import { css, keyframes } from "styled-components";
-import { LoadingErrorBoundary } from "./LoadingErrorBoundary";
+import { ReloadWrapper, ReloadMessage } from "./ReloadContext";
 
 const LoadingContext = createContext<boolean>(false);
 export default LoadingContext;
@@ -32,7 +32,7 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
   render: ({ props }: { props: T["response"] }) => any;
 }) {
   return (
-    <LoadingErrorBoundary>
+    <ReloadWrapper>
       <QueryRenderer<T>
         query={query}
         environment={environment}
@@ -49,12 +49,12 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
             );
           }
           if (error) {
-            throw new Error("something went wrong");
+            return <ReloadMessage message="oops" />;
           }
           return render({ props });
         }}
       />
-    </LoadingErrorBoundary>
+    </ReloadWrapper>
   );
 }
 
