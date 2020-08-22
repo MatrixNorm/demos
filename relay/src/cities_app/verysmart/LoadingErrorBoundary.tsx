@@ -1,10 +1,5 @@
 import * as React from "react";
-import { useState } from "react";
 import styled from "styled-components";
-
-export default function LoadingError() {
-  return <h3>Something went wrong</h3>;
-}
 
 const StyledReload = styled.div`
   text-align: center;
@@ -22,25 +17,6 @@ export function Reload({ message, onClick }: { message: string; onClick: () => v
       </button>
     </StyledReload>
   );
-}
-
-export function withReaload(Component: any) {
-  return function(props: any) {
-    const [reload, setReload] = useState(false);
-    if (reload) {
-      return <Reload message="something went wrong" onClick={() => setReload(false)} />;
-    }
-    try {
-      const reactElementOrNull = <Component {...props} />;
-      if (reactElementOrNull) {
-        return reactElementOrNull;
-      }
-      setReload(true);
-    } catch (err) {
-      setReload(true);
-    }
-    return null;
-  };
 }
 
 export class LoadingErrorBoundary extends React.Component {
