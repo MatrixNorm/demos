@@ -23,7 +23,7 @@
     "graphql": "^14.6.0",
     "graphql-tools": "^4.0.5",
     "io-ts": "^2.2.7",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "preact-render-to-string": "^3.6.3",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
