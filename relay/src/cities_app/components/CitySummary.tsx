@@ -6,10 +6,6 @@ import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 
-interface Props {
-  city: CitySummary_city;
-}
-
 const CitySummarySuccess = styled.section`
   padding: 0 1em 0 1em;
   .row {
@@ -39,6 +35,10 @@ const CitySummarySuccess = styled.section`
 const CitySummaryLoading = styled(CitySummarySuccess)`
   ${placeholderCssMixin}
 `;
+
+type Props = {
+  city: CitySummary_city;
+};
 
 export default createFragmentContainer(
   ({ city }: Props) => {

@@ -3,7 +3,7 @@ import { graphql, QueryRenderer } from "react-relay";
 import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
-  returnAsyncPayloadEnvironment,
+  returnPayloadAsyncEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
 import { LoadingPlaceholder } from "../verysmart/LoadingContext";
@@ -72,7 +72,7 @@ export const citySummaryFull = () => {
   return (
     <QueryRenderer<CitySummaryStoryQuery>
       query={query}
-      environment={returnAsyncPayloadEnvironment(function*() {
+      environment={returnPayloadAsyncEnvironment(function*() {
         yield {
           city: {
             __typename: "City",
