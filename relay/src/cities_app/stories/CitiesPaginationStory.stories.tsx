@@ -4,7 +4,7 @@ import { IEnvironment } from "relay-runtime";
 import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
-  returnAsyncPayloadEnvironment,
+  returnPayloadAsyncEnvironment,
 } from "../env";
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
 import { LoadingPlaceholder } from "../verysmart/LoadingContext";
@@ -108,7 +108,7 @@ export const loading = () => {
 };
 
 export const full = () => {
-  const environment = returnAsyncPayloadEnvironment(function*() {
+  const environment = returnPayloadAsyncEnvironment(function*() {
     yield {
       citiesPagination: {
         nodes: demoNodes,

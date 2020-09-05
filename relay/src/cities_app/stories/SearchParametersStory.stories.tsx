@@ -5,7 +5,7 @@ import {
   createTestingEnv,
   loadingForeverEnvironment,
   createRelayEnvironment,
-  returnAsyncPayloadEnvironment,
+  returnPayloadAsyncEnvironment,
 } from "../env";
 import SearchParameters from "../components/SearchParameters";
 
@@ -42,7 +42,7 @@ export const loading = () => {
 };
 
 export const noServerData = () => {
-  const environment = returnAsyncPayloadEnvironment(function*() {
+  const environment = returnPayloadAsyncEnvironment(function*() {
     yield {
       citiesMetadata: null,
     };

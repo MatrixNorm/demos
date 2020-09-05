@@ -111,6 +111,7 @@ const animation = keyframes`
 export const placeholderCssMixin = css`
   .placeholder {
     visibility: hidden;
+    position: relative;
   }
   .placeholder::after {
     content: "";

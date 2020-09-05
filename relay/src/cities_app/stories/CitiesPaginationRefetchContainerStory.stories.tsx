@@ -3,7 +3,7 @@ import {
   createRelayEnvironment,
   loadingForeverEnvironment,
   returnPayloadEnvironment,
-  returnAsyncPayloadEnvironment,
+  returnPayloadAsyncEnvironment,
 } from "../env";
 import CitiesPagination from "../components/CitiesPaginationRefetchContainer";
 
@@ -66,7 +66,7 @@ export const nullResponse = () => {
 };
 
 export const nullResponseThenReload = () => {
-  const environment = returnAsyncPayloadEnvironment(function*() {
+  const environment = returnPayloadAsyncEnvironment(function*() {
     yield {
       citiesPagination: null,
     };

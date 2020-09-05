@@ -19,6 +19,8 @@ const query = graphql`
   }
 `;
 
+window.q = query
+
 export const citySummary = () => {
   const environment = returnPayloadEnvironment({
     city: {

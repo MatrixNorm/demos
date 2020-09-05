@@ -27,9 +27,6 @@ const CitySummarySuccess = styled.section`
     font-size: 0.9em;
     margin-right: 15px;
   }
-  .placeholder {
-    position: relative;
-  }
 `;
 
 const CitySummaryLoading = styled(CitySummarySuccess)`

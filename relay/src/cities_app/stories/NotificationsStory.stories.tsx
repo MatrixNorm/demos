@@ -1,11 +1,8 @@
 import * as React from "react";
 import { createMockEnvironment, MockPayloadGenerator } from "relay-test-utils";
 import { graphql, QueryRenderer } from "react-relay";
-import {
-  Notification,
-  Notifications,
-  addNotification,
-} from "../components/Notifications";
+import { Notification, Notifications } from "../components/Notifications";
+import { addNotification } from "../mutations/NotificationsController";
 import { createTestingEnv } from "../env";
 
 export default { title: "cities_app-demo1/Notifications" };
