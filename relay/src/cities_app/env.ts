@@ -1,4 +1,4 @@
-import { Environment, Network, RecordSource, Store } from "relay-runtime";
+import { Environment, Network, RecordSource, Store, Observable } from "relay-runtime";
 // @ts-ignore
 import { graphql, graphqlSync } from "graphql";
 // @ts-ignore
@@ -30,7 +30,7 @@ export const createRelayEnvironment = (
       { user: db.users["user#1"] },
       variables
     );
-    return resp;
+    return resp as any;
   });
   const store = new Store(new RecordSource());
   const environment = new Environment({ network, store });
@@ -50,7 +50,7 @@ export const createTestingEnv = (resolvers: any) => {
 
   const network = Network.create((operation, variables) => {
     const resp = graphqlSync(executableSchema, operation.text || "", {}, {}, variables);
-    return resp;
+    return resp as any;
   });
 
   const store = new Store(new RecordSource());
@@ -67,7 +67,7 @@ export const createAsyncTestingEnv = (timeout: number, resolvers: any) => {
   const network = Network.create(async (operation, variables) => {
     await await waitFor(timeout);
     const resp = await graphql(executableSchema, operation.text || "", {}, {}, variables);
-    return resp;
+    return resp as any;
   });
 
   const store = new Store(new RecordSource());

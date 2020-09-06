@@ -6,7 +6,10 @@ import {
   returnPayloadAsyncEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
-import { LoadingPlaceholder } from "../verysmart/LoadingContext";
+import {
+  LoadingPlaceholder,
+  LoadingPlaceholderQueryRenderer,
+} from "../verysmart/LoadingContext";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };
@@ -18,8 +21,6 @@ const query = graphql`
     }
   }
 `;
-
-window.q = query
 
 export const citySummary = () => {
   const environment = returnPayloadEnvironment({
@@ -45,26 +46,15 @@ export const citySummary = () => {
 
 export const citySummaryLoading = () => {
   return (
-    <QueryRenderer<CitySummaryStoryQuery>
+    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
       query={query}
       environment={loadingForeverEnvironment()}
       variables={{ cityId: "1" }}
+      placeholderData={{
+        city: defaultData,
+      }}
       render={({ props }) => {
-        if (props === null) {
-          return (
-            <LoadingPlaceholder
-              query={query}
-              variables={{ cityId: "1" }}
-              data={{
-                city: defaultData,
-              }}
-              render={({ props }: any) => {
-                return props && props.city && <CitySummary city={props.city} />;
-              }}
-            />
-          );
-        }
-        return null;
+        return props && props.city && <CitySummary city={props.city} />;
       }}
     />
   );
@@ -72,7 +62,7 @@ export const citySummaryLoading = () => {
 
 export const citySummaryFull = () => {
   return (
-    <QueryRenderer<CitySummaryStoryQuery>
+    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
       query={query}
       environment={returnPayloadAsyncEnvironment(function*() {
         yield {
@@ -86,21 +76,10 @@ export const citySummaryFull = () => {
         };
       }, 1000)}
       variables={{ cityId: "1" }}
+      placeholderData={{
+        city: defaultData,
+      }}
       render={({ props }) => {
-        if (props === null) {
-          return (
-            <LoadingPlaceholder
-              query={query}
-              variables={{ cityId: "1" }}
-              data={{
-                city: defaultData,
-              }}
-              render={({ props }: any) => {
-                return props && props.city && <CitySummary city={props.city} />;
-              }}
-            />
-          );
-        }
         return props && props.city && <CitySummary city={props.city} />;
       }}
     />

@@ -102,23 +102,25 @@ export const defaultData = {
 };
 
 export default function({ environment }: { environment: IEnvironment }) {
+  let q = graphql`
+    query SearchParametersQuery {
+      citiesMetadata {
+        ...SearchParameters_searchMetadata
+      }
+      uiState {
+        citySearchParams {
+          ...SearchParameters_searchParams
+        }
+        citySearchParamsEditDelta {
+          ...SearchParameters_editDelta
+        }
+      }
+    }
+  `;
+  console.log(q);
   return (
     <LoadingPlaceholderQueryRenderer<SearchParametersQuery>
-      query={graphql`
-        query SearchParametersQuery {
-          citiesMetadata {
-            ...SearchParameters_searchMetadata
-          }
-          uiState {
-            citySearchParams {
-              ...SearchParameters_searchParams
-            }
-            citySearchParamsEditDelta {
-              ...SearchParameters_editDelta
-            }
-          }
-        }
-      `}
+      query={q}
       environment={environment}
       variables={{}}
       placeholderData={{
