@@ -6,10 +6,7 @@ import {
   returnPayloadAsyncEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
-import {
-  LoadingPlaceholder,
-  LoadingPlaceholderQueryRenderer,
-} from "../verysmart/LoadingContext";
+import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };
@@ -22,7 +19,7 @@ const query = graphql`
   }
 `;
 
-export const citySummary = () => {
+export const Ok = () => {
   const environment = returnPayloadEnvironment({
     city: {
       __typename: "City",
@@ -44,7 +41,7 @@ export const citySummary = () => {
   );
 };
 
-export const citySummaryLoading = () => {
+export const Loading = () => {
   return (
     <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
       query={query}
@@ -60,11 +57,38 @@ export const citySummaryLoading = () => {
   );
 };
 
-export const citySummaryFull = () => {
+export const Full = () => {
   return (
     <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
       query={query}
       environment={returnPayloadAsyncEnvironment(function*() {
+        yield {
+          city: {
+            __typename: "City",
+            id: "1",
+            name: "Madrid",
+            country: "Spain",
+            population: 3600000,
+          },
+        };
+      }, 1000)}
+      variables={{ cityId: "1" }}
+      placeholderData={{
+        city: defaultData,
+      }}
+      render={({ props }) => {
+        return props && props.city && <CitySummary city={props.city} />;
+      }}
+    />
+  );
+};
+
+export const FirstErrorThenLoad = () => {
+  return (
+    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
+      query={query}
+      environment={returnPayloadAsyncEnvironment(function*() {
+        yield new Error("shit");
         yield {
           city: {
             __typename: "City",

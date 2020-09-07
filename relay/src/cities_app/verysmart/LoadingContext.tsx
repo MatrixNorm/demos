@@ -1,5 +1,6 @@
 import * as React from "react";
-import { createContext } from "react";
+import { useState, createContext } from "react";
+import styled from "styled-components";
 import { LocalQueryRenderer, QueryRenderer } from "react-relay";
 import {
   createOperationDescriptor,
@@ -13,15 +14,22 @@ import {
   Store,
 } from "relay-runtime";
 import { css, keyframes } from "styled-components";
-import { ReloadWrapper, ReloadMessage } from "./ReloadContext";
 
 const LoadingContext = createContext<boolean>(false);
 export default LoadingContext;
+
+const StyledReload = styled.div`
+  text-align: center;
+  .message {
+    margin-bottom: 1em;
+  }
+`;
 
 export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
   query,
   environment,
   variables,
+  // XXX could be generated from the query
   placeholderData,
   render,
 }: {
@@ -31,35 +39,51 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
   placeholderData: any;
   render: ({ props }: { props: T["response"] }) => any;
 }) {
+  const [reloadKey, setReloadKey] = useState(0);
   return (
-    <ReloadWrapper>
-      <QueryRenderer<T>
-        query={query}
-        environment={environment}
-        variables={variables}
-        render={({ props, error }) => {
-          if (!error && !props) {
-            return (
-              <LoadingPlaceholder
-                query={query}
-                variables={{}}
-                data={placeholderData}
-                render={render}
-              />
-            );
-          }
-          if (error) {
-            return <ReloadMessage message="oops" />;
-          }
-          return render({ props });
-        }}
-      />
-    </ReloadWrapper>
+    <QueryRenderer<T>
+      // need this to force remount otherwise
+      // no new fetch will be done
+      key={reloadKey}
+      query={query}
+      environment={environment}
+      variables={variables}
+      render={({ props, error }) => {
+        // loading state
+        if (!error && !props) {
+          return (
+            <LoadingPlaceholder
+              query={query}
+              variables={{}}
+              data={placeholderData}
+              render={render}
+            />
+          );
+        }
+        // error during fetching
+        if (error) {
+          return (
+            <StyledReload>
+              <div className="message">oops, try again</div>
+              <button
+                onClick={() => setReloadKey((reloadKey) => reloadKey + 1)}
+                className="button"
+              >
+                Reload
+              </button>
+            </StyledReload>
+          );
+        }
+        // main path
+        return render({ props });
+      }}
+    />
   );
 }
 
 const createDummyEnvironment = () => {
   const network = Network.create(() => {
+    // can return placeholder data and no need for LocalQueryRenderer
     return { data: {} };
   });
   const store = new Store(new RecordSource());
@@ -79,9 +103,11 @@ export function LoadingPlaceholder<T extends OperationType>({
   render: ({ props }: { props: T["response"] }) => any;
 }) {
   const env = createDummyEnvironment();
+  // XXX
   const request = getRequest(query);
   const operation = createOperationDescriptor(request, variables);
   env.commitPayload(operation, data);
+  // ~XXX
   return (
     <LoadingContext.Provider value={true}>
       <LocalQueryRenderer<T>
