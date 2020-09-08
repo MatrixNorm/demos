@@ -35,6 +35,7 @@ export const Ok = () => {
       environment={environment}
       variables={{ cityId: "1" }}
       render={({ props }) => {
+        console.log(props);
         return props && props.city && <CitySummary city={props.city} />;
       }}
     />
@@ -83,7 +84,7 @@ export const Full = () => {
   );
 };
 
-export const FirstErrorThenLoad = () => {
+export const FetchErrorThenLoad = () => {
   return (
     <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
       query={query}
@@ -104,6 +105,34 @@ export const FirstErrorThenLoad = () => {
         city: defaultData,
       }}
       render={({ props }) => {
+        return props && props.city && <CitySummary city={props.city} />;
+      }}
+    />
+  );
+};
+
+export const NullData = () => {
+  return (
+    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
+      query={query}
+      environment={returnPayloadAsyncEnvironment(function*() {
+        yield { city: null };
+        // yield {
+        //   city: {
+        //     __typename: "City",
+        //     id: "1",
+        //     name: "Madrid",
+        //     country: "Spain",
+        //     population: 3600000,
+        //   },
+        // };
+      }, 1000)}
+      variables={{ cityId: "1" }}
+      placeholderData={{
+        city: defaultData,
+      }}
+      render={({ props }) => {
+        console.log(props, Object.getOwnPropertyNames(props));
         return props && props.city && <CitySummary city={props.city} />;
       }}
     />

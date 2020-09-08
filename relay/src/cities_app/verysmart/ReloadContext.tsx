@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createContext, useContext, useState } from "react";
+import { Container } from "react-relay";
 import styled from "styled-components";
 
 export const ReloadContext = createContext(() => {});
@@ -32,3 +33,9 @@ export function ReloadWrapper({ children }: { children: any }) {
 
   return <ReloadContext.Provider value={dispatch}>{children}</ReloadContext.Provider>;
 }
+
+// function wrap<Props>(fragmentContainer: Container<Props>) {
+//   return function(props: any) {
+//     return null;
+//   };
+// }
