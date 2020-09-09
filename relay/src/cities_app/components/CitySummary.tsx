@@ -2,7 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import styled from "styled-components";
 import { NukeFragRef } from "../helpers/typeUtils";
-import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
+import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 

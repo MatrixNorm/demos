@@ -6,7 +6,10 @@ import {
   returnPayloadAsyncEnvironment,
 } from "../env";
 import CitySummary, { defaultData } from "../components/CitySummary";
-import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
+import {
+  LoadingPlaceholderQueryRenderer,
+  ReloadMessagePanel,
+} from "../verysmart/LoadingContext";
 import { CitySummaryStoryQuery } from "__relay__/CitySummaryStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitySummary" };
@@ -117,23 +120,28 @@ export const NullData = () => {
       query={query}
       environment={returnPayloadAsyncEnvironment(function*() {
         yield { city: null };
-        // yield {
-        //   city: {
-        //     __typename: "City",
-        //     id: "1",
-        //     name: "Madrid",
-        //     country: "Spain",
-        //     population: 3600000,
-        //   },
-        // };
+        yield { city: null };
+        yield {
+          city: {
+            __typename: "City",
+            id: "1",
+            name: "Madrid",
+            country: "Spain",
+            population: 3600000,
+          },
+        };
       }, 1000)}
       variables={{ cityId: "1" }}
       placeholderData={{
         city: defaultData,
       }}
       render={({ props }) => {
-        console.log(props, Object.getOwnPropertyNames(props));
-        return props && props.city && <CitySummary city={props.city} />;
+        if (!props) return;
+        return props.city ? (
+          <CitySummary city={props.city} />
+        ) : (
+          <ReloadMessagePanel message="shit" />
+        );
       }}
     />
   );

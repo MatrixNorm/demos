@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, createContext } from "react";
+import { useState, useContext, createContext } from "react";
 import styled from "styled-components";
 import { LocalQueryRenderer, QueryRenderer } from "react-relay";
 import {
@@ -15,8 +15,8 @@ import {
 } from "relay-runtime";
 import { css, keyframes } from "styled-components";
 
-const LoadingContext = createContext<boolean>(false);
-export default LoadingContext;
+export const LoadingContext = createContext<boolean>(false);
+export const ReloadContext = createContext(() => {});
 
 const StyledReload = styled.div`
   text-align: center;
@@ -24,6 +24,18 @@ const StyledReload = styled.div`
     margin-bottom: 1em;
   }
 `;
+
+export function ReloadMessagePanel({ message }: { message: string }) {
+  const dispatchReload = useContext(ReloadContext);
+  return (
+    <StyledReload>
+      <div className="message">{message}</div>
+      <button onClick={dispatchReload} className="button">
+        Reload
+      </button>
+    </StyledReload>
+  );
+}
 
 export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
   query,
@@ -40,6 +52,11 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
   render: ({ props }: { props: T["response"] }) => any;
 }) {
   const [reloadKey, setReloadKey] = useState(0);
+
+  function dispatchReload() {
+    setReloadKey((reloadKey) => reloadKey + 1);
+  }
+
   return (
     <QueryRenderer<T>
       // need this to force remount otherwise
@@ -61,6 +78,7 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
           );
         }
         // error during fetching
+        // either network error or server returns `null` as a response
         if (error) {
           return (
             <StyledReload>
@@ -75,7 +93,11 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
           );
         }
         // main path
-        return render({ props });
+        return (
+          <ReloadContext.Provider value={dispatchReload}>
+            {render({ props })}
+          </ReloadContext.Provider>
+        );
       }}
     />
   );

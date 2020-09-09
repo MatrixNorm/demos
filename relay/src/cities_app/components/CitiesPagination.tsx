@@ -29,40 +29,41 @@ interface Props {
   loadNextPage: (page: CitiesPagination_page) => void;
 }
 
-function CitiesPagination({ page, loadPrevPage, loadNextPage }: Props) {
-  const { nodes, hasNext, hasPrev } = page;
-  return (
-    <Page>
-      <CitiesList>
-        {nodes &&
-          nodes.map((city) => (
-            <li key={city.id}>
-              <CitySummary city={city} />
-            </li>
-          ))}
-      </CitiesList>
-      <div className="controls-container">
-        <div className="controls">
-          {hasPrev && <PrevButton onClick={() => loadPrevPage(page)} />}
-          {hasNext && <NextButton onClick={() => loadNextPage(page)} />}
+export default createFragmentContainer(
+  ({ page, loadPrevPage, loadNextPage }: Props) => {
+    const { nodes, hasNext, hasPrev } = page;
+    return (
+      <Page>
+        <CitiesList>
+          {nodes &&
+            nodes.map((city) => (
+              <li key={city.id}>
+                <CitySummary city={city} />
+              </li>
+            ))}
+        </CitiesList>
+        <div className="controls-container">
+          <div className="controls">
+            {hasPrev && <PrevButton onClick={() => loadPrevPage(page)} />}
+            {hasNext && <NextButton onClick={() => loadNextPage(page)} />}
+          </div>
         </div>
-      </div>
-    </Page>
-  );
-}
-
-export default createFragmentContainer(CitiesPagination, {
-  page: graphql`
-    fragment CitiesPagination_page on CitiesPagination {
-      hasNext
-      hasPrev
-      nodes {
-        id
-        ...CitySummary_city
+      </Page>
+    );
+  },
+  {
+    page: graphql`
+      fragment CitiesPagination_page on CitiesPagination {
+        hasNext
+        hasPrev
+        nodes {
+          id
+          ...CitySummary_city
+        }
       }
-    }
-  `,
-});
+    `,
+  }
+);
 
 export const defaultData = {
   hasNext: false,
