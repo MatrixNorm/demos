@@ -1,5 +1,5 @@
 import * as React from "react";
-import { graphql, QueryRenderer } from "react-relay";
+import { graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import {
   loadingForeverEnvironment,
@@ -7,7 +7,10 @@ import {
   returnPayloadAsyncEnvironment,
 } from "../env";
 import CitiesPagination, { defaultData } from "../components/CitiesPagination";
-import { LoadingPlaceholder } from "../verysmart/LoadingContext";
+import {
+  LoadingPlaceholderQueryRenderer,
+  ReloadMessagePanel,
+} from "../verysmart/LoadingContext";
 import { CitiesPaginationStoryQuery } from "__relay__/CitiesPaginationStoryQuery.graphql";
 
 export default { title: "cities_app-demo1/CitiesPagination" };
@@ -20,46 +23,37 @@ const query = graphql`
   }
 `;
 
-const based = (env: IEnvironment) => {
+type RenderCallback = ({
+  props,
+}: {
+  props: CitiesPaginationStoryQuery["response"];
+}) => JSX.Element | undefined;
+
+const based = ({ env, render }: { env: IEnvironment; render?: RenderCallback }) => {
+  const renderCallback =
+    render ||
+    (({ props }) => {
+      console.log(props);
+      return (
+        props &&
+        props.citiesPagination && (
+          <CitiesPagination
+            page={props.citiesPagination}
+            loadPrevPage={() => {}}
+            loadNextPage={() => {}}
+          />
+        )
+      );
+    });
   return (
-    <QueryRenderer<CitiesPaginationStoryQuery>
+    <LoadingPlaceholderQueryRenderer<CitiesPaginationStoryQuery>
       query={query}
       environment={env}
       variables={{}}
-      render={({ props }) => {
-        if (props === null) {
-          return (
-            <LoadingPlaceholder
-              query={query}
-              variables={{}}
-              data={{
-                citiesPagination: defaultData,
-              }}
-              render={({ props }: any) => {
-                return (
-                  props &&
-                  props.citiesPagination && (
-                    <CitiesPagination
-                      page={props.citiesPagination}
-                      loadPrevPage={() => {}}
-                      loadNextPage={() => {}}
-                    />
-                  )
-                );
-              }}
-            />
-          );
-        }
-        return (
-          props.citiesPagination && (
-            <CitiesPagination
-              page={props.citiesPagination}
-              loadPrevPage={() => console.log("prev")}
-              loadNextPage={() => console.log("next")}
-            />
-          )
-        );
+      placeholderData={{
+        citiesPagination: defaultData,
       }}
+      render={renderCallback}
     />
   );
 };
@@ -91,31 +85,56 @@ const demoNodes = [
   },
 ];
 
-export const success = () => {
-  const environment = returnPayloadEnvironment({
-    citiesPagination: {
-      nodes: demoNodes,
-      hasNext: true,
-      hasPrev: true,
+const demoData = {
+  citiesPagination: {
+    nodes: demoNodes,
+    hasNext: true,
+    hasPrev: true,
+  },
+};
+
+export const Success = () => {
+  const env = returnPayloadEnvironment(demoData);
+  return based({ env });
+};
+
+export const Loading = () => {
+  const env = loadingForeverEnvironment();
+  return based({ env });
+};
+
+export const Full = () => {
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield demoData;
+  }, 1000);
+  return based({ env });
+};
+
+export const ErrorAndReload = () => {
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield new Error("shit");
+    yield demoData;
+  }, 1000);
+  return based({ env });
+};
+
+export const NullData = () => {
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield { citiesPagination: null };
+    yield demoData;
+  }, 1000);
+  return based({
+    env,
+    render: ({ props }) => {
+      return props.citiesPagination ? (
+        <CitiesPagination
+          page={props.citiesPagination}
+          loadPrevPage={() => {}}
+          loadNextPage={() => {}}
+        />
+      ) : (
+        <ReloadMessagePanel message="shit" />
+      );
     },
   });
-  return based(environment);
-};
-
-export const loading = () => {
-  const environment = loadingForeverEnvironment();
-  return based(environment);
-};
-
-export const full = () => {
-  const environment = returnPayloadAsyncEnvironment(function*() {
-    yield {
-      citiesPagination: {
-        nodes: demoNodes,
-        hasNext: true,
-        hasPrev: true,
-      },
-    };
-  }, 1000);
-  return based(environment);
 };

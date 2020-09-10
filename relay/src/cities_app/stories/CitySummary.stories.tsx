@@ -136,7 +136,6 @@ export const NullData = () => {
         city: defaultData,
       }}
       render={({ props }) => {
-        if (!props) return;
         return props.city ? (
           <CitySummary city={props.city} />
         ) : (

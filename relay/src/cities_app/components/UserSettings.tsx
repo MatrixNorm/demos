@@ -3,7 +3,7 @@ import { graphql, createFragmentContainer, RelayProp } from "react-relay";
 import styled from "styled-components";
 import * as UserSettingsUpdateController from "../mutations/UserSettingsUpdateController";
 import { isTrueDelta, compact, merge } from "../helpers/object";
-import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
+import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext";
 import { NumberInput, TextInput } from "../elements/Inputs";
 import { SubmitButton } from "../elements/Buttons";
 import { NukeFragRef } from "../helpers/typeUtils";

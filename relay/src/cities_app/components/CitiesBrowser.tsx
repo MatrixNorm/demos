@@ -7,7 +7,7 @@ import CitiesPaginationComponent from "./CitiesPaginationRefetchContainer";
 import SearchParameters from "./SearchParameters";
 import * as SearchParametersController from "../mutations/SearchParametersController";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
-import LoadingContext, { placeholderCssMixin } from "../verysmart/LoadingContext";
+import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext";
 import { CitiesBrowserUiQuery } from "__relay__/CitiesBrowserUiQuery.graphql";
 import { CitySummary_city } from "__relay__/CitySummary_city.graphql";
 

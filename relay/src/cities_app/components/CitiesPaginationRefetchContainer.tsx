@@ -5,7 +5,10 @@ import CitiesPagination, {
   defaultData as citiesPaginationDefaultData,
 } from "./CitiesPagination";
 import { SearchParametersNullableType } from "./SearchParameters";
-import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
+import {
+  LoadingPlaceholderQueryRenderer,
+  ReloadMessagePanel,
+} from "../verysmart/LoadingContext";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
@@ -44,14 +47,14 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
     root: CitiesPaginationRefetchContainer_root;
     relay: RelayRefetchProp;
   }) => {
-    return (
-      root.citiesPagination && (
-        <CitiesPagination
-          page={root.citiesPagination}
-          loadNextPage={loadNextPage(relay)}
-          loadPrevPage={loadPrevPage(relay)}
-        />
-      )
+    return root.citiesPagination ? (
+      <CitiesPagination
+        page={root.citiesPagination}
+        loadNextPage={loadNextPage(relay)}
+        loadPrevPage={loadPrevPage(relay)}
+      />
+    ) : (
+      <ReloadMessagePanel message="oops..." />
     );
   },
   {
@@ -119,7 +122,7 @@ export default function({ environment, searchParams }: Props) {
       environment={environment}
       variables={{ searchParams }}
       placeholderData={{
-        citiesPagination: { ...citiesPaginationDefaultData },
+        citiesPagination: citiesPaginationDefaultData,
       }}
       render={({ props }) => {
         return <CitiesPaginationRefetchContainer root={props} />;
