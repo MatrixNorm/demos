@@ -104,7 +104,7 @@ export const returnPayloadAsyncEnvironment = (
   const network = Network.create(async () => {
     await waitFor(timeout || 1000);
     const { value } = payloadGen.next();
-    if (value.constructor === Error) {
+    if (value && value.constructor === Error) {
       throw value;
     }
     const resp = { data: value };

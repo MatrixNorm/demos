@@ -93,6 +93,7 @@ export function LoadingPlaceholderQueryRenderer<T extends OperationType>({
           );
         }
         // main path
+        // props is non-null here
         return (
           <ReloadContext.Provider value={dispatchReload}>
             {render({ props })}

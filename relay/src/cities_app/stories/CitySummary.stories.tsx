@@ -1,5 +1,6 @@
 import * as React from "react";
 import { graphql, QueryRenderer } from "react-relay";
+import { IEnvironment } from "relay-runtime";
 import {
   loadingForeverEnvironment,
   returnPayloadEnvironment,
@@ -22,6 +23,26 @@ const query = graphql`
   }
 `;
 
+function base({ env }: { env: IEnvironment }) {
+  return (
+    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
+      query={query}
+      environment={env}
+      variables={{ cityId: "1" }}
+      placeholderData={{
+        city: defaultData,
+      }}
+      render={({ props }) => {
+        return props.city ? (
+          <CitySummary city={props.city} />
+        ) : (
+          <ReloadMessagePanel message="shit" />
+        );
+      }}
+    />
+  );
+}
+
 export const Ok = () => {
   const environment = returnPayloadEnvironment({
     city: {
@@ -38,7 +59,6 @@ export const Ok = () => {
       environment={environment}
       variables={{ cityId: "1" }}
       render={({ props }) => {
-        console.log(props);
         return props && props.city && <CitySummary city={props.city} />;
       }}
     />
@@ -55,7 +75,7 @@ export const Loading = () => {
         city: defaultData,
       }}
       render={({ props }) => {
-        return props && props.city && <CitySummary city={props.city} />;
+        return props.city && <CitySummary city={props.city} />;
       }}
     />
   );
@@ -81,7 +101,7 @@ export const Full = () => {
         city: defaultData,
       }}
       render={({ props }) => {
-        return props && props.city && <CitySummary city={props.city} />;
+        return props.city && <CitySummary city={props.city} />;
       }}
     />
   );
@@ -108,13 +128,44 @@ export const FetchErrorThenLoad = () => {
         city: defaultData,
       }}
       render={({ props }) => {
-        return props && props.city && <CitySummary city={props.city} />;
+        return props.city && <CitySummary city={props.city} />;
       }}
     />
   );
 };
 
 export const NullData = () => {
+  return (
+    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
+      query={query}
+      environment={returnPayloadAsyncEnvironment(function*() {
+        yield null;
+        yield {
+          city: {
+            __typename: "City",
+            id: "1",
+            name: "Madrid",
+            country: "Spain",
+            population: 3600000,
+          },
+        };
+      }, 1000)}
+      variables={{ cityId: "1" }}
+      placeholderData={{
+        city: defaultData,
+      }}
+      render={({ props }) => {
+        return props.city ? (
+          <CitySummary city={props.city} />
+        ) : (
+          <ReloadMessagePanel message="shit" />
+        );
+      }}
+    />
+  );
+};
+
+export const NullFragmentData = () => {
   return (
     <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
       query={query}

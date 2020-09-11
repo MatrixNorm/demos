@@ -33,9 +33,7 @@ const based = ({ env, render }: { env: IEnvironment; render?: RenderCallback }) 
   const renderCallback =
     render ||
     (({ props }) => {
-      console.log(props);
       return (
-        props &&
         props.citiesPagination && (
           <CitiesPagination
             page={props.citiesPagination}
