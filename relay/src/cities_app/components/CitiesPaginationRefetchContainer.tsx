@@ -4,11 +4,12 @@ import { IEnvironment } from "relay-runtime";
 import CitiesPagination, {
   defaultData as citiesPaginationDefaultData,
 } from "./CitiesPagination";
-import { SearchParametersNullableType } from "./SearchParameters";
 import {
   LoadingPlaceholderQueryRenderer,
   ReloadMessagePanel,
 } from "../verysmart/LoadingContext";
+import { NukeFragRef } from "../helpers/typeUtils";
+import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { CitiesPaginationRefetchContainer_root } from "__relay__/CitiesPaginationRefetchContainer_root.graphql";
 import { CitiesPaginationRefetchContainerQuery } from "__relay__/CitiesPaginationRefetchContainerQuery.graphql";
@@ -38,6 +39,23 @@ const loadPrevPage = (relay: RelayRefetchProp) => (
       });
   }
 };
+
+const RootQuery = graphql`
+  query CitiesPaginationRefetchContainerQuery(
+    $pageSize: Int
+    $after: String
+    $before: String
+    $searchParams: CitySearchParamsInput
+  ) {
+    ...CitiesPaginationRefetchContainer_root
+      @arguments(
+        pageSize: $pageSize
+        after: $after
+        before: $before
+        searchParams: $searchParams
+      )
+  }
+`;
 
 const CitiesPaginationRefetchContainer = createRefetchContainer(
   ({
@@ -77,48 +95,18 @@ const CitiesPaginationRefetchContainer = createRefetchContainer(
       }
     `,
   },
-  graphql`
-    query CitiesPaginationRefetchContainerRefetchQuery(
-      $pageSize: Int
-      $after: String
-      $before: String
-      $searchParams: CitySearchParamsInput
-    ) {
-      ...CitiesPaginationRefetchContainer_root
-        @arguments(
-          pageSize: $pageSize
-          after: $after
-          before: $before
-          searchParams: $searchParams
-        )
-    }
-  `
+  RootQuery
 );
 
 type Props = {
   environment: IEnvironment;
-  searchParams: SearchParametersNullableType;
+  searchParams: NukeFragRef<SearchParameters_searchParams>;
 };
 
 export default function({ environment, searchParams }: Props) {
   return (
     <LoadingPlaceholderQueryRenderer<CitiesPaginationRefetchContainerQuery>
-      query={graphql`
-        query CitiesPaginationRefetchContainerQuery(
-          $pageSize: Int
-          $after: String
-          $before: String
-          $searchParams: CitySearchParamsInput
-        ) {
-          ...CitiesPaginationRefetchContainer_root
-            @arguments(
-              pageSize: $pageSize
-              after: $after
-              before: $before
-              searchParams: $searchParams
-            )
-        }
-      `}
+      query={RootQuery}
       environment={environment}
       variables={{ searchParams }}
       placeholderData={{

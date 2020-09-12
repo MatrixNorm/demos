@@ -1,5 +1,5 @@
 import * as React from "react";
-import { graphql, QueryRenderer } from "react-relay";
+import { graphql } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import {
   loadingForeverEnvironment,
@@ -44,7 +44,7 @@ function base({ env }: { env: IEnvironment }) {
 }
 
 export const Ok = () => {
-  const environment = returnPayloadEnvironment({
+  const env = returnPayloadEnvironment({
     city: {
       __typename: "City",
       id: "1",
@@ -53,146 +53,73 @@ export const Ok = () => {
       population: 3600000,
     },
   });
-  return (
-    <QueryRenderer<CitySummaryStoryQuery>
-      query={query}
-      environment={environment}
-      variables={{ cityId: "1" }}
-      render={({ props }) => {
-        return props && props.city && <CitySummary city={props.city} />;
-      }}
-    />
-  );
+  return base({ env });
 };
 
 export const Loading = () => {
-  return (
-    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
-      query={query}
-      environment={loadingForeverEnvironment()}
-      variables={{ cityId: "1" }}
-      placeholderData={{
-        city: defaultData,
-      }}
-      render={({ props }) => {
-        return props.city && <CitySummary city={props.city} />;
-      }}
-    />
-  );
+  return base({ env: loadingForeverEnvironment() });
 };
 
 export const Full = () => {
-  return (
-    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
-      query={query}
-      environment={returnPayloadAsyncEnvironment(function*() {
-        yield {
-          city: {
-            __typename: "City",
-            id: "1",
-            name: "Madrid",
-            country: "Spain",
-            population: 3600000,
-          },
-        };
-      }, 1000)}
-      variables={{ cityId: "1" }}
-      placeholderData={{
-        city: defaultData,
-      }}
-      render={({ props }) => {
-        return props.city && <CitySummary city={props.city} />;
-      }}
-    />
-  );
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield {
+      city: {
+        __typename: "City",
+        id: "1",
+        name: "Madrid",
+        country: "Spain",
+        population: 3600000,
+      },
+    };
+  }, 1000);
+  return base({ env });
 };
 
 export const FetchErrorThenLoad = () => {
-  return (
-    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
-      query={query}
-      environment={returnPayloadAsyncEnvironment(function*() {
-        yield new Error("shit");
-        yield {
-          city: {
-            __typename: "City",
-            id: "1",
-            name: "Madrid",
-            country: "Spain",
-            population: 3600000,
-          },
-        };
-      }, 1000)}
-      variables={{ cityId: "1" }}
-      placeholderData={{
-        city: defaultData,
-      }}
-      render={({ props }) => {
-        return props.city && <CitySummary city={props.city} />;
-      }}
-    />
-  );
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield new Error("shit");
+    yield {
+      city: {
+        __typename: "City",
+        id: "1",
+        name: "Madrid",
+        country: "Spain",
+        population: 3600000,
+      },
+    };
+  }, 1000);
+  return base({ env });
 };
 
 export const NullData = () => {
-  return (
-    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
-      query={query}
-      environment={returnPayloadAsyncEnvironment(function*() {
-        yield null;
-        yield {
-          city: {
-            __typename: "City",
-            id: "1",
-            name: "Madrid",
-            country: "Spain",
-            population: 3600000,
-          },
-        };
-      }, 1000)}
-      variables={{ cityId: "1" }}
-      placeholderData={{
-        city: defaultData,
-      }}
-      render={({ props }) => {
-        return props.city ? (
-          <CitySummary city={props.city} />
-        ) : (
-          <ReloadMessagePanel message="shit" />
-        );
-      }}
-    />
-  );
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield null;
+    yield {
+      city: {
+        __typename: "City",
+        id: "1",
+        name: "Madrid",
+        country: "Spain",
+        population: 3600000,
+      },
+    };
+  }, 1000);
+  return base({ env });
 };
 
 export const NullFragmentData = () => {
-  return (
-    <LoadingPlaceholderQueryRenderer<CitySummaryStoryQuery>
-      query={query}
-      environment={returnPayloadAsyncEnvironment(function*() {
-        yield { city: null };
-        yield { city: null };
-        yield {
-          city: {
-            __typename: "City",
-            id: "1",
-            name: "Madrid",
-            country: "Spain",
-            population: 3600000,
-          },
-        };
-      }, 1000)}
-      variables={{ cityId: "1" }}
-      placeholderData={{
-        city: defaultData,
-      }}
-      render={({ props }) => {
-        return props.city ? (
-          <CitySummary city={props.city} />
-        ) : (
-          <ReloadMessagePanel message="shit" />
-        );
-      }}
-    />
-  );
+  const env = returnPayloadAsyncEnvironment(function*() {
+    yield { city: null };
+    yield { city: null };
+    yield {
+      city: {
+        __typename: "City",
+        id: "1",
+        name: "Madrid",
+        country: "Spain",
+        population: 3600000,
+      },
+    };
+  }, 1000);
+  return base({ env });
 };
