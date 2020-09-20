@@ -37,8 +37,8 @@ const based = ({ env, render }: { env: IEnvironment; render?: RenderCallback }) 
         props.citiesPagination && (
           <CitiesPagination
             page={props.citiesPagination}
-            loadPrevPage={() => {}}
-            loadNextPage={() => {}}
+            //@ts-ignore
+            refetch={() => {}}
           />
         )
       );
@@ -88,6 +88,7 @@ const demoData = {
     nodes: demoNodes,
     hasNext: true,
     hasPrev: true,
+    pageSize: 3,
   },
 };
 
@@ -127,8 +128,8 @@ export const NullData = () => {
       return props.citiesPagination ? (
         <CitiesPagination
           page={props.citiesPagination}
-          loadPrevPage={() => {}}
-          loadNextPage={() => {}}
+          //@ts-ignore
+          refetch={() => {}}
         />
       ) : (
         <ReloadMessagePanel message="shit" />

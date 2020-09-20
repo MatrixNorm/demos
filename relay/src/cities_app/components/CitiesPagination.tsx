@@ -1,12 +1,12 @@
-/**
- * Single page of pagination.
- */
 import * as React from "react";
-import { graphql, createFragmentContainer } from "react-relay";
+import { graphql, createFragmentContainer, RelayRefetchProp } from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
 import CitySummary, { defaultData as cityDefaultData } from "./CitySummary";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
+import { NukeFragRef } from "../helpers/typeUtils";
+
+const MAX_PAGE_SIZE = 10;
 
 const CitiesList = styled.ol`
   list-style: none;
@@ -25,15 +25,61 @@ const Page = styled.div`
 
 interface Props {
   page: CitiesPagination_page;
-  loadPrevPage: (page: CitiesPagination_page) => void;
-  loadNextPage: (page: CitiesPagination_page) => void;
+  refetch: RelayRefetchProp["refetch"];
 }
 
 export default createFragmentContainer(
-  ({ page, loadPrevPage, loadNextPage }: Props) => {
+  ({ page, refetch }: Props) => {
     const { nodes, hasNext, hasPrev } = page;
+
+    const loadNextPage = (currentPage: CitiesPagination_page) => {
+      let { nodes } = currentPage;
+      if (nodes && nodes.length > 0) {
+        let after = nodes[nodes.length - 1].id;
+        currentPage.hasNext &&
+          refetch((nextVars) => {
+            return { ...nextVars, after, before: null };
+          });
+      }
+    };
+
+    const loadPrevPage = (currentPage: CitiesPagination_page) => {
+      let { nodes } = currentPage;
+      if (nodes && nodes.length > 0) {
+        let before = nodes[0].id;
+        currentPage.hasPrev &&
+          refetch((prevVars) => {
+            return { ...prevVars, before, after: null };
+          });
+      }
+    };
+
+    const onPageSizeChange = (
+      newPageSize: number,
+      currentPage: CitiesPagination_page
+    ) => {
+      let { nodes } = currentPage;
+      refetch((prevVars) => {
+        return {
+          ...prevVars,
+          pageSize: newPageSize,
+          after: nodes && nodes.length > 0 ? nodes[0].id : null,
+          before: null,
+        };
+      });
+    };
+
     return (
       <Page>
+        <div className="pagesize-container">
+          <input
+            type="number"
+            value={page.pageSize}
+            max={MAX_PAGE_SIZE}
+            min="1"
+            onChange={(e) => onPageSizeChange(Number(e.target.value), page)}
+          />
+        </div>
         <CitiesList>
           {nodes &&
             nodes.map((city) => (
@@ -54,6 +100,7 @@ export default createFragmentContainer(
   {
     page: graphql`
       fragment CitiesPagination_page on CitiesPagination {
+        pageSize
         hasNext
         hasPrev
         nodes {
@@ -66,6 +113,7 @@ export default createFragmentContainer(
 );
 
 export const defaultData = {
+  pageSize: 5,
   hasNext: false,
   hasPrev: false,
   nodes: [
@@ -75,4 +123,4 @@ export const defaultData = {
     { ...cityDefaultData, id: "4" },
     { ...cityDefaultData, id: "5" },
   ],
-};
+} as NukeFragRef<CitiesPagination_page>;

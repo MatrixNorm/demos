@@ -78,7 +78,7 @@ export const createAsyncTestingEnv = (timeout: number, resolvers: any) => {
 export const loadingForeverEnvironment = () => {
   const network = Network.create(async () => {
     while (true) {
-      await await waitFor(1000);
+      await waitFor(1000);
     }
   });
   const store = new Store(new RecordSource());

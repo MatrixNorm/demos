@@ -14,9 +14,7 @@ type UpdateUserSettingsPayload {
 }
 
 type Mutation {
-  updateUserSettings(
-    input: UpdateUserSettingsInput!
-  ): UpdateUserSettingsPayload!
+  updateUserSettings(input: UpdateUserSettingsInput!): UpdateUserSettingsPayload!
 }
 
 type Query {
@@ -35,7 +33,7 @@ type Query {
 type User implements Node {
   id: ID!
   name: String!
-  settings: UserSettings!
+  settings: UserSettings
 }
 
 type UserSettings {
@@ -48,6 +46,7 @@ type CitiesPagination {
   nodes: [City!]
   hasNext: Boolean!
   hasPrev: Boolean!
+  pageSize: Int!
 }
 
 type City implements Node {
@@ -57,16 +56,12 @@ type City implements Node {
   population: Int!
   lat: Float!
   lng: Float!
-  stereotypicalPhotoUrl: String!
+  stereotypicalPhotoUrl: String
 }
 
 type CitiesMetadata {
   populationLowerBound: Int!
   populationUpperBound: Int!
-  latLowerBound: Float!
-  latUpperBound: Float!
-  lngLowerBound: Float!
-  lngUpperBound: Float!
 }
 
 enum CitiesOrderAttr {
