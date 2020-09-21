@@ -13,7 +13,7 @@ const CitySummarySuccess = styled.section`
   }
   .row-name {
     text-align: left;
-    margin: 0.2em 0 0.2em 0;
+    margin: 0 0 0.2em 0;
   }
   .name {
     margin-right: 2px;

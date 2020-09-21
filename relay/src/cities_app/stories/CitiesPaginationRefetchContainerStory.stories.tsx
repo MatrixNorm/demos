@@ -1,64 +1,13 @@
 import * as React from "react";
 import {
-  createRelayEnvironment,
   loadingForeverEnvironment,
   returnPayloadEnvironment,
   returnPayloadAsyncEnvironment,
 } from "../env";
-import CitiesPagination from "../components/CitiesPaginationRefetchContainer";
+import CitiesPaginationRefetchContainer from "../components/CitiesPaginationRefetchContainer";
+import { demoNodes } from "./CitiesPaginationStory.stories";
 
 export default { title: "cities_app-demo1/CitiesPaginationRefetchContainer" };
-
-const demoNodes = [
-  {
-    id: "city#1",
-    name: "Madrid",
-    country: "Spain",
-    population: 3600000,
-    lat: 0,
-    lng: 0,
-  },
-  {
-    id: "city#2",
-    name: "Rome",
-    country: "Italy",
-    population: 4600000,
-    lat: 0,
-    lng: 0,
-  },
-  {
-    id: "city#3",
-    name: "Turin",
-    country: "Italy",
-    population: 2300000,
-    lat: 0,
-    lng: 0,
-  },
-  {
-    id: "city#4",
-    name: "Paris",
-    country: "France",
-    population: 7000000,
-    lat: 0,
-    lng: 0,
-  },
-  {
-    id: "city#5",
-    name: "London",
-    country: "United Kingdom",
-    population: 9000000,
-    lat: 0,
-    lng: 0,
-  },
-  {
-    id: "city#6",
-    name: "Leon",
-    country: "France",
-    population: 2700000,
-    lat: 0,
-    lng: 0,
-  },
-];
 
 export const Aaa = () => {
   const environment = returnPayloadAsyncEnvironment(function*() {
@@ -66,43 +15,26 @@ export const Aaa = () => {
       yield {
         root: {
           citiesPagination: {
-            nodes: demoNodes.slice(0, 2),
+            nodes: demoNodes,
             hasNext: true,
             hasPrev: false,
-          },
-        },
-      };
-      yield {
-        root: {
-          citiesPagination: {
-            nodes: demoNodes.slice(2, 4),
-            hasNext: true,
-            hasPrev: true,
-          },
-        },
-      };
-      yield {
-        root: {
-          citiesPagination: {
-            nodes: demoNodes.slice(4, 6),
-            hasNext: false,
-            hasPrev: true,
+            pageSize: demoNodes.length,
           },
         },
       };
     }
   }, 1000);
-  return <CitiesPagination environment={environment} searchParams={{}} />;
+  return <CitiesPaginationRefetchContainer environment={environment} searchParams={{}} />;
 };
 
 export const loading = () => {
   const environment = loadingForeverEnvironment();
-  return <CitiesPagination environment={environment} searchParams={{}} />;
+  return <CitiesPaginationRefetchContainer environment={environment} searchParams={{}} />;
 };
 
 export const nullResponse = () => {
   const environment = returnPayloadEnvironment({ citiesPagination: null });
-  return <CitiesPagination environment={environment} searchParams={{}} />;
+  return <CitiesPaginationRefetchContainer environment={environment} searchParams={{}} />;
 };
 
 export const nullResponseThenReload = () => {
@@ -126,5 +58,5 @@ export const nullResponseThenReload = () => {
       },
     };
   }, 1000);
-  return <CitiesPagination environment={environment} searchParams={{}} />;
+  return <CitiesPaginationRefetchContainer environment={environment} searchParams={{}} />;
 };

@@ -56,7 +56,7 @@ const based = ({ env, render }: { env: IEnvironment; render?: RenderCallback }) 
   );
 };
 
-const demoNodes = [
+export const demoNodes = [
   {
     id: "city#1",
     name: "Madrid",
@@ -81,6 +81,22 @@ const demoNodes = [
     lat: 0,
     lng: 0,
   },
+  {
+    id: "city#4",
+    name: "Paris",
+    country: "France",
+    population: 7000000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#5",
+    name: "London",
+    country: "United Kingdom",
+    population: 9000000,
+    lat: 0,
+    lng: 0,
+  },
 ];
 
 const demoData = {
@@ -88,7 +104,7 @@ const demoData = {
     nodes: demoNodes,
     hasNext: true,
     hasPrev: true,
-    pageSize: 3,
+    pageSize: demoNodes.length,
   },
 };
 
@@ -111,7 +127,7 @@ export const Full = () => {
 
 export const ErrorAndReload = () => {
   const env = returnPayloadAsyncEnvironment(function*() {
-    yield new Error("shit");
+    yield new Error("oops");
     yield demoData;
   }, 1000);
   return based({ env });

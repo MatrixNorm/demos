@@ -2,6 +2,7 @@ import * as React from "react";
 import { graphql, createFragmentContainer, RelayRefetchProp } from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
+import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext";
 import CitySummary, { defaultData as cityDefaultData } from "./CitySummary";
 import { CitiesPagination_page } from "__relay__/CitiesPagination_page.graphql";
 import { NukeFragRef } from "../helpers/typeUtils";
@@ -17,10 +18,17 @@ const CitiesList = styled.ol`
   }
 `;
 
-const Page = styled.div`
+const PageSuccess = styled.div`
   .controls-container {
     text-align: center;
   }
+  .pagesize-container {
+    text-align: left;
+  }
+`;
+
+const PageLoading = styled(PageSuccess)`
+  ${placeholderCssMixin}
 `;
 
 interface Props {
@@ -37,8 +45,8 @@ export default createFragmentContainer(
       if (nodes && nodes.length > 0) {
         let after = nodes[nodes.length - 1].id;
         currentPage.hasNext &&
-          refetch((nextVars) => {
-            return { ...nextVars, after, before: null };
+          refetch((prevVars) => {
+            return { ...prevVars, after, before: null };
           });
       }
     };
@@ -69,16 +77,21 @@ export default createFragmentContainer(
       });
     };
 
+    const isLoading = React.useContext(LoadingContext);
+    const Page = isLoading ? PageLoading : PageSuccess;
+
     return (
       <Page>
         <div className="pagesize-container">
-          <input
-            type="number"
-            value={page.pageSize}
-            max={MAX_PAGE_SIZE}
-            min="1"
-            onChange={(e) => onPageSizeChange(Number(e.target.value), page)}
-          />
+          <span className="pagesize-input placeholder">
+            <input
+              type="number"
+              value={page.pageSize}
+              max={MAX_PAGE_SIZE}
+              min="1"
+              onChange={(e) => onPageSizeChange(Number(e.target.value), page)}
+            />
+          </span>
         </div>
         <CitiesList>
           {nodes &&
