@@ -56,7 +56,7 @@ const based = ({ env, render }: { env: IEnvironment; render?: RenderCallback }) 
   );
 };
 
-export const demoNodes = [
+const demoNodes = [
   {
     id: "city#1",
     name: "Madrid",

@@ -1,25 +1,66 @@
 import * as React from "react";
 import {
+  createTestingEnv,
   loadingForeverEnvironment,
   returnPayloadEnvironment,
   returnPayloadAsyncEnvironment,
 } from "../env";
 import CitiesPaginationRefetchContainer from "../components/CitiesPaginationRefetchContainer";
-import { demoNodes } from "./CitiesPaginationStory.stories";
 
 export default { title: "cities_app-demo1/CitiesPaginationRefetchContainer" };
+
+const demoNodes = [
+  {
+    id: "city#1",
+    name: "Madrid",
+    country: "Spain",
+    population: 3600000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#2",
+    name: "Rome",
+    country: "Italy",
+    population: 4600000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#3",
+    name: "Turin",
+    country: "Italy",
+    population: 2300000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#4",
+    name: "Paris",
+    country: "France",
+    population: 7000000,
+    lat: 0,
+    lng: 0,
+  },
+  {
+    id: "city#5",
+    name: "London",
+    country: "United Kingdom",
+    population: 9000000,
+    lat: 0,
+    lng: 0,
+  },
+];
 
 export const Aaa = () => {
   const environment = returnPayloadAsyncEnvironment(function*() {
     while (true) {
       yield {
-        root: {
-          citiesPagination: {
-            nodes: demoNodes,
-            hasNext: true,
-            hasPrev: false,
-            pageSize: demoNodes.length,
-          },
+        citiesPagination: {
+          nodes: demoNodes,
+          hasNext: true,
+          hasPrev: true,
+          pageSize: demoNodes.length,
         },
       };
     }

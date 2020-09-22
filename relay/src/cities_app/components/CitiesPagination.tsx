@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useState } from "react";
 import { graphql, createFragmentContainer, RelayRefetchProp } from "react-relay";
 import styled from "styled-components";
 import { NextButton, PrevButton } from "../elements/Buttons";
@@ -38,27 +39,48 @@ interface Props {
 
 export default createFragmentContainer(
   ({ page, refetch }: Props) => {
-    const { nodes, hasNext, hasPrev } = page;
+    const isLoading = React.useContext(LoadingContext);
+    const [isRefetching, setIsRefetching] = useState(false);
+
+    const Page = isLoading || isRefetching ? PageLoading : PageSuccess;
 
     const loadNextPage = (currentPage: CitiesPagination_page) => {
+      if (isRefetching) return;
+      setIsRefetching(true);
+
       let { nodes } = currentPage;
       if (nodes && nodes.length > 0) {
         let after = nodes[nodes.length - 1].id;
         currentPage.hasNext &&
-          refetch((prevVars) => {
-            return { ...prevVars, after, before: null };
-          });
+          refetch(
+            (prevVars) => {
+              return { ...prevVars, after, before: null };
+            },
+            null,
+            () => {
+              setIsRefetching(false);
+            }
+          );
       }
     };
 
     const loadPrevPage = (currentPage: CitiesPagination_page) => {
+      if (isRefetching) return;
+      setIsRefetching(true);
+
       let { nodes } = currentPage;
       if (nodes && nodes.length > 0) {
         let before = nodes[0].id;
         currentPage.hasPrev &&
-          refetch((prevVars) => {
-            return { ...prevVars, before, after: null };
-          });
+          refetch(
+            (prevVars) => {
+              return { ...prevVars, before, after: null };
+            },
+            null,
+            () => {
+              setIsRefetching(false);
+            }
+          );
       }
     };
 
@@ -66,19 +88,27 @@ export default createFragmentContainer(
       newPageSize: number,
       currentPage: CitiesPagination_page
     ) => {
+      if (isRefetching) return;
+      setIsRefetching(true);
+
       let { nodes } = currentPage;
-      refetch((prevVars) => {
-        return {
-          ...prevVars,
-          pageSize: newPageSize,
-          after: nodes && nodes.length > 0 ? nodes[0].id : null,
-          before: null,
-        };
-      });
+      refetch(
+        (prevVars) => {
+          return {
+            ...prevVars,
+            pageSize: newPageSize,
+            after: nodes && nodes.length > 0 ? nodes[0].id : null,
+            before: null,
+          };
+        },
+        null,
+        () => {
+          setIsRefetching(false);
+        }
+      );
     };
 
-    const isLoading = React.useContext(LoadingContext);
-    const Page = isLoading ? PageLoading : PageSuccess;
+    const { nodes, hasNext, hasPrev } = page;
 
     return (
       <Page>
