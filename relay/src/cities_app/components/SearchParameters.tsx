@@ -10,7 +10,7 @@ import {
   SearchParametersPresentational,
   SearchParametersType,
 } from "./SearchParametersPresentational";
-import { toQueryURL, compact } from "../helpers/object";
+import { toQueryURL, compact, Compacted } from "../helpers/object";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";

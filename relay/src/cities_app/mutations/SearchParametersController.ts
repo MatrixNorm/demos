@@ -9,23 +9,25 @@ import {
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { compact, Compacted, merge } from "../helpers/object";
-import { NukeFragRef, Writeable } from "../helpers/typeUtils";
+import { NukeFragRef, NukeNulls, Writeable } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-export type SearchParameters = Compacted<NukeFragRef<SearchParameters_searchParams>>;
+export type SearchParameters = NukeNulls<NukeFragRef<SearchParameters_searchParams>>;
 
 type Event = EditEvent | EnterRouteEvent;
-type EditEvent = { type: "edit"; payload: SearchParameters };
+type EditEvent = { type: "edit"; payload: Partial<SearchParameters> };
+type SubmitEvent = { type: "submit" };
+type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type State = {
   searchParams: SearchParameters;
-  editDelta: SearchParameters;
+  editDelta: Partial<SearchParameters>;
 };
 
 type Effect =
   | { type: "writeSearchParams"; value: SearchParameters }
-  | { type: "writeEditDelta"; value: SearchParameters };
+  | { type: "writeEditDelta"; value: Partial<SearchParameters> };
 
 const QUERY = graphql`
   query SearchParametersControllerQuery {
