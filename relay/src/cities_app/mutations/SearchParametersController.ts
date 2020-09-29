@@ -8,8 +8,8 @@ import {
 } from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { compact, Compacted, merge, shallowEqual } from "../helpers/object";
-import { NukeFragRef, NukeNulls, Writeable } from "../helpers/typeUtils";
+import { shallowEqual } from "../helpers/object";
+import { NukeFragRef } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
 export type SearchParameters = Partial<NukeFragRef<SearchParameters_searchParams>>;
@@ -192,28 +192,19 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
  * XXX io-ts ???
  */
 function extractFromUrl(urlSearchString: string): SearchParametersPurified {
+  function goodString(value: string | null) {
+    return value && value.trim().length > 0 ? value.trim() : null;
+  }
+
+  function goodNumber(value: string | null) {
+    return value && Number(value) ? Number(value) : null;
+  }
+
   let qp = new URLSearchParams(urlSearchString);
-  let searchParams = {} as Writeable<SearchParameters>;
-  if (qp.has("countryNameContains")) {
-    let value = qp.get("countryNameContains");
-    if (value) {
-      searchParams["countryNameContains"] = value;
-    }
-  }
-  if (qp.has("populationGte")) {
-    let value = Number(qp.get("populationGte"));
-    if (value) {
-      searchParams["populationGte"] = value;
-    }
-  }
-  if (qp.has("populationLte")) {
-    let value = Number(qp.get("populationLte"));
-    if (value) {
-      searchParams["populationLte"] = value;
-    }
-  }
-  if (Object.keys(searchParams).length > 0) {
-    return compact(searchParams);
-  }
-  return compact<SearchParameters>(null);
+  let searchParams: NukeFragRef<SearchParameters_searchParams> = {
+    countryNameContains: goodString(qp.get("countryNameContains")),
+    populationGte: goodNumber(qp.get("populationGte")),
+    populationLte: goodNumber(qp.get("populationLte")),
+  };
+  return purify(searchParams);
 }
