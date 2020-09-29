@@ -12,22 +12,22 @@ import { compact, Compacted, merge } from "../helpers/object";
 import { NukeFragRef, NukeNulls, Writeable } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-export type SearchParameters = NukeNulls<NukeFragRef<SearchParameters_searchParams>>;
+export type SearchParameters = Compacted<NukeFragRef<SearchParameters_searchParams>>;
 
 type Event = EditEvent | EnterRouteEvent;
-type EditEvent = { type: "edit"; payload: Partial<SearchParameters> };
+type EditEvent = { type: "edit"; payload: SearchParameters };
 type SubmitEvent = { type: "submit" };
 type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type State = {
   searchParams: SearchParameters;
-  editDelta: Partial<SearchParameters>;
+  editDelta: SearchParameters;
 };
 
 type Effect =
   | { type: "writeSearchParams"; value: SearchParameters }
-  | { type: "writeEditDelta"; value: Partial<SearchParameters> };
+  | { type: "writeEditDelta"; value: SearchParameters };
 
 const QUERY = graphql`
   query SearchParametersControllerQuery {
@@ -59,16 +59,13 @@ function reduce(state: State, event: Event): Effect[] {
   switch (event.type) {
     case "edit": {
       let editDelta = merge(state.editDelta, event.payload);
-      if (!editDelta.countryNameContains) {
-        delete editDelta["countryNameContains"];
-      }
       return [{ type: "writeEditDelta", value: editDelta }];
     }
     case "routeEnter": {
       let searchParams = extractSearchParametersFromUrl(event.urlSearchString);
       return [
         { type: "writeSearchParams", value: searchParams },
-        { type: "writeEditDelta", value: compact<SearchParameters>(null) },
+        { type: "writeEditDelta", value: compact(null) },
       ];
     }
     default:

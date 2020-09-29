@@ -5,8 +5,11 @@ import { NukeNulls } from "./typeUtils";
  * and `null` values in an object
  */
 
-type __Compacted__ = "__Compacted__";
-export type Compacted<T extends object> = Partial<NukeNulls<T>> & __Compacted__;
+declare const __compacted__: unique symbol;
+export type Compacted<T extends object> = {
+  readonly [__compacted__]: true;
+  readonly data: Partial<NukeNulls<T>>;
+};
 
 /**
  * values of `undefined` and `null` are treated as absent value
@@ -16,30 +19,20 @@ export function compact<T extends object>(
   obj: T | Partial<T> | null | undefined
 ): Compacted<T> {
   if (!obj) {
-    return {} as Compacted<T>;
+    return { [__compacted__]: true, data: {} };
   }
   let compacted = Object.fromEntries(
     Object.entries(obj).filter(([_, v]) => v !== undefined && v !== null)
   );
   // @ts-ignore
-  return compacted as Compacted<T>;
+  return { [__compacted__]: true, data: compacted };
 }
 
 export function merge<T extends object>(
-  left: Compacted<T> | null,
-  right: Compacted<T> | null
-): Compacted<T>;
-export function merge<T extends object>(
-  left: NukeNulls<T>,
-  right: Compacted<T> | null
-): NukeNulls<T>;
-export function merge<T extends object>(
-  left: Partial<T> | null,
-  right: Compacted<T> | null
-): Partial<T>;
-export function merge(left: any, right: any): any {
-  // @ts-ignore
-  return { ...left, ...right };
+  left: Compacted<T>,
+  right: Compacted<T>
+): Compacted<T> {
+  return { [__compacted__]: true, data: { ...left.data, ...right.data } };
 }
 
 /**
