@@ -209,13 +209,12 @@ function extractFromUrl(urlSearchString: string): SearchParametersPurified {
   return purify(searchParams);
 }
 
-type SearchParametersRequired = NukeNulls<Required<SearchParameters>>;
-
-type SearchParametersValidator = {
-  [P in keyof SearchParametersRequired]: (
-    value: unknown
-  ) => SearchParametersRequired[P] | null;
+type Validator<T> = {
+  [P in keyof T]: (value: unknown) => T[P] | null;
 };
+
+type SearchParametersRequired = NukeNulls<Required<SearchParameters>>;
+type SearchParametersValidator = Validator<SearchParametersRequired>;
 
 function nonEmptyString(value: unknown): string | null {
   if (typeof value === "string") {
@@ -239,7 +238,7 @@ const searchParametersValidator: SearchParametersValidator = {
   populationLte: positiveNumber,
 };
 
-function validatePartially<Validator>(validator: Validator, rawObject: object) {
+function validatePartially<T>(validator: Validator<T>, rawObject: object): Partial<T> {
   let result = {};
   for (let prop in validator) {
     let validatorFn = validator[prop];
