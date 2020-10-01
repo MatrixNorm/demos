@@ -9,7 +9,7 @@ import {
 import { retainRecord } from "../helpers/relayStore";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { shallowEqual } from "../helpers/object";
-import { NukeFragRef } from "../helpers/typeUtils";
+import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
 export type SearchParameters = Partial<NukeFragRef<SearchParameters_searchParams>>;
@@ -207,4 +207,46 @@ function extractFromUrl(urlSearchString: string): SearchParametersPurified {
     populationLte: goodNumber(qp.get("populationLte")),
   };
   return purify(searchParams);
+}
+
+type SearchParametersRequired = NukeNulls<Required<SearchParameters>>;
+
+type SearchParametersValidator = {
+  [P in keyof SearchParametersRequired]: (
+    value: unknown
+  ) => SearchParametersRequired[P] | null;
+};
+
+function nonEmptyString(value: unknown): string | null {
+  if (typeof value === "string") {
+    let trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+  }
+  return null;
+}
+
+function positiveNumber(value: unknown): number | null {
+  if (typeof value === "string") {
+    let num = Number(value);
+    return num && num > 0 ? num : null;
+  }
+  return null;
+}
+
+const searchParametersValidator: SearchParametersValidator = {
+  countryNameContains: nonEmptyString,
+  populationGte: positiveNumber,
+  populationLte: positiveNumber,
+};
+
+function validatePartially<Validator>(validator: Validator, rawObject: object) {
+  let result = {};
+  for (let prop in validator) {
+    let validatorFn = validator[prop];
+    let validationResult = validatorFn(rawObject[prop]);
+    if (validationResult) {
+      result[prop] = validationResult;
+    }
+  }
+  return result;
 }
