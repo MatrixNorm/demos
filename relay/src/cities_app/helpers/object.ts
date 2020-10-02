@@ -1,12 +1,12 @@
 import { NukeNulls } from "./typeUtils";
 
 /**
- * opaque type to guarantee there is no `undefined`
+ * "opaque" type to guarantee there is no `undefined`
  * and `null` values in an object
  */
 
 declare const __compacted__: unique symbol;
-export type Compacted<T extends object> = {
+export type Compacted<T> = {
   readonly [__compacted__]: true;
   readonly data: Partial<NukeNulls<T>>;
 };
@@ -15,9 +15,7 @@ export type Compacted<T extends object> = {
  * values of `undefined` and `null` are treated as absent value
  *
  */
-export function compact<T extends object>(
-  obj: T | Partial<T> | null | undefined
-): Compacted<T> {
+export function compact<T>(obj: Partial<T> | null | undefined): Compacted<T> {
   if (!obj) {
     return { [__compacted__]: true, data: {} };
   }
@@ -28,12 +26,12 @@ export function compact<T extends object>(
   return { [__compacted__]: true, data: compacted };
 }
 
-export function merge<T extends object>(
-  left: Compacted<T>,
-  right: Compacted<T>
-): Compacted<T> {
-  return { [__compacted__]: true, data: { ...left.data, ...right.data } };
-}
+// export function merge<T extends object>(
+//   left: Compacted<T>,
+//   right: Compacted<T>
+// ): Compacted<T> {
+//   return { [__compacted__]: true, data: { ...left.data, ...right.data } };
+// }
 
 /**
  * delta = {x:1, y:2}

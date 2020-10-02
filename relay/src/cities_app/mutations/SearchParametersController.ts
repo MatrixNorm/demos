@@ -7,8 +7,9 @@ import {
   ROOT_ID,
 } from "relay-runtime";
 import { retainRecord } from "../helpers/relayStore";
+import * as spec from "../helpers/spec";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { shallowEqual } from "../helpers/object";
+import { shallowEqual, compact, Compacted } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
@@ -188,9 +189,6 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
   }
 }
 
-/**
- * XXX io-ts ???
- */
 function extractFromUrl(urlSearchString: string): SearchParametersPurified {
   function goodString(value: string | null) {
     return value && value.trim().length > 0 ? value.trim() : null;
@@ -201,6 +199,7 @@ function extractFromUrl(urlSearchString: string): SearchParametersPurified {
   }
 
   let qp = new URLSearchParams(urlSearchString);
+  let x = validate(Object.fromEntries(qp));
   let searchParams: NukeFragRef<SearchParameters_searchParams> = {
     countryNameContains: goodString(qp.get("countryNameContains")),
     populationGte: goodNumber(qp.get("populationGte")),
@@ -209,43 +208,22 @@ function extractFromUrl(urlSearchString: string): SearchParametersPurified {
   return purify(searchParams);
 }
 
-type Validator<T> = {
-  [P in keyof T]: (value: unknown) => T[P] | null;
-};
-
 type SearchParametersRequired = NukeNulls<Required<SearchParameters>>;
-type SearchParametersValidator = Validator<SearchParametersRequired>;
+type SearchParametersValidator = spec.Validator<SearchParametersRequired>;
 
-function nonEmptyString(value: unknown): string | null {
-  if (typeof value === "string") {
-    let trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
-  }
-  return null;
+function validate(rawObject: unknown) {
+  const searchParametersValidator: SearchParametersValidator = {
+    countryNameContains: spec.nonEmptyString,
+    populationGte: spec.positiveNumber,
+    populationLte: spec.positiveNumber,
+  };
+  return spec.validatePartially(searchParametersValidator, rawObject);
 }
 
-function positiveNumber(value: unknown): number | null {
-  if (typeof value === "string") {
-    let num = Number(value);
-    return num && num > 0 ? num : null;
-  }
-  return null;
-}
-
-const searchParametersValidator: SearchParametersValidator = {
-  countryNameContains: nonEmptyString,
-  populationGte: positiveNumber,
-  populationLte: positiveNumber,
-};
-
-function validatePartially<T>(validator: Validator<T>, rawObject: object): Partial<T> {
-  let result = {};
-  for (let prop in validator) {
-    let validatorFn = validator[prop];
-    let validationResult = validatorFn(rawObject[prop]);
-    if (validationResult) {
-      result[prop] = validationResult;
-    }
-  }
-  return result;
+function validatePartiallyFromUrl<T>(
+  validator: Validator<T>,
+  urlSearchString: string
+): Compacted<T> {
+  let qp = new URLSearchParams(urlSearchString);
+  return validatePartially(validator, Object.fromEntries(qp));
 }
