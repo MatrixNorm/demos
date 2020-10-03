@@ -93,9 +93,15 @@ export const full = () => {
             }
             uiState {
               citySearchParams {
-                countryNameContains
-                populationGte
-                populationLte
+                countryNameContains {
+                  value
+                }
+                populationGte {
+                  value
+                }
+                populationLte {
+                  value
+                }
               }
             }
           }

@@ -13,15 +13,12 @@ import { shallowEqual, compact, Compacted } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-export type SearchParameters = Partial<NukeFragRef<SearchParameters_searchParams>>;
-
-type SearchParametersPurified = {
-  purified: true;
-  data: SearchParameters;
-};
+export type SearchParametersNullable = NukeFragRef<SearchParameters_searchParams>;
+type SearchParameters = NukeNulls<SearchParametersNullable>;
+type SearchParametersCompacted = Compacted<SearchParameters>;
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
-type EditEvent = { type: "edit"; delta: SearchParameters };
+type EditEvent = { type: "edit"; delta: Partial<SearchParametersNullable> };
 type SubmitEvent = { type: "submit" };
 type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
@@ -119,9 +116,6 @@ const QUERY = graphql`
       citySearchParams {
         ...SearchParameters_searchParams @relay(mask: false)
       }
-      citySearchParamsEditDelta {
-        ...SearchParameters_editDelta @relay(mask: false)
-      }
     }
   }
 `;
@@ -189,26 +183,7 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
   }
 }
 
-function extractFromUrl(urlSearchString: string): SearchParametersPurified {
-  function goodString(value: string | null) {
-    return value && value.trim().length > 0 ? value.trim() : null;
-  }
-
-  function goodNumber(value: string | null) {
-    return value && Number(value) ? Number(value) : null;
-  }
-
-  let qp = new URLSearchParams(urlSearchString);
-  let x = validate(Object.fromEntries(qp));
-  let searchParams: NukeFragRef<SearchParameters_searchParams> = {
-    countryNameContains: goodString(qp.get("countryNameContains")),
-    populationGte: goodNumber(qp.get("populationGte")),
-    populationLte: goodNumber(qp.get("populationLte")),
-  };
-  return purify(searchParams);
-}
-
-type SearchParametersRequired = NukeNulls<Required<SearchParameters>>;
+type SearchParametersRequired = NukeNulls<SearchParameters>;
 type SearchParametersValidator = spec.Validator<SearchParametersRequired>;
 
 function validate(rawObject: unknown) {
@@ -220,10 +195,7 @@ function validate(rawObject: unknown) {
   return spec.validatePartially(searchParametersValidator, rawObject);
 }
 
-function validatePartiallyFromUrl<T>(
-  validator: Validator<T>,
-  urlSearchString: string
-): Compacted<T> {
+function extractFromUrl(urlSearchString: string) {
   let qp = new URLSearchParams(urlSearchString);
-  return validatePartially(validator, Object.fromEntries(qp));
+  return validate(Object.fromEntries(qp));
 }

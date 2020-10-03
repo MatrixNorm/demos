@@ -13,13 +13,11 @@ import {
 import { toQueryURL, compact, Compacted } from "../helpers/object";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { SearchParameters_editDelta } from "__relay__/SearchParameters_editDelta.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
 type Props = {
   searchMetadata: SearchParameters_searchMetadata;
   searchParams: SearchParameters_searchParams | null;
-  editDelta: SearchParameters_editDelta | null;
   environment: IEnvironment;
 };
 
@@ -73,16 +71,21 @@ const SearchParametersFC = createFragmentContainer(
     `,
     searchParams: graphql`
       fragment SearchParameters_searchParams on UICitySearchParams {
-        countryNameContains
-        populationGte
-        populationLte
-      }
-    `,
-    editDelta: graphql`
-      fragment SearchParameters_editDelta on UICitySearchParams {
-        countryNameContains
-        populationGte
-        populationLte
+        countryNameContains {
+          value
+          draft
+          error
+        }
+        populationGte {
+          value
+          draft
+          error
+        }
+        populationLte {
+          value
+          draft
+          error
+        }
       }
     `,
   }
@@ -94,9 +97,9 @@ export const defaultData = {
     populationUpperBound: 1000000,
   } as SearchParameters_searchMetadata,
   searchParams: {
-    countryNameContains: "",
-    populationGte: 1000,
-    populationLte: 1000000,
+    countryNameContains: { value: "" },
+    populationGte: { value: 1000 },
+    populationLte: { value: 1000000 },
   } as SearchParameters_searchParams,
   editDelta: null,
 };
@@ -110,9 +113,6 @@ export default function({ environment }: { environment: IEnvironment }) {
       uiState {
         citySearchParams {
           ...SearchParameters_searchParams
-        }
-        citySearchParamsEditDelta {
-          ...SearchParameters_editDelta
         }
       }
     }
@@ -137,7 +137,6 @@ export default function({ environment }: { environment: IEnvironment }) {
           <SearchParametersFC
             searchMetadata={props.citiesMetadata}
             searchParams={props.uiState?.citySearchParams || null}
-            editDelta={props.uiState?.citySearchParamsEditDelta || null}
             environment={environment}
           />
         );

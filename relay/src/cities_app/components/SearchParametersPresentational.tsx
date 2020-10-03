@@ -9,8 +9,7 @@ import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
-export type SearchParametersType = NukeFragRef<SearchParameters_searchParams>;
-export type SearchParametersNonNullType = NukeNulls<SearchParametersType>;
+type SearchParameters = NukeFragRef<SearchParameters_searchParams>;
 export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
 
 const SearchParametersBlock = styled.div`
@@ -51,8 +50,8 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export type Props = {
-  onEdit: (delta: Partial<SearchParametersType>) => void;
-  searchParams: SearchParametersNonNullType;
+  onEdit: (delta: Partial<SearchParameters>) => void;
+  searchParams: SearchParameters;
   searchMetadata: SearchMetadataType;
   url: string | null;
 };
