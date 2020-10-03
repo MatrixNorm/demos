@@ -6,11 +6,19 @@ import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
-import { SearchParameters_searchMetadata } from "__relay__/SearchParameters_searchMetadata.graphql";
+import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
-type SearchParameters = NukeFragRef<SearchParameters_searchParams>;
-export type SearchMetadataType = NukeFragRef<SearchParameters_searchMetadata>;
+type SearchParameters = NukeNulls<NukeFragRef<SearchParameters_searchParams>>;
+export type Fields = {
+  [P in keyof SearchParameters]: Pick<SearchParameters[P], "value" | "error">;
+};
+export type EditPayload = Partial<
+  {
+    [P in keyof Fields]: Fields[P]["value"];
+  }
+>;
+export type Metadata = NukeFragRef<SearchParameters_metadata>;
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {
@@ -50,23 +58,23 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export type Props = {
-  onEdit: (delta: Partial<SearchParameters>) => void;
-  searchParams: SearchParameters;
-  searchMetadata: SearchMetadataType;
+  onEdit: (delta: EditPayload) => void;
+  fields: Fields;
+  metadata: Metadata;
   url: string | null;
 };
 
 export function SearchParametersPresentational(props: Props) {
   let isLoading = React.useContext(LoadingContext);
-  let { searchParams, url, searchMetadata, onEdit } = props;
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
+  let { fields, url, metadata, onEdit } = props;
   return (
     <SearchParametersBlock>
       <ParameterSection>
         <div className="label placeholder">Country</div>
         <div className="input placeholder">
           <TextInput
-            value={searchParams.countryNameContains}
+            value={fields.countryNameContains.value}
             onChange={(value) => onEdit({ countryNameContains: value })}
           />
         </div>
@@ -75,10 +83,10 @@ export function SearchParametersPresentational(props: Props) {
         <div className="label placeholder">Population</div>
         <div className="input placeholder">
           <RangeSlider
-            min={searchMetadata.populationLowerBound}
-            max={searchMetadata.populationUpperBound}
-            x1={searchParams.populationGte}
-            x2={searchParams.populationLte}
+            min={metadata.populationLowerBound}
+            max={metadata.populationUpperBound}
+            x1={fields.populationGte.value}
+            x2={fields.populationLte.value}
             step={1}
             onChange={(range) =>
               onEdit({ populationGte: range.lower, populationLte: range.upper })
