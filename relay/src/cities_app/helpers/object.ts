@@ -1,5 +1,17 @@
 import { NukeNulls } from "./typeUtils";
 
+export function objKeys<T>(obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[];
+}
+
+export function objSubset<T, U extends keyof T>(obj: T, subset: U[]): Pick<T, U> {
+  let result = {} as Pick<T, U>;
+  for (let prop of subset) {
+    result[prop] = obj[prop];
+  }
+  return result;
+}
+
 /**
  * "opaque" type to guarantee there is no `undefined`
  * and `null` values in an object

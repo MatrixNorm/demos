@@ -3,62 +3,63 @@ import { graphql, createFragmentContainer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
 import { useRouteMatch } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
-import { ReloadMessage } from "../verysmart/ReloadContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import * as SPController from "../mutations/SearchParametersController";
 import { SearchParametersPresentational, Fields } from "./SearchParametersPresentational";
-import { toQueryURL, compact, Compacted } from "../helpers/object";
+import { objKeys, toQueryURL, compact, Compacted } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
+type Metadata = NukeFragRef<SearchParameters_metadata> | null;
+type SearchParams = NukeFragRef<SearchParameters_searchParams> | null;
+
 type Props = {
-  metadata: NukeFragRef<SearchParameters_metadata> | null;
-  searchParams: SearchParameters_searchParams | null;
+  metadata: Metadata;
+  searchParams: SearchParams;
   environment: IEnvironment;
 };
+
+function $$CalcDisplayData$$(
+  metadata: Metadata,
+  searchParams: SearchParams
+): { fields: Fields; metadata: NonNullable<Metadata> } {
+  const defaultMetadata = {
+    populationLowerBound: 0,
+    populationUpperBound: 10 ** 8,
+  };
+
+  const finalMetadata: NonNullable<Metadata> = { ...defaultMetadata, ...metadata };
+
+  const defaultSearchParams = {
+    countryNameContains: "",
+    populationGte: finalMetadata.populationLowerBound,
+    populationLte: finalMetadata.populationUpperBound,
+  };
+
+  let result: any = {};
+  for (let prop of objKeys(defaultSearchParams)) {
+    let x = (searchParams || {})[prop];
+    if (x) {
+      result[prop] = {
+        value: x.value || defaultSearchParams[prop],
+        error: x.error || null,
+      };
+    } else {
+      result[prop] = {
+        value: defaultSearchParams[prop],
+        error: null,
+      };
+    }
+  }
+  return { fields: result, metadata: finalMetadata };
+}
 
 const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
     const { url } = useRouteMatch();
-
-    const defaultMetadata = {
-      populationLowerBound: 0,
-      populationUpperBound: 10 ** 8,
-    };
-
-    let metadata = { ...defaultMetadata, ...props.metadata };
-
-    const defaultSearchParams = {
-      countryNameContains: "",
-      populationGte: metadata.populationLowerBound,
-      populationLte: metadata.populationUpperBound,
-    };
-
-    const fields: Fields = {
-      countryNameContains: {
-        ...{
-          value: defaultSearchParams.countryNameContains,
-          error: null,
-        },
-        ...props.searchParams?.countryNameContains,
-      },
-      populationGte: {
-        ...{
-          value: defaultSearchParams.populationGte,
-          error: null,
-        },
-        ...props.searchParams?.populationGte,
-      },
-      populationLte: {
-        ...{
-          value: defaultSearchParams.populationLte,
-          error: null,
-        },
-        ...props.searchParams?.populationLte,
-      },
-    };
+    const { fields, metadata } = $$CalcDisplayData$$(props.metadata, props.searchParams);
 
     function onEdit(delta: Partial<SearchParametersType>) {
       SPController.handleEvent(
