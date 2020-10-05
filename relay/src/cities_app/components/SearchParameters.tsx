@@ -1,11 +1,15 @@
 import * as React from "react";
 import { graphql, createFragmentContainer } from "react-relay";
 import { IEnvironment } from "relay-runtime";
-import { useRouteMatch } from "react-router-dom";
+import { useRouteMatch, useHistory } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import * as SPController from "../mutations/SearchParametersController";
-import { SearchParametersPresentational, Fields } from "./SearchParametersPresentational";
+import {
+  SearchParametersDisplayComponent,
+  SearchParametersForDisplay,
+  SearchParametersOnlyValues,
+} from "./SearchParametersPresentational";
 import { objKeys, toQueryURL, compact, Compacted } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
@@ -24,7 +28,7 @@ type Props = {
 function $$CalcDisplayData$$(
   metadata: Metadata,
   searchParams: SearchParams
-): { fields: Fields; metadata: NonNullable<Metadata> } {
+): { fields: SearchParametersForDisplay; metadata: NonNullable<Metadata> } {
   const defaultMetadata = {
     populationLowerBound: 0,
     populationUpperBound: 10 ** 8,
@@ -32,7 +36,7 @@ function $$CalcDisplayData$$(
 
   const finalMetadata: NonNullable<Metadata> = { ...defaultMetadata, ...metadata };
 
-  const defaultSearchParams = {
+  const defaultSearchParams: SearchParametersOnlyValues = {
     countryNameContains: "",
     populationGte: finalMetadata.populationLowerBound,
     populationLte: finalMetadata.populationUpperBound,
@@ -58,12 +62,17 @@ function $$CalcDisplayData$$(
 
 const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
-    const { url } = useRouteMatch();
+    const { url: baseUrl } = useRouteMatch();
+    const history = useHistory();
     const { fields, metadata } = $$CalcDisplayData$$(props.metadata, props.searchParams);
 
-    function onEdit(delta: Partial<SearchParametersType>) {
+    function onEdit(delta: Partial<SearchParametersOnlyValues>) {
+      SPController.handleEvent({ type: "edit", payload: delta }, props.environment);
+    }
+
+    function onSubmit() {
       SPController.handleEvent(
-        { type: "edit", payload: compact(delta) },
+        { type: "submit", payload: { history, baseUrl } },
         props.environment
       );
     }
@@ -72,18 +81,13 @@ const SearchParametersFC = createFragmentContainer(
       fields: fields,
       metadata: metadata,
       onEdit,
-      url:
-        Object.keys(editDeltaCompacted).length > 0
-          ? `${url}?${toQueryURL({ ...searchParamsCompacted, ...editDeltaCompacted })}`
-          : null,
+      onSubmit,
     };
-
     const renderCallback = React.useContext(RenderCallbackContext)["SearchParameters"];
     if (renderCallback) {
       return renderCallback(args);
     }
-
-    return <SearchParametersPresentational {...args} />;
+    return <SearchParametersDisplayComponent {...args} />;
   },
   {
     metadata: graphql`

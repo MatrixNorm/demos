@@ -1,6 +1,5 @@
 import * as React from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext";
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
@@ -10,15 +9,13 @@ import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.g
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
 type SearchParameters = NukeNulls<NukeFragRef<SearchParameters_searchParams>>;
-export type Fields = {
+type Metadata = NukeFragRef<SearchParameters_metadata>;
+export type SearchParametersForDisplay = {
   [P in keyof SearchParameters]: Pick<SearchParameters[P], "value" | "error">;
 };
-export type EditPayload = Partial<
-  {
-    [P in keyof Fields]: Fields[P]["value"];
-  }
->;
-export type Metadata = NukeFragRef<SearchParameters_metadata>;
+export type SearchParametersOnlyValues = {
+  [P in keyof SearchParameters]: SearchParameters[P]["value"];
+};
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {
@@ -58,16 +55,20 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export type Props = {
-  onEdit: (delta: EditPayload) => void;
-  fields: Fields;
+  fields: SearchParametersForDisplay;
   metadata: Metadata;
-  url: string | null;
+  onEdit: (delta: Partial<SearchParametersOnlyValues>) => void;
+  onSubmit: () => void | null;
 };
 
-export function SearchParametersPresentational(props: Props) {
+export function SearchParametersDisplayComponent({
+  fields,
+  metadata,
+  onEdit,
+  onSubmit,
+}: Props) {
   let isLoading = React.useContext(LoadingContext);
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
-  let { fields, url, metadata, onEdit } = props;
   return (
     <SearchParametersBlock>
       <ParameterSection>
@@ -94,11 +95,9 @@ export function SearchParametersPresentational(props: Props) {
           />
         </div>
       </ParameterSection>
-      {url && (
+      {onSubmit && (
         <div className="submit-button-box">
-          <SubmitButton>
-            <Link to={url}>apply</Link>
-          </SubmitButton>
+          <SubmitButton onClick={onSubmit}></SubmitButton>
         </div>
       )}
     </SearchParametersBlock>
