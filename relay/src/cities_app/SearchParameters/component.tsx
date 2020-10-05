@@ -9,7 +9,7 @@ import {
   SearchParametersDisplayComponent,
   SearchParametersForDisplay,
   SearchParametersOnlyValues,
-} from "./SearchParametersPresentational";
+} from "./componentDisplay";
 import { objKeys } from "../helpers/object";
 import { NukeFragRef } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
