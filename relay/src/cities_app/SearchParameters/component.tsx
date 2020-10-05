@@ -4,39 +4,32 @@ import { IEnvironment } from "relay-runtime";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
-import * as SPController from "../mutations/SearchParametersController";
-import {
-  SearchParametersDisplayComponent,
-  SearchParametersForDisplay,
-  SearchParametersOnlyValues,
-} from "./componentDisplay";
+import * as SPController from "./controller";
+import { SearchParametersDisplayComponent } from "./componentDisplay";
+import * as t from "./types";
 import { objKeys } from "../helpers/object";
-import { NukeFragRef } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-type Metadata = NukeFragRef<SearchParameters_metadata> | null;
-type SearchParams = NukeFragRef<SearchParameters_searchParams> | null;
-
 type Props = {
-  metadata: Metadata;
-  searchParams: SearchParams;
+  metadata: SearchParameters_metadata | null;
+  searchParams: SearchParameters_searchParams | null;
   environment: IEnvironment;
 };
 
 function $$CalcDisplayData$$(
-  metadata: Metadata,
-  searchParams: SearchParams
-): { fields: SearchParametersForDisplay; metadata: NonNullable<Metadata> } {
+  metadata: SearchParameters_metadata | null,
+  searchParams: SearchParameters_searchParams | null
+): { fields: t.SearchParametersForDisplay; metadata: t.Metadata } {
   const defaultMetadata = {
     populationLowerBound: 0,
     populationUpperBound: 10 ** 8,
   };
 
-  const finalMetadata: NonNullable<Metadata> = { ...defaultMetadata, ...metadata };
+  const finalMetadata: t.Metadata = { ...defaultMetadata, ...metadata };
 
-  const defaultSearchParams: SearchParametersOnlyValues = {
+  const defaultSearchParams: t.SearchParametersOnlyValues = {
     countryNameContains: "",
     populationGte: finalMetadata.populationLowerBound,
     populationLte: finalMetadata.populationUpperBound,
@@ -66,7 +59,7 @@ const SearchParametersFC = createFragmentContainer(
     const history = useHistory();
     const { fields, metadata } = $$CalcDisplayData$$(props.metadata, props.searchParams);
 
-    function onEdit(delta: Partial<SearchParametersOnlyValues>) {
+    function onEdit(delta: Partial<t.SearchParametersOnlyValues>) {
       SPController.handleEvent({ type: "edit", payload: delta }, props.environment);
     }
 
@@ -118,18 +111,21 @@ const SearchParametersFC = createFragmentContainer(
   }
 );
 
-export const defaultData = {
-  searchMetadata: {
+export const defaultData = (function() {
+  let metadata: t.Metadata = {
     populationLowerBound: 1000,
     populationUpperBound: 1000000,
-  } as SearchParameters_metadata,
-  searchParams: {
-    countryNameContains: { value: "" },
-    populationGte: { value: 1000 },
-    populationLte: { value: 1000000 },
-  } as SearchParameters_searchParams,
-  editDelta: null,
-};
+  };
+  let searchParams: t.SearchParameters = {
+    countryNameContains: { value: "", draft: null, error: null },
+    populationGte: { value: 1000, draft: null, error: null },
+    populationLte: { value: 1000000, draft: null, error: null },
+  };
+  return {
+    metadata,
+    searchParams,
+  };
+})();
 
 export default function({ environment }: { environment: IEnvironment }) {
   let q = graphql`
@@ -151,7 +147,7 @@ export default function({ environment }: { environment: IEnvironment }) {
       environment={environment}
       variables={{}}
       placeholderData={{
-        citiesMetadata: { ...defaultData.searchMetadata },
+        citiesMetadata: { ...defaultData.metadata },
         uiState: {
           citySearchParams: { ...defaultData.searchParams },
         },

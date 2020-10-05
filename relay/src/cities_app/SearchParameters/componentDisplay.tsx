@@ -4,18 +4,7 @@ import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
-import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
-import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
-import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-
-type SearchParameters = NukeNulls<NukeFragRef<SearchParameters_searchParams>>;
-type Metadata = NukeFragRef<SearchParameters_metadata>;
-export type SearchParametersForDisplay = {
-  [P in keyof SearchParameters]: Pick<SearchParameters[P], "value" | "error">;
-};
-export type SearchParametersOnlyValues = {
-  [P in keyof SearchParameters]: SearchParameters[P]["value"];
-};
+import * as t from "./types";
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {
@@ -55,9 +44,9 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export type Props = {
-  fields: SearchParametersForDisplay;
-  metadata: Metadata;
-  onEdit: (delta: Partial<SearchParametersOnlyValues>) => void;
+  fields: t.SearchParametersForDisplay;
+  metadata: t.Metadata;
+  onEdit: (delta: Partial<t.SearchParametersOnlyValues>) => void;
   onSubmit: () => void | null;
 };
 

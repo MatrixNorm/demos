@@ -9,7 +9,7 @@ import {
 import { History } from "history";
 import { retainRecord } from "../helpers/relayStore";
 import * as spec from "../helpers/spec";
-import { SearchParametersOnlyValues } from "../components/SearchParametersPresentational";
+import * as t from "./types";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { shallowEqual, compact, Compacted } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
@@ -19,7 +19,7 @@ export type SearchParametersNullable = NukeFragRef<SearchParameters_searchParams
 type SearchParameters = NukeNulls<SearchParametersNullable>;
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
-type EditEvent = { type: "edit"; delta: Partial<SearchParametersOnlyValues> };
+type EditEvent = { type: "edit"; delta: Partial<t.SearchParametersOnlyValues> };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
