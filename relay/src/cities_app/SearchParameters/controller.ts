@@ -19,14 +19,14 @@ export type SearchParametersNullable = NukeFragRef<SearchParameters_searchParams
 type SearchParameters = NukeNulls<SearchParametersNullable>;
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
-type EditEvent = { type: "edit"; delta: Partial<t.SearchParametersOnlyValues> };
+type EditEvent = { type: "edit"; payload: Partial<t.SearchParametersOnlyValues> };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type Effect =
   | { type: "writeSearchParams"; value: SearchParameters }
-  | { type: "writeEditDelta"; value: SearchParameters };
+  | { type: "redirectToUrl"; value: { history: History; url: string } };
 
 function reduce(state: State, event: Event): Effect[] {
   let eventType = event.rawEvent.type;
