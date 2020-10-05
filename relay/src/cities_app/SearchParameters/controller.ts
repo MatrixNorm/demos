@@ -134,26 +134,6 @@ export function handleEvent(event: Event, environment: IEnvironment) {
   });
 }
 
-function writeEditDelta(delta: SearchParameters, environment: IEnvironment) {
-  commitLocalUpdate(environment, (store) => {
-    store.delete(`${ROOT_ID}:uiState:citySearchParamsEditDelta`);
-  });
-  if (Object.keys(delta).length > 0) {
-    commitLocalUpdate(environment, (store) => {
-      const record = store
-        .get(ROOT_ID)
-        ?.getOrCreateLinkedRecord("uiState", "UIState")
-        ?.getOrCreateLinkedRecord("citySearchParamsEditDelta", "UICitySearchParams");
-      if (record) {
-        for (let key in delta) {
-          record.setValue(delta[key as keyof SearchParameters], key);
-        }
-      }
-    });
-    retainRecord(QUERY, environment);
-  }
-}
-
 function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
   commitLocalUpdate(environment, (store) => {
     store.delete(`${ROOT_ID}:uiState:citySearchParams`);
