@@ -9,14 +9,13 @@ import {
 import { History } from "history";
 import { retainRecord } from "../helpers/relayStore";
 import * as spec from "../helpers/spec";
+import * as o from "../helpers/object";
 import * as t from "./types";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { shallowEqual, compact, Compacted } from "../helpers/object";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
 export type SearchParametersNullable = NukeFragRef<SearchParameters_searchParams>;
-type SearchParameters = NukeNulls<SearchParametersNullable>;
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
 type EditEvent = { type: "edit"; payload: Partial<t.SearchParametersOnlyValues> };
@@ -25,22 +24,37 @@ type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type Effect =
-  | { type: "writeSearchParams"; value: SearchParameters }
+  | { type: "writeSearchParams"; value: t.SearchParameters }
   | { type: "redirectToUrl"; value: { history: History; url: string } };
 
-function reduce(state: State, event: Event): Effect[] {
-  let eventType = event.rawEvent.type;
-  let eventPayload = event.payload.data;
-  let searchParams = state.searchParams.data;
-  let editDelta = state.editDelta.data;
-
-  switch (eventType) {
-    case "edit": {
-      let _editDelta = { ...editDelta, ...eventPayload };
-      if (shallowEqual(_editDelta, editDelta)) {
-        return [];
+function $$mergeEditPayload$$(
+  state: t.SearchParameters,
+  payload: Partial<t.SearchParametersOnlyValues>
+): t.SearchParameters | null {
+  const nextState = { ...state };
+  for (let prop of o.objKeys(payload)) {
+    let value = payload[prop];
+    if (value) {
+      let x = { ...nextState[prop], value };
+      if (nextState[prop]) {
+        nextState[prop] = { ...nextState[prop], value };
+      } else {
+        nextState[prop] = { value };
       }
-      return [{ type: "writeEditDelta", value: editDelta }];
+    }
+  }
+  return nextState;
+}
+
+function reduce(state: t.SearchParameters, event: Event): Effect[] | null {
+  switch (event.type) {
+    case "edit": {
+      let { payload } = event;
+      let nextState = $$mergeEditPayload$$(state, payload);
+      if (nextState) {
+        return [{ type: "writeSearchParams", value: nextState }];
+      }
+      return null;
     }
     case "routeEnter": {
       return [
