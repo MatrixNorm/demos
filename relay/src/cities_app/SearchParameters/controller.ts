@@ -9,7 +9,6 @@ import {
 import { History } from "history";
 import { retainRecord } from "../helpers/relayStore";
 import * as spec from "../helpers/spec";
-import * as o from "../helpers/object";
 import * as t from "./types";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
@@ -18,7 +17,7 @@ import { SearchParametersControllerQueryResponse } from "__relay__/SearchParamet
 export type SearchParametersNullable = NukeFragRef<SearchParameters_searchParams>;
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
-type EditEvent = { type: "edit"; payload: Partial<t.SearchParametersOnlyValues> };
+type EditEvent = { type: "edit"; payload: t.SearchParametersEditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
@@ -27,20 +26,21 @@ type Effect =
   | { type: "writeSearchParams"; value: t.SearchParameters }
   | { type: "redirectToUrl"; value: { history: History; url: string } };
 
+function decodePayload(
+  payload: t.SearchParametersEditPayload
+): Partial<t.SearchParametersOnlyValues> | null {
+  return null;
+}
+
 function $$mergeEditPayload$$(
   state: t.SearchParameters,
   payload: Partial<t.SearchParametersOnlyValues>
-): t.SearchParameters | null {
+): t.SearchParameters {
   const nextState = { ...state };
-  for (let prop of o.objKeys(payload)) {
-    let value = payload[prop];
+  for (let [prop, value] of Object.entries(payload)) {
     if (value) {
-      let x = { ...nextState[prop], value };
-      if (nextState[prop]) {
-        nextState[prop] = { ...nextState[prop], value };
-      } else {
-        nextState[prop] = { value };
-      }
+      //@ts-ignore
+      nextState[prop] = { ...nextState[prop], value };
     }
   }
   return nextState;
@@ -49,12 +49,8 @@ function $$mergeEditPayload$$(
 function reduce(state: t.SearchParameters, event: Event): Effect[] | null {
   switch (event.type) {
     case "edit": {
-      let { payload } = event;
-      let nextState = $$mergeEditPayload$$(state, payload);
-      if (nextState) {
-        return [{ type: "writeSearchParams", value: nextState }];
-      }
-      return null;
+      let nextState = $$mergeEditPayload$$(state, event.payload);
+      return [{ type: "writeSearchParams", value: nextState }];
     }
     case "routeEnter": {
       return [
@@ -74,42 +70,6 @@ function reduce(state: t.SearchParameters, event: Event): Effect[] | null {
     default:
       return [];
   }
-}
-
-// XXX
-export function purify(
-  input: SearchParameters | null | undefined
-): SearchParametersPurified {
-  if (!input) {
-    return { purified: true, data: {} };
-  }
-  let copy = { ...input };
-  let { countryNameContains } = copy;
-  if (countryNameContains && countryNameContains.trim().length === 0) {
-    delete copy["countryNameContains"];
-  }
-  let denulled = Object.fromEntries(
-    Object.entries(copy).filter(([_, v]) => v !== undefined && v !== null)
-  );
-  return { purified: true, data: denulled };
-}
-
-function purifyEvent(event: Event): EventPurified {
-  let payload: SearchParametersPurified = { purified: true, data: {} };
-  switch (event.type) {
-    case "edit": {
-      payload = purify(event.delta);
-      break;
-    }
-    case "routeEnter": {
-      payload = extractFromUrl(event.urlSearchString);
-      break;
-    }
-  }
-  return {
-    rawEvent: event,
-    payload,
-  };
 }
 
 const QUERY = graphql`
