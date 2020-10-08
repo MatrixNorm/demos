@@ -10,11 +10,7 @@ import { History } from "history";
 import { retainRecord } from "../helpers/relayStore";
 import * as spec from "../helpers/spec";
 import * as t from "./types";
-import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
-
-export type SearchParametersNullable = NukeFragRef<SearchParameters_searchParams>;
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
 type EditEvent = { type: "edit"; payload: t.SearchParametersEditPayload };
@@ -113,7 +109,34 @@ function reduceRouteEnter(
 function reduceSubmit(
   state: t.SearchParameters,
   payload: { history: History; baseUrl: string }
-): Extract<Effect, { type: "redirectToUrl" }> | null {}
+): Extract<Effect, { type: "redirectToUrl" }> | null {
+  //@@@
+  function hasError(state: t.SearchParameters): boolean {
+    return (
+      Object.values(state)
+        .filter(Boolean)
+        //@ts-ignore
+        .some(({ error }) => error !== null)
+    );
+  }
+
+  function redirectUrl(state: t.SearchParameters): string {
+    return payload.baseUrl;
+  }
+
+  if (hasError(state)) return null;
+
+  return {
+    type: "redirectToUrl",
+    value: { history: payload.history, url: redirectUrl(state) },
+  };
+}
+
+function reduceCancel(
+  state: t.SearchParameters
+): Extract<Effect, { type: "writeSearchParams" }> | null {
+  return null;
+}
 
 function reduce(state: t.SearchParameters, event: Event): Effect | Effect[] | null {
   switch (event.type) {
@@ -124,13 +147,10 @@ function reduce(state: t.SearchParameters, event: Event): Effect | Effect[] | nu
       return reduceRouteEnter(event.urlSearchString);
     }
     case "submit": {
-      return [
-        { type: "writeSearchParams", value: { ...searchParams, ...editDelta } },
-        { type: "writeEditDelta", value: {} },
-      ];
+      return reduceSubmit(state, event.payload);
     }
     case "cancel": {
-      return [{ type: "writeEditDelta", value: {} }];
+      return reduceCancel(state);
     }
     default:
       return [];
