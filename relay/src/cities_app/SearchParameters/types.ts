@@ -7,6 +7,9 @@ export type SearchParameters = NukeFragRef<SearchParameters_searchParams>;
 export type SearchParametersDenulled = NukeNulls<
   NukeFragRef<SearchParameters_searchParams>
 >;
+export type SearchParametersBlank = {
+  [P in keyof SearchParameters]: null;
+};
 export type SearchParametersForDisplay = {
   [P in keyof SearchParametersDenulled]: Pick<
     SearchParametersDenulled[P],
@@ -24,6 +27,8 @@ export type SearchParametersEditPayload = Partial<
 >;
 
 export type SearchParametersValidator = spec.Validator<SearchParametersOnlyValues>;
-export type SearchParametersValidatorResult = spec.ValidationResult<SearchParametersOnlyValues>;
+export type SearchParametersValidatorResult = spec.ValidationResult<
+  SearchParametersOnlyValues
+>;
 
 export type Metadata = NukeFragRef<SearchParameters_metadata>;

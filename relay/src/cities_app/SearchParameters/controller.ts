@@ -55,9 +55,9 @@ function validatePayload(payload: Partial<t.SearchParametersOnlyValues>) {
 function reduceEdit(
   state: t.SearchParameters,
   payload: t.SearchParametersEditPayload
-): Effect[] | undefined {
+): Effect | null {
   let decoded = decodePayload(payload);
-  if (decoded === null) return;
+  if (decoded === null) return null;
 
   let validated = validatePayload(decoded);
   let nextState = { ...state };
@@ -74,19 +74,54 @@ function reduceEdit(
       };
     }
   }
-  return [{ type: "writeSearchParams", value: nextState }];
+  return { type: "writeSearchParams", value: nextState };
 }
 
-function reduce(state: t.SearchParameters, event: Event): Effect[] | undefined {
+function reduceRouteEnter(
+  urlSearchString: string
+): Extract<Effect, { type: "writeSearchParams" }> | null {
+  //@ts-ignore
+  let decoded = decodePayload(Object.fromEntries(new URLSearchParams(urlSearchString)));
+  if (decoded === null) return null;
+
+  let validated = validatePayload(decoded);
+  let nextState: t.SearchParametersBlank = {
+    countryNameContains: null,
+    populationGte: null,
+    populationLte: null,
+  };
+
+  for (let prop in validated) {
+    let validatedResult = validated[prop as keyof typeof validated];
+    if (validatedResult) {
+      if (validatedResult.error) {
+        //@ts-ignore
+        nextState[prop] = {
+          value: null,
+          draft: validatedResult.value,
+          error: validatedResult.error,
+        };
+      } else {
+        //@ts-ignore
+        nextState[prop] = { value: validatedResult.value, draft: null, error: null };
+      }
+    }
+  }
+  return { type: "writeSearchParams", value: nextState };
+}
+
+function reduceSubmit(
+  state: t.SearchParameters,
+  payload: { history: History; baseUrl: string }
+): Extract<Effect, { type: "redirectToUrl" }> | null {}
+
+function reduce(state: t.SearchParameters, event: Event): Effect | Effect[] | null {
   switch (event.type) {
     case "edit": {
       return reduceEdit(state, event.payload);
     }
     case "routeEnter": {
-      return [
-        { type: "writeSearchParams", value: eventPayload },
-        { type: "writeEditDelta", value: {} },
-      ];
+      return reduceRouteEnter(event.urlSearchString);
     }
     case "submit": {
       return [
