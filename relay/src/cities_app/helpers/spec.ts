@@ -1,6 +1,4 @@
-export type ScalarValidatorResult<V> =
-  | { valid: true; value: V }
-  | { valid: false; value: V; error: string };
+export type ScalarValidatorResult<V> = { value: V; error: string | null };
 
 export type ScalarValidator<V> = (value: V) => ScalarValidatorResult<V>;
 
@@ -12,34 +10,15 @@ export type ValidationResult<T> = {
   [P in keyof T]: ScalarValidatorResult<T[P]>;
 };
 
-export function nonEmptyString(value: unknown): string | null {
-  if (typeof value === "string") {
-    let trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : null;
+export function validatePartially<T>(
+  validator: Validator<T>,
+  data: Partial<T>
+): Partial<ValidationResult<T>> {
+  let result = {};
+  for (let prop in data) {
+    let scalarValidator = validator[prop];
+    //@ts-ignore
+    result[prop] = scalarValidator(data[prop]);
   }
-  return null;
+  return result;
 }
-
-export function positiveNumber(value: unknown): number | null {
-  if (typeof value === "string") {
-    let num = Number(value);
-    return num && num > 0 ? num : null;
-  }
-  return null;
-}
-
-// export function validatePartially<T>(
-//   validator: Validator<T>,
-//   rawObject: unknown
-// ): Compacted<T> {
-//   if (typeof rawObject === "object" && rawObject !== null) {
-//     let result = {};
-//     for (let prop in validator) {
-//       let validatorFn = validator[prop];
-//       //@ts-ignore
-//       result[prop] = validatorFn(rawObject[prop]);
-//     }
-//     return compact(result);
-//   }
-//   return compact(null);
-// }

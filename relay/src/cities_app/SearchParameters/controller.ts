@@ -32,25 +32,55 @@ function decodePayload(
   return null;
 }
 
-function $$mergeEditPayload$$(
-  state: t.SearchParameters,
-  payload: Partial<t.SearchParametersOnlyValues>
-): t.SearchParameters {
-  const nextState = { ...state };
-  for (let [prop, value] of Object.entries(payload)) {
-    if (value) {
-      //@ts-ignore
-      nextState[prop] = { ...nextState[prop], value };
-    }
+function validatePayload(payload: Partial<t.SearchParametersOnlyValues>) {
+  function nonEmptyString(value: string): { value: string; error: string | null } {
+    let trimmed = value.trim();
+    return trimmed.length > 0
+      ? { value, error: null }
+      : { value, error: "Should not be blank" };
   }
-  return nextState;
+
+  function positiveNumber(value: number): { value: number; error: string | null } {
+    return value > 0 ? { value, error: null } : { value, error: "Should be positive" };
+  }
+
+  const searchParametersValidator: t.SearchParametersValidator = {
+    countryNameContains: nonEmptyString,
+    populationGte: positiveNumber,
+    populationLte: positiveNumber,
+  };
+  return spec.validatePartially(searchParametersValidator, payload);
 }
 
-function reduce(state: t.SearchParameters, event: Event): Effect[] | null {
+function reduceEdit(
+  state: t.SearchParameters,
+  payload: t.SearchParametersEditPayload
+): Effect[] | undefined {
+  let decoded = decodePayload(payload);
+  if (decoded === null) return;
+
+  let validated = validatePayload(decoded);
+  let nextState = { ...state };
+
+  for (let prop in validated) {
+    let validatedResult = validated[prop as keyof typeof validated];
+    if (validatedResult) {
+      //@ts-ignore
+      nextState[prop] = {
+        //@ts-ignore
+        value: nextState[prop].value,
+        draft: validatedResult.value,
+        error: validatedResult.error,
+      };
+    }
+  }
+  return [{ type: "writeSearchParams", value: nextState }];
+}
+
+function reduce(state: t.SearchParameters, event: Event): Effect[] | undefined {
   switch (event.type) {
     case "edit": {
-      let nextState = $$mergeEditPayload$$(state, event.payload);
-      return [{ type: "writeSearchParams", value: nextState }];
+      return reduceEdit(state, event.payload);
     }
     case "routeEnter": {
       return [
@@ -126,18 +156,6 @@ function writeSearchParams(searchParams: SearchParameters, environment: IEnviron
     });
     retainRecord(QUERY, environment);
   }
-}
-
-type SearchParametersRequired = NukeNulls<SearchParameters>;
-type SearchParametersValidator = spec.Validator<SearchParametersRequired>;
-
-function validate(rawObject: unknown) {
-  const searchParametersValidator: SearchParametersValidator = {
-    countryNameContains: spec.nonEmptyString,
-    populationGte: spec.positiveNumber,
-    populationLte: spec.positiveNumber,
-  };
-  return spec.validatePartially(searchParametersValidator, rawObject);
 }
 
 function extractFromUrl(urlSearchString: string) {
