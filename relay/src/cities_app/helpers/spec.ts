@@ -1,6 +1,8 @@
-export type ScalarValidatorResult<V> = { value: V; error: string | null };
+export type ScalarValidatorResult<V> =
+  | { value: V; error: null }
+  | { value: unknown; error: string };
 
-export type ScalarValidator<V> = (value: V) => ScalarValidatorResult<V>;
+export type ScalarValidator<V> = (value: unknown) => ScalarValidatorResult<V>;
 
 export type Validator<T> = {
   [P in keyof T]: ScalarValidator<T[P]>;

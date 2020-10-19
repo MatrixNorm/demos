@@ -8,66 +8,68 @@ import {
 } from "relay-runtime";
 import { History } from "history";
 import { retainRecord } from "../helpers/relayStore";
-import * as spec from "../helpers/spec";
 import * as t from "./types";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
 type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
-type EditEvent = { type: "edit"; payload: t.SearchParametersEditPayload };
+type EditEvent = { type: "edit"; payload: t.SPEditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type Effect =
-  | { type: "writeSearchParams"; value: t.SearchParameters }
+  | { type: "writeSearchParams"; value: t.SP }
   | { type: "redirectToUrl"; value: { history: History; url: string } };
 
-function decodePayload(
-  payload: t.SearchParametersEditPayload
-): Partial<t.SearchParametersOnlyValues> | null {
-  return null;
-}
-
-function validatePayload(payload: Partial<t.SearchParametersOnlyValues>) {
-  function nonEmptyString(value: string): { value: string; error: string | null } {
+function validate(payload: t.SPEditPayload): t.SPEditPayloadValidated {
+  function nonEmptyString(value: string): { error: string } | null {
     let trimmed = value.trim();
-    return trimmed.length > 0
-      ? { value, error: null }
-      : { value, error: "Should not be blank" };
+    return trimmed.length > 0 ? null : { error: "Should not be blank" };
   }
 
-  function positiveNumber(value: number): { value: number; error: string | null } {
-    return value > 0 ? { value, error: null } : { value, error: "Should be positive" };
+  function nonNegativeNumber(value: number): { error: string } | null {
+    return value > 0 ? null : { error: "Should not be negative" };
   }
 
-  const searchParametersValidator: t.SearchParametersValidator = {
+  const searchParametersValidator = {
     countryNameContains: nonEmptyString,
-    populationGte: positiveNumber,
-    populationLte: positiveNumber,
+    populationGte: nonNegativeNumber,
+    populationLte: nonNegativeNumber,
   };
-  return spec.validatePartially(searchParametersValidator, payload);
+
+  const result = {};
+  for (let [prop, value] of Object.entries(payload)) {
+    //@ts-ignore
+    let propResult = searchParametersValidator[prop](val);
+    //@ts-ignore
+    result[prop] = propResult ? { value, error: propResult.error } : value;
+  }
+  return result;
 }
 
-function reduceEdit(
-  state: t.SearchParameters,
-  payload: t.SearchParametersEditPayload
-): Effect | null {
-  let decoded = decodePayload(payload);
-  if (decoded === null) return null;
-
-  let validated = validatePayload(decoded);
+function reduceEdit(state: t.SP, payload: t.SPEditPayload): Effect | null {
+  let validatedPayload = validate(payload);
   let nextState = { ...state };
 
-  for (let prop in validated) {
-    let validatedResult = validated[prop as keyof typeof validated];
-    if (validatedResult) {
+  for (let prop of Object.keys(validatedPayload)) {
+    let vResult = validatedPayload[prop as keyof typeof validatedPayload];
+    if (vResult) {
       //@ts-ignore
-      nextState[prop] = {
+      if (vResult?.error) {
         //@ts-ignore
-        value: nextState[prop].value,
-        draft: validatedResult.value,
-        error: validatedResult.error,
-      };
+        nextState[prop] = {
+          //@ts-ignore
+          ...nextState[prop],
+          draft: vResult.value,
+          //@ts-ignore
+          error: vResult.error,
+        };
+      } else {
+        nextState[prop] = {
+          ...nextState[prop],
+          draft: vResult.value,
+        };
+      }
     }
   }
   return { type: "writeSearchParams", value: nextState };
@@ -138,7 +140,7 @@ function reduceCancel(
   return null;
 }
 
-function reduce(state: t.SearchParameters, event: Event): Effect | Effect[] | null {
+function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
   switch (event.type) {
     case "edit": {
       return reduceEdit(state, event.payload);

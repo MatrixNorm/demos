@@ -44,9 +44,9 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export type Props = {
-  fields: t.SearchParametersForDisplay;
+  fields: t.SPDisplayed;
   metadata: t.Metadata;
-  onEdit: (delta: Partial<t.SearchParametersOnlyValues>) => void;
+  onEdit: (delta: t.SPEditPayload) => void;
   onSubmit: () => void | null;
 };
 

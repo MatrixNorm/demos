@@ -4,7 +4,7 @@ import { IEnvironment } from "relay-runtime";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
-import * as SPController from "./controller";
+import * as SPController from "./SearchParametersController";
 import { SearchParametersDisplayComponent } from "./componentDisplay";
 import * as t from "./types";
 import { objKeys } from "../helpers/object";
@@ -21,7 +21,7 @@ type Props = {
 function $$CalcDisplayData$$(
   metadata: SearchParameters_metadata | null,
   searchParams: SearchParameters_searchParams | null
-): { fields: t.SearchParametersForDisplay; metadata: t.Metadata } {
+): { fields: t.SPDisplayed; metadata: t.Metadata } {
   const defaultMetadata = {
     populationLowerBound: 0,
     populationUpperBound: 10 ** 8,
@@ -29,7 +29,7 @@ function $$CalcDisplayData$$(
 
   const finalMetadata: t.Metadata = { ...defaultMetadata, ...metadata };
 
-  const defaultSearchParams: t.SearchParametersOnlyValues = {
+  const defaultSearchParams: t.SPValues = {
     countryNameContains: "",
     populationGte: finalMetadata.populationLowerBound,
     populationLte: finalMetadata.populationUpperBound,
@@ -59,7 +59,7 @@ const SearchParametersFC = createFragmentContainer(
     const history = useHistory();
     const { fields, metadata } = $$CalcDisplayData$$(props.metadata, props.searchParams);
 
-    function onEdit(delta: Partial<t.SearchParametersOnlyValues>) {
+    function onEdit(delta: t.SPEditPayload) {
       SPController.handleEvent({ type: "edit", payload: delta }, props.environment);
     }
 
@@ -116,7 +116,7 @@ export const defaultData = (function() {
     populationLowerBound: 1000,
     populationUpperBound: 1000000,
   };
-  let searchParams: t.SearchParameters = {
+  let searchParams: t.SP = {
     countryNameContains: { value: "", draft: null, error: null },
     populationGte: { value: 1000, draft: null, error: null },
     populationLte: { value: 1000000, draft: null, error: null },

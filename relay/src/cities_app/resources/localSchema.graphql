@@ -1,11 +1,11 @@
 type UIFieldString {
-  value: String!
+  value: String
   draft: String
   error: String
 }
 
 type UIFieldInt {
-  value: Int!
+  value: Int
   draft: String
   error: String
 }
