@@ -5,16 +5,16 @@ import { SearchParameters_searchParams } from "__relay__/SearchParameters_search
 
 export type SP = NukeFragRef<SearchParameters_searchParams>;
 
-export type SPDenulled = NukeNulls<SP>;
-
 export type SPBlank = {
   [P in keyof SP]: null;
 };
 
+type SPDenulled = NukeNulls<SP>;
+
 export type SPDisplayed = {
   [P in keyof SPDenulled]: {
     value: NonNullable<SPDenulled[P]["value"]>;
-    error: SPDenulled[P]["error"];
+    error: string | null;
   };
 };
 
@@ -26,13 +26,10 @@ export type SPEditPayload = Partial<SPValues>;
 
 export type SPEditPayloadValidated = Partial<
   {
-    [P in keyof SPValues]: { value: SPValues[P] } | { error: string; value: SPValues[P] };
+    [P in keyof SPValues]:
+      | { error: null; value: SPValues[P] }
+      | { error: string; value: SPValues[P] };
   }
->;
-
-export type SearchParametersValidator = spec.Validator<SearchParametersOnlyValues>;
-export type SearchParametersValidatorResult = spec.ValidationResult<
-  SearchParametersOnlyValues
 >;
 
 export type Metadata = NukeFragRef<SearchParameters_metadata>;

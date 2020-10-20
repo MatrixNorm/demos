@@ -18,10 +18,14 @@ type CancelEvent = { type: "cancel" };
 type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
 type Effect =
-  | { type: "writeSearchParams"; value: t.SP }
+  | { type: "writeState"; value: t.SP }
   | { type: "redirectToUrl"; value: { history: History; url: string } };
 
-function validate(payload: t.SPEditPayload): t.SPEditPayloadValidated {
+function doesStateHasErrors(state: t.SP): boolean {
+  return Object.values(state).some((vRecord) => vRecord && vRecord.error);
+}
+
+function validateEditPayload(payload: t.SPEditPayload): t.SPEditPayloadValidated {
   function nonEmptyString(value: string): { error: string } | null {
     let trimmed = value.trim();
     return trimmed.length > 0 ? null : { error: "Should not be blank" };
@@ -47,32 +51,62 @@ function validate(payload: t.SPEditPayload): t.SPEditPayloadValidated {
   return result;
 }
 
-function reduceEdit(state: t.SP, payload: t.SPEditPayload): Effect | null {
-  let validatedPayload = validate(payload);
+function reduceEdit(
+  state: t.SP,
+  payload: t.SPEditPayload
+): Extract<Effect, { type: "writeState" }> | null {
+  let validatedPayload = validateEditPayload(payload);
   let nextState = { ...state };
+  let shouldUpdate = false;
 
-  for (let prop of Object.keys(validatedPayload)) {
+  for (let prop in validatedPayload) {
     let vResult = validatedPayload[prop as keyof typeof validatedPayload];
     if (vResult) {
       //@ts-ignore
-      if (vResult?.error) {
+      nextState[prop] = {
         //@ts-ignore
-        nextState[prop] = {
-          //@ts-ignore
-          ...nextState[prop],
-          draft: vResult.value,
-          //@ts-ignore
-          error: vResult.error,
-        };
-      } else {
-        nextState[prop] = {
-          ...nextState[prop],
-          draft: vResult.value,
-        };
+        value: nextState[prop]?.value || null,
+        draft: vResult.value,
+        error: vResult.error,
+      };
+      shouldUpdate = true;
+    }
+  }
+  return shouldUpdate ? { type: "writeState", value: nextState } : null;
+}
+
+function reduceSubmit(
+  state: t.SP,
+  payload: { history: History; baseUrl: string }
+):  [Extract<Effect, { type: "writeState" }>, Extract<Effect, { type: "redirectToUrl" }>] | null {
+  if (doesStateHasErrors(state)) {
+    return null;
+  }
+
+  let nextState = { ...state };
+
+  for(let prop in nextState) {
+    //@ts-ignore
+    if(nextState[prop]) {
+      //@ts-ignore
+      nextState[prop] = {
+        error: null,
+        draft: null;
+        //@ts-ignore
+        value: nextState[prop].value || nextState[prop].draft
       }
     }
   }
-  return { type: "writeSearchParams", value: nextState };
+
+  return [
+    {
+      type: "writeState",
+      value: nextState,
+    },
+    {
+    type: "redirectToUrl",
+    value: { history: payload.history, url: redirectUrl(state) },
+  }];
 }
 
 function reduceRouteEnter(
@@ -106,32 +140,6 @@ function reduceRouteEnter(
     }
   }
   return { type: "writeSearchParams", value: nextState };
-}
-
-function reduceSubmit(
-  state: t.SearchParameters,
-  payload: { history: History; baseUrl: string }
-): Extract<Effect, { type: "redirectToUrl" }> | null {
-  //@@@
-  function hasError(state: t.SearchParameters): boolean {
-    return (
-      Object.values(state)
-        .filter(Boolean)
-        //@ts-ignore
-        .some(({ error }) => error !== null)
-    );
-  }
-
-  function redirectUrl(state: t.SearchParameters): string {
-    return payload.baseUrl;
-  }
-
-  if (hasError(state)) return null;
-
-  return {
-    type: "redirectToUrl",
-    value: { history: payload.history, url: redirectUrl(state) },
-  };
 }
 
 function reduceCancel(

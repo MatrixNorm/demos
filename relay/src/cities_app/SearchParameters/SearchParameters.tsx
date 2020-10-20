@@ -93,18 +93,24 @@ const SearchParametersFC = createFragmentContainer(
       fragment SearchParameters_searchParams on UICitySearchParams {
         countryNameContains {
           value
-          draft
-          error
+          draft {
+            value
+            error
+          }
         }
         populationGte {
           value
-          draft
-          error
+          draft {
+            value
+            error
+          }
         }
         populationLte {
           value
-          draft
-          error
+          draft {
+            value
+            error
+          }
         }
       }
     `,

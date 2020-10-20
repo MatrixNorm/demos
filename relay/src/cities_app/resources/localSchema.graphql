@@ -1,13 +1,21 @@
+type UIDraftStateString {
+  value: String!
+  error: String
+}
+
+type UIDraftStateInt {
+  value: Int!
+  error: String
+}
+
 type UIFieldString {
   value: String
-  draft: String
-  error: String
+  draft: UIDraftStateString
 }
 
 type UIFieldInt {
   value: Int
-  draft: String
-  error: String
+  draft: UIDraftStateInt
 }
 
 extend type Query {
