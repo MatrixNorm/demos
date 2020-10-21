@@ -26,10 +26,12 @@ export type SPEditPayload = Partial<SPValues>;
 
 export type SPEditPayloadValidated = Partial<
   {
-    [P in keyof SPValues]:
-      | { error: null; value: SPValues[P] }
-      | { error: string; value: SPValues[P] };
+    [P in keyof SPValues]: { error: string | null; value: SPValues[P] };
   }
 >;
+
+export type SPValidator = {
+  [P in keyof SPValues]: (value: SPValues[P]) => { error: string | null };
+};
 
 export type Metadata = NukeFragRef<SearchParameters_metadata>;
