@@ -35,48 +35,53 @@ function validateEditPayload(payload: t.SPEditPayload): t.SPEditPayloadValidated
     return { error: value > 0 ? null : "Should not be negative" };
   }
 
-  const searchParametersValidator: t.SPValidator = {
+  const validator: t.SPValidator = {
     countryNameContains: nonEmptyString,
     populationGte: nonNegativeNumber,
     populationLte: nonNegativeNumber,
   };
 
-  const result = {};
-  for (let prop of Object.keys(payload) as (keyof typeof payload)[]) {
-    let value = payload[prop];
-    if (value) {
+  let pairs = Object.entries(validator)
+    .map(([propName, propValidator]) => {
+      let propValue = payload[propName as keyof typeof validator];
       //@ts-ignore
-      let errorOrNull = searchParametersValidator[prop](value);
-      //@ts-ignore
-      result[prop] = { value, error: errorOrNull?.error || null };
-    }
-  }
-  return result;
+      return propValue ? [propName, propValidator(propValue)] : null;
+    })
+    .filter(Boolean);
+
+  //@ts-ignore
+  return Object.fromEntries(pairs);
 }
 
-// function reduceEdit(
-//   state: t.SP,
-//   payload: t.SPEditPayload
-// ): Extract<Effect, { type: "writeState" }> | null {
-//   let validatedPayload = validateEditPayload(payload);
-//   let nextState = { ...state };
-//   let shouldUpdate = false;
+// function f(x: Record<keyof t.SP, 0>) {}
+// f({countryNameContains: 0, populationGte: 0, populationLte: 0})
 
-//   for (let prop in validatedPayload) {
-//     let vResult = validatedPayload[prop as keyof typeof validatedPayload];
-//     if (vResult) {
-//       //@ts-ignore
-//       nextState[prop] = {
-//         //@ts-ignore
-//         value: nextState[prop]?.value || null,
-//         draft: vResult.value,
-//         error: vResult.error,
-//       };
-//       shouldUpdate = true;
-//     }
-//   }
-//   return shouldUpdate ? { type: "writeState", value: nextState } : null;
-// }
+function reduceEdit(
+  state: t.SP,
+  payload: t.SPEditPayload
+): Extract<Effect, { type: "writeState" }> {
+  let validatedPayload = validateEditPayload(payload);
+
+  let nextStatePairs = Object.entries(state).map(([propName, propState]) => {
+    let propValidationResult = validatedPayload[propName as keyof typeof state];
+    if (propValidationResult) {
+      return [
+        propName,
+        {
+          value: propState?.value || null,
+          draft: propValidationResult.value,
+          error: propValidationResult.error,
+        },
+      ];
+    } else {
+      return [propName, propState];
+    }
+  });
+
+  let nextState = Object.fromEntries(nextStatePairs);
+
+  return { type: "writeState", value: nextState };
+}
 
 // function reduceSubmit(
 //   state: t.SP,
