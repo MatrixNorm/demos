@@ -29,7 +29,7 @@ const BLANK_STATE: t.SPBlank = {
   populationLte: null,
 };
 
-function doesStateHasErrors(state: t.SP): boolean {
+function doesStateHasNoErrors(state: t.SP): state is t.SPNoError {
   return Object.values(state).some((vRecord) => vRecord?.draft?.error);
 }
 
@@ -118,72 +118,37 @@ function reduceSubmit(
   state: t.SP,
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
-  if (doesStateHasErrors(state)) {
-    return null;
+  if (doesStateHasNoErrors(state)) {
+    return {
+      type: "redirect",
+      value: { history: payload.history, url: redirectUrlFromState(state) },
+    };
   }
-  return {
-    type: "redirect",
-    value: { history: payload.history, url: redirectUrlFromState(state) },
-  };
+  return null;
 }
 
-// function reduceRouteEnter(
-//   urlSearchString: string
-// ): Extract<Effect, { type: "writeSearchParams" }> | null {
-//   //@ts-ignore
-//   let decoded = decodePayload(Object.fromEntries(new URLSearchParams(urlSearchString)));
-//   if (decoded === null) return null;
+function reduceCancel(state: t.SP): EffectWriteState | null {
+  return null;
+}
 
-//   let validated = validatePayload(decoded);
-//   let nextState: t.SearchParametersBlank = {
-//     countryNameContains: null,
-//     populationGte: null,
-//     populationLte: null,
-//   };
-
-//   for (let prop in validated) {
-//     let validatedResult = validated[prop as keyof typeof validated];
-//     if (validatedResult) {
-//       if (validatedResult.error) {
-//         //@ts-ignore
-//         nextState[prop] = {
-//           value: null,
-//           draft: validatedResult.value,
-//           error: validatedResult.error,
-//         };
-//       } else {
-//         //@ts-ignore
-//         nextState[prop] = { value: validatedResult.value, draft: null, error: null };
-//       }
-//     }
-//   }
-//   return { type: "writeSearchParams", value: nextState };
-// }
-
-// function reduceCancel(
-//   state: t.SearchParameters
-// ): Extract<Effect, { type: "writeSearchParams" }> | null {
-//   return null;
-// }
-
-// function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
-//   switch (event.type) {
-//     case "edit": {
-//       return reduceEdit(state, event.payload);
-//     }
-//     case "routeEnter": {
-//       return reduceRouteEnter(event.urlSearchString);
-//     }
-//     case "submit": {
-//       return reduceSubmit(state, event.payload);
-//     }
-//     case "cancel": {
-//       return reduceCancel(state);
-//     }
-//     default:
-//       return [];
-//   }
-// }
+function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
+  switch (event.type) {
+    case "edit": {
+      return reduceEdit(state, event.payload);
+    }
+    case "start": {
+      return reduceStart(event.payload);
+    }
+    case "submit": {
+      return reduceSubmit(state, event.payload);
+    }
+    case "cancel": {
+      return reduceCancel(state);
+    }
+    default:
+      return [];
+  }
+}
 
 // const QUERY = graphql`
 //   query SearchParametersControllerQuery {
