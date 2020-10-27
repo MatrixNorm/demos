@@ -11,6 +11,15 @@ export type SPBlank = {
 
 type SPDenulled = NukeNulls<SP>;
 
+export type SPNoError = {
+  [P in keyof SPDenulled]: {
+    value: SPDenulled[P]["value"];
+    draft: SPDenulled[P]["draft"] extends null
+      ? null
+      : SPDenulled[P]["draft"] & { error: null };
+  } | null;
+};
+
 export type SPDisplayed = {
   [P in keyof SPDenulled]: {
     value: NonNullable<SPDenulled[P]["value"]>;

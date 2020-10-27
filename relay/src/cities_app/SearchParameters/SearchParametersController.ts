@@ -11,21 +11,41 @@ import { retainRecord } from "../helpers/relayStore";
 import * as t from "./types";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-type Event = EditEvent | EnterRouteEvent | SubmitEvent | CancelEvent;
+type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
+
+type StartEvent = { type: "start"; payload: unknown };
 type EditEvent = { type: "edit"; payload: t.SPEditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
-type EnterRouteEvent = { type: "routeEnter"; urlSearchString: string };
 
-type Effect =
-  | { type: "writeState"; value: t.SP }
-  | { type: "redirectToUrl"; value: { history: History; url: string } };
+type Effect = EffectWriteState | EffectRedirect;
+
+type EffectWriteState = { type: "writeState"; value: t.SP };
+type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
+
+const BLANK_STATE: t.SPBlank = {
+  countryNameContains: null,
+  populationGte: null,
+  populationLte: null,
+};
 
 function doesStateHasErrors(state: t.SP): boolean {
   return Object.values(state).some((vRecord) => vRecord?.draft?.error);
 }
 
-function validateEditPayload(payload: t.SPEditPayload): t.SPEditPayloadValidated {
+function isEditPayloadEmpty(payload: t.SPEditPayload) {
+  return false;
+}
+
+function redirectUrlFromState(state: t.SPNoError): string {
+  return "";
+}
+
+function decode(payload: unknown): t.SPEditPayload {
+  return {};
+}
+
+function validate(payload: t.SPEditPayload): t.SPEditPayloadValidated {
   function nonEmptyString(value: string): { error: string | null } {
     let trimmed = value.trim();
     return { error: trimmed.length > 0 ? null : "Should not be blank" };
@@ -53,17 +73,12 @@ function validateEditPayload(payload: t.SPEditPayload): t.SPEditPayloadValidated
   return Object.fromEntries(pairs);
 }
 
-// function f(x: Record<keyof t.SP, 0>) {}
-// f({countryNameContains: 0, populationGte: 0, populationLte: 0})
-
-function reduceEdit(
+function validatedPayloadToNextState(
   state: t.SP,
-  payload: t.SPEditPayload
-): Extract<Effect, { type: "writeState" }> {
-  let validatedPayload = validateEditPayload(payload);
-
-  let nextStatePairs = Object.entries(state).map(([propName, propState]) => {
-    let propValidationResult = validatedPayload[propName as keyof typeof state];
+  validatedPayload: t.SPEditPayloadValidated
+): t.SP {
+  const nextStatePairs = Object.entries(state).map(([propName, propState]) => {
+    const propValidationResult = validatedPayload[propName as keyof typeof state];
     if (propValidationResult) {
       return [
         propName,
@@ -78,44 +93,39 @@ function reduceEdit(
     }
   });
 
-  let nextState = Object.fromEntries(nextStatePairs);
+  const nextState = Object.fromEntries(nextStatePairs);
 
+  return nextState;
+}
+
+function reduceStart(payload: unknown): EffectWriteState {
+  const decodedPayload = decode(payload);
+  const validatedPayload = validate(decodedPayload);
+  const nextState = validatedPayloadToNextState(BLANK_STATE, validatedPayload);
   return { type: "writeState", value: nextState };
 }
 
-// function reduceSubmit(
-//   state: t.SP,
-//   payload: { history: History; baseUrl: string }
-// ):  [Extract<Effect, { type: "writeState" }>, Extract<Effect, { type: "redirectToUrl" }>] | null {
-//   if (doesStateHasErrors(state)) {
-//     return null;
-//   }
+function reduceEdit(state: t.SP, payload: t.SPEditPayload): EffectWriteState | null {
+  if (isEditPayloadEmpty(payload)) {
+    return null;
+  }
+  const validatedPayload = validate(payload);
+  const nextState = validatedPayloadToNextState(state, validatedPayload);
+  return { type: "writeState", value: nextState };
+}
 
-//   let nextState = { ...state };
-
-//   for(let prop in nextState) {
-//     //@ts-ignore
-//     if(nextState[prop]) {
-//       //@ts-ignore
-//       nextState[prop] = {
-//         error: null,
-//         draft: null;
-//         //@ts-ignore
-//         value: nextState[prop].value || nextState[prop].draft
-//       }
-//     }
-//   }
-
-//   return [
-//     {
-//       type: "writeState",
-//       value: nextState,
-//     },
-//     {
-//     type: "redirectToUrl",
-//     value: { history: payload.history, url: redirectUrl(state) },
-//   }];
-// }
+function reduceSubmit(
+  state: t.SP,
+  payload: { history: History; baseUrl: string }
+): EffectRedirect | null {
+  if (doesStateHasErrors(state)) {
+    return null;
+  }
+  return {
+    type: "redirect",
+    value: { history: payload.history, url: redirectUrlFromState(state) },
+  };
+}
 
 // function reduceRouteEnter(
 //   urlSearchString: string
