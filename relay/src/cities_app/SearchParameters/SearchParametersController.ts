@@ -5,6 +5,7 @@ import {
   getRequest,
   IEnvironment,
   ROOT_ID,
+  Environment,
 } from "relay-runtime";
 import { History } from "history";
 import { retainRecord } from "../helpers/relayStore";
@@ -29,19 +30,32 @@ const BLANK_STATE: t.SPBlank = {
   populationLte: null,
 };
 
-function doesStateHasNoErrors(state: t.SP): state is t.SPNoError {
-  return Object.values(state).some((vRecord) => vRecord?.draft?.error);
+function isStateValid(state: t.SP): state is t.SPNoError {
+  return !Object.values(state).some((vRecord) => vRecord?.draft?.error);
 }
 
 function isEditPayloadEmpty(payload: t.SPEditPayload) {
-  return false;
+  return Object.values(payload).filter(Boolean).length === 0;
 }
 
-function redirectUrlFromState(state: t.SPNoError): string {
-  return "";
+function urlQueryStringFromState(state: t.SPNoError): string {
+  const pairs = Object.entries(state)
+    .map(([prop, vRecord]) => [prop, vRecord?.draft.value || vRecord?.value])
+    .filter(([_, value]) => Boolean(value));
+  return new URLSearchParams(Object.fromEntries(pairs)).toString();
 }
 
 function decode(payload: unknown): t.SPEditPayload {
+  if (typeof payload === "object") {
+    return {
+      // @ts-ignore
+      countryNameContains: payload?.countryNameContains,
+      // @ts-ignore
+      populationGte: parseInt(payload?.populationGte) || undefined,
+      // @ts-ignore
+      populationLte: parseInt(payload?.populationLte) || undefined,
+    };
+  }
   return {};
 }
 
@@ -118,10 +132,13 @@ function reduceSubmit(
   state: t.SP,
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
-  if (doesStateHasNoErrors(state)) {
+  if (isStateValid(state)) {
     return {
       type: "redirect",
-      value: { history: payload.history, url: redirectUrlFromState(state) },
+      value: {
+        history: payload.history,
+        url: `${payload.baseUrl}/${urlQueryStringFromState(state)}`,
+      },
     };
   }
   return null;
@@ -150,41 +167,50 @@ function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
   }
 }
 
-// const QUERY = graphql`
-//   query SearchParametersControllerQuery {
-//     ... on Query {
-//       __typename
-//     }
-//     uiState {
-//       citySearchParams {
-//         ...SearchParameters_searchParams @relay(mask: false)
-//       }
-//     }
-//   }
-// `;
+const QUERY = graphql`
+  query SearchParametersControllerQuery {
+    ... on Query {
+      __typename
+    }
+    uiState {
+      citySearchParams {
+        ...SearchParameters_searchParams @relay(mask: false)
+      }
+    }
+  }
+`;
 
-// function lookupState(environment: IEnvironment): State {
-//   const operation = createOperationDescriptor(getRequest(QUERY), {});
-//   const response = environment.lookup(operation.fragment);
-//   const data = response.data as SearchParametersControllerQueryResponse;
-//   return {
-//     searchParams: purify(data?.uiState?.citySearchParams),
-//     editDelta: purify(data?.uiState?.citySearchParamsEditDelta),
-//   };
-// }
+function lookupStateFromRelayStore(environment: IEnvironment): t.SP {
+  const operation = createOperationDescriptor(getRequest(QUERY), {});
+  const response = environment.lookup(operation.fragment);
+  const data = response.data as SearchParametersControllerQueryResponse;
+  const searchParams = data.uiState?.citySearchParams;
+  if (searchParams) {
+    return searchParams;
+  } else {
+    return BLANK_STATE;
+  }
+}
 
-// export function handleEvent(event: Event, environment: IEnvironment) {
-//   const state = lookupState(environment);
-//   const effects = reduce(state, purifyEvent(event));
-//   effects.forEach((eff) => {
-//     if (eff.type === "writeSearchParams") {
-//       writeSearchParams(eff.value, environment);
-//     }
-//     if (eff.type === "writeEditDelta") {
-//       writeEditDelta(eff.value, environment);
-//     }
-//   });
-// }
+export function handleEvent(event: Event, environment: IEnvironment) {
+  const state = lookupStateFromRelayStore(environment);
+  let effects = reduce(state, event);
+  if (effects) {
+    if (!Array.isArray(effects)) {
+      effects = [effects];
+    }
+    effects.forEach((effect) => {
+      if (effect.type === "writeState") {
+        writeStateIntoRelayStore(effect.value, environment);
+      }
+      if (effect.type === "redirect") {
+        redirectToUrl(effect.value);
+      }
+    });
+  }
+}
+
+function writeStateIntoRelayStore(state: t.SP, environment: IEnvironment) {}
 
 // function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
 //   commitLocalUpdate(environment, (store) => {
@@ -204,9 +230,4 @@ function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
 //     });
 //     retainRecord(QUERY, environment);
 //   }
-// }
-
-// function extractFromUrl(urlSearchString: string) {
-//   let qp = new URLSearchParams(urlSearchString);
-//   return validate(Object.fromEntries(qp));
 // }
