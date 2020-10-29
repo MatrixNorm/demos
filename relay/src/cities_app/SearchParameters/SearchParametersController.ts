@@ -24,11 +24,26 @@ type Effect = EffectWriteState | EffectRedirect;
 type EffectWriteState = { type: "writeState"; value: t.SP };
 type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
 
+// module globals
+
 const BLANK_STATE: t.SPBlank = {
   countryNameContains: null,
   populationGte: null,
   populationLte: null,
 };
+
+const QUERY = graphql`
+  query SearchParametersControllerQuery {
+    ... on Query {
+      __typename
+    }
+    uiState {
+      citySearchParams {
+        ...SearchParameters_searchParams @relay(mask: false)
+      }
+    }
+  }
+`;
 
 function isStateValid(state: t.SP): state is t.SPNoError {
   return !Object.values(state).some((vRecord) => vRecord?.draft?.error);
@@ -163,22 +178,9 @@ function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
       return reduceCancel(state);
     }
     default:
-      return [];
+      return null;
   }
 }
-
-const QUERY = graphql`
-  query SearchParametersControllerQuery {
-    ... on Query {
-      __typename
-    }
-    uiState {
-      citySearchParams {
-        ...SearchParameters_searchParams @relay(mask: false)
-      }
-    }
-  }
-`;
 
 function lookupStateFromRelayStore(environment: IEnvironment): t.SP {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
@@ -210,7 +212,22 @@ export function handleEvent(event: Event, environment: IEnvironment) {
   }
 }
 
-function writeStateIntoRelayStore(state: t.SP, environment: IEnvironment) {}
+function writeStateIntoRelayStore(state: t.SP, environment: IEnvironment) {
+  const request = getRequest(QUERY);
+  const operationDescriptor = createOperationDescriptor(request, {});
+  let data = {
+    __typename: "__Root",
+    uiState: {
+      citySearchParams: state,
+    },
+  };
+  environment.commitPayload(operationDescriptor, data);
+  environment.retain(operationDescriptor);
+}
+
+function redirectToUrl({ history, url }: { history: History; url: string }) {}
+
+// For reference. Do not delete.
 
 // function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
 //   commitLocalUpdate(environment, (store) => {
