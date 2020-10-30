@@ -1,14 +1,6 @@
 import { graphql } from "react-relay";
-import {
-  commitLocalUpdate,
-  createOperationDescriptor,
-  getRequest,
-  IEnvironment,
-  ROOT_ID,
-  Environment,
-} from "relay-runtime";
+import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
 import { History } from "history";
-import { retainRecord } from "../helpers/relayStore";
 import * as t from "./types";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
@@ -60,6 +52,7 @@ function urlQueryStringFromState(state: t.SPNoError): string {
   return new URLSearchParams(Object.fromEntries(pairs)).toString();
 }
 
+// should be derived from spec for free
 function decode(payload: unknown): t.SPEditPayload {
   if (typeof payload === "object") {
     return {
@@ -74,6 +67,7 @@ function decode(payload: unknown): t.SPEditPayload {
   return {};
 }
 
+// can get from spec for free
 function validate(payload: t.SPEditPayload): t.SPEditPayloadValidated {
   function nonEmptyString(value: string): { error: string | null } {
     let trimmed = value.trim();
@@ -204,8 +198,7 @@ export function handleEvent(event: Event, environment: IEnvironment) {
     effects.forEach((effect) => {
       if (effect.type === "writeState") {
         writeStateIntoRelayStore(effect.value, environment);
-      }
-      if (effect.type === "redirect") {
+      } else if (effect.type === "redirect") {
         redirectToUrl(effect.value);
       }
     });
@@ -225,10 +218,11 @@ function writeStateIntoRelayStore(state: t.SP, environment: IEnvironment) {
   environment.retain(operationDescriptor);
 }
 
-function redirectToUrl({ history, url }: { history: History; url: string }) {}
+function redirectToUrl({ history, url }: { history: History; url: string }) {
+  history.push(url);
+}
 
 // For reference. Do not delete.
-
 // function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
 //   commitLocalUpdate(environment, (store) => {
 //     store.delete(`${ROOT_ID}:uiState:citySearchParams`);
