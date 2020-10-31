@@ -18,7 +18,7 @@ type EffectRedirect = { type: "redirect"; value: { history: History; url: string
 
 // module globals
 
-const BLANK_STATE: t.SPBlank = {
+export const BLANK_STATE: t.SPBlank = {
   countryNameContains: null,
   populationGte: null,
   populationLte: null,

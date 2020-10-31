@@ -7,22 +7,16 @@ import RenderCallbackContext from "../verysmart/RenderCallbackContext";
 import * as SPController from "./SearchParametersController";
 import { SearchParametersDisplayComponent } from "./componentDisplay";
 import * as t from "./types";
-import { objKeys } from "../helpers/object";
+import { NukeFragRef } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
 
-type Props = {
-  metadata: SearchParameters_metadata | null;
-  searchParams: SearchParameters_searchParams | null;
-  environment: IEnvironment;
-};
-
-function $$CalcDisplayData$$(
+function calcDisplayData(
   metadata: SearchParameters_metadata | null,
   searchParams: SearchParameters_searchParams | null
-): { fields: t.SPDisplayed; metadata: t.Metadata } {
-  const defaultMetadata = {
+): { fieldsData: t.SPDisplayed; metadata: t.Metadata } {
+  const defaultMetadata: NukeFragRef<SearchParameters_metadata> = {
     populationLowerBound: 0,
     populationUpperBound: 10 ** 8,
   };
@@ -35,29 +29,35 @@ function $$CalcDisplayData$$(
     populationLte: finalMetadata.populationUpperBound,
   };
 
-  let result: any = {};
-  for (let prop of objKeys(defaultSearchParams)) {
-    let x = (searchParams || {})[prop];
-    if (x) {
-      result[prop] = {
-        value: x.value || defaultSearchParams[prop],
-        error: x.error || null,
-      };
-    } else {
-      result[prop] = {
-        value: defaultSearchParams[prop],
-        error: null,
-      };
-    }
-  }
-  return { fields: result, metadata: finalMetadata };
+  const fieldsData = Object.fromEntries(
+    Object.entries(defaultSearchParams).map(([prop, defaultValue]) => {
+      let sp = searchParams || {};
+      return [
+        prop,
+        {
+          // @ts-ignore
+          value: sp[prop]?.draft?.value || sp[prop]?.value || defaultValue,
+          // @ts-ignore
+          error: sp[prop]?.draft?.error || null,
+        },
+      ];
+    })
+  ) as t.SPDisplayed;
+
+  return { fieldsData, metadata: finalMetadata };
 }
+
+type Props = {
+  metadata: SearchParameters_metadata | null;
+  searchParams: SearchParameters_searchParams | null;
+  environment: IEnvironment;
+};
 
 const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
     const { url: baseUrl } = useRouteMatch();
     const history = useHistory();
-    const { fields, metadata } = $$CalcDisplayData$$(props.metadata, props.searchParams);
+    const { fieldsData, metadata } = calcDisplayData(props.metadata, props.searchParams);
 
     function onEdit(delta: t.SPEditPayload) {
       SPController.handleEvent({ type: "edit", payload: delta }, props.environment);
@@ -71,8 +71,8 @@ const SearchParametersFC = createFragmentContainer(
     }
 
     const args = {
-      fields: fields,
-      metadata: metadata,
+      fields: fieldsData,
+      metadata,
       onEdit,
       onSubmit,
     };
@@ -123,9 +123,9 @@ export const defaultData = (function() {
     populationUpperBound: 1000000,
   };
   let searchParams: t.SP = {
-    countryNameContains: { value: "", draft: null, error: null },
-    populationGte: { value: 1000, draft: null, error: null },
-    populationLte: { value: 1000000, draft: null, error: null },
+    countryNameContains: { value: "", draft: null },
+    populationGte: { value: 1000, draft: null },
+    populationLte: { value: 1000000, draft: null },
   };
   return {
     metadata,
@@ -134,7 +134,7 @@ export const defaultData = (function() {
 })();
 
 export default function({ environment }: { environment: IEnvironment }) {
-  let q = graphql`
+  let query = graphql`
     query SearchParametersQuery {
       citiesMetadata {
         ...SearchParameters_metadata
@@ -146,10 +146,10 @@ export default function({ environment }: { environment: IEnvironment }) {
       }
     }
   `;
-  console.log(q);
+
   return (
     <LoadingPlaceholderQueryRenderer<SearchParametersQuery>
-      query={q}
+      query={query}
       environment={environment}
       variables={{}}
       placeholderData={{
@@ -159,9 +159,6 @@ export default function({ environment }: { environment: IEnvironment }) {
         },
       }}
       render={({ props }) => {
-        // if (!props.citiesMetadata) {
-        //   return <ReloadMessage message="Something went wrong. Try to reload." />;
-        // }
         return (
           <SearchParametersFC
             metadata={props.citiesMetadata || null}
