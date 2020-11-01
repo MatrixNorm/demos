@@ -7,7 +7,7 @@ import {
   createRelayEnvironment,
   returnPayloadAsyncEnvironment,
 } from "../env";
-import SearchParameters from "../components/SearchParameters";
+import SearchParameters from "../SearchParameters/SearchParameters";
 
 export default {
   title: "cities_app-demo1/SearchParameters",
@@ -60,7 +60,7 @@ export const serverError = () => {
   const environment = createTestingEnv({
     Query: {
       citiesMetadata: () => {
-        console.log("sheisse")
+        console.log("sheisse");
         throw new Error("sheisse");
       },
     },

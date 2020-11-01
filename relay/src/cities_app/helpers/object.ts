@@ -38,12 +38,12 @@ export function compact<T>(obj: Partial<T> | null | undefined): Compacted<T> {
   return { [__compacted__]: true, data: compacted };
 }
 
-// export function merge<T extends object>(
-//   left: Compacted<T>,
-//   right: Compacted<T>
-// ): Compacted<T> {
-//   return { [__compacted__]: true, data: { ...left.data, ...right.data } };
-// }
+export function merge<T extends object>(
+  left: Compacted<T>,
+  right: Compacted<T>
+): Compacted<T> {
+  return { [__compacted__]: true, data: { ...left.data, ...right.data } };
+}
 
 /**
  * delta = {x:1, y:2}

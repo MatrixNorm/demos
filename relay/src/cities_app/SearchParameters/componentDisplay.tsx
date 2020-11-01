@@ -86,7 +86,7 @@ export function SearchParametersDisplayComponent({
       </ParameterSection>
       {onSubmit && (
         <div className="submit-button-box">
-          <SubmitButton onClick={onSubmit}></SubmitButton>
+          <SubmitButton onClick={onSubmit}>Aaa</SubmitButton>
         </div>
       )}
     </SearchParametersBlock>
