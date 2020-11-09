@@ -7,7 +7,7 @@ import { SearchParametersControllerQueryResponse } from "__relay__/SearchParamet
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
 type StartEvent = { type: "start"; payload: unknown };
-type EditEvent = { type: "edit"; payload: t.SPEditPayload };
+type EditEvent = { type: "edit"; payload: t.SPEditDelta };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 
@@ -41,8 +41,8 @@ function isStateValid(state: t.SP): state is t.SPNoError {
   return !Object.values(state).some((vRecord) => vRecord?.draft?.error);
 }
 
-function isEditPayloadEmpty(payload: t.SPEditPayload) {
-  return Object.values(payload).filter(Boolean).length === 0;
+function isEditDeltaEmpty(payload: t.SPEditDelta) {
+  return Object.values(payload).filter((x) => x !== undefined).length === 0;
 }
 
 function urlQueryStringFromState(state: t.SPNoError): string {
@@ -52,88 +52,124 @@ function urlQueryStringFromState(state: t.SPNoError): string {
   return new URLSearchParams(Object.fromEntries(pairs)).toString();
 }
 
-// should be derived from spec for free
-function decode(payload: unknown): t.SPEditPayload {
-  if (typeof payload === "object") {
+// spec, zod, io-ts
+function decode(input: unknown): Partial<t.SPValues> {
+  function decodeString(i: unknown): string | undefined {
+    return typeof i === "string" ? i : undefined;
+  }
+
+  function decodeNumber(i: unknown): number | undefined {
+    if (typeof i === "number") {
+      return i;
+    }
+    if (typeof i === "string") {
+      return parseInt(i) || undefined;
+    }
+    return undefined;
+  }
+
+  if (input === null || input === undefined) {
+    return {};
+  } else if (typeof input === "object") {
     return {
       // @ts-ignore
-      countryNameContains: payload?.countryNameContains,
+      countryNameContains: decodeString(input.countryNameContains),
       // @ts-ignore
-      populationGte: parseInt(payload?.populationGte) || undefined,
+      populationGte: decodeNumber(input.populationGte),
       // @ts-ignore
-      populationLte: parseInt(payload?.populationLte) || undefined,
+      populationLte: decodeNumber(input.populationLte),
     };
+  } else {
+    return {};
   }
-  return {};
 }
 
-// can get from spec for free
-function validate(payload: t.SPEditPayload): t.SPEditPayloadValidated {
-  function nonEmptyString(value: string): { error: string | null } {
+function normalizeEditPayload(payload: t.SPEditDelta): t.SPEditDelta {
+  if (
+    typeof payload.countryNameContains === "string" &&
+    payload.countryNameContains.length === 0
+  ) {
+    return { ...payload, countryNameContains: null };
+  }
+  return payload;
+}
+
+// spec, zod, io-ts
+function validate(payload: t.SPEditDelta): t.SPEditDeltaValidated {
+  function nonBlankString(value: string): string | null {
     let trimmed = value.trim();
-    return { error: trimmed.length > 0 ? null : "Should not be blank" };
+    return trimmed.length > 0 ? null : "Should not be blank";
   }
 
-  function nonNegativeNumber(value: number): { error: string | null } {
-    return { error: value > 0 ? null : "Should not be negative" };
+  function nonNegativeNumber(value: number): string | null {
+    return value > 0 ? null : "Should not be negative";
   }
 
   const validator: t.SPValidator = {
-    countryNameContains: nonEmptyString,
+    countryNameContains: nonBlankString,
     populationGte: nonNegativeNumber,
     populationLte: nonNegativeNumber,
   };
 
-  let pairs = Object.entries(validator)
-    .map(([propName, propValidator]) => {
-      let propValue = payload[propName as keyof typeof validator];
+  let pairs = Object.entries(payload)
+    .map(([prop, value]) => {
+      if (value === undefined) {
+        return undefined;
+      }
+      if (value === null) {
+        return [prop, null];
+      }
       //@ts-ignore
-      return propValue ? [propName, propValidator(propValue)] : null;
+      let error = validator[prop](value);
+      return [prop, { value, error }];
     })
     .filter(Boolean);
-
   //@ts-ignore
   return Object.fromEntries(pairs);
 }
 
 function validatedPayloadToNextState(
   state: t.SP,
-  validatedPayload: t.SPEditPayloadValidated
+  validatedPayload: t.SPEditDeltaValidated
 ): t.SP {
+  console.log({ validatedPayload });
   const nextStatePairs = Object.entries(state).map(([propName, propState]) => {
     const propValidationResult = validatedPayload[propName as keyof typeof state];
-    if (propValidationResult) {
-      return [
-        propName,
-        {
-          value: propState?.value || null,
-          draft: propValidationResult.value,
-          error: propValidationResult.error,
-        },
-      ];
-    } else {
+    if (propValidationResult === undefined) {
       return [propName, propState];
     }
+    if (propValidationResult === null) {
+      return [propName, null];
+    }
+    return [
+      propName,
+      {
+        value: propState?.value || null,
+        draft: { ...propValidationResult },
+      },
+    ];
   });
 
-  const nextState = Object.fromEntries(nextStatePairs);
-
-  return nextState;
+  return Object.fromEntries(nextStatePairs);
 }
 
 function reduceStart(payload: unknown): EffectWriteState {
   const decodedPayload = decode(payload);
-  const validatedPayload = validate(decodedPayload);
+  const normalizedPayload = normalizeEditPayload(decodedPayload);
+  const validatedPayload = validate(normalizedPayload);
   const nextState = validatedPayloadToNextState(BLANK_STATE, validatedPayload);
   return { type: "writeState", value: nextState };
 }
 
-function reduceEdit(state: t.SP, payload: t.SPEditPayload): EffectWriteState | null {
-  if (isEditPayloadEmpty(payload)) {
+function reduceEdit(state: t.SP, payload: t.SPEditDelta): EffectWriteState | null {
+  const normalizedPayload = normalizeEditPayload(payload);
+  if (isEditDeltaEmpty(normalizedPayload)) {
     return null;
   }
-  const validatedPayload = validate(payload);
+  const validatedPayload = validate(normalizedPayload);
+  //console.log({ validatedPayload });
   const nextState = validatedPayloadToNextState(state, validatedPayload);
+  console.log({ nextState });
   return { type: "writeState", value: nextState };
 }
 
@@ -158,6 +194,7 @@ function reduceCancel(state: t.SP): EffectWriteState | null {
 }
 
 function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
+  console.log(event);
   switch (event.type) {
     case "edit": {
       return reduceEdit(state, event.payload);
@@ -190,7 +227,9 @@ function lookupStateFromRelayStore(environment: IEnvironment): t.SP {
 
 export function handleEvent(event: Event, environment: IEnvironment) {
   const state = lookupStateFromRelayStore(environment);
+  //console.log("A: ", state, event);
   let effects = reduce(state, event);
+  //console.log("B: ", effects);
   if (effects) {
     if (!Array.isArray(effects)) {
       effects = [effects];

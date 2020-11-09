@@ -1,5 +1,4 @@
-import * as spec from "../helpers/spec";
-import { NukeFragRef, NukeNulls } from "../helpers/typeUtils";
+import { NukeFragRef, NukeNulls, Nullify } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
 
@@ -31,16 +30,16 @@ export type SPValues = {
   [P in keyof SPDenulled]: NonNullable<SPDenulled[P]["value"]>;
 };
 
-export type SPEditPayload = Partial<SPValues>;
+export type SPEditDelta = Partial<Nullify<SPValues>>;
 
-export type SPEditPayloadValidated = Partial<
+export type SPEditDeltaValidated = Partial<
   {
-    [P in keyof SPValues]: { error: string | null; value: SPValues[P] };
+    [P in keyof SPValues]: { error: string | null; value: SPValues[P] } | null;
   }
 >;
 
 export type SPValidator = {
-  [P in keyof SPValues]: (value: SPValues[P]) => { error: string | null };
+  [P in keyof SPValues]: (value: SPValues[P]) => string | null;
 };
 
 export type Metadata = NukeFragRef<SearchParameters_metadata>;

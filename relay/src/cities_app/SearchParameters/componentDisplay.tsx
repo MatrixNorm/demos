@@ -56,6 +56,7 @@ export function SearchParametersDisplayComponent({
   onEdit,
   onSubmit,
 }: Props) {
+  console.log({ fields });
   let isLoading = React.useContext(LoadingContext);
   let ParameterSection = isLoading ? ParameterSectionSkeleton : ParameterSectionSuccess;
   return (
@@ -68,6 +69,7 @@ export function SearchParametersDisplayComponent({
             onChange={(value) => onEdit({ countryNameContains: value })}
           />
         </div>
+        <div>{fields.countryNameContains.error}</div>
       </ParameterSection>
       <ParameterSection>
         <div className="label placeholder">Population</div>
@@ -86,7 +88,7 @@ export function SearchParametersDisplayComponent({
       </ParameterSection>
       {onSubmit && (
         <div className="submit-button-box">
-          <SubmitButton onClick={onSubmit}>Aaa</SubmitButton>
+          <SubmitButton onClick={onSubmit}>Submit</SubmitButton>
         </div>
       )}
     </SearchParametersBlock>

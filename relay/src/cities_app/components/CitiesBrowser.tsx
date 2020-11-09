@@ -28,8 +28,8 @@ export default ({ environment }: { environment: IEnvironment }) => {
 
   SearchParametersController.handleEvent(
     {
-      type: "routeEnter",
-      urlSearchString: location.search,
+      type: "start",
+      payload: location.search,
     },
     environment
   );

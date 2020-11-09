@@ -55,11 +55,12 @@ type Props = {
 
 const SearchParametersFC = createFragmentContainer(
   (props: Props) => {
+    console.log(props);
     const { url: baseUrl } = useRouteMatch();
     const history = useHistory();
     const { fieldsData, metadata } = calcDisplayData(props.metadata, props.searchParams);
 
-    function onEdit(delta: t.SPEditPayload) {
+    function onEdit(delta: t.SPEditDelta) {
       SPController.handleEvent({ type: "edit", payload: delta }, props.environment);
     }
 
