@@ -94,45 +94,28 @@ const SearchParametersFC = createFragmentContainer(
       fragment SearchParameters_searchParams on UICitySearchParams {
         countryNameContains {
           value
-          draft {
-            value
-            error
-          }
+          draft
+          error
         }
         populationGte {
           value
-          draft {
-            value
-            error
-          }
+          draft
+          error
         }
         populationLte {
           value
-          draft {
-            value
-            error
-          }
+          draft
+          error
         }
       }
     `,
   }
 );
 
-export const defaultData = (function() {
-  let metadata: t.Metadata = {
-    populationLowerBound: 1000,
-    populationUpperBound: 1000000,
-  };
-  let searchParams: t.SP = {
-    countryNameContains: { value: "", draft: null },
-    populationGte: { value: 1000, draft: null },
-    populationLte: { value: 1000000, draft: null },
-  };
-  return {
-    metadata,
-    searchParams,
-  };
-})();
+export const defaultData = {
+  metadata: null,
+  searchParams: null,
+};
 
 export default function({ environment }: { environment: IEnvironment }) {
   let query = graphql`
@@ -154,9 +137,9 @@ export default function({ environment }: { environment: IEnvironment }) {
       environment={environment}
       variables={{}}
       placeholderData={{
-        citiesMetadata: { ...defaultData.metadata },
+        citiesMetadata: defaultData.metadata,
         uiState: {
-          citySearchParams: { ...defaultData.searchParams },
+          citySearchParams: defaultData.searchParams,
         },
       }}
       render={({ props }) => {

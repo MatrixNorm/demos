@@ -1,21 +1,17 @@
-type UIDraftStateString {
-  value: String!
-  error: String
-}
-
-type UIDraftStateInt {
-  value: Int!
-  error: String
-}
-
-type UIFieldString {
+# this type allows for incorrect
+# values e.g.
+# {value: "a", draft: null, error: "should be null"}
+#
+type UIStringFieldState {
   value: String
-  draft: UIDraftStateString
+  draft: String
+  error: String
 }
 
-type UIFieldInt {
+type UIIntFieldState {
   value: Int
-  draft: UIDraftStateInt
+  draft: Int
+  error: String
 }
 
 extend type Query {
@@ -30,9 +26,9 @@ type UIState {
 }
 
 type UICitySearchParams {
-  countryNameContains: UIFieldString
-  populationGte: UIFieldInt
-  populationLte: UIFieldInt
+  countryNameContains: UIStringFieldState
+  populationGte: UIIntFieldState
+  populationLte: UIIntFieldState
 }
 
 type UINotification implements Node {

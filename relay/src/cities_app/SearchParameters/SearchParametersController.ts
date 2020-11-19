@@ -18,7 +18,7 @@ type EffectRedirect = { type: "redirect"; value: { history: History; url: string
 
 // module globals
 
-export const BLANK_STATE: t.SPBlank = {
+export const BLANK_STATE: t.SpStateBlank = {
   countryNameContains: null,
   populationGte: null,
   populationLte: null,
@@ -213,18 +213,6 @@ function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
   }
 }
 
-function lookupStateFromRelayStore(environment: IEnvironment): t.SP {
-  const operation = createOperationDescriptor(getRequest(QUERY), {});
-  const response = environment.lookup(operation.fragment);
-  const data = response.data as SearchParametersControllerQueryResponse;
-  const searchParams = data.uiState?.citySearchParams;
-  if (searchParams) {
-    return searchParams;
-  } else {
-    return BLANK_STATE;
-  }
-}
-
 export function handleEvent(event: Event, environment: IEnvironment) {
   const state = lookupStateFromRelayStore(environment);
   //console.log("A: ", state, event);
@@ -241,6 +229,18 @@ export function handleEvent(event: Event, environment: IEnvironment) {
         redirectToUrl(effect.value);
       }
     });
+  }
+}
+
+function lookupStateFromRelayStore(environment: IEnvironment): t.SpState {
+  const operation = createOperationDescriptor(getRequest(QUERY), {});
+  const response = environment.lookup(operation.fragment);
+  const data = response.data as SearchParametersControllerQueryResponse;
+  const searchParams = data.uiState?.citySearchParams || null;
+  if (searchParams) {
+    return searchParams;
+  } else {
+    return BLANK_STATE;
   }
 }
 
@@ -262,6 +262,7 @@ function redirectToUrl({ history, url }: { history: History; url: string }) {
 }
 
 // For reference. Do not delete.
+
 // function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
 //   commitLocalUpdate(environment, (store) => {
 //     store.delete(`${ROOT_ID}:uiState:citySearchParams`);

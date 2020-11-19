@@ -1,8 +1,22 @@
 import { NukeFragRef, NukeNulls, Nullify } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
+import { keyof } from "io-ts";
 
 export type SP = NukeFragRef<SearchParameters_searchParams>;
+
+export type FieldState<T> =
+  | null
+  | { value: T | null; draft: null }
+  | { value: T | null; draft: T; error: string | null };
+
+export type SpState = {
+  [P in keyof SP]: FieldState<NonNullable<NonNullable<SP[P]>["value"]>>;
+};
+
+export type SpStateBlank = {
+  [P in keyof SpState]: null;
+};
 
 export type SPBlank = {
   [P in keyof SP]: null;
