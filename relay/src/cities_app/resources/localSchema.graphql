@@ -1,34 +1,34 @@
-# this type allows for incorrect
-# values e.g.
-# {value: "a", draft: null, error: "should be null"}
-#
-type UIStringFieldState {
-  value: String
-  draft: String
-  error: String
-}
-
-type UIIntFieldState {
-  value: Int
-  draft: Int
-  error: String
-}
-
 extend type Query {
   uiState: UIState
 }
 
 type UIState {
-  citySearchParams: UICitySearchParams
+  citySearchParamsState: UICitySearchParamsState
   notifications: [UINotification!]
   userSettingsEditDelta: UIUserSettingsDelta
   userSettingsOptimisticDelta: UIUserSettingsDelta
 }
 
+# @ts
+type UICitySearchParamsState {
+  value: UICitySearchParams
+  draft: UICitySearchParams
+  fieldErrors: UICitySearchParamsError
+  rootErrors: [String!]
+}
+
+# @ts
 type UICitySearchParams {
-  countryNameContains: UIStringFieldState
-  populationGte: UIIntFieldState
-  populationLte: UIIntFieldState
+  countryNameContains: String
+  populationGte: Int
+  populationLte: Int
+}
+
+# @ts
+type UICitySearchParamsError {
+  countryNameContains: String
+  populationGte: String
+  populationLte: String
 }
 
 type UINotification implements Node {

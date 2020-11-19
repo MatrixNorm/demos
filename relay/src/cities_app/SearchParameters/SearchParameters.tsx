@@ -90,23 +90,24 @@ const SearchParametersFC = createFragmentContainer(
         populationUpperBound
       }
     `,
-    searchParams: graphql`
-      fragment SearchParameters_searchParams on UICitySearchParams {
-        countryNameContains {
-          value
-          draft
-          error
+    searchParamsState: graphql`
+      fragment SearchParameters_searchParamsState on UICitySearchParamsState {
+        value {
+          countryNameContains
+          populationGte
+          populationLte
         }
-        populationGte {
-          value
-          draft
-          error
+        draft {
+          countryNameContains
+          populationGte
+          populationLte
         }
-        populationLte {
-          value
-          draft
-          error
+        fieldErrors {
+          countryNameContains
+          populationGte
+          populationLte
         }
+        rootErrors
       }
     `,
   }
@@ -124,8 +125,8 @@ export default function({ environment }: { environment: IEnvironment }) {
         ...SearchParameters_metadata
       }
       uiState {
-        citySearchParams {
-          ...SearchParameters_searchParams
+        citySearchParamsState {
+          ...SearchParameters_searchParamsState
         }
       }
     }

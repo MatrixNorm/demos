@@ -30,8 +30,8 @@ const QUERY = graphql`
       __typename
     }
     uiState {
-      citySearchParams {
-        ...SearchParameters_searchParams @relay(mask: false)
+      citySearchParamsState {
+        ...SearchParameters_searchParamsState @relay(mask: false)
       }
     }
   }
