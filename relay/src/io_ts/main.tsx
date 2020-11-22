@@ -92,3 +92,16 @@ pipe(
     }
   )
 );
+
+type Foo = {
+  x: string;
+  y: number;
+};
+
+let a: Foo = {
+  x: "@",
+  y: 3,
+};
+let b: Partial<Foo> = { x: "#", y: undefined };
+let c: Foo = { ...a, ...b };
+console.log(c);
