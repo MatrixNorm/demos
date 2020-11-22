@@ -1,4 +1,7 @@
 import * as t from "io-ts";
+import { PathReporter } from "io-ts/lib/PathReporter";
+import { pipe } from "fp-ts/lib/function";
+import * as Either from "fp-ts/lib/Either";
 
 const isString = (input: unknown): input is string => typeof input === "string";
 
@@ -21,18 +24,20 @@ const SearchParamsCoercer = t.type({
 const nonBlankString = new t.Type<string>(
   "nonBlankString",
   isString,
-  (input, context) =>
+  (input, c) =>
     isString(input) && input.trim().length > 0
       ? t.success(input)
-      : t.failure(input, context),
+      : t.failure(input, c, "nonBlankString"),
   t.identity
 );
 
 const nonNegativeNumber = new t.Type<number>(
   "nonNegativeNumber",
   isNumber,
-  (input, context) =>
-    isNumber(input) && input >= 0 ? t.success(input) : t.failure(input, context),
+  (input, c) =>
+    isNumber(input) && input >= 0
+      ? t.success(input)
+      : t.failure(input, c, "nonNegativeNumber"),
   t.identity
 );
 
@@ -56,8 +61,34 @@ const SearchParams = t.brand(
 
 type SearchParams = t.TypeOf<typeof SearchParams>;
 
-console.log(SearchParamsShape, SearchParams);
+pipe(
+  SearchParams.decode({
+    countryNameContains: "  ",
+    populationGte: -1,
+    populationLte: -3,
+  }),
+  Either.fold(
+    (errors) => {
+      console.log(errors);
+    },
+    (x) => {
+      console.log(x);
+    }
+  )
+);
 
-console.log(
-  SearchParams.decode({ countryNameContains: " w ", populationGte: 1, populationLte: 3 })
+pipe(
+  SearchParams.decode({
+    countryNameContains: " f ",
+    populationGte: 3,
+    populationLte: 1,
+  }),
+  Either.fold(
+    (errors) => {
+      console.log(errors);
+    },
+    (x) => {
+      console.log(x);
+    }
+  )
 );

@@ -36,23 +36,36 @@ export const SearchParamsCoercer = t.type({
   populationLte: coerceToNumber,
 });
 
+// XXX
 export const SearchParamsShape = t.type({
   countryNameContains: t.union([nonBlankString, t.null]),
   populationGte: t.union([nonNegativeNumber, t.null]),
   populationLte: t.union([nonNegativeNumber, t.null]),
 });
-
 export type SearchParamsShape = t.TypeOf<typeof SearchParamsShape>;
 
+// XXX
 interface SearchParamsBrand {
   readonly Positive: unique symbol;
 }
-
 export const SearchParams = t.brand(
   SearchParamsShape,
   (x): x is t.Branded<any, SearchParamsBrand> => {
     const { populationGte: gte, populationLte: lte } = x;
-    return gte !== null && lte !== null ? gte <= lte : true;
+    return gte !== null && gte !== undefined && lte !== null && lte !== undefined
+      ? gte <= lte
+      : true;
   },
   "SearchParams"
 );
+export type SearchParams = t.TypeOf<typeof SearchParams>;
+
+// XXX
+export type SearchParamsState = {
+  value: SearchParams;
+  draft: SearchParamsShape;
+  fieldErrors: {
+    [P in keyof SearchParamsShape]: String | null;
+  };
+  rootErrors: String[] | null;
+};

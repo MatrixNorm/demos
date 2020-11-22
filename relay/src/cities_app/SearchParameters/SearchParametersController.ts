@@ -1,13 +1,16 @@
 import { graphql } from "react-relay";
 import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
 import { History } from "history";
+import { pipe } from "fp-ts/lib/function";
+import * as Either from "fp-ts/lib/Either";
+import * as md from "./model";
 import * as t from "./types";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
 type StartEvent = { type: "start"; payload: unknown };
-type EditEvent = { type: "edit"; payload: t.SPEditDelta };
+type EditEvent = { type: "edit"; payload: Partial<md.SearchParamsShape> };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 
@@ -50,38 +53,6 @@ function urlQueryStringFromState(state: t.SPNoError): string {
     .map(([prop, vRecord]) => [prop, vRecord?.draft.value || vRecord?.value])
     .filter(([_, value]) => Boolean(value));
   return new URLSearchParams(Object.fromEntries(pairs)).toString();
-}
-
-// spec, zod, io-ts
-function decode(input: unknown): Partial<t.SPValues> {
-  function decodeString(i: unknown): string | undefined {
-    return typeof i === "string" ? i : undefined;
-  }
-
-  function decodeNumber(i: unknown): number | undefined {
-    if (typeof i === "number") {
-      return i;
-    }
-    if (typeof i === "string") {
-      return parseInt(i) || undefined;
-    }
-    return undefined;
-  }
-
-  if (input === null || input === undefined) {
-    return {};
-  } else if (typeof input === "object") {
-    return {
-      // @ts-ignore
-      countryNameContains: decodeString(input.countryNameContains),
-      // @ts-ignore
-      populationGte: decodeNumber(input.populationGte),
-      // @ts-ignore
-      populationLte: decodeNumber(input.populationLte),
-    };
-  } else {
-    return {};
-  }
 }
 
 function normalizeEditPayload(payload: t.SPEditDelta): t.SPEditDelta {
@@ -161,14 +132,34 @@ function reduceStart(payload: unknown): EffectWriteState {
   return { type: "writeState", value: nextState };
 }
 
-function reduceEdit(state: t.SP, payload: t.SPEditDelta): EffectWriteState | null {
+function reduceEdit(
+  state: md.SearchParamsState,
+  payload: Partial<md.SearchParamsShape>
+): EffectWriteState | null {
+  let z: Partial<md.SearchParamsShape> = { populationGte: undefined };
+  let y: md.SearchParamsShape = { ...state.draft, ...z };
+  const nextState = {
+    ...state,
+    draft: { ...state.draft, ...payload },
+  };
+  const x = pipe(
+    model.SearchParamsEditDelta.decode(payload),
+    Either.fold(
+      (errors) => {
+        return 1;
+      },
+      (editDelta) => {
+        return 2;
+      }
+    )
+  );
   const normalizedPayload = normalizeEditPayload(payload);
   if (isEditDeltaEmpty(normalizedPayload)) {
     return null;
   }
   const validatedPayload = validate(normalizedPayload);
   //console.log({ validatedPayload });
-  const nextState = validatedPayloadToNextState(state, validatedPayload);
+  //const nextState = validatedPayloadToNextState(state, validatedPayload);
   console.log({ nextState });
   return { type: "writeState", value: nextState };
 }

@@ -4,7 +4,9 @@ import { NukeFragRef, NukeNulls, Nullify } from "../helpers/typeUtils";
 import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
 import { SearchParameters_searchParamsState } from "__relay__/SearchParameters_searchParamsState.graphql";
 
-export type SearchParams = t.TypeOf<typeof model.SearchParamsShape>;
+export type SearchParams = t.TypeOf<typeof model.SearchParams>;
+
+export type SearchParamsEditDelta = Partial<SearchParams>;
 
 export type SearchParamsState = {
   value: SearchParams;
