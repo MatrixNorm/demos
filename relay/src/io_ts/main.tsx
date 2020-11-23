@@ -77,31 +77,18 @@ pipe(
   )
 );
 
-pipe(
-  SearchParams.decode({
-    countryNameContains: " f ",
-    populationGte: 3,
-    populationLte: 1,
-  }),
-  Either.fold(
-    (errors) => {
-      console.log(errors);
-    },
-    (x) => {
-      console.log(x);
-    }
-  )
-);
-
-type Foo = {
-  x: string;
-  y: number;
-};
-
-let a: Foo = {
-  x: "@",
-  y: 3,
-};
-let b: Partial<Foo> = { x: "#", y: undefined };
-let c: Foo = { ...a, ...b };
-console.log(c);
+// pipe(
+//   SearchParams.decode({
+//     countryNameContains: " f ",
+//     populationGte: 3,
+//     populationLte: 1,
+//   }),
+//   Either.fold(
+//     (errors) => {
+//       console.log(errors);
+//     },
+//     (x) => {
+//       console.log(x);
+//     }
+//   )
+// );

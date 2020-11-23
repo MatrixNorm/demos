@@ -1,5 +1,15 @@
 import { NukeNulls } from "./typeUtils";
 
+export function safeMerge<T>(target: T, source: Partial<T>): T {
+  return { ...target, ...killUndefined(source) };
+}
+
+export function killUndefined<T>(obj: Partial<T>): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, v]) => v !== undefined)
+  ) as Partial<T>;
+}
+
 export function objKeys<T>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[];
 }

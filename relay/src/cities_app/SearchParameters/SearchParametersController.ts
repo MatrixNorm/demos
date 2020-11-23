@@ -3,6 +3,7 @@ import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runti
 import { History } from "history";
 import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
+import * as o from "../helpers/object";
 import * as md from "./model";
 import * as t from "./types";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
@@ -132,34 +133,29 @@ function reduceStart(payload: unknown): EffectWriteState {
   return { type: "writeState", value: nextState };
 }
 
+function extractErrors(
+  validationErrors: any
+): Pick<md.SearchParamsState, "fieldErrors" | "rootErrors"> {
+  return { fieldErrors: null, rootErrors: null };
+}
+
 function reduceEdit(
   state: md.SearchParamsState,
   payload: Partial<md.SearchParamsShape>
 ): EffectWriteState | null {
-  let z: Partial<md.SearchParamsShape> = { populationGte: undefined };
-  let y: md.SearchParamsShape = { ...state.draft, ...z };
-  const nextState = {
-    ...state,
-    draft: { ...state.draft, ...payload },
-  };
-  const x = pipe(
-    model.SearchParamsEditDelta.decode(payload),
+  const nextDraft = o.safeMerge(state.draft, payload);
+  const nextState = pipe(
+    md.SearchParams.decode(nextDraft),
     Either.fold(
-      (errors) => {
-        return 1;
+      (validationErrors) => {
+        const { fieldErrors, rootErrors } = extractErrors(validationErrors);
+        return { ...state, draft: nextState, fieldErrors, rootErrors };
       },
-      (editDelta) => {
-        return 2;
+      (validDraft) => {
+        return { value: validDraft, draft: null, fieldErrors: null, rootErrors: null };
       }
     )
   );
-  const normalizedPayload = normalizeEditPayload(payload);
-  if (isEditDeltaEmpty(normalizedPayload)) {
-    return null;
-  }
-  const validatedPayload = validate(normalizedPayload);
-  //console.log({ validatedPayload });
-  //const nextState = validatedPayloadToNextState(state, validatedPayload);
   console.log({ nextState });
   return { type: "writeState", value: nextState };
 }

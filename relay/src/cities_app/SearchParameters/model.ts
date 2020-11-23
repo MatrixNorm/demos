@@ -62,10 +62,12 @@ export type SearchParams = t.TypeOf<typeof SearchParams>;
 
 // XXX
 export type SearchParamsState = {
-  value: SearchParams;
-  draft: SearchParamsShape;
-  fieldErrors: {
-    [P in keyof SearchParamsShape]: String | null;
-  };
+  value: SearchParams | null;
+  draft: SearchParamsShape | null;
+  fieldErrors:
+    | {
+        [P in keyof SearchParamsShape]: String | null;
+      }
+    | null;
   rootErrors: String[] | null;
 };
