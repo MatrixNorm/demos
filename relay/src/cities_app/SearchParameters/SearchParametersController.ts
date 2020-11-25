@@ -1,3 +1,4 @@
+import * as iots from "io-ts";
 import { graphql } from "react-relay";
 import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
 import { History } from "history";
@@ -8,10 +9,12 @@ import * as md from "./model";
 import * as t from "./types";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
+type EditPayload = Partial<md.CitySearchParamsShape>;
+
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
 type StartEvent = { type: "start"; payload: unknown };
-type EditEvent = { type: "edit"; payload: Partial<md.SearchParamsShape> };
+type EditEvent = { type: "edit"; payload: EditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 
@@ -56,7 +59,7 @@ function urlQueryStringFromState(state: t.SPNoError): string {
   return new URLSearchParams(Object.fromEntries(pairs)).toString();
 }
 
-function normalizeEditPayload(payload: t.SPEditDelta): t.SPEditDelta {
+function normalizeEditPayload(payload: EditPayload): EditPayload {
   if (
     typeof payload.countryNameContains === "string" &&
     payload.countryNameContains.length === 0
@@ -64,40 +67,6 @@ function normalizeEditPayload(payload: t.SPEditDelta): t.SPEditDelta {
     return { ...payload, countryNameContains: null };
   }
   return payload;
-}
-
-// spec, zod, io-ts
-function validate(payload: t.SPEditDelta): t.SPEditDeltaValidated {
-  function nonBlankString(value: string): string | null {
-    let trimmed = value.trim();
-    return trimmed.length > 0 ? null : "Should not be blank";
-  }
-
-  function nonNegativeNumber(value: number): string | null {
-    return value > 0 ? null : "Should not be negative";
-  }
-
-  const validator: t.SPValidator = {
-    countryNameContains: nonBlankString,
-    populationGte: nonNegativeNumber,
-    populationLte: nonNegativeNumber,
-  };
-
-  let pairs = Object.entries(payload)
-    .map(([prop, value]) => {
-      if (value === undefined) {
-        return undefined;
-      }
-      if (value === null) {
-        return [prop, null];
-      }
-      //@ts-ignore
-      let error = validator[prop](value);
-      return [prop, { value, error }];
-    })
-    .filter(Boolean);
-  //@ts-ignore
-  return Object.fromEntries(pairs);
 }
 
 function validatedPayloadToNextState(
@@ -134,25 +103,46 @@ function reduceStart(payload: unknown): EffectWriteState {
 }
 
 function extractErrors(
-  validationErrors: any
-): Pick<md.SearchParamsState, "fieldErrors" | "rootErrors"> {
-  return { fieldErrors: null, rootErrors: null };
+  validationErrors: iots.Errors
+): Pick<md.CitySearchParamsState, "fieldErrors" | "rootErrors"> {
+  validationErrors.reduce((acc, error) => {
+    return error;
+  });
+  return { fieldErrors: citySearchParamsBlank, rootErrors: [] };
 }
 
+type CitySearchParamsBlank = {
+  [P in keyof md.CitySearchParamsShape]: null;
+};
+
+const citySearchParamsBlank: CitySearchParamsBlank = {
+  countryNameContains: null,
+  populationGte: null,
+  populationLte: null,
+};
+
 function reduceEdit(
-  state: md.SearchParamsState,
-  payload: Partial<md.SearchParamsShape>
+  state: md.CitySearchParamsState,
+  payload: EditPayload
 ): EffectWriteState | null {
-  const nextDraft = o.safeMerge(state.draft, payload);
+  const normalizedPayload = normalizeEditPayload(payload);
+
+  const nextDraft = o.safeMerge(state.draft, normalizedPayload);
+
   const nextState = pipe(
-    md.SearchParams.decode(nextDraft),
+    md.CitySearchParams.decode(nextDraft),
     Either.fold(
       (validationErrors) => {
         const { fieldErrors, rootErrors } = extractErrors(validationErrors);
-        return { ...state, draft: nextState, fieldErrors, rootErrors };
+        return { ...state, draft: nextDraft, fieldErrors, rootErrors };
       },
       (validDraft) => {
-        return { value: validDraft, draft: null, fieldErrors: null, rootErrors: null };
+        return {
+          value: validDraft,
+          draft: citySearchParamsBlank,
+          fieldErrors: citySearchParamsBlank,
+          rootErrors: [],
+        };
       }
     )
   );

@@ -30,44 +30,42 @@ const nonNegativeNumber = new t.Type<number>(
 );
 
 // can be derived from model
-export const SearchParamsCoercer = t.type({
+export const CitySearchParamsCoercer = t.type({
   countryNameContains: t.string,
   populationGte: coerceToNumber,
   populationLte: coerceToNumber,
 });
 
 // XXX
-export const SearchParamsShape = t.type({
+export const CitySearchParamsShape = t.type({
   countryNameContains: t.union([nonBlankString, t.null]),
   populationGte: t.union([nonNegativeNumber, t.null]),
   populationLte: t.union([nonNegativeNumber, t.null]),
 });
-export type SearchParamsShape = t.TypeOf<typeof SearchParamsShape>;
+export type CitySearchParamsShape = t.TypeOf<typeof CitySearchParamsShape>;
 
 // XXX
-interface SearchParamsBrand {
+interface CitySearchParamsBrand {
   readonly Positive: unique symbol;
 }
-export const SearchParams = t.brand(
-  SearchParamsShape,
-  (x): x is t.Branded<any, SearchParamsBrand> => {
+export const CitySearchParams = t.brand(
+  CitySearchParamsShape,
+  (x): x is t.Branded<any, CitySearchParamsBrand> => {
     const { populationGte: gte, populationLte: lte } = x;
-    return gte !== null && gte !== undefined && lte !== null && lte !== undefined
-      ? gte <= lte
-      : true;
+    return gte !== null && lte !== null ? gte <= lte : true;
   },
   "SearchParams"
 );
-export type SearchParams = t.TypeOf<typeof SearchParams>;
+export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
+
+type CitySearchParamsErrors = {
+  [P in keyof CitySearchParamsShape]: String | null;
+};
 
 // XXX
-export type SearchParamsState = {
-  value: SearchParams | null;
-  draft: SearchParamsShape | null;
-  fieldErrors:
-    | {
-        [P in keyof SearchParamsShape]: String | null;
-      }
-    | null;
-  rootErrors: String[] | null;
+export type CitySearchParamsState = {
+  value: CitySearchParams;
+  draft: CitySearchParamsShape;
+  fieldErrors: CitySearchParamsErrors;
+  rootErrors: String[];
 };
