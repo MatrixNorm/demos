@@ -1,7 +1,6 @@
 import * as t from "io-ts";
 
 const isString = (input: unknown): input is string => typeof input === "string";
-
 const isNumber = (input: unknown): input is number => typeof input === "number";
 
 const coerceToNumber = new t.Type<number, string>(
@@ -38,9 +37,9 @@ export const CitySearchParamsCoercer = t.type({
 
 // XXX
 export const CitySearchParamsShape = t.type({
-  countryNameContains: t.union([nonBlankString, t.null]),
-  populationGte: t.union([nonNegativeNumber, t.null]),
-  populationLte: t.union([nonNegativeNumber, t.null]),
+  countryNameContains: nonBlankString,
+  populationGte: nonNegativeNumber,
+  populationLte: nonNegativeNumber,
 });
 export type CitySearchParamsShape = t.TypeOf<typeof CitySearchParamsShape>;
 
@@ -49,10 +48,10 @@ interface CitySearchParamsBrand {
   readonly Positive: unique symbol;
 }
 export const CitySearchParams = t.brand(
-  CitySearchParamsShape,
+  t.partial(CitySearchParamsShape.props),
   (x): x is t.Branded<any, CitySearchParamsBrand> => {
     const { populationGte: gte, populationLte: lte } = x;
-    return gte !== null && lte !== null ? gte <= lte : true;
+    return gte !== undefined && lte !== undefined ? gte <= lte : true;
   },
   "SearchParams"
 );
@@ -67,6 +66,6 @@ export type CitySearchParamsErrors = Partial<
 // XXX
 export type CitySearchParamsState = {
   value: CitySearchParams;
-  draft: CitySearchParamsShape;
+  draft: Partial<CitySearchParamsShape>;
   errors: CitySearchParamsErrors;
 };

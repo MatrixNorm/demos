@@ -4,12 +4,12 @@ import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runti
 import { History } from "history";
 import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
-import * as o from "../helpers/object";
 import * as md from "./model";
 import * as t from "./types";
+import { Nullify } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
-type EditPayload = Partial<md.CitySearchParamsShape>;
+type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
 
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
@@ -119,20 +119,34 @@ type CitySearchParamsBlank = {
   [P in keyof md.CitySearchParamsShape]: null;
 };
 
-const citySearchParamsBlank: CitySearchParamsBlank = {
-  countryNameContains: null,
-  populationGte: null,
-  populationLte: null,
-};
+function applyEditPayload(
+  draft: md.CitySearchParamsState["draft"],
+  payload: EditPayload
+): md.CitySearchParamsState["draft"] {
+  let nextDraft = { ...draft };
+  for (let prop in payload) {
+    //@ts-ignore
+    let value = payload[prop];
+    //@ts-ignore
+    if (payload[prop] !== undefined) {
+      if (value === null) {
+        //@ts-ignore
+        delete nextDraft[prop];
+      } else {
+        //@ts-ignore
+        nextDraft[prop] = value;
+      }
+    }
+  }
+  return nextDraft;
+}
 
 function reduceEdit(
   state: md.CitySearchParamsState,
   payload: EditPayload
 ): EffectWriteState | null {
   const normalizedPayload = normalizeEditPayload(payload);
-
-  const nextDraft = o.safeMerge(state.draft, normalizedPayload);
-
+  const nextDraft = applyEditPayload(state.draft, normalizedPayload);
   const nextState = pipe(
     md.CitySearchParams.decode(nextDraft),
     Either.fold(
@@ -143,7 +157,7 @@ function reduceEdit(
       (validDraft) => {
         return {
           value: validDraft,
-          draft: citySearchParamsBlank,
+          draft: {},
           errors: {},
         };
       }
