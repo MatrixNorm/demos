@@ -20,7 +20,7 @@ type CancelEvent = { type: "cancel" };
 
 type Effect = EffectWriteState | EffectRedirect;
 
-type EffectWriteState = { type: "writeState"; value: t.SP };
+type EffectWriteState = { type: "writeState"; value: md.CitySearchParamsState };
 type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
 
 // module globals
@@ -95,11 +95,34 @@ function validatedPayloadToNextState(
 }
 
 function reduceStart(payload: unknown): EffectWriteState {
-  const decodedPayload = decode(payload);
-  const normalizedPayload = normalizeEditPayload(decodedPayload);
-  const validatedPayload = validate(normalizedPayload);
-  const nextState = validatedPayloadToNextState(BLANK_STATE, validatedPayload);
-  return { type: "writeState", value: nextState };
+  const draft: md.CitySearchParamsState["draft"] = pipe(
+    md.CitySearchParamsCoercer.decode(payload),
+    Either.fold(
+      () => {
+        return {};
+      },
+      (coerced) => {
+        return coerced;
+      }
+    )
+  );
+  const state = pipe(
+    md.CitySearchParams.decode(draft),
+    Either.fold(
+      (validationErrors) => {
+        const errors = extractErrors(validationErrors);
+        return { value: {}, draft, errors };
+      },
+      (validDraft) => {
+        return {
+          value: validDraft,
+          draft: {},
+          errors: {},
+        };
+      }
+    )
+  );
+  return { type: "writeState", value: state };
 }
 
 function extractErrors(
@@ -114,10 +137,6 @@ function extractErrors(
     return acc;
   }, {} as md.CitySearchParamsState["errors"]);
 }
-
-type CitySearchParamsBlank = {
-  [P in keyof md.CitySearchParamsShape]: null;
-};
 
 function applyEditPayload(
   draft: md.CitySearchParamsState["draft"],

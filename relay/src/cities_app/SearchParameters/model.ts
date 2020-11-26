@@ -3,13 +3,6 @@ import * as t from "io-ts";
 const isString = (input: unknown): input is string => typeof input === "string";
 const isNumber = (input: unknown): input is number => typeof input === "number";
 
-const coerceToNumber = new t.Type<number, string>(
-  "coerceToNumber",
-  isNumber,
-  (input, context) => (isNumber(input) ? t.success(input) : t.failure(input, context)),
-  String
-);
-
 const nonBlankString = new t.Type<string>(
   "nonBlankString",
   isString,
@@ -28,12 +21,31 @@ const nonNegativeNumber = new t.Type<number>(
   t.identity
 );
 
+const coerceToString = new t.Type<string | undefined, string>(
+  "coerceToString",
+  isString,
+  (input) =>
+    typeof input === "string" && input.trim().length > 0
+      ? t.success(input)
+      : t.success(undefined),
+  String
+);
+
+const coerceToNumber = new t.Type<number | undefined, string>(
+  "coerceToNumber",
+  isNumber,
+  (input) => (isNumber(input) ? t.success(input) : t.success(undefined)),
+  String
+);
+
 // can be derived from model
-export const CitySearchParamsCoercer = t.type({
-  countryNameContains: t.string,
+export const CitySearchParamsCoercer = t.partial({
+  countryNameContains: coerceToString,
   populationGte: coerceToNumber,
   populationLte: coerceToNumber,
 });
+
+type X = t.TypeOf<typeof CitySearchParamsCoercer>;
 
 // XXX
 export const CitySearchParamsShape = t.type({
