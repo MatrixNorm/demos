@@ -104,11 +104,15 @@ function reduceStart(payload: unknown): EffectWriteState {
 
 function extractErrors(
   validationErrors: iots.Errors
-): Pick<md.CitySearchParamsState, "fieldErrors" | "rootErrors"> {
-  validationErrors.reduce((acc, error) => {
-    return error;
-  });
-  return { fieldErrors: citySearchParamsBlank, rootErrors: [] };
+): md.CitySearchParamsState["errors"] {
+  return validationErrors.reduce((acc, error) => {
+    let c = error.context;
+    if (c.length === 2) {
+      //@ts-ignore
+      acc[c[1].key] = "shit";
+    }
+    return acc;
+  }, {} as md.CitySearchParamsState["errors"]);
 }
 
 type CitySearchParamsBlank = {
@@ -133,15 +137,14 @@ function reduceEdit(
     md.CitySearchParams.decode(nextDraft),
     Either.fold(
       (validationErrors) => {
-        const { fieldErrors, rootErrors } = extractErrors(validationErrors);
-        return { ...state, draft: nextDraft, fieldErrors, rootErrors };
+        const errors = extractErrors(validationErrors);
+        return { ...state, draft: nextDraft, errors };
       },
       (validDraft) => {
         return {
           value: validDraft,
           draft: citySearchParamsBlank,
-          fieldErrors: citySearchParamsBlank,
-          rootErrors: [],
+          errors: {},
         };
       }
     )

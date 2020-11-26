@@ -58,14 +58,15 @@ export const CitySearchParams = t.brand(
 );
 export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
 
-type CitySearchParamsErrors = {
-  [P in keyof CitySearchParamsShape]: String | null;
-};
+export type CitySearchParamsErrors = Partial<
+  {
+    [P in keyof CitySearchParamsShape]: String;
+  } & { _: String[] }
+>;
 
 // XXX
 export type CitySearchParamsState = {
   value: CitySearchParams;
   draft: CitySearchParamsShape;
-  fieldErrors: CitySearchParamsErrors;
-  rootErrors: String[];
+  errors: CitySearchParamsErrors;
 };

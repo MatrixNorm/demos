@@ -102,12 +102,12 @@ const SearchParametersFC = createFragmentContainer(
           populationGte
           populationLte
         }
-        fieldErrors {
+        errors {
           countryNameContains
           populationGte
           populationLte
+          _
         }
-        rootErrors
       }
     `,
   }

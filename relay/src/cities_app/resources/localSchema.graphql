@@ -13,8 +13,7 @@ type UIState {
 type UICitySearchParamsState {
   value: UICitySearchParams
   draft: UICitySearchParams
-  fieldErrors: UICitySearchParamsErrors
-  rootErrors: [String!]
+  errors: UICitySearchParamsErrors
 }
 
 # @ts
@@ -29,6 +28,7 @@ type UICitySearchParamsErrors {
   countryNameContains: String
   populationGte: String
   populationLte: String
+  _: [String]
 }
 
 type UINotification implements Node {
