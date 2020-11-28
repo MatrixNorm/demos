@@ -24,10 +24,7 @@ const nonNegativeNumber = new t.Type<number>(
 const coerceToString = new t.Type<string | undefined, string>(
   "coerceToString",
   isString,
-  (input) =>
-    typeof input === "string" && input.trim().length > 0
-      ? t.success(input)
-      : t.success(undefined),
+  (input) => (typeof input === "string" ? t.success(input) : t.success(undefined)),
   String
 );
 
@@ -44,8 +41,6 @@ export const CitySearchParamsCoercer = t.partial({
   populationGte: coerceToNumber,
   populationLte: coerceToNumber,
 });
-
-type X = t.TypeOf<typeof CitySearchParamsCoercer>;
 
 // XXX
 export const CitySearchParamsShape = t.type({

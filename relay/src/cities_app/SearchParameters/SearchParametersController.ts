@@ -10,6 +10,8 @@ import { Nullify } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
 type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
+type Draft = md.CitySearchParamsState["draft"];
+type ValidValue = md.CitySearchParamsState["value"];
 
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
@@ -22,14 +24,6 @@ type Effect = EffectWriteState | EffectRedirect;
 
 type EffectWriteState = { type: "writeState"; value: md.CitySearchParamsState };
 type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
-
-// module globals
-
-export const BLANK_STATE: t.SpStateBlank = {
-  countryNameContains: null,
-  populationGte: null,
-  populationLte: null,
-};
 
 const QUERY = graphql`
   query SearchParametersControllerQuery {
@@ -44,11 +38,7 @@ const QUERY = graphql`
   }
 `;
 
-function isStateValid(state: t.SP): state is t.SPNoError {
-  return !Object.values(state).some((vRecord) => vRecord?.draft?.error);
-}
-
-function isEditDeltaEmpty(payload: t.SPEditDelta) {
+function isEditPayloadEmpty(payload: EditPayload) {
   return Object.values(payload).filter((x) => x !== undefined).length === 0;
 }
 
@@ -69,33 +59,20 @@ function normalizeEditPayload(payload: EditPayload): EditPayload {
   return payload;
 }
 
-function validatedPayloadToNextState(
-  state: t.SP,
-  validatedPayload: t.SPEditDeltaValidated
-): t.SP {
-  console.log({ validatedPayload });
-  const nextStatePairs = Object.entries(state).map(([propName, propState]) => {
-    const propValidationResult = validatedPayload[propName as keyof typeof state];
-    if (propValidationResult === undefined) {
-      return [propName, propState];
-    }
-    if (propValidationResult === null) {
-      return [propName, null];
-    }
-    return [
-      propName,
-      {
-        value: propState?.value || null,
-        draft: { ...propValidationResult },
-      },
-    ];
-  });
-
-  return Object.fromEntries(nextStatePairs);
+function normalizeStartPayload(payload: Draft): Draft {
+  if (
+    payload.countryNameContains !== undefined &&
+    payload.countryNameContains.length === 0
+  ) {
+    let next = { ...payload };
+    delete next["countryNameContains"];
+    return next;
+  }
+  return payload;
 }
 
 function reduceStart(payload: unknown): EffectWriteState {
-  const draft: md.CitySearchParamsState["draft"] = pipe(
+  const draft: Draft = pipe(
     md.CitySearchParamsCoercer.decode(payload),
     Either.fold(
       () => {
@@ -104,14 +81,15 @@ function reduceStart(payload: unknown): EffectWriteState {
       (coerced) => {
         return coerced;
       }
-    )
+    ),
+    normalizeStartPayload
   );
   const state = pipe(
     md.CitySearchParams.decode(draft),
     Either.fold(
       (validationErrors) => {
         const errors = extractErrors(validationErrors);
-        return { value: {}, draft, errors };
+        return { value: {} as ValidValue, draft, errors };
       },
       (validDraft) => {
         return {
@@ -206,7 +184,7 @@ function reduceCancel(state: t.SP): EffectWriteState | null {
   return null;
 }
 
-function reduce(state: t.SP, event: Event): Effect | Effect[] | null {
+function reduce(state: md.CitySearchParamsState, event: Event): Effect | Effect[] | null {
   console.log(event);
   switch (event.type) {
     case "edit": {
