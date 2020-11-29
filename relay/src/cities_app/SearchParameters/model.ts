@@ -1,7 +1,10 @@
 import * as t from "io-ts";
+import { keyframes } from "styled-components";
 
 const isString = (input: unknown): input is string => typeof input === "string";
 const isNumber = (input: unknown): input is number => typeof input === "number";
+const isEmptyObject = (input: unknown): input is {} =>
+  typeof input === "object" && input !== null && Object.keys(input).length === 0;
 
 const nonBlankString = new t.Type<string>(
   "nonBlankString",
@@ -18,6 +21,14 @@ const nonNegativeNumber = new t.Type<number>(
   isNumber,
   (input, context) =>
     isNumber(input) && input >= 0 ? t.success(input) : t.failure(input, context),
+  t.identity
+);
+
+const EmptyObject = new t.Type<{}>(
+  "EmptyObject",
+  isEmptyObject,
+  (input, context) =>
+    isEmptyObject(input) ? t.success(input) : t.failure(input, context),
   t.identity
 );
 
@@ -76,3 +87,11 @@ export type CitySearchParamsState = {
   draft: Partial<CitySearchParamsShape>;
   errors: CitySearchParamsErrors;
 };
+
+export const ValidState = t.type({
+  value: CitySearchParams,
+  draft: EmptyObject,
+  error: EmptyObject,
+});
+
+export type ValidState = t.TypeOf<typeof ValidState>;

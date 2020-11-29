@@ -42,10 +42,11 @@ function isEditPayloadEmpty(payload: EditPayload) {
   return Object.values(payload).filter((x) => x !== undefined).length === 0;
 }
 
-function urlQueryStringFromState(state: t.SPNoError): string {
-  const pairs = Object.entries(state)
-    .map(([prop, vRecord]) => [prop, vRecord?.draft.value || vRecord?.value])
-    .filter(([_, value]) => Boolean(value));
+function urlQueryStringFromSearchParams(searchParams: ValidValue): string {
+  const pairs = Object.entries(searchParams).filter(
+    ([_, propValue]) => propValue !== undefined
+  );
+  //@ts-ignore
   return new URLSearchParams(Object.fromEntries(pairs)).toString();
 }
 
@@ -142,6 +143,9 @@ function reduceEdit(
   state: md.CitySearchParamsState,
   payload: EditPayload
 ): EffectWriteState | null {
+  if (isEditPayloadEmpty(payload)) {
+    return null;
+  }
   const normalizedPayload = normalizeEditPayload(payload);
   const nextDraft = applyEditPayload(state.draft, normalizedPayload);
   const nextState = pipe(
@@ -165,22 +169,29 @@ function reduceEdit(
 }
 
 function reduceSubmit(
-  state: t.SP,
+  state: md.CitySearchParamsState,
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
-  if (isStateValid(state)) {
-    return {
-      type: "redirect",
-      value: {
-        history: payload.history,
-        url: `${payload.baseUrl}/${urlQueryStringFromState(state)}`,
+  return pipe(
+    md.ValidState.decode(state),
+    Either.fold(
+      () => {
+        return null;
       },
-    };
-  }
-  return null;
+      (state) => {
+        return {
+          type: "redirect",
+          value: {
+            history: payload.history,
+            url: `${payload.baseUrl}/${urlQueryStringFromSearchParams(state.value)}`,
+          },
+        };
+      }
+    )
+  );
 }
 
-function reduceCancel(state: t.SP): EffectWriteState | null {
+function reduceCancel(state: md.CitySearchParamsState): EffectWriteState | null {
   return null;
 }
 
