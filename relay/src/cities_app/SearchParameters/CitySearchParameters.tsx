@@ -4,13 +4,12 @@ import { IEnvironment } from "relay-runtime";
 import { useRouteMatch, useHistory } from "react-router-dom";
 import { LoadingPlaceholderQueryRenderer } from "../verysmart/LoadingContext";
 import RenderCallbackContext from "../verysmart/RenderCallbackContext";
-import * as SPController from "./SearchParametersController";
+import * as CSPController from "./CitySearchParametersController";
 import { SearchParametersDisplayComponent } from "./componentDisplay";
-import * as t from "./types";
 import { NukeFragRef } from "../helpers/typeUtils";
-import { SearchParameters_metadata } from "__relay__/SearchParameters_metadata.graphql";
-import { SearchParameters_searchParams } from "__relay__/SearchParameters_searchParams.graphql";
-import { SearchParametersQuery } from "__relay__/SearchParametersQuery.graphql";
+import { CitySearchParameters_metadata } from "__relay__/CitySearchParameters_metadata.graphql";
+import { CitySearchParameters_state } from "__relay__/CitySearchParameters_state.graphql";
+import { CitySearchParametersQuery } from "__relay__/CitySearchParametersQuery.graphql";
 
 function calcDisplayData(
   metadata: SearchParameters_metadata | null,
@@ -48,8 +47,8 @@ function calcDisplayData(
 }
 
 type Props = {
-  metadata: SearchParameters_metadata | null;
-  searchParams: SearchParameters_searchParams | null;
+  metadata: CitySearchParameters_metadata | null;
+  citySearchParamsState: CitySearchParameters_state | null;
   environment: IEnvironment;
 };
 
@@ -58,14 +57,14 @@ const SearchParametersFC = createFragmentContainer(
     console.log(props);
     const { url: baseUrl } = useRouteMatch();
     const history = useHistory();
-    const { fieldsData, metadata } = calcDisplayData(props.metadata, props.searchParams);
+    const { fieldsData, metadata } = calcDisplayData(props.metadata, props.citySearchParamsState);
 
     function onEdit(delta: t.SPEditDelta) {
-      SPController.handleEvent({ type: "edit", payload: delta }, props.environment);
+      CSPController.handleEvent({ type: "edit", payload: delta }, props.environment);
     }
 
     function onSubmit() {
-      SPController.handleEvent(
+      CSPController.handleEvent(
         { type: "submit", payload: { history, baseUrl } },
         props.environment
       );
@@ -85,13 +84,13 @@ const SearchParametersFC = createFragmentContainer(
   },
   {
     metadata: graphql`
-      fragment SearchParameters_metadata on CitiesMetadata {
+      fragment CitySearchParameters_metadata on CitiesMetadata {
         populationLowerBound
         populationUpperBound
       }
     `,
-    searchParamsState: graphql`
-      fragment SearchParameters_searchParamsState on UICitySearchParamsState {
+    state: graphql`
+      fragment CitySearchParameters_state on UICitySearchParamsState {
         value {
           countryNameContains
           populationGte
@@ -120,20 +119,20 @@ export const defaultData = {
 
 export default function({ environment }: { environment: IEnvironment }) {
   let query = graphql`
-    query SearchParametersQuery {
+    query CitySearchParametersQuery {
       citiesMetadata {
-        ...SearchParameters_metadata
+        ...CitySearchParameters_metadata
       }
       uiState {
         citySearchParamsState {
-          ...SearchParameters_searchParamsState
+          ...CitySearchParameters_state
         }
       }
     }
   `;
 
   return (
-    <LoadingPlaceholderQueryRenderer<SearchParametersQuery>
+    <LoadingPlaceholderQueryRenderer<CitySearchParametersQuery>
       query={query}
       environment={environment}
       variables={{}}
@@ -147,7 +146,7 @@ export default function({ environment }: { environment: IEnvironment }) {
         return (
           <SearchParametersFC
             metadata={props.citiesMetadata || null}
-            searchParams={props.uiState?.citySearchParams || null}
+            citySearchParamsState={props.uiState?.citySearchParamsState || null}
             environment={environment}
           />
         );

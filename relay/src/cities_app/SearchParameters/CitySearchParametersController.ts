@@ -7,7 +7,7 @@ import * as Either from "fp-ts/lib/Either";
 import * as o from "../helpers/object";
 import * as md from "./model";
 import { Nullify } from "../helpers/typeUtils";
-import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
+import { CitySearchParametersControllerQueryResponse } from "__relay__/CitySearchParametersControllerQuery.graphql";
 
 type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
 type Draft = md.CitySearchParamsState["draft"];
@@ -26,13 +26,13 @@ type EffectWriteState = { type: "writeState"; value: md.CitySearchParamsState };
 type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
 
 const QUERY = graphql`
-  query SearchParametersControllerQuery {
+  query CitySearchParametersControllerQuery {
     ... on Query {
       __typename
     }
     uiState {
       citySearchParamsState {
-        ...SearchParameters_searchParamsState @relay(mask: false)
+        ...CitySearchParameters_state @relay(mask: false)
       }
     }
   }
@@ -237,7 +237,7 @@ export function handleEvent(event: Event, environment: IEnvironment) {
 function lookupStateFromRelayStore(environment: IEnvironment): md.CitySearchParamsState {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
-  const data = response.data as SearchParametersControllerQueryResponse;
+  const data = response.data as CitySearchParametersControllerQueryResponse;
   const searchParams = data.uiState?.citySearchParamsState;
   if (searchParams) {
     return {
