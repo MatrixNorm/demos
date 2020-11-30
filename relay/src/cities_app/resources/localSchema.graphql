@@ -28,7 +28,7 @@ type UICitySearchParamsErrors {
   countryNameContains: String
   populationGte: String
   populationLte: String
-  _: [String]
+  _: [String!]
 }
 
 type UINotification implements Node {

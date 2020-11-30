@@ -4,7 +4,6 @@ import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
-import * as t from "./types";
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {

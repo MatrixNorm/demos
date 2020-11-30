@@ -4,8 +4,8 @@ import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runti
 import { History } from "history";
 import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
+import * as o from "../helpers/object";
 import * as md from "./model";
-import * as t from "./types";
 import { Nullify } from "../helpers/typeUtils";
 import { SearchParametersControllerQueryResponse } from "__relay__/SearchParametersControllerQuery.graphql";
 
@@ -173,7 +173,7 @@ function reduceSubmit(
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
   return pipe(
-    md.ValidState.decode(state),
+    md.CitySearchParamsValidState.decode(state),
     Either.fold(
       () => {
         return null;
@@ -192,7 +192,7 @@ function reduceSubmit(
 }
 
 function reduceCancel(state: md.CitySearchParamsState): EffectWriteState | null {
-  return null;
+  return { type: "writeState", value: { ...state, draft: {}, errors: {} } };
 }
 
 function reduce(state: md.CitySearchParamsState, event: Event): Effect | Effect[] | null {
@@ -234,25 +234,32 @@ export function handleEvent(event: Event, environment: IEnvironment) {
   }
 }
 
-function lookupStateFromRelayStore(environment: IEnvironment): t.SpState {
+function lookupStateFromRelayStore(environment: IEnvironment): md.CitySearchParamsState {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
   const data = response.data as SearchParametersControllerQueryResponse;
-  const searchParams = data.uiState?.citySearchParams || null;
+  const searchParams = data.uiState?.citySearchParamsState;
   if (searchParams) {
-    return searchParams;
+    return {
+      value: o.removeNullProps(searchParams.value),
+      draft: o.removeNullProps(searchParams.draft),
+      errors: o.removeNullProps(searchParams.errors),
+    } as md.CitySearchParamsState;
   } else {
-    return BLANK_STATE;
+    return { value: {} as ValidValue, draft: {}, errors: {} };
   }
 }
 
-function writeStateIntoRelayStore(state: t.SP, environment: IEnvironment) {
+function writeStateIntoRelayStore(
+  state: md.CitySearchParamsState,
+  environment: IEnvironment
+) {
   const request = getRequest(QUERY);
   const operationDescriptor = createOperationDescriptor(request, {});
   let data = {
     __typename: "__Root",
     uiState: {
-      citySearchParams: state,
+      citySearchParamsState: state,
     },
   };
   environment.commitPayload(operationDescriptor, data);

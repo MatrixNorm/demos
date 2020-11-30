@@ -1,5 +1,4 @@
 import * as t from "io-ts";
-import { keyframes } from "styled-components";
 
 const isString = (input: unknown): input is string => typeof input === "string";
 const isNumber = (input: unknown): input is number => typeof input === "number";
@@ -88,10 +87,10 @@ export type CitySearchParamsState = {
   errors: CitySearchParamsErrors;
 };
 
-export const ValidState = t.type({
+export const CitySearchParamsValidState = t.type({
   value: CitySearchParams,
   draft: EmptyObject,
   error: EmptyObject,
 });
 
-export type ValidState = t.TypeOf<typeof ValidState>;
+export type CitySearchParamsValidState = t.TypeOf<typeof CitySearchParamsValidState>;

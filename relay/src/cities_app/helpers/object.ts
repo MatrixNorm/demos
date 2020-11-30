@@ -10,6 +10,15 @@ export function killUndefined<T>(obj: Partial<T>): Partial<T> {
   ) as Partial<T>;
 }
 
+export function removeNullProps<T>(obj: Partial<T> | null): Partial<NukeNulls<T>> {
+  if (obj === null) {
+    return {};
+  }
+  return Object.fromEntries(
+    Object.entries(obj).filter(([_, v]) => v !== null)
+  ) as Partial<NukeNulls<T>>;
+}
+
 export function objKeys<T>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[];
 }
