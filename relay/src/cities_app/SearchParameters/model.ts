@@ -76,8 +76,8 @@ export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
 
 export type CitySearchParamsErrors = Partial<
   {
-    [P in keyof CitySearchParamsShape]: String;
-  } & { _: String[] }
+    [P in keyof CitySearchParamsShape]: string;
+  } & { _: string[] }
 >;
 
 // XXX

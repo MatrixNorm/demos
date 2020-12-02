@@ -9,7 +9,7 @@ import * as md from "./model";
 import { Nullify } from "../helpers/typeUtils";
 import { CitySearchParametersControllerQueryResponse } from "__relay__/CitySearchParametersControllerQuery.graphql";
 
-type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
+export type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
 type Draft = md.CitySearchParamsState["draft"];
 type ValidValue = md.CitySearchParamsState["value"];
 
@@ -237,6 +237,7 @@ export function handleEvent(event: Event, environment: IEnvironment) {
 function lookupStateFromRelayStore(environment: IEnvironment): md.CitySearchParamsState {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
+  // XXX runtimes can be different
   const data = response.data as CitySearchParametersControllerQueryResponse;
   const searchParams = data.uiState?.citySearchParamsState;
   if (searchParams) {

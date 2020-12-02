@@ -4,6 +4,8 @@ import { LoadingContext, placeholderCssMixin } from "../verysmart/LoadingContext
 import { SubmitButton } from "../elements/Buttons";
 import RangeSlider from "../elements/RangeSlider";
 import { TextInput } from "../elements/Inputs";
+import * as t from "./types";
+import { EditPayload } from "./CitySearchParametersController";
 
 const SearchParametersBlock = styled.div`
   .submit-button-box {
@@ -43,9 +45,9 @@ const ParameterSectionSkeleton = styled(ParameterSectionSuccess)`
 `;
 
 export type Props = {
-  fields: t.SPDisplayed;
+  fields: t.Fields;
   metadata: t.Metadata;
-  onEdit: (delta: t.SPEditPayload) => void;
+  onEdit: (delta: EditPayload) => void;
   onSubmit: () => void | null;
 };
 
