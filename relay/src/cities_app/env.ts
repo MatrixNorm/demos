@@ -2,7 +2,7 @@ import { Environment, Network, RecordSource, Store, Observable } from "relay-run
 // @ts-ignore
 import { graphql, graphqlSync } from "graphql";
 // @ts-ignore
-import { makeExecutableSchema } from "graphql-tools";
+import { makeExecutableSchema, IResolvers } from "graphql-tools";
 // @ts-ignore
 import serverSchemaTxt from "raw-loader!./resources/serverSchema.graphql";
 import { serverResolvers } from "./resolvers/index";
@@ -42,7 +42,7 @@ export const createRelayEnvironment = (
   return environment;
 };
 
-export const createTestingEnv = (resolvers: any) => {
+export const createTestingEnv = (resolvers: IResolvers) => {
   const executableSchema = makeExecutableSchema({
     typeDefs: serverSchemaTxt,
     resolvers,

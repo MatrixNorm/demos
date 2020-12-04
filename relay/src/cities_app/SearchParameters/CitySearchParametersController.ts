@@ -234,24 +234,24 @@ export function handleEvent(event: Event, environment: IEnvironment) {
   }
 }
 
-function lookupStateFromRelayStore(environment: IEnvironment): md.CitySearchParamsState {
+export function lookupStateFromRelayStore(
+  environment: IEnvironment
+): md.CitySearchParamsState {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
-  // XXX runtimes can be different
-  const data = response.data as CitySearchParametersControllerQueryResponse;
-  const searchParams = data.uiState?.citySearchParamsState;
+
+  const searchParams = (response.data.uiState as any)?.citySearchParamsState as
+    | md.CitySearchParamsState
+    | undefined;
+
   if (searchParams) {
-    return {
-      value: o.removeNullProps(searchParams.value),
-      draft: o.removeNullProps(searchParams.draft),
-      errors: o.removeNullProps(searchParams.errors),
-    } as md.CitySearchParamsState;
+    return searchParams;
   } else {
     return { value: {} as ValidValue, draft: {}, errors: {} };
   }
 }
 
-function writeStateIntoRelayStore(
+export function writeStateIntoRelayStore(
   state: md.CitySearchParamsState,
   environment: IEnvironment
 ) {

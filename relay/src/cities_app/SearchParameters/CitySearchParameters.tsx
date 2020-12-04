@@ -36,13 +36,13 @@ function calcDisplayData(
         prop,
         {
           // @ts-ignore
-          value: s[prop]?.draft?.value || s[prop]?.value || defaultValue,
+          value: (s.value || {})[prop] || (state ?.draft || {})[prop] || defaultValue,
           // @ts-ignore
-          error: state?.errors
+          error: (s.errors || {})[prop],
         },
       ];
     })
-  ) as t.SPDisplayed;
+  ) as t.Fields;
 
   return { fields, metadata: finalMetadata };
 }
@@ -121,7 +121,7 @@ export const defaultData = {
   searchParams: null,
 };
 
-export default function({ environment }: { environment: IEnvironment }) {
+export default function ({ environment }: { environment: IEnvironment }) {
   let query = graphql`
     query CitySearchParametersQuery {
       citiesMetadata {
@@ -150,7 +150,7 @@ export default function({ environment }: { environment: IEnvironment }) {
         return (
           <SearchParametersFC
             metadata={props.citiesMetadata || null}
-            citySearchParamsState={props.uiState?.citySearchParamsState || null}
+            citySearchParamsState={props.uiState ?.citySearchParamsState || null}
             environment={environment}
           />
         );
