@@ -1,3 +1,4 @@
+.jestcache
 src/__relay__
 babel_gen/
 cljs_build/
