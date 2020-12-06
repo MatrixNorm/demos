@@ -1,6 +1,12 @@
 import * as iots from "io-ts";
 import { graphql } from "react-relay";
-import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runtime";
+import {
+  createOperationDescriptor,
+  getRequest,
+  IEnvironment,
+  commitLocalUpdate,
+  ROOT_ID,
+} from "relay-runtime";
 import { History } from "history";
 import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
@@ -249,11 +255,11 @@ export function lookupStateFromRelayStore(
   if (searchParams) {
     return searchParams;
   } else {
-    return { value: {} as md.CitySearchParamsState["value"], draft: {}, errors: {} };
+    return { value: {} as Value, draft: {}, errors: {} };
   }
 }
 
-export function $writeStateIntoRelayStore$(
+export function writeStateIntoRelayStore$(
   state: md.CitySearchParamsState,
   environment: IEnvironment
 ) {
@@ -265,6 +271,9 @@ export function $writeStateIntoRelayStore$(
       citySearchParamsState: state,
     },
   };
+  commitLocalUpdate(environment, (store) => {
+    store.delete(`${ROOT_ID}:uiState:citySearchParamsState`);
+  });
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
 }
@@ -275,22 +284,25 @@ function redirectToUrl({ history, url }: { history: History; url: string }) {
 
 // For reference. Do not delete.
 
-// function writeSearchParams(searchParams: SearchParameters, environment: IEnvironment) {
-//   commitLocalUpdate(environment, (store) => {
-//     store.delete(`${ROOT_ID}:uiState:citySearchParams`);
-//   });
-//   if (Object.keys(searchParams).length > 0) {
-//     commitLocalUpdate(environment, (store) => {
-//       const record = store
-//         .get(ROOT_ID)
-//         ?.getOrCreateLinkedRecord("uiState", "UIState")
-//         ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
-//       if (record) {
-//         for (let key in searchParams) {
-//           record.setValue(searchParams[key as keyof SearchParameters], key);
-//         }
-//       }
-//     });
-//     retainRecord(QUERY, environment);
-//   }
-// }
+function writeStateIntoRelayStore2$(
+  searchParams: SearchParameters,
+  environment: IEnvironment
+) {
+  commitLocalUpdate(environment, (store) => {
+    store.delete(`${ROOT_ID}:uiState:citySearchParams`);
+  });
+  if (Object.keys(searchParams).length > 0) {
+    commitLocalUpdate(environment, (store) => {
+      const record = store
+        .get(ROOT_ID)
+        ?.getOrCreateLinkedRecord("uiState", "UIState")
+        ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
+      if (record) {
+        for (let key in searchParams) {
+          record.setValue(searchParams[key as keyof SearchParameters], key);
+        }
+      }
+    });
+    retainRecord(QUERY, environment);
+  }
+}

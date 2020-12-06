@@ -26,13 +26,13 @@ describe("XXX", () => {
       draft: {},
       errors: {},
     };
-    cspc.$writeStateIntoRelayStore$(state, __env);
+    cspc.writeStateIntoRelayStore$(state, __env);
     let stateFromStore = cspc.lookupStateFromRelayStore(__env);
     expect(stateFromStore).toEqual(state);
   });
 
-  test("write 2", () => {
-    let state: md.CitySearchParamsState = {
+  test("over-write", () => {
+    let state1: md.CitySearchParamsState = {
       value: {
         countryNameContains: "a",
         populationLte: 120,
@@ -40,8 +40,18 @@ describe("XXX", () => {
       draft: { countryNameContains: "b" },
       errors: { countryNameContains: "bad value" },
     };
-    cspc.$writeStateIntoRelayStore$(state, __env);
+    let state2: md.CitySearchParamsState = {
+      value: {
+        populationLte: 120,
+        populationGte: 10,
+      } as md.CitySearchParams,
+      draft: {},
+      errors: {},
+    };
+    cspc.writeStateIntoRelayStore$(state1, __env);
+    cspc.writeStateIntoRelayStore$(state2, __env);
     let stateFromStore = cspc.lookupStateFromRelayStore(__env);
-    expect(stateFromStore).toEqual(state);
+    console.log(stateFromStore);
+    expect(stateFromStore).toEqual(state2);
   });
 });
