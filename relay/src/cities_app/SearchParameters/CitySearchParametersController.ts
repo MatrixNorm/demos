@@ -4,14 +4,13 @@ import { createOperationDescriptor, getRequest, IEnvironment } from "relay-runti
 import { History } from "history";
 import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
-import * as o from "../helpers/object";
 import * as md from "./model";
+import * as ob from "../helpers/object";
 import { Nullify } from "../helpers/typeUtils";
-import { CitySearchParametersControllerQueryResponse } from "__relay__/CitySearchParametersControllerQuery.graphql";
 
 export type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
+type Value = md.CitySearchParamsState["value"];
 type Draft = md.CitySearchParamsState["draft"];
-type ValidValue = md.CitySearchParamsState["value"];
 
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
@@ -42,7 +41,7 @@ function isEditPayloadEmpty(payload: EditPayload) {
   return Object.values(payload).filter((x) => x !== undefined).length === 0;
 }
 
-function urlQueryStringFromSearchParams(searchParams: ValidValue): string {
+function urlQueryStringFromSearchParams(searchParams: Value): string {
   const pairs = Object.entries(searchParams).filter(
     ([_, propValue]) => propValue !== undefined
   );
@@ -52,7 +51,8 @@ function urlQueryStringFromSearchParams(searchParams: ValidValue): string {
 
 function normalizeEditPayload(payload: EditPayload): EditPayload {
   if (
-    typeof payload.countryNameContains === "string" &&
+    payload.countryNameContains !== undefined &&
+    payload.countryNameContains !== null &&
     payload.countryNameContains.length === 0
   ) {
     return { ...payload, countryNameContains: null };
@@ -60,7 +60,7 @@ function normalizeEditPayload(payload: EditPayload): EditPayload {
   return payload;
 }
 
-function normalizeStartPayload(payload: Draft): Draft {
+function normalizeInitialPayload(payload: Draft): Draft {
   if (
     payload.countryNameContains !== undefined &&
     payload.countryNameContains.length === 0
@@ -83,14 +83,14 @@ function reduceStart(payload: unknown): EffectWriteState {
         return coerced;
       }
     ),
-    normalizeStartPayload
+    normalizeInitialPayload
   );
   const state = pipe(
     md.CitySearchParams.decode(draft),
     Either.fold(
       (validationErrors) => {
         const errors = extractErrors(validationErrors);
-        return { value: {} as ValidValue, draft, errors };
+        return { value: {} as Value, draft, errors };
       },
       (validDraft) => {
         return {
@@ -117,10 +117,7 @@ function extractErrors(
   }, {} as md.CitySearchParamsState["errors"]);
 }
 
-function applyEditPayload(
-  draft: md.CitySearchParamsState["draft"],
-  payload: EditPayload
-): md.CitySearchParamsState["draft"] {
+function applyEditPayloadToDraft(draft: Draft, payload: EditPayload): Draft {
   let nextDraft = { ...draft };
   for (let prop in payload) {
     //@ts-ignore
@@ -139,6 +136,10 @@ function applyEditPayload(
   return nextDraft;
 }
 
+function getCandidateValue(currentValue: Value, draft: Draft): Draft {
+  return ob.safeMerge(currentValue, draft);
+}
+
 function reduceEdit(
   state: md.CitySearchParamsState,
   payload: EditPayload
@@ -147,17 +148,18 @@ function reduceEdit(
     return null;
   }
   const normalizedPayload = normalizeEditPayload(payload);
-  const nextDraft = applyEditPayload(state.draft, normalizedPayload);
+  const nextDraft = applyEditPayloadToDraft(state.draft, normalizedPayload);
+  const candidateValue = getCandidateValue(state.value, nextDraft);
   const nextState = pipe(
-    md.CitySearchParams.decode(nextDraft),
+    md.CitySearchParams.decode(candidateValue),
     Either.fold(
       (validationErrors) => {
         const errors = extractErrors(validationErrors);
         return { ...state, draft: nextDraft, errors };
       },
-      (validDraft) => {
+      (goodValue) => {
         return {
-          value: validDraft,
+          value: goodValue,
           draft: {},
           errors: {},
         };
@@ -226,7 +228,7 @@ export function handleEvent(event: Event, environment: IEnvironment) {
     }
     effects.forEach((effect) => {
       if (effect.type === "writeState") {
-        writeStateIntoRelayStore(effect.value, environment);
+        $writeStateIntoRelayStore$(effect.value, environment);
       } else if (effect.type === "redirect") {
         redirectToUrl(effect.value);
       }
@@ -247,11 +249,11 @@ export function lookupStateFromRelayStore(
   if (searchParams) {
     return searchParams;
   } else {
-    return { value: {} as ValidValue, draft: {}, errors: {} };
+    return { value: {} as md.CitySearchParamsState["value"], draft: {}, errors: {} };
   }
 }
 
-export function writeStateIntoRelayStore(
+export function $writeStateIntoRelayStore$(
   state: md.CitySearchParamsState,
   environment: IEnvironment
 ) {

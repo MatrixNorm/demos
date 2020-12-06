@@ -1,9 +1,13 @@
 import * as t from "io-ts";
 
+type EmptyObject = { [k: string]: undefined };
+
 const isString = (input: unknown): input is string => typeof input === "string";
 const isNumber = (input: unknown): input is number => typeof input === "number";
-const isEmptyObject = (input: unknown): input is {} =>
-  typeof input === "object" && input !== null && Object.keys(input).length === 0;
+const isEmptyObject = (input: unknown): input is EmptyObject =>
+  typeof input === "object" &&
+  input !== null &&
+  Object.entries(input).filter(([_, v]) => v !== undefined).length === 0;
 
 const nonBlankString = new t.Type<string>(
   "nonBlankString",
@@ -23,7 +27,7 @@ const nonNegativeNumber = new t.Type<number>(
   t.identity
 );
 
-const EmptyObject = new t.Type<{}>(
+const EmptyObject = new t.Type<EmptyObject>(
   "EmptyObject",
   isEmptyObject,
   (input, context) =>
@@ -45,14 +49,10 @@ const coerceToNumber = new t.Type<number | undefined, string>(
   String
 );
 
-// can be derived from model
-export const CitySearchParamsCoercer = t.partial({
-  countryNameContains: coerceToString,
-  populationGte: coerceToNumber,
-  populationLte: coerceToNumber,
-});
+/////////
+// XXX //
+/////////
 
-// XXX
 export const CitySearchParamsShape = t.type({
   countryNameContains: nonBlankString,
   populationGte: nonNegativeNumber,
@@ -60,19 +60,61 @@ export const CitySearchParamsShape = t.type({
 });
 export type CitySearchParamsShape = t.TypeOf<typeof CitySearchParamsShape>;
 
-// XXX
-interface CitySearchParamsBrand {
-  readonly Positive: unique symbol;
-}
+// XXX can be derived from model
+export const CitySearchParamsCoercer = t.partial({
+  countryNameContains: coerceToString,
+  populationGte: coerceToNumber,
+  populationLte: coerceToNumber,
+});
+
+/////////
+// XXX //
+/////////
+
 export const CitySearchParams = t.brand(
   t.partial(CitySearchParamsShape.props),
-  (x): x is t.Branded<any, CitySearchParamsBrand> => {
+  (
+    x
+  ): x is t.Branded<
+    any,
+    {
+      readonly citySearchParams: unique symbol;
+    }
+  > => {
     const { populationGte: gte, populationLte: lte } = x;
     return gte !== undefined && lte !== undefined ? gte <= lte : true;
   },
-  "SearchParams"
+  "CitySearchParams"
 );
 export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
+
+/////////
+// XXX //
+/////////
+
+// export const CitySearchParamsErrors = t.partial({
+//   countryNameContains: nonBlankString,
+//   populationGte: nonBlankString,
+//   populationLte: nonBlankString,
+//   _: t.array(nonBlankString),
+// });
+// export type CitySearchParamsErrors = t.TypeOf<typeof CitySearchParamsErrors>;
+
+// interface CitySearchParamsStateBrand {
+//   readonly citySearchParamsState: unique symbol;
+// }
+// export const CitySearchParamsState = t.brand(
+//   t.type({
+//     value: CitySearchParams,
+//     draft: t.partial(CitySearchParamsShape.props),
+//     errors: CitySearchParamsErrors,
+//   }),
+//   (x): x is t.Branded<any, CitySearchParamsStateBrand> => {
+//     const { populationGte: gte, populationLte: lte } = x;
+//     return gte !== undefined && lte !== undefined ? gte <= lte : true;
+//   },
+//   "CitySearchParamsState"
+// );
 
 export type CitySearchParamsErrors = Partial<
   {
@@ -80,7 +122,6 @@ export type CitySearchParamsErrors = Partial<
   } & { _: string[] }
 >;
 
-// XXX
 export type CitySearchParamsState = {
   value: CitySearchParams;
   draft: Partial<CitySearchParamsShape>;
@@ -90,7 +131,15 @@ export type CitySearchParamsState = {
 export const CitySearchParamsValidState = t.type({
   value: CitySearchParams,
   draft: EmptyObject,
-  error: EmptyObject,
+  errors: EmptyObject,
 });
-
 export type CitySearchParamsValidState = t.TypeOf<typeof CitySearchParamsValidState>;
+
+export const CitySearchParamsValidDraftState = t.type({
+  value: CitySearchParams,
+  draft: EmptyObject,
+  errors: EmptyObject,
+});
+export type CitySearchParamsValidDraftState = t.TypeOf<
+  typeof CitySearchParamsValidDraftState
+>;

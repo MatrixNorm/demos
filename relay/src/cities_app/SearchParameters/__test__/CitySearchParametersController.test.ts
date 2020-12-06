@@ -17,10 +17,31 @@ describe("XXX", () => {
     expect(state).toEqual({ value: {}, draft: {}, errors: {} });
   });
 
-  test("2", () => {
-    let state: md.CitySearchParamsState = { value: {}, draft: {}, errors: {} };
+  test("write 1", () => {
+    let state: md.CitySearchParamsValidState = {
+      value: {
+        countryNameContains: "a",
+        populationLte: 120,
+      } as md.CitySearchParams,
+      draft: {},
+      errors: {},
+    };
+    cspc.$writeStateIntoRelayStore$(state, __env);
     let stateFromStore = cspc.lookupStateFromRelayStore(__env);
-    console.log(stateFromStore);
-    //expect(state).toEqual({ value: {}, draft: {}, errors: {} });
+    expect(stateFromStore).toEqual(state);
+  });
+
+  test("write 2", () => {
+    let state: md.CitySearchParamsState = {
+      value: {
+        countryNameContains: "a",
+        populationLte: 120,
+      } as md.CitySearchParams,
+      draft: { countryNameContains: "b" },
+      errors: { countryNameContains: "bad value" },
+    };
+    cspc.$writeStateIntoRelayStore$(state, __env);
+    let stateFromStore = cspc.lookupStateFromRelayStore(__env);
+    expect(stateFromStore).toEqual(state);
   });
 });
