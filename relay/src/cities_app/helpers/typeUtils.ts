@@ -1,3 +1,5 @@
+export function assertNever(value: never) {}
+
 export type NukeFragRef<T> = T extends object
   ? {
       [P in Exclude<keyof T, " $fragmentRefs" | " $refType">]: NukeFragRef<T[P]>;

@@ -12,24 +12,24 @@ describe("XXX", () => {
     __env = createMockEnvironment();
   });
 
-  test("initial state", () => {
-    let state = cspc.lookupStateFromRelayStore(__env);
-    expect(state).toEqual({ value: {}, draft: {}, errors: {} });
-  });
+  // test("initial state", () => {
+  //   let state = cspc.lookupStateFromRelayStore(__env);
+  //   expect(state).toEqual({ value: {}, draft: {}, errors: {} });
+  // });
 
-  test("write 1", () => {
-    let state: md.CitySearchParamsValidState = {
-      value: {
-        countryNameContains: "a",
-        populationLte: 120,
-      } as md.CitySearchParams,
-      draft: {},
-      errors: {},
-    };
-    cspc.writeStateIntoRelayStore$(state, __env);
-    let stateFromStore = cspc.lookupStateFromRelayStore(__env);
-    expect(stateFromStore).toEqual(state);
-  });
+  // test("write 1", () => {
+  //   let state: md.CitySearchParamsValidState = {
+  //     value: {
+  //       countryNameContains: "a",
+  //       populationLte: 120,
+  //     } as md.CitySearchParams,
+  //     draft: {},
+  //     errors: {},
+  //   };
+  //   cspc.writeStateIntoRelayStore$(state, __env);
+  //   let stateFromStore = cspc.lookupStateFromRelayStore(__env);
+  //   expect(stateFromStore).toEqual(state);
+  // });
 
   test("over-write", () => {
     let state1: md.CitySearchParamsState = {
@@ -42,16 +42,17 @@ describe("XXX", () => {
     };
     let state2: md.CitySearchParamsState = {
       value: {
-        populationLte: 120,
+        populationLte: 30,
         populationGte: 10,
       } as md.CitySearchParams,
       draft: {},
       errors: {},
     };
     cspc.writeStateIntoRelayStore$(state1, __env);
+    console.log(1111111111)
     cspc.writeStateIntoRelayStore$(state2, __env);
-    let stateFromStore = cspc.lookupStateFromRelayStore(__env);
-    console.log(stateFromStore);
-    expect(stateFromStore).toEqual(state2);
+    // let stateFromStore = cspc.lookupStateFromRelayStore(__env);
+    // console.log(stateFromStore);
+    //expect(stateFromStore).toEqual(state2);
   });
 });
