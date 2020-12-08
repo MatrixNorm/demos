@@ -236,7 +236,7 @@ export function handleEvent(event: Event, environment: IEnvironment) {
     }
     effects.forEach((effect) => {
       if (effect.type === "writeState") {
-        $writeStateIntoRelayStore$(effect.value, environment);
+        writeStateIntoRelayStore$(effect.value, environment);
       } else if (effect.type === "redirect") {
         redirectToUrl(effect.value);
       }
@@ -250,7 +250,6 @@ export function lookupStateFromRelayStore(
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
   const state = (response.data.uiState as any)?.citySearchParamsState;
-  console.log(state);
   if (state) {
     return state;
   } else {
@@ -270,44 +269,47 @@ export function writeStateIntoRelayStore$(
       citySearchParamsState: state,
     },
   };
-  console.log(1, lookupStateFromRelayStore(environment));
   environment.commitUpdate((store) => {
-    store.delete(`${ROOT_ID}:uiState:citySearchParamsState`);
+    // XXX how to delete record recursively
+    const path = `${ROOT_ID}:uiState:citySearchParamsState`;
+    store.delete(`${path}:value`);
+    store.delete(`${path}:draft`);
+    store.delete(`${path}:errors`);
+    store.delete(`${path}`);
   });
-  console.log(2, lookupStateFromRelayStore(environment));
-  console.log(JSON.stringify(data));
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);
-  console.log(3, lookupStateFromRelayStore(environment));
 }
 
 function redirectToUrl({ history, url }: { history: History; url: string }) {
   history.push(url);
 }
 
-function writeStateIntoRelayStore2$(
-  state: md.CitySearchParamsState,
-  environment: IEnvironment
-) {
-  environment.commitUpdate((store) => {
-    store.delete(`${ROOT_ID}:uiState:citySearchParamsState`);
-    const uiState = store.get(ROOT_ID)?.getOrCreateLinkedRecord("uiState", "UIState");
-    uiState
-      ?.setLinkedRecord()
-      ?.getOrCreateLinkedRecord("citySearchParamsState", "UICitySearchParamsState");
-  });
-  if (Object.keys(searchParams).length > 0) {
-    commitLocalUpdate(environment, (store) => {
-      const record = store
-        .get(ROOT_ID)
-        ?.getOrCreateLinkedRecord("uiState", "UIState")
-        ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
-      if (record) {
-        for (let key in searchParams) {
-          record.setValue(searchParams[key as keyof SearchParameters], key);
-        }
-      }
-    });
-    retainRecord(QUERY, environment);
-  }
-}
+// XXX for reference
+
+// function writeStateIntoRelayStore2$(
+//   state: md.CitySearchParamsState,
+//   environment: IEnvironment
+// ) {
+//   environment.commitUpdate((store) => {
+//     store.delete(`${ROOT_ID}:uiState:citySearchParamsState`);
+//     const uiState = store.get(ROOT_ID)?.getOrCreateLinkedRecord("uiState", "UIState");
+//     uiState
+//       ?.setLinkedRecord()
+//       ?.getOrCreateLinkedRecord("citySearchParamsState", "UICitySearchParamsState");
+//   });
+//   if (Object.keys(searchParams).length > 0) {
+//     commitLocalUpdate(environment, (store) => {
+//       const record = store
+//         .get(ROOT_ID)
+//         ?.getOrCreateLinkedRecord("uiState", "UIState")
+//         ?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
+//       if (record) {
+//         for (let key in searchParams) {
+//           record.setValue(searchParams[key as keyof SearchParameters], key);
+//         }
+//       }
+//     });
+//     retainRecord(QUERY, environment);
+//   }
+// }
