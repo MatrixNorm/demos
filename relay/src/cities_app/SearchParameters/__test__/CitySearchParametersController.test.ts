@@ -1,11 +1,10 @@
 /* globals describe test expect beforeEach */
-import { cons } from "fp-ts/lib/ReadonlyArray";
 import { IEnvironment } from "relay-runtime";
 import { createMockEnvironment } from "relay-test-utils";
 import * as md from "../model";
 import * as cspc from "../CitySearchParametersController";
 
-describe("XXX", () => {
+describe("state write-read", () => {
   let __env: IEnvironment;
 
   beforeEach(() => {

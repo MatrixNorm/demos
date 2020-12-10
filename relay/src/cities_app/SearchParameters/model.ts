@@ -53,13 +53,6 @@ const coerceToNumber = new t.Type<number | undefined, string>(
 // XXX //
 /////////
 
-export const CitySearchParamsShape = t.type({
-  countryNameContains: nonBlankString,
-  populationGte: nonNegativeNumber,
-  populationLte: nonNegativeNumber,
-});
-export type CitySearchParamsShape = t.TypeOf<typeof CitySearchParamsShape>;
-
 // XXX can be derived from model
 export const CitySearchParamsCoercer = t.partial({
   countryNameContains: coerceToString,
@@ -67,26 +60,28 @@ export const CitySearchParamsCoercer = t.partial({
   populationLte: coerceToNumber,
 });
 
-/////////
-// XXX //
-/////////
+export const CitySearchParams = t.partial({
+  countryNameContains: nonBlankString,
+  populationGte: nonNegativeNumber,
+  populationLte: nonNegativeNumber,
+});
 
-export const CitySearchParams = t.brand(
-  t.partial(CitySearchParamsShape.props),
-  (
-    x
-  ): x is t.Branded<
-    any,
-    {
-      readonly citySearchParams: unique symbol;
-    }
-  > => {
-    const { populationGte: gte, populationLte: lte } = x;
-    return gte !== undefined && lte !== undefined ? gte <= lte : true;
-  },
-  "CitySearchParams"
-);
 export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
+
+export const CitySearchParamsRefined = CitySearchParams.pipe(
+  new t.Type<CitySearchParams, CitySearchParams, CitySearchParams>(
+    "CitySearchParamsRefined",
+    (input): input is CitySearchParams => true,
+    (input, c) => {
+      const { populationGte: gte, populationLte: lte } = input;
+      if (gte !== undefined && lte !== undefined && gte > lte) {
+        return t.failure(input, c, "gte > lte");
+      }
+      return t.success(input);
+    },
+    t.identity
+  )
+);
 
 /////////
 // XXX //
@@ -118,13 +113,13 @@ export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
 
 export type CitySearchParamsErrors = Partial<
   {
-    [P in keyof CitySearchParamsShape]: string;
+    [P in keyof CitySearchParams]: string;
   } & { _: string[] }
 >;
 
 export type CitySearchParamsState = {
   value: CitySearchParams;
-  draft: Partial<CitySearchParamsShape>;
+  draft: CitySearchParams;
   errors: CitySearchParamsErrors;
 };
 

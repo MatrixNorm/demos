@@ -60,10 +60,13 @@ const SearchParams2 = new t.Type<SearchParams, SearchParams, SearchParams>(
   t.identity
 );
 
+const SearchParams3 = SearchParams.pipe(SearchParams2);
+type SearchParams3 = t.TypeOf<typeof SearchParams3>;
+
 let input = {
-  countryNameContains: " ",
-  populationGte: -1,
-  populationLte: -3,
+  countryNameContains: " d ",
+  populationGte: 3,
+  populationLte: 1,
 };
 
 pipe(
@@ -80,6 +83,18 @@ pipe(
 
 pipe(
   SearchParams2.decode(input),
+  Either.fold(
+    (errors) => {
+      console.log(errors);
+    },
+    (x) => {
+      console.log(x);
+    }
+  )
+);
+
+pipe(
+  SearchParams3.decode(input),
   Either.fold(
     (errors) => {
       console.log(errors);

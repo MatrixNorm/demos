@@ -12,9 +12,8 @@ import * as Either from "fp-ts/lib/Either";
 import * as md from "./model";
 import * as ob from "../helpers/object";
 import { Nullify, assertNever } from "../helpers/typeUtils";
-import { entries } from "lodash";
 
-export type EditPayload = Partial<Nullify<md.CitySearchParamsShape>>;
+export type EditPayload = Nullify<md.CitySearchParams>;
 type Value = md.CitySearchParamsState["value"];
 type Draft = md.CitySearchParamsState["draft"];
 
