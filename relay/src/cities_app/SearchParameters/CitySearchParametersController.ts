@@ -15,16 +15,17 @@ import { assertNever } from "../helpers/typeUtils";
 
 export type EditPayload = md.CitySearchParamsDraft;
 
-type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
+type Event = InitEvent | EditEvent | SubmitEvent | CancelEvent;
 
-type StartEvent = { type: "start"; payload: unknown };
+type InitEvent = { type: "init"; payload: unknown };
 type EditEvent = { type: "edit"; payload: EditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 
-type Effect = EffectWriteState | EffectRedirect;
+type Effect = EffectWriteDraft | EffectWriteValue | EffectRedirect;
 
-type EffectWriteState = { type: "writeState"; value: md.CitySearchParamsState };
+type EffectWriteDraft = { type: "writeDraft"; value: md.CitySearchParamsDraft };
+type EffectWriteValue = { type: "writeValue"; value: md.CitySearchParams };
 type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
 
 const QUERY = graphql`
@@ -75,105 +76,46 @@ function normalizeInitialPayload(payload: md.CitySearchParams): md.CitySearchPar
   return payload;
 }
 
-function reduceStart(payload: unknown): EffectWriteState {
-  const draft: Draft = pipe(
+function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
+  const draft = pipe(
     md.CitySearchParamsCoercer.decode(payload),
     Either.fold(
-      () => {
-        return {};
-      },
-      (coerced) => {
-        return coerced;
-      }
+      () => ({}),
+      (coerced) => coerced
     ),
     normalizeInitialPayload
   );
   const state = pipe(
     md.CitySearchParams.decode(draft),
     Either.fold(
-      (validationErrors) => {
-        const errors = extractErrors(validationErrors);
-        return { value: {} as Value, draft, errors };
-      },
-      (validDraft) => {
-        return {
-          value: validDraft,
-          draft: {},
-          errors: {},
-        };
-      }
-    )
-  );
-  return { type: "writeState", value: state };
-}
-
-function extractErrors(
-  validationErrors: iots.Errors
-): md.CitySearchParamsState["errors"] {
-  return validationErrors.reduce((acc, error) => {
-    let c = error.context;
-    if (c.length === 2) {
-      //@ts-ignore
-      acc[c[1].key] = "shit";
-    }
-    return acc;
-  }, {} as md.CitySearchParamsState["errors"]);
-}
-
-function applyEditPayloadToDraft(
-  draft: md.CitySearchParams,
-  payload: EditPayload
-): md.CitySearchParams {
-  let nextDraft = { ...draft };
-  for (let prop in payload) {
-    //@ts-ignore
-    let value = payload[prop];
-    //@ts-ignore
-    if (payload[prop] !== undefined) {
-      if (value === null) {
-        //@ts-ignore
-        delete nextDraft[prop];
-      } else {
-        //@ts-ignore
-        nextDraft[prop] = value;
-      }
-    }
-  }
-  return nextDraft;
-}
-
-function getCandidateValue(currentValue: Value, draft: Draft): Draft {
-  return ob.safeMerge(currentValue, draft);
-}
-
-function reduceEdit(
-  draft: md.CitySearchParams,
-  payload: EditPayload
-): EffectWriteState | null {
-  if (isEditPayloadEmpty(payload)) {
-    return null;
-  }
-  const normalizedPayload = normalizeEditPayload(payload);
-  const nextDraft = applyEditPayloadToDraft(draft, normalizedPayload);
-  const candidateValue = getCandidateValue(state.value, nextDraft);
-  const nextState = pipe(
-    md.CitySearchParams.decode(candidateValue),
-    Either.fold(
-      (validationErrors) => {
-        const errors = extractErrors(validationErrors);
-        return { ...state, draft: nextDraft, errors };
+      () => {
+        return { value: {} as md.CitySearchParams, draft };
       },
       (goodValue) => {
         return {
           value: goodValue,
-          draft: {},
-          errors: {},
+          draft: {} as md.CitySearchParamsDraft,
         };
       }
     )
   );
-  console.log({ nextState });
-  return { type: "writeState", value: nextState };
+  return [
+    { type: "writeValue", value: state.value },
+    { type: "writeDraft", value: state.value },
+  ];
+}
+
+function reduceEdit(
+  draft: md.CitySearchParamsDraft,
+  payload: EditPayload
+): EffectWriteDraft | null {
+  if (isEditPayloadEmpty(payload)) {
+    return null;
+  }
+  return {
+    type: "writeDraft",
+    value: ob.safeMerge(draft, normalizeEditPayload(payload)),
+  };
 }
 
 function reduceSubmit(
@@ -199,25 +141,23 @@ function reduceSubmit(
   );
 }
 
-function reduceCancel(state: md.CitySearchParamsState): EffectWriteState | null {
-  return { type: "writeState", value: { ...state, draft: {}, errors: {} } };
+function reduceCancel(): EffectWriteDraft | null {
+  return { type: "writeDraft", value: {} };
 }
 
-function reduce(state: md.CitySearchParamsState, event: Event): Effect | Effect[] | null {
-  console.log(event);
-
+function reduce(draft: md.CitySearchParamsDraft, event: Event): Effect | Effect[] | null {
   switch (event.type) {
     case "edit": {
-      return reduceEdit(state, event.payload);
+      return reduceEdit(draft, event.payload);
     }
-    case "start": {
-      return reduceStart(event.payload);
+    case "init": {
+      return reduceInit(event.payload);
     }
     case "submit": {
-      return reduceSubmit(state, event.payload);
+      return reduceSubmit(draft, event.payload);
     }
     case "cancel": {
-      return reduceCancel(state);
+      return reduceCancel();
     }
     default:
       assertNever(event);
