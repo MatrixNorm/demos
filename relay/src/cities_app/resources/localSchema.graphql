@@ -3,17 +3,11 @@ extend type Query {
 }
 
 type UIState {
-  citySearchParamsState: UICitySearchParamsState
+  citySearchParams: UICitySearchParams
+  citySearchParamsDraft: UICitySearchParams
   notifications: [UINotification!]
   userSettingsEditDelta: UIUserSettingsDelta
   userSettingsOptimisticDelta: UIUserSettingsDelta
-}
-
-# @ts
-type UICitySearchParamsState {
-  value: UICitySearchParams
-  draft: UICitySearchParams
-  errors: UICitySearchParamsErrors
 }
 
 # @ts
@@ -21,14 +15,6 @@ type UICitySearchParams {
   countryNameContains: String
   populationGte: Int
   populationLte: Int
-}
-
-# @ts
-type UICitySearchParamsErrors {
-  countryNameContains: String
-  populationGte: String
-  populationLte: String
-  _: [String!]
 }
 
 type UINotification implements Node {

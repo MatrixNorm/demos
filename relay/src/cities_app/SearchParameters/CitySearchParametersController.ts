@@ -11,11 +11,9 @@ import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
 import * as md from "./model";
 import * as ob from "../helpers/object";
-import { Nullify, assertNever } from "../helpers/typeUtils";
+import { assertNever } from "../helpers/typeUtils";
 
-export type EditPayload = Nullify<md.CitySearchParams>;
-type Value = md.CitySearchParamsState["value"];
-type Draft = md.CitySearchParamsState["draft"];
+export type EditPayload = md.CitySearchParamsDraft;
 
 type Event = StartEvent | EditEvent | SubmitEvent | CancelEvent;
 
@@ -65,7 +63,7 @@ function normalizeEditPayload(payload: EditPayload): EditPayload {
   return payload;
 }
 
-function normalizeInitialPayload(payload: Draft): Draft {
+function normalizeInitialPayload(payload: md.CitySearchParams): md.CitySearchParams {
   if (
     payload.countryNameContains !== undefined &&
     payload.countryNameContains.length === 0
@@ -122,7 +120,10 @@ function extractErrors(
   }, {} as md.CitySearchParamsState["errors"]);
 }
 
-function applyEditPayloadToDraft(draft: Draft, payload: EditPayload): Draft {
+function applyEditPayloadToDraft(
+  draft: md.CitySearchParams,
+  payload: EditPayload
+): md.CitySearchParams {
   let nextDraft = { ...draft };
   for (let prop in payload) {
     //@ts-ignore
@@ -146,14 +147,14 @@ function getCandidateValue(currentValue: Value, draft: Draft): Draft {
 }
 
 function reduceEdit(
-  state: md.CitySearchParamsState,
+  draft: md.CitySearchParams,
   payload: EditPayload
 ): EffectWriteState | null {
   if (isEditPayloadEmpty(payload)) {
     return null;
   }
   const normalizedPayload = normalizeEditPayload(payload);
-  const nextDraft = applyEditPayloadToDraft(state.draft, normalizedPayload);
+  const nextDraft = applyEditPayloadToDraft(draft, normalizedPayload);
   const candidateValue = getCandidateValue(state.value, nextDraft);
   const nextState = pipe(
     md.CitySearchParams.decode(candidateValue),

@@ -3,7 +3,15 @@ import * as t from "io-ts";
 type EmptyObject = { [k: string]: undefined };
 
 const isString = (input: unknown): input is string => typeof input === "string";
+
+const isNonBlankString = (input: unknown): input is string =>
+  isString(input) && input.trim().length > 0;
+
 const isNumber = (input: unknown): input is number => typeof input === "number";
+
+const isNonNegativeNumber = (input: unknown): input is number =>
+  isNumber(input) && input >= 0;
+
 const isEmptyObject = (input: unknown): input is EmptyObject =>
   typeof input === "object" &&
   input !== null &&
@@ -11,19 +19,17 @@ const isEmptyObject = (input: unknown): input is EmptyObject =>
 
 const nonBlankString = new t.Type<string>(
   "nonBlankString",
-  isString,
+  isNonBlankString,
   (input, context) =>
-    isString(input) && input.trim().length > 0
-      ? t.success(input)
-      : t.failure(input, context),
+    isNonBlankString(input) ? t.success(input) : t.failure(input, context),
   t.identity
 );
 
 const nonNegativeNumber = new t.Type<number>(
   "nonNegativeNumber",
-  isNumber,
+  isNonNegativeNumber,
   (input, context) =>
-    isNumber(input) && input >= 0 ? t.success(input) : t.failure(input, context),
+    isNonNegativeNumber(input) ? t.success(input) : t.failure(input, context),
   t.identity
 );
 
@@ -52,26 +58,29 @@ const coerceToNumber = new t.Type<number | undefined, string>(
 /////////
 // XXX //
 /////////
+export type CitySearchParamsDraft = t.TypeOf<typeof CitySearchParamsDraft>;
 
-// XXX can be derived from model
-export const CitySearchParamsCoercer = t.partial({
-  countryNameContains: coerceToString,
-  populationGte: coerceToNumber,
-  populationLte: coerceToNumber,
+export const CitySearchParamsDraft = t.partial({
+  countryNameContains: t.union([t.string, t.null]),
+  populationGte: t.union([t.number, t.null]),
+  populationLte: t.union([t.number, t.null]),
 });
 
-export const CitySearchParams = t.partial({
+/////////
+// XXX //
+/////////
+export type CitySearchParams = t.TypeOf<typeof CitySearchParams__>;
+
+export const CitySearchParams__ = t.partial({
   countryNameContains: nonBlankString,
   populationGte: nonNegativeNumber,
   populationLte: nonNegativeNumber,
 });
 
-export type CitySearchParams = t.TypeOf<typeof CitySearchParams>;
-
-export const CitySearchParamsRefined = CitySearchParams.pipe(
+export const CitySearchParams = CitySearchParams__.pipe(
   new t.Type<CitySearchParams, CitySearchParams, CitySearchParams>(
-    "CitySearchParamsRefined",
-    (input): input is CitySearchParams => true,
+    "CitySearchParams",
+    (input): input is CitySearchParams => CitySearchParams__.is(input),
     (input, c) => {
       const { populationGte: gte, populationLte: lte } = input;
       if (gte !== undefined && lte !== undefined && gte > lte) {
@@ -83,58 +92,9 @@ export const CitySearchParamsRefined = CitySearchParams.pipe(
   )
 );
 
-/////////
-// XXX //
-/////////
-
-// export const CitySearchParamsErrors = t.partial({
-//   countryNameContains: nonBlankString,
-//   populationGte: nonBlankString,
-//   populationLte: nonBlankString,
-//   _: t.array(nonBlankString),
-// });
-// export type CitySearchParamsErrors = t.TypeOf<typeof CitySearchParamsErrors>;
-
-// interface CitySearchParamsStateBrand {
-//   readonly citySearchParamsState: unique symbol;
-// }
-// export const CitySearchParamsState = t.brand(
-//   t.type({
-//     value: CitySearchParams,
-//     draft: t.partial(CitySearchParamsShape.props),
-//     errors: CitySearchParamsErrors,
-//   }),
-//   (x): x is t.Branded<any, CitySearchParamsStateBrand> => {
-//     const { populationGte: gte, populationLte: lte } = x;
-//     return gte !== undefined && lte !== undefined ? gte <= lte : true;
-//   },
-//   "CitySearchParamsState"
-// );
-
-export type CitySearchParamsErrors = Partial<
-  {
-    [P in keyof CitySearchParams]: string;
-  } & { _: string[] }
->;
-
-export type CitySearchParamsState = {
-  value: CitySearchParams;
-  draft: CitySearchParams;
-  errors: CitySearchParamsErrors;
-};
-
-export const CitySearchParamsValidState = t.type({
-  value: CitySearchParams,
-  draft: EmptyObject,
-  errors: EmptyObject,
+// XXX can be derived
+export const CitySearchParamsCoercer = t.partial({
+  countryNameContains: coerceToString,
+  populationGte: coerceToNumber,
+  populationLte: coerceToNumber,
 });
-export type CitySearchParamsValidState = t.TypeOf<typeof CitySearchParamsValidState>;
-
-export const CitySearchParamsValidDraftState = t.type({
-  value: CitySearchParams,
-  draft: EmptyObject,
-  errors: EmptyObject,
-});
-export type CitySearchParamsValidDraftState = t.TypeOf<
-  typeof CitySearchParamsValidDraftState
->;
