@@ -41,18 +41,18 @@ const EmptyObject = new t.Type<EmptyObject>(
   t.identity
 );
 
-const coerceToString = new t.Type<string | undefined, string>(
+const coerceToString = new t.Type<string | undefined>(
   "coerceToString",
   isString,
   (input) => (typeof input === "string" ? t.success(input) : t.success(undefined)),
-  String
+  t.identity
 );
 
-const coerceToNumber = new t.Type<number | undefined, string>(
+const coerceToNumber = new t.Type<number | undefined>(
   "coerceToNumber",
   isNumber,
   (input) => (isNumber(input) ? t.success(input) : t.success(undefined)),
-  String
+  t.identity
 );
 
 /////////

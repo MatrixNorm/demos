@@ -45,7 +45,7 @@ function isEditPayloadEmpty(payload: EditPayload) {
   return Object.values(payload).filter((x) => x !== undefined).length === 0;
 }
 
-function urlQueryStringFromSearchParams(searchParams: Value): string {
+function urlQueryStringFromSearchParams(searchParams: md.CitySearchParams): string {
   const pairs = Object.entries(searchParams).filter(
     ([_, propValue]) => propValue !== undefined
   );
@@ -76,8 +76,13 @@ function normalizeInitialPayload(payload: md.CitySearchParams): md.CitySearchPar
   return payload;
 }
 
+function applyDraftToValue(
+  draft: md.CitySearchParamsDraft,
+  value: md.CitySearchParams
+): md.CitySearchParams {}
+
 function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
-  const draft = pipe(
+  const candidate = pipe(
     md.CitySearchParamsCoercer.decode(payload),
     Either.fold(
       () => ({}),
@@ -85,24 +90,23 @@ function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
     ),
     normalizeInitialPayload
   );
-  const state = pipe(
-    md.CitySearchParams.decode(draft),
+  return pipe(
+    md.CitySearchParams.decode(candidate),
     Either.fold(
       () => {
-        return { value: {} as md.CitySearchParams, draft };
+        return [
+          { type: "writeValue", value: {} },
+          { type: "writeDraft", value: candidate },
+        ];
       },
       (goodValue) => {
-        return {
-          value: goodValue,
-          draft: {} as md.CitySearchParamsDraft,
-        };
+        return [
+          { type: "writeValue", value: goodValue },
+          { type: "writeDraft", value: {} },
+        ];
       }
     )
   );
-  return [
-    { type: "writeValue", value: state.value },
-    { type: "writeDraft", value: state.value },
-  ];
 }
 
 function reduceEdit(
@@ -119,11 +123,13 @@ function reduceEdit(
 }
 
 function reduceSubmit(
-  state: md.CitySearchParamsState,
+  value: md.CitySearchParams,
+  draft: md.CitySearchParamsDraft,
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
+  const candidateValue = applyDraftToValue(draft, value);
   return pipe(
-    md.CitySearchParamsValidState.decode(state),
+    md.CitySearchParams.decode(candidateValue),
     Either.fold(
       () => {
         return null;

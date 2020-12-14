@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
+  useHistory,
 } from "react-router-dom";
 
 // This site has 3 pages, all of which are rendered
@@ -16,6 +17,7 @@ import {
 // work properly.
 
 export default function BasicExample() {
+  console.log("Root");
   return (
     <Router>
       <div>
@@ -60,8 +62,16 @@ export default function BasicExample() {
 // in your app.
 
 function Home() {
+  const history = useHistory();
+
+  function handleClick() {
+    history.push("/about");
+  }
   return (
     <div>
+      <button type="button" onClick={handleClick}>
+        Go about
+      </button>
       <h2>Home</h2>
     </div>
   );
