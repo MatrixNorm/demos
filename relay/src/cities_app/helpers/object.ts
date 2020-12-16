@@ -1,13 +1,17 @@
 import { NukeNulls } from "./typeUtils";
 
-export function safeMerge<T>(target: T, source: Partial<T>): T {
-  return { ...target, ...killUndefined(source) };
+export function dropUndefineds<T>(obj: T): T {
+  return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as T;
 }
 
-export function killUndefined<T>(obj: Partial<T>): Partial<T> {
+export function dropNulls<T>(obj: T): NukeNulls<T> {
   return Object.fromEntries(
-    Object.entries(obj).filter(([_, v]) => v !== undefined)
-  ) as Partial<T>;
+    Object.entries(obj).filter(([_, v]) => v !== null)
+  ) as NukeNulls<T>;
+}
+
+export function safeMerge<T>(target: T, source: Partial<T>): T {
+  return { ...target, ...dropUndefineds(source) };
 }
 
 export function removeNullProps<T>(obj: Partial<T> | null): Partial<NukeNulls<T>> {

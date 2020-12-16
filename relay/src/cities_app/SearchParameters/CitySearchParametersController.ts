@@ -28,19 +28,6 @@ type EffectWriteDraft = { type: "writeDraft"; value: md.CitySearchParamsDraft };
 type EffectWriteValue = { type: "writeValue"; value: md.CitySearchParams };
 type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
 
-const QUERY = graphql`
-  query CitySearchParametersControllerQuery {
-    ... on Query {
-      __typename
-    }
-    uiState {
-      citySearchParamsState {
-        ...CitySearchParameters_state @relay(mask: false)
-      }
-    }
-  }
-`;
-
 function isEditPayloadEmpty(payload: EditPayload) {
   return Object.values(payload).filter((x) => x !== undefined).length === 0;
 }
@@ -75,11 +62,6 @@ function normalizeInitialPayload(payload: md.CitySearchParams): md.CitySearchPar
   }
   return payload;
 }
-
-function applyDraftToValue(
-  draft: md.CitySearchParamsDraft,
-  value: md.CitySearchParams
-): md.CitySearchParams {}
 
 function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
   const candidate = pipe(
@@ -127,19 +109,23 @@ function reduceSubmit(
   draft: md.CitySearchParamsDraft,
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
-  const candidateValue = applyDraftToValue(draft, value);
+  const candidateValue: md.CitySearchParams = ob.dropNulls({
+    ...value,
+    // XXX
+    ...ob.dropUndefineds(draft),
+  });
   return pipe(
     md.CitySearchParams.decode(candidateValue),
     Either.fold(
       () => {
         return null;
       },
-      (state) => {
+      (goodValue) => {
         return {
           type: "redirect",
           value: {
             history: payload.history,
-            url: `${payload.baseUrl}/${urlQueryStringFromSearchParams(state.value)}`,
+            url: `${payload.baseUrl}/${urlQueryStringFromSearchParams(goodValue)}`,
           },
         };
       }
@@ -151,7 +137,11 @@ function reduceCancel(): EffectWriteDraft | null {
   return { type: "writeDraft", value: {} };
 }
 
-function reduce(draft: md.CitySearchParamsDraft, event: Event): Effect | Effect[] | null {
+function reduce(
+  value: md.CitySearchParams,
+  draft: md.CitySearchParamsDraft,
+  event: Event
+): Effect | Effect[] | null {
   switch (event.type) {
     case "edit": {
       return reduceEdit(draft, event.payload);
@@ -160,7 +150,7 @@ function reduce(draft: md.CitySearchParamsDraft, event: Event): Effect | Effect[
       return reduceInit(event.payload);
     }
     case "submit": {
-      return reduceSubmit(draft, event.payload);
+      return reduceSubmit(value, draft, event.payload);
     }
     case "cancel": {
       return reduceCancel();
@@ -190,9 +180,22 @@ export function handleEvent(event: Event, environment: IEnvironment) {
   }
 }
 
+const QUERY = graphql`
+  query CitySearchParametersControllerQuery {
+    ... on Query {
+      __typename
+    }
+    uiState {
+      citySearchParamsState {
+        ...CitySearchParameters_state @relay(mask: false)
+      }
+    }
+  }
+`;
+
 export function lookupStateFromRelayStore(
   environment: IEnvironment
-): md.CitySearchParamsState {
+): { value: md.CitySearchParams; draft: md.CitySearchParamsDraft } {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
   const state = (response.data.uiState as any)?.citySearchParamsState;
