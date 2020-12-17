@@ -92,12 +92,10 @@ export const full = () => {
               __typename
             }
             uiState {
-              citySearchParamsState {
-                value {
-                  countryNameContains
-                  populationGte
-                  populationLte
-                }
+              citySearchParams {
+                countryNameContains
+                populationGte
+                populationLte
               }
             }
           }

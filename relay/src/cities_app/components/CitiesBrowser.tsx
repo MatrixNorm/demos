@@ -48,12 +48,10 @@ export default ({ environment }: { environment: IEnvironment }) => {
                   __typename
                 }
                 uiState {
-                  citySearchParamsState {
-                    value {
-                      countryNameContains
-                      populationGte
-                      populationLte
-                    }
+                  citySearchParams {
+                    countryNameContains
+                    populationGte
+                    populationLte
                   }
                 }
               }

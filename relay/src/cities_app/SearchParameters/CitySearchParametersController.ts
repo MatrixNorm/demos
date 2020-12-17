@@ -186,9 +186,7 @@ const QUERY = graphql`
       __typename
     }
     uiState {
-      citySearchParamsState {
-        ...CitySearchParameters_state @relay(mask: false)
-      }
+      ...CitySearchParameters_state @relay(mask: false)
     }
   }
 `;
@@ -220,11 +218,9 @@ export function writeStateIntoRelayStore$(
   };
   environment.commitUpdate((store) => {
     // XXX how to delete record recursively
-    const path = `${ROOT_ID}:uiState:citySearchParamsState`;
-    store.delete(`${path}:value`);
-    store.delete(`${path}:draft`);
-    store.delete(`${path}:errors`);
-    store.delete(`${path}`);
+    const path = `${ROOT_ID}:uiState`;
+    store.delete(`${path}:citySearchParams`);
+    store.delete(`${path}:citySearchParamsDraft`);
   });
   environment.commitPayload(operationDescriptor, data);
   environment.retain(operationDescriptor);

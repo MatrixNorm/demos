@@ -36,7 +36,7 @@ function calcDisplayData(
         prop,
         {
           // @ts-ignore
-          value: (s.value || {})[prop] || (state ?.draft || {})[prop] || defaultValue,
+          value: (s.value || {})[prop] || (state?.draft || {})[prop] || defaultValue,
           // @ts-ignore
           error: (s.errors || {})[prop],
         },
@@ -94,22 +94,16 @@ const SearchParametersFC = createFragmentContainer(
       }
     `,
     state: graphql`
-      fragment CitySearchParameters_state on UICitySearchParamsState {
-        value {
+      fragment CitySearchParameters_state on UIState {
+        citySearchParams {
           countryNameContains
           populationGte
           populationLte
         }
-        draft {
+        citySearchParamsDraft {
           countryNameContains
           populationGte
           populationLte
-        }
-        errors {
-          countryNameContains
-          populationGte
-          populationLte
-          _
         }
       }
     `,
@@ -121,16 +115,14 @@ export const defaultData = {
   searchParams: null,
 };
 
-export default function ({ environment }: { environment: IEnvironment }) {
+export default function({ environment }: { environment: IEnvironment }) {
   let query = graphql`
     query CitySearchParametersQuery {
       citiesMetadata {
         ...CitySearchParameters_metadata
       }
       uiState {
-        citySearchParamsState {
-          ...CitySearchParameters_state
-        }
+        ...CitySearchParameters_state
       }
     }
   `;
@@ -150,7 +142,7 @@ export default function ({ environment }: { environment: IEnvironment }) {
         return (
           <SearchParametersFC
             metadata={props.citiesMetadata || null}
-            citySearchParamsState={props.uiState ?.citySearchParamsState || null}
+            citySearchParamsState={props.uiState?.citySearchParamsState || null}
             environment={environment}
           />
         );
