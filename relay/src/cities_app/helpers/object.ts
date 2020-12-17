@@ -1,5 +1,9 @@
 import { NukeNulls } from "./typeUtils";
 
+export function isObjectEmpty<T>(obj: T): boolean {
+  return Object.values(obj).filter((x) => x !== undefined).length === 0;
+}
+
 export function dropUndefineds<T>(obj: T): T {
   return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v !== undefined)) as T;
 }

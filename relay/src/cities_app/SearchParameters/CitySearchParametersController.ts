@@ -16,28 +16,20 @@ import { assertNever } from "../helpers/typeUtils";
 export type EditPayload = md.CitySearchParamsDraft;
 
 type Event = InitEvent | EditEvent | SubmitEvent | CancelEvent;
-
 type InitEvent = { type: "init"; payload: unknown };
 type EditEvent = { type: "edit"; payload: EditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 
 type Effect = EffectWriteDraft | EffectWriteValue | EffectRedirect;
-
 type EffectWriteDraft = { type: "writeDraft"; value: md.CitySearchParamsDraft };
 type EffectWriteValue = { type: "writeValue"; value: md.CitySearchParams };
-type EffectRedirect = { type: "redirect"; value: { history: History; url: string } };
-
-function isEditPayloadEmpty(payload: EditPayload) {
-  return Object.values(payload).filter((x) => x !== undefined).length === 0;
-}
+type EffectRedirect = { type: "redirect"; payload: { history: History; url: string } };
 
 function urlQueryStringFromSearchParams(searchParams: md.CitySearchParams): string {
-  const pairs = Object.entries(searchParams).filter(
-    ([_, propValue]) => propValue !== undefined
-  );
+  // XXX inexplicit conversion from number to string
   //@ts-ignore
-  return new URLSearchParams(Object.fromEntries(pairs)).toString();
+  return new URLSearchParams(ob.dropUndefineds(searchParams)).toString();
 }
 
 function normalizeEditPayload(payload: EditPayload): EditPayload {
@@ -95,7 +87,7 @@ function reduceEdit(
   draft: md.CitySearchParamsDraft,
   payload: EditPayload
 ): EffectWriteDraft | null {
-  if (isEditPayloadEmpty(payload)) {
+  if (ob.isObjectEmpty(payload)) {
     return null;
   }
   return {
@@ -123,7 +115,7 @@ function reduceSubmit(
       (goodValue) => {
         return {
           type: "redirect",
-          value: {
+          payload: {
             history: payload.history,
             url: `${payload.baseUrl}/${urlQueryStringFromSearchParams(goodValue)}`,
           },
@@ -155,29 +147,43 @@ function reduce(
     case "cancel": {
       return reduceCancel();
     }
-    default:
+    default: {
       assertNever(event);
       return null;
+    }
   }
 }
 
-export function handleEvent(event: Event, environment: IEnvironment) {
-  const state = lookupStateFromRelayStore(environment);
-  //console.log("A: ", state, event);
-  let effects = reduce(state, event);
-  //console.log("B: ", effects);
+export function handleEvent(event: Event, environment: IEnvironment): void {
+  const { value, draft } = lookupStateFromRelayStore(environment);
+  let effects = reduce(value, draft, event);
   if (effects) {
-    if (!Array.isArray(effects)) {
-      effects = [effects];
-    }
-    effects.forEach((effect) => {
-      if (effect.type === "writeState") {
-        writeStateIntoRelayStore$(effect.value, environment);
-      } else if (effect.type === "redirect") {
-        redirectToUrl(effect.value);
-      }
-    });
+    processEffects(Array.isArray(effects) ? effects : [effects]);
   }
+}
+
+function processEffects(effects: Effect[]): void {
+  effects.forEach((effect) => {
+    switch (effect.type) {
+      case "writeValue": {
+        return;
+      }
+      case "writeDraft": {
+        return;
+      }
+      case "redirect": {
+        return;
+      }
+      default: {
+        assertNever(effect);
+      }
+    }
+    if (effect.type === "writeState") {
+      writeStateIntoRelayStore$(effect.value, environment);
+    } else if (effect.type === "redirect") {
+      redirectToUrl(effect.value);
+    }
+  });
 }
 
 const QUERY = graphql`
@@ -196,7 +202,8 @@ export function lookupStateFromRelayStore(
 ): { value: md.CitySearchParams; draft: md.CitySearchParamsDraft } {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
-  const state = (response.data.uiState as any)?.citySearchParamsState;
+  const value = (response.data.uiState as any)?.citySearchParams;
+  const draft = (response.data.uiState as any)?.citySearchParamsDraft;
   if (state) {
     return state;
   } else {
