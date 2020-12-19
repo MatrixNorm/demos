@@ -1,4 +1,5 @@
-import * as iots from "io-ts";
+const invariant = require("invariant");
+
 import { graphql } from "react-relay";
 import {
   createOperationDescriptor,
@@ -206,16 +207,8 @@ export function lookupStateFromRelayStore(
   const value = uiState?.citySearchParams || ({} as md.CitySearchParams);
   const draft = uiState?.citySearchParamsDraft || ({} as md.CitySearchParamsDraft);
 
-  if (process.env.NODE_ENV === "development") {
-    if (Either.isLeft(md.CitySearchParams.decode(value))) {
-      console.log(value);
-      throw "";
-    }
-    if (Either.isLeft(md.CitySearchParams.decode(draft))) {
-      console.log(draft);
-      throw "";
-    }
-  }
+  invariant(Either.isRight(md.CitySearchParams.decode(value)), "XXX");
+  invariant(Either.isRight(md.CitySearchParamsDraft.decode(draft)), "XXX");
 
   return { value, draft };
 }
@@ -225,16 +218,8 @@ export function writeStateIntoRelayStore$(
   draft: md.CitySearchParamsDraft,
   environment: IEnvironment
 ): void {
-  if (process.env.NODE_ENV === "development") {
-    if (Either.isLeft(md.CitySearchParams.decode(value))) {
-      console.log(value);
-      throw "";
-    }
-    if (Either.isLeft(md.CitySearchParams.decode(draft))) {
-      console.log(draft);
-      throw "";
-    }
-  }
+  invariant(Either.isRight(md.CitySearchParams.decode(value)), "XXX");
+  invariant(Either.isRight(md.CitySearchParamsDraft.decode(draft)), "XXX");
 
   const request = getRequest(QUERY);
   const operationDescriptor = createOperationDescriptor(request, {});
