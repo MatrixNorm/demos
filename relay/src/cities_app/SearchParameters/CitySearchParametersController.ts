@@ -202,25 +202,47 @@ export function lookupStateFromRelayStore(
 ): { value: md.CitySearchParams; draft: md.CitySearchParamsDraft } {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
   const response = environment.lookup(operation.fragment);
-  const value = (response.data.uiState as any)?.citySearchParams;
-  const draft = (response.data.uiState as any)?.citySearchParamsDraft;
-  if (state) {
-    return state;
-  } else {
-    return { value: {} as Value, draft: {}, errors: {} };
+  const uiState = (response.data as any)?.uiState;
+  const value = uiState?.citySearchParams || ({} as md.CitySearchParams);
+  const draft = uiState?.citySearchParamsDraft || ({} as md.CitySearchParamsDraft);
+
+  if (process.env.NODE_ENV === "development") {
+    if (Either.isLeft(md.CitySearchParams.decode(value))) {
+      console.log(value);
+      throw "";
+    }
+    if (Either.isLeft(md.CitySearchParams.decode(draft))) {
+      console.log(draft);
+      throw "";
+    }
   }
+
+  return { value, draft };
 }
 
 export function writeStateIntoRelayStore$(
-  state: md.CitySearchParamsState,
+  value: md.CitySearchParams,
+  draft: md.CitySearchParamsDraft,
   environment: IEnvironment
-) {
+): void {
+  if (process.env.NODE_ENV === "development") {
+    if (Either.isLeft(md.CitySearchParams.decode(value))) {
+      console.log(value);
+      throw "";
+    }
+    if (Either.isLeft(md.CitySearchParams.decode(draft))) {
+      console.log(draft);
+      throw "";
+    }
+  }
+
   const request = getRequest(QUERY);
   const operationDescriptor = createOperationDescriptor(request, {});
   let data = {
     __typename: "__Root",
     uiState: {
-      citySearchParamsState: state,
+      citySearchParams: value,
+      citySearchParamsDraft: draft,
     },
   };
   environment.commitUpdate((store) => {
