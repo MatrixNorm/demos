@@ -12,6 +12,7 @@ import { pipe } from "fp-ts/lib/function";
 import * as Either from "fp-ts/lib/Either";
 import * as md from "./model";
 import * as ob from "../helpers/object";
+import * as storeHelpers from "../helpers/relayStore";
 import { assertNever } from "../helpers/typeUtils";
 
 export type EditPayload = md.CitySearchParamsDraft;
@@ -157,19 +158,19 @@ export function handleEvent(event: Event, environment: IEnvironment): void {
   const { value, draft } = coeffectLookupState(environment);
   let effects = reduce(value, draft, event);
   if (effects) {
-    processEffects(Array.isArray(effects) ? effects : [effects]);
+    processEffects(Array.isArray(effects) ? effects : [effects], environment);
   }
 }
 
-function processEffects(effects: Effect[]): void {
+function processEffects(effects: Effect[], environment: IEnvironment): void {
   effects.forEach((effect) => {
     switch (effect.type) {
       case "writeState": {
-        coeffectLookupState(effect.value, environment);
+        effectWriteState(effect.value, effect.draft, environment);
         break;
       }
       case "redirect": {
-        effectRedirect(effect.value);
+        effectRedirect(effect.payload);
         break;
       }
       default: {
@@ -210,36 +211,27 @@ export function effectWriteState(
   draft: md.CitySearchParamsDraft | undefined,
   environment: IEnvironment
 ): void {
-  const request = getRequest(QUERY);
-  const operationDescriptor = createOperationDescriptor(request, {});
-
   if (value) {
     invariant(Either.isRight(md.CitySearchParams.decode(value)), "XXX");
-    let data = {
-      // XXX
-      __typename: "__Root",
-      uiState: { citySearchParams: value },
-    };
+
     environment.commitUpdate((store) => {
       store.delete(`${ROOT_ID}:uiState:citySearchParams`);
     });
-    environment.commitPayload(operationDescriptor, data);
+    storeHelpers.commitPayload(environment, QUERY, {
+      uiState: { citySearchParams: value },
+    });
   }
 
   if (draft) {
     invariant(Either.isRight(md.CitySearchParams.decode(draft)), "XXX");
-    let data = {
-      // XXX
-      __typename: "__Root",
-      uiState: { citySearchParamsDraft: draft },
-    };
+
     environment.commitUpdate((store) => {
       store.delete(`${ROOT_ID}:uiState:citySearchParamsDraft`);
     });
-    environment.commitPayload(operationDescriptor, data);
+    storeHelpers.commitPayload(environment, QUERY, {
+      uiState: { citySearchParamsDraft: draft },
+    });
   }
-
-  environment.retain(operationDescriptor);
 }
 
 function effectRedirect({ history, url }: { history: History; url: string }) {
