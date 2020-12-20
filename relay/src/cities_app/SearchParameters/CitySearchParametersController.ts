@@ -22,9 +22,12 @@ type EditEvent = { type: "edit"; payload: EditPayload };
 type SubmitEvent = { type: "submit"; payload: { history: History; baseUrl: string } };
 type CancelEvent = { type: "cancel" };
 
-type Effect = EffectWriteDraft | EffectWriteValue | EffectRedirect;
-type EffectWriteDraft = { type: "writeDraft"; value: md.CitySearchParamsDraft };
-type EffectWriteValue = { type: "writeValue"; value: md.CitySearchParams };
+type Effect = EffectWriteState | EffectRedirect;
+type EffectWriteState = {
+  type: "writeState";
+  value?: md.CitySearchParams;
+  draft?: md.CitySearchParamsDraft;
+};
 type EffectRedirect = { type: "redirect"; payload: { history: History; url: string } };
 
 function urlQueryStringFromSearchParams(searchParams: md.CitySearchParams): string {
@@ -44,6 +47,7 @@ function normalizeEditPayload(payload: EditPayload): EditPayload {
   return payload;
 }
 
+// XXX code duplication?
 function normalizeInitialPayload(payload: md.CitySearchParams): md.CitySearchParams {
   if (
     payload.countryNameContains !== undefined &&
@@ -56,7 +60,7 @@ function normalizeInitialPayload(payload: md.CitySearchParams): md.CitySearchPar
   return payload;
 }
 
-function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
+function reduceInit(payload: unknown): EffectWriteState {
   const candidate = pipe(
     md.CitySearchParamsCoercer.decode(payload),
     Either.fold(
@@ -69,16 +73,10 @@ function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
     md.CitySearchParams.decode(candidate),
     Either.fold(
       () => {
-        return [
-          { type: "writeValue", value: {} },
-          { type: "writeDraft", value: candidate },
-        ];
+        return { type: "writeState", value: {}, draft: candidate };
       },
       (goodValue) => {
-        return [
-          { type: "writeValue", value: goodValue },
-          { type: "writeDraft", value: {} },
-        ];
+        return { type: "writeState", value: goodValue, draft: {} };
       }
     )
   );
@@ -87,13 +85,13 @@ function reduceInit(payload: unknown): [EffectWriteValue, EffectWriteDraft] {
 function reduceEdit(
   draft: md.CitySearchParamsDraft,
   payload: EditPayload
-): EffectWriteDraft | null {
+): EffectWriteState | null {
   if (ob.isObjectEmpty(payload)) {
     return null;
   }
   return {
-    type: "writeDraft",
-    value: ob.safeMerge(draft, normalizeEditPayload(payload)),
+    type: "writeState",
+    draft: ob.safeMerge(draft, normalizeEditPayload(payload)),
   };
 }
 
@@ -126,8 +124,8 @@ function reduceSubmit(
   );
 }
 
-function reduceCancel(): EffectWriteDraft | null {
-  return { type: "writeDraft", value: {} };
+function reduceCancel(): EffectWriteState {
+  return { type: "writeState", draft: {} };
 }
 
 function reduce(
@@ -156,7 +154,7 @@ function reduce(
 }
 
 export function handleEvent(event: Event, environment: IEnvironment): void {
-  const { value, draft } = lookupStateFromRelayStore(environment);
+  const { value, draft } = coeffectLookupState(environment);
   let effects = reduce(value, draft, event);
   if (effects) {
     processEffects(Array.isArray(effects) ? effects : [effects]);
@@ -166,23 +164,17 @@ export function handleEvent(event: Event, environment: IEnvironment): void {
 function processEffects(effects: Effect[]): void {
   effects.forEach((effect) => {
     switch (effect.type) {
-      case "writeValue": {
-        return;
-      }
-      case "writeDraft": {
-        return;
+      case "writeState": {
+        coeffectLookupState(effect.value, environment);
+        break;
       }
       case "redirect": {
-        return;
+        effectRedirect(effect.value);
+        break;
       }
       default: {
         assertNever(effect);
       }
-    }
-    if (effect.type === "writeState") {
-      writeStateIntoRelayStore$(effect.value, environment);
-    } else if (effect.type === "redirect") {
-      redirectToUrl(effect.value);
     }
   });
 }
@@ -198,7 +190,7 @@ const QUERY = graphql`
   }
 `;
 
-export function lookupStateFromRelayStore(
+export function coeffectLookupState(
   environment: IEnvironment
 ): { value: md.CitySearchParams; draft: md.CitySearchParamsDraft } {
   const operation = createOperationDescriptor(getRequest(QUERY), {});
@@ -213,49 +205,54 @@ export function lookupStateFromRelayStore(
   return { value, draft };
 }
 
-export function writeStateIntoRelayStore$(
-  value: md.CitySearchParams,
-  draft: md.CitySearchParamsDraft,
+export function effectWriteState(
+  value: md.CitySearchParams | undefined,
+  draft: md.CitySearchParamsDraft | undefined,
   environment: IEnvironment
 ): void {
-  invariant(Either.isRight(md.CitySearchParams.decode(value)), "XXX");
-  invariant(Either.isRight(md.CitySearchParamsDraft.decode(draft)), "XXX");
-
   const request = getRequest(QUERY);
   const operationDescriptor = createOperationDescriptor(request, {});
-  let data = {
-    __typename: "__Root",
-    uiState: {
-      citySearchParams: value,
-      citySearchParamsDraft: draft,
-    },
-  };
-  environment.commitUpdate((store) => {
-    // XXX how to delete record recursively
-    const path = `${ROOT_ID}:uiState`;
-    store.delete(`${path}:citySearchParams`);
-    store.delete(`${path}:citySearchParamsDraft`);
-  });
-  environment.commitPayload(operationDescriptor, data);
+
+  if (value) {
+    invariant(Either.isRight(md.CitySearchParams.decode(value)), "XXX");
+    let data = {
+      // XXX
+      __typename: "__Root",
+      uiState: { citySearchParams: value },
+    };
+    environment.commitUpdate((store) => {
+      store.delete(`${ROOT_ID}:uiState:citySearchParams`);
+    });
+    environment.commitPayload(operationDescriptor, data);
+  }
+
+  if (draft) {
+    invariant(Either.isRight(md.CitySearchParams.decode(draft)), "XXX");
+    let data = {
+      // XXX
+      __typename: "__Root",
+      uiState: { citySearchParamsDraft: draft },
+    };
+    environment.commitUpdate((store) => {
+      store.delete(`${ROOT_ID}:uiState:citySearchParamsDraft`);
+    });
+    environment.commitPayload(operationDescriptor, data);
+  }
+
   environment.retain(operationDescriptor);
 }
 
-function redirectToUrl({ history, url }: { history: History; url: string }) {
+function effectRedirect({ history, url }: { history: History; url: string }) {
   history.push(url);
 }
 
-// XXX for reference
+// For reference. Do not delete.
 
-// function writeStateIntoRelayStore2$(
-//   state: md.CitySearchParamsState,
-//   environment: IEnvironment
-// ) {
+// function writeValue$(value: md.CitySearchParams, environment: IEnvironment) {
 //   environment.commitUpdate((store) => {
 //     store.delete(`${ROOT_ID}:uiState:citySearchParamsState`);
 //     const uiState = store.get(ROOT_ID)?.getOrCreateLinkedRecord("uiState", "UIState");
-//     uiState
-//       ?.setLinkedRecord()
-//       ?.getOrCreateLinkedRecord("citySearchParamsState", "UICitySearchParamsState");
+//     uiState?.getOrCreateLinkedRecord("citySearchParams", "UICitySearchParams");
 //   });
 //   if (Object.keys(searchParams).length > 0) {
 //     commitLocalUpdate(environment, (store) => {
