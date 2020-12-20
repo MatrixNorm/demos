@@ -206,11 +206,15 @@ export function coeffectLookupState(
   return { value, draft };
 }
 
-export function effectWriteState(
-  value: md.CitySearchParams | undefined,
-  draft: md.CitySearchParamsDraft | undefined,
-  environment: IEnvironment
-): void {
+export function effectWriteState({
+  value,
+  draft,
+  environment,
+}: {
+  value?: md.CitySearchParams;
+  draft?: md.CitySearchParamsDraft;
+  environment: IEnvironment;
+}): void {
   if (value) {
     invariant(Either.isRight(md.CitySearchParams.decode(value)), "XXX");
 
@@ -223,7 +227,7 @@ export function effectWriteState(
   }
 
   if (draft) {
-    invariant(Either.isRight(md.CitySearchParams.decode(draft)), "XXX");
+    invariant(Either.isRight(md.CitySearchParamsDraft.decode(draft)), "XXX");
 
     environment.commitUpdate((store) => {
       store.delete(`${ROOT_ID}:uiState:citySearchParamsDraft`);
