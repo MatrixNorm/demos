@@ -31,6 +31,31 @@ type EffectWriteState = {
 };
 type EffectRedirect = { type: "redirect"; payload: { history: History; url: string } };
 
+export function calcCandidateValue(
+  value: md.CitySearchParams,
+  draft: md.CitySearchParamsDraft
+): md.CitySearchParams {
+  return ob.dropNulls({
+    ...value,
+    // XXX
+    ...ob.dropUndefineds(draft),
+  });
+}
+
+export function calcErrorsFromCandidateValue(
+  candidateValue: md.CitySearchParams
+): md.CitySearchParamsError {
+  return pipe(
+    md.CitySearchParams.decode(candidateValue),
+    Either.fold(
+      (errors) => {
+        return {};
+      },
+      () => ({})
+    )
+  );
+}
+
 function urlQueryStringFromSearchParams(searchParams: md.CitySearchParams): string {
   // XXX inexplicit conversion from number to string
   //@ts-ignore
@@ -101,11 +126,7 @@ function reduceSubmit(
   draft: md.CitySearchParamsDraft,
   payload: { history: History; baseUrl: string }
 ): EffectRedirect | null {
-  const candidateValue: md.CitySearchParams = ob.dropNulls({
-    ...value,
-    // XXX
-    ...ob.dropUndefineds(draft),
-  });
+  const candidateValue = calcCandidateValue(value, draft);
   return pipe(
     md.CitySearchParams.decode(candidateValue),
     Either.fold(
@@ -166,7 +187,7 @@ function processEffects(effects: Effect[], environment: IEnvironment): void {
   effects.forEach((effect) => {
     switch (effect.type) {
       case "writeState": {
-        effectWriteState(effect.value, effect.draft, environment);
+        effectWriteState({ value: effect.value, draft: effect.draft, environment });
         break;
       }
       case "redirect": {

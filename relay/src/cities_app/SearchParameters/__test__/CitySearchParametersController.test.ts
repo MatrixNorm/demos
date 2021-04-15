@@ -1,9 +1,7 @@
 /* globals describe test expect beforeEach */
 import { IEnvironment } from "relay-runtime";
 import { createMockEnvironment } from "relay-test-utils";
-import * as md from "../model";
 import * as ctrl from "../CitySearchParametersController";
-import { state } from "fp-ts/lib/State";
 
 describe("state write-read", () => {
   let __env: IEnvironment;

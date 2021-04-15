@@ -98,3 +98,7 @@ export const CitySearchParamsCoercer = t.partial({
   populationGte: coerceToNumber,
   populationLte: coerceToNumber,
 });
+
+export type CitySearchParamsError = {
+  [P in keyof CitySearchParams]: string;
+} & { $$?: string[] };
