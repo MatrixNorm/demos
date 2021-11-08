@@ -19,7 +19,7 @@
     "datascript": "^0.18.8",
     "dexie": "^2.0.4",
     "fp-ts": "^2.7.0",
-    "graphiql": "^0.14.2",
+    "graphiql": "^1.4.7",
     "graphql": "^14.6.0",
     "graphql-tools": "^4.0.5",
     "io-ts": "^2.2.7",
